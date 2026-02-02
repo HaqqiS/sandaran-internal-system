@@ -1,0 +1,326 @@
+// Prisma schema for Better Auth
+// learn more: https://better-auth.com/docs/concepts/database
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+// NOTE: When using mysql or sqlserver, uncomment the //@db.Text annotations in model Account below
+// Further reading:
+// https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// --- ENUMS ---
+enum GlobalRole {
+  ADMIN
+  CEO
+  USER
+  NONE
+}
+
+enum ProjectRole {
+  MANDOR
+  ARCHITECT
+  FINANCE
+}
+
+enum ProjectStatus {
+  ACTIVE
+  DONE
+  PAUSED
+}
+
+enum TransactionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum LogisticType {
+  IN
+  OUT
+}
+
+enum DocumentType {
+  DESIGN
+  DRAWING
+  REFERENCE
+  SPECIFICATION
+  OTHER
+}
+
+// --- MODELS ---
+model User {
+  id            String  @id
+  name          String //@db.Text
+  email         String
+  emailVerified Boolean @default(false)
+  image         String? //@db.Text
+
+  // custom fields
+  roleGlobal   GlobalRole @default(NONE)
+  isActive     Boolean    @default(false)
+  approvedAt   DateTime?
+  approvedById String?
+  approvedBy   User?      @relation("UserApproval", fields: [approvedById], references: [id])
+  approvals    User[]     @relation("UserApproval")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  // relations
+  sessions       Session[]
+  accounts       Account[]
+  projectMembers ProjectMember[]
+  reports        DailyReport[]
+  requests       EmergencyTransaction[] @relation("RequestedBy")
+  verifications  EmergencyTransaction[] @relation("VerifiedBy")
+  logistics      LogisticTransaction[]
+  documents      ProjectDocument[]
+  comments       ReportComment[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String? //@db.Text
+  userAgent String? //@db.Text
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String //@db.Text
+  providerId            String //@db.Text
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String? //@db.Text
+  refreshToken          String? //@db.Text
+  idToken               String? //@db.Text
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String? //@db.Text
+  password              String? //@db.Text
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String //@db.Text
+  value      String //@db.Text
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@map("verification")
+}
+
+model Project {
+  id          String        @id @default(cuid())
+  name        String
+  slug        String        @unique // Untuk URL: /project/villa-jimbaran
+  description String?       @db.Text
+  location    String?
+  startDate   DateTime?
+  endDate     DateTime?
+  status      ProjectStatus @default(ACTIVE)
+
+  // Relations
+  members       ProjectMember[]
+  dailyReports  DailyReport[]
+  emergencyFund EmergencyFund?
+  logistics     LogisticItem[]
+  documents     ProjectDocument[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProjectMember {
+  id        String      @id @default(cuid())
+  userId    String
+  projectId String
+  role      ProjectRole
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, projectId]) // Satu user hanya punya satu role di satu project
+}
+
+model DailyReport {
+  id         String   @id @default(cuid())
+  slug       String
+  projectId  String
+  userId     String
+  reportDate DateTime @default(now())
+
+  taskDescription String  @db.Text
+  progressPercent Int     @default(0)
+  issues          String? @db.Text
+
+  weather      String? // e.g., "Cerah", "Hujan"
+  totalWorkers Int     @default(0) // Total pekerja hari ini
+  location     String? // e.g., "Villa A", "Lantai 2"
+
+  project  Project           @relation(fields: [projectId], references: [id])
+  user     User              @relation(fields: [userId], references: [id])
+  media    ReportMedia[]
+  tasks    DailyReportTask[]
+  comments ReportComment[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([projectId, slug])
+}
+
+model DailyReportTask {
+  id          String  @id @default(cuid())
+  reportId    String
+  taskName    String // e.g., "Pengecoran lantai 2", "Pemasangan bata"
+  workerCount Int     @default(0) // Jumlah pekerja untuk task ini
+  progress    Int     @default(0) // Progress 0-100%
+  notes       String? @db.Text // Optional notes
+
+  report DailyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([reportId])
+}
+
+model ProjectDocument {
+  id        String @id @default(cuid())
+  projectId String
+  userId    String // ARCHITECT who uploaded
+
+  // File info
+  fileName String // Original filename
+  fileType DocumentType @default(OTHER)
+  publicId String // Cloudinary Public ID
+  url      String // Cloudinary Secure URL
+  fileSize Int? // File size in bytes
+  mimeType String? // e.g., "application/pdf", "image/png"
+
+  // Metadata
+  title       String? // Optional title/description
+  description String? @db.Text
+  version     String? // e.g., "v1.0", "Rev A"
+
+  // Relations
+  project  Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  uploader User    @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([userId])
+  @@index([fileType])
+}
+
+model ReportMedia {
+  id       String @id @default(cuid())
+  reportId String
+  publicId String // Cloudinary Public ID
+  url      String // Cloudinary Secure URL
+
+  report DailyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model ReportComment {
+  id       String @id @default(cuid())
+  reportId String
+  userId   String
+  content  String @db.Text
+
+  report DailyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  author User        @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([reportId])
+  @@index([userId])
+}
+
+model EmergencyFund {
+  id             String  @id @default(cuid())
+  projectId      String  @unique
+  currentBalance Decimal @default(0) @db.Decimal(15, 2)
+
+  project      Project                @relation(fields: [projectId], references: [id])
+  transactions EmergencyTransaction[]
+
+  updatedAt DateTime @updatedAt
+}
+
+model EmergencyTransaction {
+  id            String            @id @default(cuid())
+  fundId        String
+  requestedById String
+  amount        Decimal           @db.Decimal(15, 2)
+  description   String            @db.Text
+  proofPublicId String? // Bukti nota di Cloudinary
+  status        TransactionStatus @default(PENDING)
+
+  verifiedById String?
+  verifiedAt   DateTime?
+
+  fund      EmergencyFund @relation(fields: [fundId], references: [id])
+  requester User          @relation("RequestedBy", fields: [requestedById], references: [id])
+  verifier  User?         @relation("VerifiedBy", fields: [verifiedById], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model LogisticItem {
+  id        String @id @default(cuid())
+  slug      String @unique // Untuk URL: /logistics/semen-tiga-roda
+  projectId String
+  name      String
+  unit      String // e.g., "Sack", "Pcs", "Kg"
+
+  project      Project               @relation(fields: [projectId], references: [id])
+  transactions LogisticTransaction[]
+
+  createdAt DateTime @default(now())
+}
+
+model LogisticTransaction {
+  id       String       @id @default(cuid())
+  itemId   String
+  userId   String // Siapa yang menginput
+  type     LogisticType
+  quantity Float
+  notes    String?
+
+  item LogisticItem @relation(fields: [itemId], references: [id])
+  user User         @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}
