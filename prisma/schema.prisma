@@ -302,7 +302,7 @@ model EmergencyTransaction {
 
 model LogisticItem {
   id        String   @id @default(cuid())
-  slug      String   @unique // Untuk URL: /logistics/semen-tiga-roda
+  slug      String   // Untuk URL: /logistics/semen-tiga-roda
   projectId String
   name      String
   unit      String   // e.g., "Sack", "Pcs", "Kg"
@@ -311,6 +311,7 @@ model LogisticItem {
   transactions LogisticTransaction[]
 
   createdAt    DateTime              @default(now())
+  @@unique([projectId, slug])
 }
 
 model LogisticTransaction {

@@ -21290,17 +21290,18 @@ export namespace Prisma {
 
   export type LogisticItemWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    slug?: string
+    projectId_slug?: LogisticItemProjectIdSlugCompoundUniqueInput
     AND?: LogisticItemWhereInput | LogisticItemWhereInput[]
     OR?: LogisticItemWhereInput[]
     NOT?: LogisticItemWhereInput | LogisticItemWhereInput[]
+    slug?: StringFilter<"LogisticItem"> | string
     projectId?: StringFilter<"LogisticItem"> | string
     name?: StringFilter<"LogisticItem"> | string
     unit?: StringFilter<"LogisticItem"> | string
     createdAt?: DateTimeFilter<"LogisticItem"> | Date | string
     project?: XOR<ProjectScalarRelationFilter, ProjectWhereInput>
     transactions?: LogisticTransactionListRelationFilter
-  }, "id" | "slug">
+  }, "id" | "projectId_slug">
 
   export type LogisticItemOrderByWithAggregationInput = {
     id?: SortOrder
@@ -23601,6 +23602,11 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumTransactionStatusFilter<$PrismaModel>
     _max?: NestedEnumTransactionStatusFilter<$PrismaModel>
+  }
+
+  export type LogisticItemProjectIdSlugCompoundUniqueInput = {
+    projectId: string
+    slug: string
   }
 
   export type LogisticItemCountOrderByAggregateInput = {
