@@ -1,3 +1,5 @@
 export { AppSidebar } from "./app-sidebar"
 export { DashboardLayout } from "./dashboard-layout"
+export { InternalLayoutClient } from "./internal-layout-client"
+export { PageLayout } from "./page-layout"
 export { SiteHeader } from "./site-header"

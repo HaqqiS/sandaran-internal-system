@@ -54,6 +54,7 @@
     "better-auth": "^1.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cmdk": "^1.1.1",
     "next": "^15.2.3",
     "next-themes": "^0.4.6",
     "radix-ui": "^1.4.3",
@@ -66,7 +67,8 @@
     "superjson": "^2.2.1",
     "tailwind-merge": "^3.4.0",
     "vaul": "^1.1.2",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.13",
