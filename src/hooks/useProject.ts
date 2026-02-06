@@ -14,6 +14,10 @@ export function useProject(projectId: string) {
   return api.project.getById.useQuery({ projectId }, { enabled: !!projectId })
 }
 
+export function useProjectBySlug(slug: string) {
+  return api.project.getBySlug.useQuery({ slug }, { enabled: !!slug })
+}
+
 export function useProjectMembers(projectId: string) {
   return api.project.getMembers.useQuery(
     { projectId },

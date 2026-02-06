@@ -210,6 +210,71 @@ export const projectRouter = createTRPCRouter({
     }),
 
   /**
+   * Get project by Slug
+   * Project members + CEO can view
+   */
+  getBySlug: protectedProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { id: userId, roleGlobal } = ctx.session.user
+
+      const project = await ctx.db.project.findUnique({
+        where: { slug: input.slug },
+        include: {
+          members: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  image: true,
+                  roleGlobal: true,
+                },
+              },
+            },
+          },
+          emergencyFund: true,
+          _count: {
+            select: {
+              dailyReports: true,
+              documents: true,
+              logistics: true,
+            },
+          },
+        },
+      })
+
+      if (!project) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Project not found",
+        })
+      }
+
+      // Check access: ADMIN/CEO or Project Member
+      if (roleGlobal === "ADMIN" || roleGlobal === "CEO") {
+        return project
+      }
+
+      const isMember = project.members.some(
+        (member) => member.userId === userId,
+      )
+      if (!isMember) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not a member of this project",
+        })
+      }
+
+      return project
+    }),
+
+  /**
    * Update project
    * Only ADMIN can update projects
    */
@@ -402,16 +467,37 @@ export const projectRouter = createTRPCRouter({
    * Get project members
    * All project members can view
    */
-  getMembers: projectMemberProcedure
+  getMembers: protectedProcedure
     .input(
       z.object({
         projectId: z.string(),
       }),
     )
-    .query(async ({ ctx }) => {
+    .query(async ({ ctx, input }) => {
+      const { id: userId, roleGlobal } = ctx.session.user
+
+      // Check access: ADMIN/CEO or Project Member
+      if (roleGlobal !== "ADMIN" && roleGlobal !== "CEO") {
+        const isMember = await ctx.db.projectMember.findUnique({
+          where: {
+            userId_projectId: {
+              userId,
+              projectId: input.projectId,
+            },
+          },
+        })
+
+        if (!isMember) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You are not a member of this project",
+          })
+        }
+      }
+
       const members = await ctx.db.projectMember.findMany({
         where: {
-          projectId: ctx.projectId,
+          projectId: input.projectId,
         },
         include: {
           user: {

@@ -56,6 +56,33 @@ export const userRouter = createTRPCRouter({
   }),
 
   /**
+   * Search users (for adding members)
+   * Returns users not strictly restricted
+   */
+  search: protectedProcedure
+    .input(z.object({ query: z.string().optional() }))
+    .query(async ({ ctx, input }) => {
+      const query = input.query || ""
+
+      return ctx.db.user.findMany({
+        where: {
+          OR: [
+            { name: { contains: query, mode: "insensitive" } },
+            { email: { contains: query, mode: "insensitive" } },
+          ],
+          isActive: true,
+        },
+        take: 10,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+        },
+      })
+    }),
+
+  /**
    * Approve user and assign role
    */
   approveUser: adminProcedure

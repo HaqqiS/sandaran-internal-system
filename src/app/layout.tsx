@@ -2,7 +2,7 @@ import "~/styles/globals.css"
 
 import type { Metadata } from "next"
 import { Geist, Inter } from "next/font/google"
-
+import { Toaster } from "sonner"
 import { TRPCReactProvider } from "~/trpc/react"
 
 export const metadata: Metadata = {
@@ -27,7 +27,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${geist.variable}`}>
       <body>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider>
+          <Toaster richColors position="top-center" duration={5000} />
+          {children}
+        </TRPCReactProvider>
       </body>
     </html>
   )

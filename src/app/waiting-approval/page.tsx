@@ -19,7 +19,7 @@ export default async function WaitingApprovalPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-linear-to-b from-gray-50 to-gray-100 px-4">
       <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-8 shadow-xl">
         <div className="text-center">
           {/* Icon */}

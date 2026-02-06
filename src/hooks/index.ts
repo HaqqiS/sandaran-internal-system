@@ -62,3 +62,5 @@ export {
   useUpdateReportTask,
   useUploadReportMedia,
 } from "./useReport"
+
+export { useSearchUsers } from "./useUser"
