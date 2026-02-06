@@ -4,6 +4,7 @@
  * Central export for all custom hooks
  */
 
+export { useMediaQuery } from "./use-media-query"
 // Comment hooks
 export {
   useCommentsByReport,
@@ -43,6 +44,7 @@ export {
   useCreateProject,
   useDeleteProject,
   useProject,
+  useProjectBySlug,
   useProjectList,
   useProjectMembers,
   useRemoveMember,
@@ -62,5 +64,5 @@ export {
   useUpdateReportTask,
   useUploadReportMedia,
 } from "./useReport"
-
+// User hooks
 export { useSearchUsers } from "./useUser"
