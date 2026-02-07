@@ -4,7 +4,6 @@
 import { IconCalendar } from "@tabler/icons-react"
 import { useForm } from "@tanstack/react-form"
 import { format } from "date-fns"
-import { useRef } from "react"
 import { toast } from "sonner"
 import { z } from "zod"
 import { Button } from "~/components/ui/button"
@@ -115,9 +114,6 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
     },
   })
 
-  // Track if slug was manually edited
-  const isSlugManuallyEdited = useRef(false)
-
   return (
     <form
       onSubmit={(e) => {
@@ -144,14 +140,12 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                     const newName = e.target.value
                     field.handleChange(newName)
 
-                    // Auto-generate slug only in create mode and if not manually edited
-                    if (!isEditMode && !isSlugManuallyEdited.current) {
-                      const newSlug = newName
-                        .toLowerCase()
-                        .replace(/[^a-z0-9]+/g, "-")
-                        .replace(/^-|-$/g, "")
-                      form.setFieldValue("slug", newSlug)
-                    }
+                    // Auto-generate slug from name
+                    const newSlug = newName
+                      .toLowerCase()
+                      .replace(/[^a-z0-9]+/g, "-")
+                      .replace(/^-|-$/g, "")
+                    form.setFieldValue("slug", newSlug)
                   }}
                   aria-invalid={isInvalid}
                   placeholder="My Construction Project"
@@ -178,21 +172,14 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                   id={field.name}
                   name={field.name}
                   value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => {
-                    isSlugManuallyEdited.current = true
-                    field.handleChange(e.target.value)
-                  }}
+                  readOnly
                   aria-invalid={isInvalid}
                   placeholder="my-construction-project"
                   autoComplete="off"
-                  disabled={isEditMode}
-                  className={isEditMode ? "bg-muted cursor-not-allowed" : ""}
+                  className="bg-muted cursor-not-allowed"
                 />
                 <FieldDescription>
-                  {isEditMode
-                    ? "Slug cannot be changed after creation."
-                    : "URL-friendly identifier (auto-generated from name)."}
+                  Auto-generated from project name.
                 </FieldDescription>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
