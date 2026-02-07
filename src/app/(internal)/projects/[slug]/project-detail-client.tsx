@@ -10,11 +10,13 @@ import {
   IconUsers,
 } from "@tabler/icons-react"
 import { format } from "date-fns"
-import type { GlobalRole } from "generated/prisma"
+import type { GlobalRole, ProjectRole } from "generated/prisma"
 import { useState } from "react"
 import { PageLayout } from "~/components/layout"
 import { MemberManagement } from "~/components/project/member-management"
 import { ProjectDialog } from "~/components/project/project-dialog"
+import { ReportList } from "~/components/report/report-list"
+import { ReportSheet } from "~/components/report/report-sheet"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
@@ -30,10 +32,21 @@ interface ProjectDetailClientProps {
 export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
   const { data: project, isLoading, error } = useProjectBySlug(slug)
   const [isEditOpen, setIsEditOpen] = useState(false)
+  const [isCreateReportOpen, setIsCreateReportOpen] = useState(false)
   const session = useSessionStore((state) => state.session)
   const canManage = isAdmin(
     session?.user?.roleGlobal as GlobalRole | null | undefined,
   )
+
+  // Check if user can create reports (MANDOR or ARCHITECT, or ADMIN)
+  const userRole = session?.user?.roleGlobal as GlobalRole | undefined
+  const isAdminRole = userRole === "ADMIN" || userRole === "CEO"
+  const projectMember = project?.members.find(
+    (m) => m.userId === session?.user?.id,
+  )
+  const memberRole = projectMember?.role as ProjectRole | undefined
+  const canCreateReport =
+    isAdminRole || memberRole === "MANDOR" || memberRole === "ARCHITECT"
 
   if (isLoading) {
     return (
@@ -62,25 +75,14 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
       title={project.name}
       actions={
         canManage && (
-          <ProjectDialog
-            project={{
-              id: project.id,
-              name: project.name,
-              slug: project.slug,
-              description: project.description,
-              location: project.location,
-              startDate: project.startDate,
-              endDate: project.endDate,
-              status: project.status,
-            }}
-            open={isEditOpen}
-            onOpenChange={setIsEditOpen}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsEditOpen(true)}
           >
-            <Button variant="outline" size="sm">
-              <IconPencil className="mr-2 h-4 w-4" />
-              Edit Project
-            </Button>
-          </ProjectDialog>
+            <IconPencil className="mr-2 h-4 w-4" />
+            Edit Project
+          </Button>
         )
       }
     >
@@ -153,9 +155,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="team">Team</TabsTrigger>
-            <TabsTrigger value="reports" asChild>
-              <a href={`/projects/${project.slug}/reports`}>Reports</a>
-            </TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
             <TabsTrigger value="documents" disabled>
               Documents
             </TabsTrigger>
@@ -203,8 +203,31 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
               </CardContent>
             </Card>
           </TabsContent>
+
+          <TabsContent value="reports">
+            <ReportList
+              projectId={project.id}
+              projectSlug={project.slug}
+              canCreate={canCreateReport}
+              onCreateClick={() => setIsCreateReportOpen(true)}
+            />
+          </TabsContent>
         </Tabs>
       </div>
+
+      {canManage && (
+        <ProjectDialog
+          project={project}
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+        />
+      )}
+
+      <ReportSheet
+        projectId={project.id}
+        open={isCreateReportOpen}
+        onOpenChange={setIsCreateReportOpen}
+      />
     </PageLayout>
   )
 }
