@@ -24,6 +24,13 @@ export function useReportsByProject(
   )
 }
 
+export function useReportBySlug(projectId: string, reportSlug: string) {
+  return api.report.getBySlug.useQuery(
+    { projectId, reportSlug },
+    { enabled: !!projectId && !!reportSlug },
+  )
+}
+
 export function useCreateReport() {
   const utils = api.useUtils()
   return api.report.create.useMutation({

@@ -181,6 +181,62 @@ export const reportRouter = createTRPCRouter({
     }),
 
   /**
+   * Get report by slug
+   * All project members can view
+   */
+  getBySlug: projectMemberProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+        reportSlug: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const report = await ctx.db.dailyReport.findFirst({
+        where: {
+          slug: input.reportSlug,
+          projectId: ctx.projectId,
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+          tasks: {
+            orderBy: { createdAt: "asc" },
+          },
+          media: {
+            orderBy: { createdAt: "asc" },
+          },
+          comments: {
+            include: {
+              author: {
+                select: {
+                  id: true,
+                  name: true,
+                  image: true,
+                },
+              },
+            },
+            orderBy: { createdAt: "desc" },
+          },
+        },
+      })
+
+      if (!report) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Report not found",
+        })
+      }
+
+      return report
+    }),
+
+  /**
    * Update a daily report
    * Only report owner can update
    */

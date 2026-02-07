@@ -1,5 +1,5 @@
+import type { GlobalRole } from "generated/prisma"
 import type { auth } from "~/server/better-auth"
-import type { GlobalRole } from "../../generated/prisma"
 
 type Session = typeof auth.$Infer.Session
 

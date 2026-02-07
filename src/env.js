@@ -16,6 +16,9 @@ export const env = createEnv({
     BETTER_AUTH_GITHUB_CLIENT_SECRET: z.string(),
     BETTER_AUTH_GOOGLE_CLIENT_ID: z.string(),
     BETTER_AUTH_GOOGLE_CLIENT_SECRET: z.string(),
+    CLOUDINARY_CLOUD_NAME: z.string(),
+    CLOUDINARY_API_KEY: z.string(),
+    CLOUDINARY_API_SECRET: z.string(),
     DATABASE_URL: z.string().url(),
     DIRECT_URL: z.string().url(),
     NODE_ENV: z
@@ -45,6 +48,9 @@ export const env = createEnv({
     BETTER_AUTH_GOOGLE_CLIENT_ID: process.env.BETTER_AUTH_GOOGLE_CLIENT_ID,
     BETTER_AUTH_GOOGLE_CLIENT_SECRET:
       process.env.BETTER_AUTH_GOOGLE_CLIENT_SECRET,
+    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
     DIRECT_URL: process.env.DIRECT_URL,
     NODE_ENV: process.env.NODE_ENV,

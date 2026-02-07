@@ -59,6 +59,7 @@ export {
   useDeleteReportMedia,
   useDeleteReportTask,
   useReport,
+  useReportBySlug,
   useReportsByProject,
   useUpdateReport,
   useUpdateReportTask,

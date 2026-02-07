@@ -1,6 +1,7 @@
 "use client"
 
 import { IconPlus, IconTrash } from "@tabler/icons-react"
+import type { GlobalRole, ProjectRole } from "generated/prisma"
 import { useState } from "react"
 import { toast } from "sonner"
 import {
@@ -39,7 +40,6 @@ import {
 } from "~/hooks"
 import { isAdmin } from "~/lib/auth-guards"
 import { useSessionStore } from "~/stores/use-session-store"
-import type { GlobalRole, ProjectRole } from "../../../generated/prisma"
 import { UserSelect } from "./user-select"
 
 interface MemberManagementProps {

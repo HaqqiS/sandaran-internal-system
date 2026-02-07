@@ -4,6 +4,7 @@ import { emergencyRouter } from "~/server/api/routers/emergency.router"
 import { logisticRouter } from "~/server/api/routers/logistic.router"
 import { projectRouter } from "~/server/api/routers/project.router"
 import { reportRouter } from "~/server/api/routers/report.router"
+import { uploadRouter } from "~/server/api/routers/upload.router"
 import { userRouter } from "~/server/api/routers/user"
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc"
 
@@ -20,6 +21,7 @@ export const appRouter = createTRPCRouter({
   document: documentRouter,
   emergency: emergencyRouter,
   logistic: logisticRouter,
+  upload: uploadRouter,
 })
 
 // export type definition of API

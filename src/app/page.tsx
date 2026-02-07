@@ -2,7 +2,7 @@ import { headers } from "next/headers"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 
-import { OAuthButtons } from "~/components/oauth-buttons"
+import { OAuthButtons } from "~/components/shared/oauth-buttons"
 import { Button } from "~/components/ui/button"
 import { auth } from "~/server/better-auth"
 import { getSession } from "~/server/better-auth/server"
