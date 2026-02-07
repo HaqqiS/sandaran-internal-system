@@ -1,6 +1,7 @@
 "use client"
 
 import { IconLoader2, IconPlus, IconX } from "@tabler/icons-react"
+import NextImage from "next/image"
 import { useCallback, useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { toast } from "sonner"
@@ -90,10 +91,12 @@ export function MediaUpload({
               key={media.id}
               className="group relative aspect-square overflow-hidden rounded-lg border bg-muted"
             >
-              <img
+              <NextImage
                 src={media.url}
                 alt="Report media"
-                className="h-full w-full object-cover"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
               />
               {canEdit && (
                 <Button

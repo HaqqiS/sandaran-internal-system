@@ -19,13 +19,14 @@ import { toast } from "sonner"
 import { PageLayout } from "~/components/layout"
 import { MediaGallery } from "~/components/report/media-gallery"
 import { MediaUpload } from "~/components/report/media-upload"
-import { ReportSheet } from "~/components/report/report-sheet"
+import { ReportDialog } from "~/components/report/report-dialog"
+import { TaskList } from "~/components/report/task-list"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Progress } from "~/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
+
 import {
   useDeleteReportMedia,
   useProjectBySlug,
@@ -136,7 +137,7 @@ export function ReportDetailClient({
       }
     >
       <div className="flex flex-col gap-6 p-4 md:p-6">
-        {/* Header Card */}
+        {/* Detail Card (Top) */}
         <Card>
           <CardHeader>
             <div className="flex flex-wrap items-start justify-between gap-4">
@@ -172,91 +173,98 @@ export function ReportDetailClient({
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Stats Row */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Progress</span>
-                  <span className="font-medium">{report.progressPercent}%</span>
+          <CardContent>
+            <div className="grid gap-6 md:grid-cols-3">
+              {/* Left Column: Stats */}
+              <div className="md:col-span-1">
+                <div className="rounded-lg border p-4 space-y-4 h-full">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Progress</span>
+                      <span className="font-medium">
+                        {report.progressPercent}%
+                      </span>
+                    </div>
+                    <Progress value={report.progressPercent} className="h-3" />
+                  </div>
+                  <div className="flex items-center gap-2 pt-2">
+                    <IconUsers className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <p className="text-2xl font-bold">
+                        {report.totalWorkers}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Total Workers
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <Progress value={report.progressPercent} className="h-3" />
               </div>
-              <div className="flex items-center gap-2 rounded-lg border p-3">
-                <IconUsers className="h-5 w-5 text-muted-foreground" />
-                <div>
-                  <p className="text-2xl font-bold">{report.totalWorkers}</p>
-                  <p className="text-xs text-muted-foreground">Total Workers</p>
+
+              {/* Right Column: Task & Issues */}
+              <div className="space-y-4 md:col-span-2">
+                <div className="rounded-lg border p-4">
+                  <h4 className="mb-2 font-semibold">Task Description</h4>
+                  <p className="whitespace-pre-wrap text-sm">
+                    {report.taskDescription}
+                  </p>
                 </div>
+
+                {report.issues && (
+                  <div className="rounded-lg border p-4">
+                    <h4 className="mb-2 font-semibold">Issues / Problems</h4>
+                    <p className="whitespace-pre-wrap text-sm text-muted-foreground">
+                      {report.issues}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Content Tabs */}
-        <Tabs defaultValue="details" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="media">
-              Media ({report.media.length})
-            </TabsTrigger>
-          </TabsList>
+        {/* Task Breakdown Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Task Breakdown</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TaskList
+              projectId={project.id}
+              reportId={report.id}
+              tasks={report.tasks}
+              canEdit={canEdit}
+            />
+          </CardContent>
+        </Card>
 
-          <TabsContent value="details" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Task Description</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="whitespace-pre-wrap text-sm">
-                  {report.taskDescription}
-                </p>
-              </CardContent>
-            </Card>
-
-            {report.issues && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Issues / Problems</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="whitespace-pre-wrap text-sm text-muted-foreground">
-                    {report.issues}
-                  </p>
-                </CardContent>
-              </Card>
+        {/* Media Card (Bottom) */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Photos ({report.media.length})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {canEdit ? (
+              <MediaUpload
+                projectId={project.id}
+                projectSlug={projectSlug}
+                reportId={report.id}
+                existingMedia={report.media}
+                canEdit={canEdit}
+              />
+            ) : (
+              <MediaGallery
+                media={report.media}
+                onDelete={handleDeleteMedia}
+                canDelete={canEdit}
+              />
             )}
-          </TabsContent>
-
-          <TabsContent value="media" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Photos</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {canEdit ? (
-                  <MediaUpload
-                    projectId={project.id}
-                    projectSlug={projectSlug}
-                    reportId={report.id}
-                    existingMedia={report.media}
-                    canEdit={canEdit}
-                  />
-                ) : (
-                  <MediaGallery
-                    media={report.media}
-                    onDelete={handleDeleteMedia}
-                    canDelete={canEdit}
-                  />
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Edit Sheet */}
-      <ReportSheet
+      <ReportDialog
         projectId={project.id}
         report={report}
         open={isEditOpen}

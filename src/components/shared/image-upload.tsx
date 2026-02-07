@@ -1,6 +1,7 @@
 "use client"
 
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react"
+import NextImage from "next/image"
 import { useCallback, useState } from "react"
 import { useDropzone } from "react-dropzone"
 import { Button } from "~/components/ui/button"
@@ -91,10 +92,12 @@ export function ImageUpload({
     <div className={cn("space-y-2", className)}>
       {displayUrl ? (
         <div className="relative aspect-video overflow-hidden rounded-lg border bg-muted">
-          <img
+          <NextImage
             src={displayUrl}
             alt="Upload preview"
-            className="h-full w-full object-cover"
+            fill
+            className="object-cover"
+            unoptimized={displayUrl.startsWith("blob:")}
           />
           {onRemove && !isLoading && (
             <Button

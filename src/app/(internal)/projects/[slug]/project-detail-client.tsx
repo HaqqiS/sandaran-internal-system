@@ -15,8 +15,8 @@ import { useState } from "react"
 import { PageLayout } from "~/components/layout"
 import { MemberManagement } from "~/components/project/member-management"
 import { ProjectDialog } from "~/components/project/project-dialog"
+import { ReportDialog } from "~/components/report/report-dialog"
 import { ReportList } from "~/components/report/report-list"
-import { ReportSheet } from "~/components/report/report-sheet"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
@@ -223,7 +223,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
         />
       )}
 
-      <ReportSheet
+      <ReportDialog
         projectId={project.id}
         open={isCreateReportOpen}
         onOpenChange={setIsCreateReportOpen}

@@ -7,13 +7,13 @@
  * need to use are documented accordingly near the end.
  */
 
-import { initTRPC, TRPCError } from "@trpc/server";
-import type { ProjectRole } from "generated/prisma";
-import superjson from "superjson";
-import z, { ZodError } from "zod";
+import { initTRPC, TRPCError } from "@trpc/server"
+import type { ProjectRole } from "generated/prisma"
+import superjson from "superjson"
+import z, { ZodError } from "zod"
 
-import { auth } from "~/server/better-auth";
-import { db } from "~/server/db";
+import { auth } from "~/server/better-auth"
+import { db } from "~/server/db"
 
 /**
  * 1. CONTEXT
@@ -30,13 +30,13 @@ import { db } from "~/server/db";
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   const session = await auth.api.getSession({
     headers: opts.headers,
-  });
+  })
   return {
     db,
     session,
     ...opts,
-  };
-};
+  }
+}
 
 /**
  * 2. INITIALIZATION
@@ -55,16 +55,16 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
         zodError:
           error.cause instanceof ZodError ? error.cause.flatten() : null,
       },
-    };
+    }
   },
-});
+})
 
 /**
  * Create a server-side caller.
  *
  * @see https://trpc.io/docs/server/server-side-calls
  */
-export const createCallerFactory = t.createCallerFactory;
+export const createCallerFactory = t.createCallerFactory
 
 /**
  * 3. ROUTER & PROCEDURE (THE IMPORTANT BIT)
@@ -78,7 +78,7 @@ export const createCallerFactory = t.createCallerFactory;
  *
  * @see https://trpc.io/docs/router
  */
-export const createTRPCRouter = t.router;
+export const createTRPCRouter = t.router
 
 /**
  * Middleware for timing procedure execution and adding an artificial delay in development.
@@ -87,21 +87,21 @@ export const createTRPCRouter = t.router;
  * network latency that would occur in production but not in local development.
  */
 const timingMiddleware = t.middleware(async ({ next, path }) => {
-  const start = Date.now();
+  const start = Date.now()
 
   if (t._config.isDev) {
     // artificial delay in dev
-    const waitMs = Math.floor(Math.random() * 400) + 100;
-    await new Promise((resolve) => setTimeout(resolve, waitMs));
+    const waitMs = Math.floor(Math.random() * 400) + 100
+    await new Promise((resolve) => setTimeout(resolve, waitMs))
   }
 
-  const result = await next();
+  const result = await next()
 
-  const end = Date.now();
-  console.log(`[TRPC] ${path} took ${end - start}ms to execute`);
+  const end = Date.now()
+  console.log(`[TRPC] ${path} took ${end - start}ms to execute`)
 
-  return result;
-});
+  return result
+})
 
 /**
  * Public (unauthenticated) procedure
@@ -110,7 +110,7 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
  * guarantee that a user querying is authorized, but you can still access user session data if they
  * are logged in.
  */
-export const publicProcedure = t.procedure.use(timingMiddleware);
+export const publicProcedure = t.procedure.use(timingMiddleware)
 
 /**
  * Protected (authenticated) procedure
@@ -127,17 +127,17 @@ export const protectedProcedure = t.procedure
       throw new TRPCError({
         code: "UNAUTHORIZED",
         message: "Not authenticated",
-      });
+      })
     }
 
-    const { roleGlobal, isActive } = ctx.session.user;
+    const { roleGlobal, isActive } = ctx.session.user
 
     // Check if user is active
     if (!isActive) {
       throw new TRPCError({
         code: "FORBIDDEN",
         message: "Account is not active. Please wait for admin approval.",
-      });
+      })
     }
 
     // Check if user has authorized role (not NONE)
@@ -145,7 +145,7 @@ export const protectedProcedure = t.procedure
       throw new TRPCError({
         code: "FORBIDDEN",
         message: "You do not have permission to access this system.",
-      });
+      })
     }
 
     // Only allow ADMIN, CEO, USER roles
@@ -157,7 +157,7 @@ export const protectedProcedure = t.procedure
       throw new TRPCError({
         code: "FORBIDDEN",
         message: "Invalid role. Access denied.",
-      });
+      })
     }
 
     return next({
@@ -165,8 +165,8 @@ export const protectedProcedure = t.procedure
         // infers the `session` as non-nullable
         session: { ...ctx.session, user: ctx.session.user },
       },
-    });
-  });
+    })
+  })
 
 /**
  * Admin-only procedure
@@ -181,17 +181,17 @@ export const adminProcedure = t.procedure
       throw new TRPCError({
         code: "UNAUTHORIZED",
         message: "Not authenticated",
-      });
+      })
     }
 
-    const { roleGlobal, isActive } = ctx.session.user;
+    const { roleGlobal, isActive } = ctx.session.user
 
     // Check if user is active
     if (!isActive) {
       throw new TRPCError({
         code: "FORBIDDEN",
         message: "Account is not active.",
-      });
+      })
     }
 
     // Check if user has admin role
@@ -199,7 +199,7 @@ export const adminProcedure = t.procedure
       throw new TRPCError({
         code: "FORBIDDEN",
         message: "Admin access required.",
-      });
+      })
     }
 
     return next({
@@ -207,8 +207,8 @@ export const adminProcedure = t.procedure
         // infers the `session` as non-nullable with admin role
         session: { ...ctx.session, user: ctx.session.user },
       },
-    });
-  });
+    })
+  })
 
 /**
  * Project-scoped procedure factory (Layer 3: Project Context Guard)
@@ -235,43 +235,43 @@ export const adminProcedure = t.procedure
 export const projectProcedure = (
   allowedRoles: ProjectRole[],
   options?: {
-    allowCEO?: boolean; // Allow CEO to perform mutations (default: false)
+    allowCEO?: boolean // Allow CEO to perform mutations (default: false)
   },
 ) => {
   return protectedProcedure
     .input(z.object({ projectId: z.string() }).passthrough())
     .use(async ({ ctx, next, input, type }) => {
       // Extract projectId from input
-      const projectId = input.projectId;
+      const projectId = input.projectId
 
       if (!projectId) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "projectId is required in input",
-        });
+        })
       }
 
-      const { id: userId, roleGlobal } = ctx.session.user;
+      const { id: userId, roleGlobal } = ctx.session.user
 
       // ADMIN and CEO have special access
-      const isAdminOrCEO = roleGlobal === "ADMIN" || roleGlobal === "CEO";
+      const isAdminOrCEO = roleGlobal === "ADMIN" || roleGlobal === "CEO"
 
       // Get user's project role
       const member = await ctx.db.projectMember.findUnique({
         where: {
           userId_projectId: { userId, projectId },
         },
-      });
+      })
 
       // Check if user is a project member (unless ADMIN/CEO)
       if (!member && !isAdminOrCEO) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "You are not a member of this project",
-        });
+        })
       }
 
-      const projectRole = member?.role;
+      const projectRole = member?.role
 
       // Verify user has one of the allowed roles (unless ADMIN)
       if (
@@ -282,19 +282,19 @@ export const projectProcedure = (
         throw new TRPCError({
           code: "FORBIDDEN",
           message: `This action requires one of the following roles: ${allowedRoles.join(", ")}`,
-        });
+        })
       }
 
       // CEO read-only enforcement (unless explicitly allowed)
       if (roleGlobal === "CEO" && !options?.allowCEO) {
         // Check if this is a mutation (write operation)
-        const isMutation = type === "mutation";
+        const isMutation = type === "mutation"
 
         if (isMutation) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "CEO has read-only access to project operations",
-          });
+          })
         }
       }
 
@@ -304,6 +304,6 @@ export const projectProcedure = (
           projectId,
           projectRole: projectRole ?? null,
         },
-      });
-    });
-};
+      })
+    })
+}

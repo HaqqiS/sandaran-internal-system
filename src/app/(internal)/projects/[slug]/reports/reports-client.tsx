@@ -5,8 +5,8 @@ import type { GlobalRole, ProjectRole } from "generated/prisma"
 import Link from "next/link"
 import { useState } from "react"
 import { PageLayout } from "~/components/layout"
+import { ReportDialog } from "~/components/report/report-dialog"
 import { ReportList } from "~/components/report/report-list"
-import { ReportSheet } from "~/components/report/report-sheet"
 import { Button } from "~/components/ui/button"
 import { useProjectBySlug } from "~/hooks"
 import { useSessionStore } from "~/stores/use-session-store"
@@ -78,7 +78,7 @@ export function ReportsClient({ projectSlug }: ReportsClientProps) {
         />
       </div>
 
-      <ReportSheet
+      <ReportDialog
         projectId={project.id}
         open={isCreateOpen}
         onOpenChange={setIsCreateOpen}
