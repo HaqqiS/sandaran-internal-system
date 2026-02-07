@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server"
 import { z } from "zod"
+import { deleteCloudinaryAsset } from "~/lib/cloudinary"
 import { requireOwnership } from "~/server/api/helpers/permission"
 import { createTRPCRouter, projectProcedure } from "~/server/api/trpc"
 
@@ -525,6 +526,14 @@ export const reportRouter = createTRPCRouter({
         ctx.session.user.id,
         ctx.session.user.roleGlobal,
       )
+
+      // Delete from Cloudinary first
+      if (media.publicId) {
+        await deleteCloudinaryAsset(media.publicId).catch((err) => {
+          console.error("Failed to delete Cloudinary asset:", err)
+          // Continue to delete from DB even if Cloudinary fails
+        })
+      }
 
       await ctx.db.reportMedia.delete({
         where: { id: input.mediaId },
