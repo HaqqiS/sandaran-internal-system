@@ -266,6 +266,7 @@ exports.Prisma.EmergencyTransactionScalarFieldEnum = {
   amount: 'amount',
   description: 'description',
   proofPublicId: 'proofPublicId',
+  type: 'type',
   status: 'status',
   verifiedById: 'verifiedById',
   verifiedAt: 'verifiedAt',
@@ -332,10 +333,14 @@ exports.DocumentType = exports.$Enums.DocumentType = {
   OTHER: 'OTHER'
 };
 
+exports.TransactionType = exports.$Enums.TransactionType = {
+  DEPOSIT: 'DEPOSIT',
+  WITHDRAWAL: 'WITHDRAWAL'
+};
+
 exports.TransactionStatus = exports.$Enums.TransactionStatus = {
-  PENDING: 'PENDING',
-  APPROVED: 'APPROVED',
-  REJECTED: 'REJECTED'
+  UNREVIEWED: 'UNREVIEWED',
+  REVIEWED: 'REVIEWED'
 };
 
 exports.LogisticType = exports.$Enums.LogisticType = {

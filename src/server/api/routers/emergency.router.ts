@@ -8,8 +8,8 @@ import { createTRPCRouter, projectProcedure } from "~/server/api/trpc"
  * Handles emergency fund management and transactions.
  *
  * Permissions:
- * - MANDOR can request funds
- * - FINANCE can add balance and verify transactions
+ * - MANDOR can request funds (Withdraw)
+ * - FINANCE can add balance (Deposit) and verify requests
  * - All project members can view
  */
 
@@ -79,7 +79,7 @@ export const emergencyRouter = createTRPCRouter({
     }),
 
   /**
-   * Add balance to emergency fund
+   * Add balance to emergency fund (Top-up)
    * Only FINANCE can add balance
    */
   addBalance: financeProcedure
@@ -112,7 +112,8 @@ export const emergencyRouter = createTRPCRouter({
           requestedById: ctx.session.user.id,
           amount: input.amount,
           description: input.description,
-          status: "APPROVED", // Auto-approved for balance additions
+          type: "DEPOSIT",
+          status: "REVIEWED", // Auto-approved for balance additions
           verifiedById: ctx.session.user.id,
           verifiedAt: new Date(),
         },
@@ -132,7 +133,7 @@ export const emergencyRouter = createTRPCRouter({
     }),
 
   /**
-   * Request emergency fund
+   * Request emergency fund (Withdraw)
    * MANDOR can request
    */
   request: mandorProcedure
@@ -158,6 +159,7 @@ export const emergencyRouter = createTRPCRouter({
       }
 
       // Check if sufficient balance
+      // NOTE: Balance decreases immediately upon request creation
       if (Number(fund.currentBalance) < input.amount) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -172,7 +174,8 @@ export const emergencyRouter = createTRPCRouter({
           amount: input.amount,
           description: input.description,
           proofPublicId: input.proofPublicId,
-          status: "PENDING",
+          type: "WITHDRAWAL",
+          status: "UNREVIEWED",
         },
         include: {
           requester: {
@@ -185,11 +188,21 @@ export const emergencyRouter = createTRPCRouter({
         },
       })
 
+      // Deduct balance immediately
+      await ctx.db.emergencyFund.update({
+        where: { id: fund.id },
+        data: {
+          currentBalance: {
+            decrement: input.amount,
+          },
+        },
+      })
+
       return transaction
     }),
 
   /**
-   * Verify (approve/reject) emergency fund request
+   * Verify (Review) emergency fund request
    * Only FINANCE can verify
    */
   verify: financeProcedure
@@ -197,7 +210,7 @@ export const emergencyRouter = createTRPCRouter({
       z.object({
         projectId: z.string(),
         transactionId: z.string(),
-        status: z.enum(["APPROVED", "REJECTED"]),
+        status: z.enum(["REVIEWED"]),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -225,18 +238,19 @@ export const emergencyRouter = createTRPCRouter({
       }
 
       // Check if already verified
-      if (transaction.status !== "PENDING") {
+      if (transaction.status !== "UNREVIEWED") {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Transaction already verified",
+          message: "Transaction already reviewed",
         })
       }
 
-      // Update transaction
+      // Update transaction status
+      // Balance was already deducted during request creation, so we don't change it here
       const updated = await ctx.db.emergencyTransaction.update({
         where: { id: input.transactionId },
         data: {
-          status: input.status,
+          status: input.status, // "REVIEWED"
           verifiedById: ctx.session.user.id,
           verifiedAt: new Date(),
         },
@@ -258,18 +272,6 @@ export const emergencyRouter = createTRPCRouter({
         },
       })
 
-      // If approved, deduct from balance
-      if (input.status === "APPROVED") {
-        await ctx.db.emergencyFund.update({
-          where: { id: transaction.fundId },
-          data: {
-            currentBalance: {
-              decrement: transaction.amount,
-            },
-          },
-        })
-      }
-
       return updated
     }),
 
@@ -281,7 +283,8 @@ export const emergencyRouter = createTRPCRouter({
     .input(
       z.object({
         projectId: z.string(),
-        status: z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
+        status: z.enum(["UNREVIEWED", "REVIEWED"]).optional(),
+        type: z.enum(["DEPOSIT", "WITHDRAWAL"]).optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -298,6 +301,7 @@ export const emergencyRouter = createTRPCRouter({
         where: {
           fundId: fund.id,
           ...(input.status && { status: input.status }),
+          ...(input.type && { type: input.type }),
         },
         include: {
           requester: {

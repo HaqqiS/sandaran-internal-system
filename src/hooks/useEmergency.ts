@@ -1,4 +1,4 @@
-import type { TransactionStatus } from "generated/prisma"
+import type { TransactionStatus, TransactionType } from "generated/prisma"
 import { api } from "~/trpc/react"
 
 /**
@@ -17,9 +17,10 @@ export function useEmergencyFund(projectId: string) {
 export function useEmergencyTransactions(
   projectId: string,
   status?: TransactionStatus,
+  type?: TransactionType,
 ) {
   return api.emergency.getTransactions.useQuery(
-    { projectId, status },
+    { projectId, status, type },
     { enabled: !!projectId },
   )
 }
@@ -29,6 +30,9 @@ export function useAddEmergencyBalance() {
   return api.emergency.addBalance.useMutation({
     onSuccess: (_data, variables) => {
       void utils.emergency.getByProject.invalidate({
+        projectId: variables.projectId,
+      })
+      void utils.emergency.getTransactions.invalidate({
         projectId: variables.projectId,
       })
     },

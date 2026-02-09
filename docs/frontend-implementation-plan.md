@@ -279,12 +279,13 @@ Textarea untuk add comment
 
 ### Component Patterns
 
-| Component    | Desktop         | Mobile              |
-| ------------ | --------------- | ------------------- |
-| Form dialogs | Dialog          | Sheet (full height) |
-| Data list    | DataTable       | Cards               |
-| Actions      | Visible buttons | Dropdown menu       |
-| Navigation   | Sidebar         | Collapsible sidebar |
+| Component     | Desktop         | Mobile              |
+| ------------- | --------------- | ------------------- |
+| Form dialogs  | Dialog          | Drawer              |
+| Data list     | DataTable       | Cards               |
+| Actions       | Visible buttons | Dropdown menu       |
+| Navigation    | Sidebar         | Collapsible sidebar |
+| Notifications | Toast           | Toast               |
 
 ### Role-Based UI
 
@@ -354,17 +355,6 @@ pnpm add browser-image-compression
 pnpm add cloudinary
 pnpm add @tanstack/react-table  # if not installed
 ```
-
----
-
-## User Review Required
-
-> [!IMPORTANT]
-> **Pilih preferensi untuk memulai Phase 2:**
->
-> 1. Apakah struktur folder komponen sudah sesuai? (misal: `src/components/project/`, `src/components/report/`)
-> 2. Untuk routing project detail, apakah prefer `/projects/[slug]` atau `/projects/[id]`?
-> 3. Apakah perlu install TanStack Table jika belum ada, atau gunakan table component yang sudah ada?
 
 ---
 

@@ -37,9 +37,13 @@ enum ProjectStatus {
 }
 
 enum TransactionStatus {
-  PENDING
-  APPROVED
-  REJECTED
+  UNREVIEWED
+  REVIEWED
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
 }
 
 enum LogisticType {
@@ -286,7 +290,8 @@ model EmergencyTransaction {
   amount        Decimal           @db.Decimal(15, 2)
   description   String            @db.Text
   proofPublicId String? // Bukti nota di Cloudinary
-  status        TransactionStatus @default(PENDING)
+  type          TransactionType   @default(WITHDRAWAL)
+  status        TransactionStatus @default(UNREVIEWED)
 
   verifiedById String?
   verifiedAt   DateTime?

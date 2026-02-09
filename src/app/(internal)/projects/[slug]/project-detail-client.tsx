@@ -12,6 +12,8 @@ import {
 import { format } from "date-fns"
 import type { GlobalRole, ProjectRole } from "generated/prisma"
 import { useState } from "react"
+import { FundOverviewCard } from "~/components/emergency/fund-overview-card"
+import { TransactionList } from "~/components/emergency/transaction-list"
 import { PageLayout } from "~/components/layout"
 import { MemberManagement } from "~/components/project/member-management"
 import { ProjectDialog } from "~/components/project/project-dialog"
@@ -38,15 +40,23 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
     session?.user?.roleGlobal as GlobalRole | null | undefined,
   )
 
-  // Check if user can create reports (MANDOR or ARCHITECT, or ADMIN)
+  // Check user roles
   const userRole = session?.user?.roleGlobal as GlobalRole | undefined
   const isAdminRole = userRole === "ADMIN" || userRole === "CEO"
+  const isSuperAdmin = userRole === "ADMIN" // CEO is read-only for emergency fund
+
   const projectMember = project?.members.find(
     (m) => m.userId === session?.user?.id,
   )
   const memberRole = projectMember?.role as ProjectRole | undefined
+
+  // Permissions
   const canCreateReport =
     isAdminRole || memberRole === "MANDOR" || memberRole === "ARCHITECT"
+
+  const canAddFund = isSuperAdmin || memberRole === "FINANCE"
+  const canWithdraw = isSuperAdmin || memberRole === "MANDOR"
+  const canReview = isSuperAdmin || memberRole === "FINANCE"
 
   if (isLoading) {
     return (
@@ -148,6 +158,14 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
               </div>
             </CardContent>
           </Card>
+
+          {/* Emergency Fund Stat - New */}
+          <FundOverviewCard
+            projectId={project.id}
+            projectSlug={project.slug}
+            canAddFund={canAddFund}
+            canWithdraw={canWithdraw}
+          />
         </div>
 
         {/* Main Content Tabs */}
@@ -156,6 +174,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="team">Team</TabsTrigger>
             <TabsTrigger value="reports">Reports</TabsTrigger>
+            <TabsTrigger value="emergency">Emergency Fund</TabsTrigger>
             <TabsTrigger value="documents" disabled>
               Documents
             </TabsTrigger>
@@ -211,6 +230,10 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
               canCreate={canCreateReport}
               onCreateClick={() => setIsCreateReportOpen(true)}
             />
+          </TabsContent>
+
+          <TabsContent value="emergency" className="space-y-4">
+            <TransactionList projectId={project.id} canReview={canReview} />
           </TabsContent>
         </Tabs>
       </div>
