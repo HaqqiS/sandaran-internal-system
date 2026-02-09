@@ -35,6 +35,10 @@ export function useUploadDocument() {
   })
 }
 
+export function useGetDownloadUrl() {
+  return api.document.getDownloadUrl.useMutation()
+}
+
 export function useUpdateDocument() {
   const utils = api.useUtils()
   return api.document.update.useMutation({

@@ -7,6 +7,7 @@ interface UploadOptions {
   type: "reports" | "documents" | "emergency"
   maxSizeMB?: number
   maxWidthOrHeight?: number
+  resourceType?: "auto" | "image" | "video" | "raw"
 }
 
 interface UploadResult {
@@ -81,9 +82,12 @@ export function useCloudinaryUpload() {
       formData.append("timestamp", params.timestamp.toString())
       formData.append("signature", params.signature)
       formData.append("folder", params.folder)
+      formData.append("type", "authenticated")
+
+      const resourceType = options.resourceType ?? "auto"
 
       const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${params.cloudName}/image/upload`,
+        `https://api.cloudinary.com/v1_1/${params.cloudName}/${resourceType}/upload`,
         { method: "POST", body: formData },
       )
 

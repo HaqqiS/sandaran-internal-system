@@ -12,6 +12,9 @@ cloudinary.config({
 interface SignatureParams {
   folder: string
   timestamp: number
+  type?: string
+  access_mode?: string
+  [key: string]: unknown
 }
 
 /**
@@ -29,6 +32,7 @@ export function generateUploadSignature(options: {
   const params: SignatureParams = {
     folder,
     timestamp,
+    type: "authenticated",
   }
 
   const signature = cloudinary.utils.api_sign_request(
@@ -42,6 +46,7 @@ export function generateUploadSignature(options: {
     folder,
     cloudName: env.CLOUDINARY_CLOUD_NAME,
     apiKey: env.CLOUDINARY_API_KEY,
+    type: "authenticated",
   }
 }
 
@@ -75,6 +80,25 @@ export function getOptimizedImageUrl(
         fetch_format: options?.format || "auto",
       },
     ],
+  })
+}
+
+/**
+ * Generate signed download URL for private/restricted assets (like PDFs)
+ */
+export function getSignedDownloadUrl(
+  publicId: string,
+  resourceType: "image" | "video" | "raw" = "raw",
+) {
+  // Use "authenticated" type if it was uploaded as such, otherwise try "upload" (public)
+  // Since we suspect strict ACLs, a signed URL is safer.
+  return cloudinary.url(publicId, {
+    resource_type: resourceType,
+    type: "authenticated",
+    sign_url: true,
+    secure: true,
+    // Add expiration to make it a valid signed URL
+    expires_at: Math.floor(Date.now() / 1000) + 3600,
   })
 }
 

@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server"
 import { z } from "zod"
+import { getSignedDownloadUrl } from "~/lib/cloudinary"
 import { requireOwnership } from "~/server/api/helpers/permission"
 import { createTRPCRouter, projectProcedure } from "~/server/api/trpc"
 
@@ -154,6 +155,41 @@ export const documentRouter = createTRPCRouter({
       }
 
       return document
+    }),
+
+  /**
+   * Get signed download URL for a specific document
+   * This generates a fresh link with expiry
+   */
+  getDownloadUrl: projectMemberProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+        documentId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const document = await ctx.db.projectDocument.findFirst({
+        where: {
+          id: input.documentId,
+          projectId: ctx.projectId,
+        },
+      })
+
+      if (!document) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Document not found",
+        })
+      }
+
+      const isImage = document.mimeType?.startsWith("image/")
+      const resourceType = isImage ? "image" : "raw"
+
+      // Generate signed URL with 1-hour expiry
+      const url = getSignedDownloadUrl(document.publicId, resourceType)
+
+      return { url }
     }),
 
   /**
