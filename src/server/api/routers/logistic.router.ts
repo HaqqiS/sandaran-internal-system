@@ -16,8 +16,8 @@ import { createTRPCRouter, projectProcedure } from "~/server/api/trpc"
 // FINANCE manages items
 const financeProcedure = projectProcedure(["FINANCE"])
 
-// MANDOR records transactions
-const mandorProcedure = projectProcedure(["MANDOR"])
+// MANDOR and FINANCE record transactions
+const logisticProcedure = projectProcedure(["MANDOR", "FINANCE"])
 
 // All can view
 const projectMemberProcedure = projectProcedure([
@@ -164,9 +164,9 @@ export const logisticRouter = createTRPCRouter({
 
   /**
    * Record a logistic transaction (IN or OUT)
-   * MANDOR can record transactions
+   * MANDOR and FINANCE can record transactions
    */
-  recordTransaction: mandorProcedure
+  recordTransaction: logisticProcedure
     .input(
       z.object({
         projectId: z.string(),
