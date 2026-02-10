@@ -66,6 +66,7 @@ export function UploadDialog({
     fileName: string
     fileSize: number
     mimeType: string
+    resourceType: string
   } | null>(null)
 
   const form = useForm({
@@ -93,6 +94,7 @@ export function UploadDialog({
           url: fileData.url,
           fileSize: fileData.fileSize,
           mimeType: fileData.mimeType,
+          resourceType: fileData.resourceType,
           title: value.title || undefined,
           description: value.description || undefined,
           version: value.version || undefined,
@@ -134,13 +136,21 @@ export function UploadDialog({
               projectSlug={projectSlug}
               type="documents"
               value={fileData?.url}
-              onChange={(url, publicId, fileName, size, mimeType) => {
+              onChange={(
+                url,
+                publicId,
+                fileName,
+                size,
+                mimeType,
+                resourceType,
+              ) => {
                 setFileData({
                   url,
                   publicId,
                   fileName,
                   fileSize: size,
                   mimeType,
+                  resourceType,
                 })
               }}
               onRemove={() => setFileData(null)}

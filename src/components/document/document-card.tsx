@@ -65,6 +65,7 @@ export function DocumentCard({
 
   const handleDownload = async () => {
     try {
+      console.log("Document data:", document)
       const { url } = await getDownloadUrl({
         projectId: document.projectId,
         documentId: document.id,

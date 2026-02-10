@@ -11969,6 +11969,7 @@ export namespace Prisma {
     url: string | null
     fileSize: number | null
     mimeType: string | null
+    resourceType: string | null
     title: string | null
     description: string | null
     version: string | null
@@ -11986,6 +11987,7 @@ export namespace Prisma {
     url: string | null
     fileSize: number | null
     mimeType: string | null
+    resourceType: string | null
     title: string | null
     description: string | null
     version: string | null
@@ -12003,6 +12005,7 @@ export namespace Prisma {
     url: number
     fileSize: number
     mimeType: number
+    resourceType: number
     title: number
     description: number
     version: number
@@ -12030,6 +12033,7 @@ export namespace Prisma {
     url?: true
     fileSize?: true
     mimeType?: true
+    resourceType?: true
     title?: true
     description?: true
     version?: true
@@ -12047,6 +12051,7 @@ export namespace Prisma {
     url?: true
     fileSize?: true
     mimeType?: true
+    resourceType?: true
     title?: true
     description?: true
     version?: true
@@ -12064,6 +12069,7 @@ export namespace Prisma {
     url?: true
     fileSize?: true
     mimeType?: true
+    resourceType?: true
     title?: true
     description?: true
     version?: true
@@ -12168,6 +12174,7 @@ export namespace Prisma {
     url: string
     fileSize: number | null
     mimeType: string | null
+    resourceType: string | null
     title: string | null
     description: string | null
     version: string | null
@@ -12204,6 +12211,7 @@ export namespace Prisma {
     url?: boolean
     fileSize?: boolean
     mimeType?: boolean
+    resourceType?: boolean
     title?: boolean
     description?: boolean
     version?: boolean
@@ -12223,6 +12231,7 @@ export namespace Prisma {
     url?: boolean
     fileSize?: boolean
     mimeType?: boolean
+    resourceType?: boolean
     title?: boolean
     description?: boolean
     version?: boolean
@@ -12242,6 +12251,7 @@ export namespace Prisma {
     url?: boolean
     fileSize?: boolean
     mimeType?: boolean
+    resourceType?: boolean
     title?: boolean
     description?: boolean
     version?: boolean
@@ -12261,6 +12271,7 @@ export namespace Prisma {
     url?: boolean
     fileSize?: boolean
     mimeType?: boolean
+    resourceType?: boolean
     title?: boolean
     description?: boolean
     version?: boolean
@@ -12268,7 +12279,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ProjectDocumentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "userId" | "fileName" | "fileType" | "publicId" | "url" | "fileSize" | "mimeType" | "title" | "description" | "version" | "createdAt" | "updatedAt", ExtArgs["result"]["projectDocument"]>
+  export type ProjectDocumentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "projectId" | "userId" | "fileName" | "fileType" | "publicId" | "url" | "fileSize" | "mimeType" | "resourceType" | "title" | "description" | "version" | "createdAt" | "updatedAt", ExtArgs["result"]["projectDocument"]>
   export type ProjectDocumentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     project?: boolean | ProjectDefaultArgs<ExtArgs>
     uploader?: boolean | UserDefaultArgs<ExtArgs>
@@ -12298,6 +12309,7 @@ export namespace Prisma {
       url: string
       fileSize: number | null
       mimeType: string | null
+      resourceType: string | null
       title: string | null
       description: string | null
       version: string | null
@@ -12737,6 +12749,7 @@ export namespace Prisma {
     readonly url: FieldRef<"ProjectDocument", 'String'>
     readonly fileSize: FieldRef<"ProjectDocument", 'Int'>
     readonly mimeType: FieldRef<"ProjectDocument", 'String'>
+    readonly resourceType: FieldRef<"ProjectDocument", 'String'>
     readonly title: FieldRef<"ProjectDocument", 'String'>
     readonly description: FieldRef<"ProjectDocument", 'String'>
     readonly version: FieldRef<"ProjectDocument", 'String'>
@@ -19979,6 +19992,7 @@ export namespace Prisma {
     url: 'url',
     fileSize: 'fileSize',
     mimeType: 'mimeType',
+    resourceType: 'resourceType',
     title: 'title',
     description: 'description',
     version: 'version',
@@ -20949,6 +20963,7 @@ export namespace Prisma {
     url?: StringFilter<"ProjectDocument"> | string
     fileSize?: IntNullableFilter<"ProjectDocument"> | number | null
     mimeType?: StringNullableFilter<"ProjectDocument"> | string | null
+    resourceType?: StringNullableFilter<"ProjectDocument"> | string | null
     title?: StringNullableFilter<"ProjectDocument"> | string | null
     description?: StringNullableFilter<"ProjectDocument"> | string | null
     version?: StringNullableFilter<"ProjectDocument"> | string | null
@@ -20968,6 +20983,7 @@ export namespace Prisma {
     url?: SortOrder
     fileSize?: SortOrderInput | SortOrder
     mimeType?: SortOrderInput | SortOrder
+    resourceType?: SortOrderInput | SortOrder
     title?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     version?: SortOrderInput | SortOrder
@@ -20990,6 +21006,7 @@ export namespace Prisma {
     url?: StringFilter<"ProjectDocument"> | string
     fileSize?: IntNullableFilter<"ProjectDocument"> | number | null
     mimeType?: StringNullableFilter<"ProjectDocument"> | string | null
+    resourceType?: StringNullableFilter<"ProjectDocument"> | string | null
     title?: StringNullableFilter<"ProjectDocument"> | string | null
     description?: StringNullableFilter<"ProjectDocument"> | string | null
     version?: StringNullableFilter<"ProjectDocument"> | string | null
@@ -21009,6 +21026,7 @@ export namespace Prisma {
     url?: SortOrder
     fileSize?: SortOrderInput | SortOrder
     mimeType?: SortOrderInput | SortOrder
+    resourceType?: SortOrderInput | SortOrder
     title?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     version?: SortOrderInput | SortOrder
@@ -21034,6 +21052,7 @@ export namespace Prisma {
     url?: StringWithAggregatesFilter<"ProjectDocument"> | string
     fileSize?: IntNullableWithAggregatesFilter<"ProjectDocument"> | number | null
     mimeType?: StringNullableWithAggregatesFilter<"ProjectDocument"> | string | null
+    resourceType?: StringNullableWithAggregatesFilter<"ProjectDocument"> | string | null
     title?: StringNullableWithAggregatesFilter<"ProjectDocument"> | string | null
     description?: StringNullableWithAggregatesFilter<"ProjectDocument"> | string | null
     version?: StringNullableWithAggregatesFilter<"ProjectDocument"> | string | null
@@ -22192,6 +22211,7 @@ export namespace Prisma {
     url: string
     fileSize?: number | null
     mimeType?: string | null
+    resourceType?: string | null
     title?: string | null
     description?: string | null
     version?: string | null
@@ -22211,6 +22231,7 @@ export namespace Prisma {
     url: string
     fileSize?: number | null
     mimeType?: string | null
+    resourceType?: string | null
     title?: string | null
     description?: string | null
     version?: string | null
@@ -22226,6 +22247,7 @@ export namespace Prisma {
     url?: StringFieldUpdateOperationsInput | string
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
     mimeType?: NullableStringFieldUpdateOperationsInput | string | null
+    resourceType?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     version?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22245,6 +22267,7 @@ export namespace Prisma {
     url?: StringFieldUpdateOperationsInput | string
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
     mimeType?: NullableStringFieldUpdateOperationsInput | string | null
+    resourceType?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     version?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22262,6 +22285,7 @@ export namespace Prisma {
     url: string
     fileSize?: number | null
     mimeType?: string | null
+    resourceType?: string | null
     title?: string | null
     description?: string | null
     version?: string | null
@@ -22277,6 +22301,7 @@ export namespace Prisma {
     url?: StringFieldUpdateOperationsInput | string
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
     mimeType?: NullableStringFieldUpdateOperationsInput | string | null
+    resourceType?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     version?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22294,6 +22319,7 @@ export namespace Prisma {
     url?: StringFieldUpdateOperationsInput | string
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
     mimeType?: NullableStringFieldUpdateOperationsInput | string | null
+    resourceType?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     version?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23404,6 +23430,7 @@ export namespace Prisma {
     url?: SortOrder
     fileSize?: SortOrder
     mimeType?: SortOrder
+    resourceType?: SortOrder
     title?: SortOrder
     description?: SortOrder
     version?: SortOrder
@@ -23425,6 +23452,7 @@ export namespace Prisma {
     url?: SortOrder
     fileSize?: SortOrder
     mimeType?: SortOrder
+    resourceType?: SortOrder
     title?: SortOrder
     description?: SortOrder
     version?: SortOrder
@@ -23442,6 +23470,7 @@ export namespace Prisma {
     url?: SortOrder
     fileSize?: SortOrder
     mimeType?: SortOrder
+    resourceType?: SortOrder
     title?: SortOrder
     description?: SortOrder
     version?: SortOrder
@@ -25704,6 +25733,7 @@ export namespace Prisma {
     url: string
     fileSize?: number | null
     mimeType?: string | null
+    resourceType?: string | null
     title?: string | null
     description?: string | null
     version?: string | null
@@ -25721,6 +25751,7 @@ export namespace Prisma {
     url: string
     fileSize?: number | null
     mimeType?: string | null
+    resourceType?: string | null
     title?: string | null
     description?: string | null
     version?: string | null
@@ -26087,6 +26118,7 @@ export namespace Prisma {
     url?: StringFilter<"ProjectDocument"> | string
     fileSize?: IntNullableFilter<"ProjectDocument"> | number | null
     mimeType?: StringNullableFilter<"ProjectDocument"> | string | null
+    resourceType?: StringNullableFilter<"ProjectDocument"> | string | null
     title?: StringNullableFilter<"ProjectDocument"> | string | null
     description?: StringNullableFilter<"ProjectDocument"> | string | null
     version?: StringNullableFilter<"ProjectDocument"> | string | null
@@ -26461,6 +26493,7 @@ export namespace Prisma {
     url: string
     fileSize?: number | null
     mimeType?: string | null
+    resourceType?: string | null
     title?: string | null
     description?: string | null
     version?: string | null
@@ -26478,6 +26511,7 @@ export namespace Prisma {
     url: string
     fileSize?: number | null
     mimeType?: string | null
+    resourceType?: string | null
     title?: string | null
     description?: string | null
     version?: string | null
@@ -28472,6 +28506,7 @@ export namespace Prisma {
     url: string
     fileSize?: number | null
     mimeType?: string | null
+    resourceType?: string | null
     title?: string | null
     description?: string | null
     version?: string | null
@@ -28803,6 +28838,7 @@ export namespace Prisma {
     url?: StringFieldUpdateOperationsInput | string
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
     mimeType?: NullableStringFieldUpdateOperationsInput | string | null
+    resourceType?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     version?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28820,6 +28856,7 @@ export namespace Prisma {
     url?: StringFieldUpdateOperationsInput | string
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
     mimeType?: NullableStringFieldUpdateOperationsInput | string | null
+    resourceType?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     version?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28836,6 +28873,7 @@ export namespace Prisma {
     url?: StringFieldUpdateOperationsInput | string
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
     mimeType?: NullableStringFieldUpdateOperationsInput | string | null
+    resourceType?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     version?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28905,6 +28943,7 @@ export namespace Prisma {
     url: string
     fileSize?: number | null
     mimeType?: string | null
+    resourceType?: string | null
     title?: string | null
     description?: string | null
     version?: string | null
@@ -29015,6 +29054,7 @@ export namespace Prisma {
     url?: StringFieldUpdateOperationsInput | string
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
     mimeType?: NullableStringFieldUpdateOperationsInput | string | null
+    resourceType?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     version?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29032,6 +29072,7 @@ export namespace Prisma {
     url?: StringFieldUpdateOperationsInput | string
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
     mimeType?: NullableStringFieldUpdateOperationsInput | string | null
+    resourceType?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     version?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29048,6 +29089,7 @@ export namespace Prisma {
     url?: StringFieldUpdateOperationsInput | string
     fileSize?: NullableIntFieldUpdateOperationsInput | number | null
     mimeType?: NullableStringFieldUpdateOperationsInput | string | null
+    resourceType?: NullableStringFieldUpdateOperationsInput | string | null
     title?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     version?: NullableStringFieldUpdateOperationsInput | string | null

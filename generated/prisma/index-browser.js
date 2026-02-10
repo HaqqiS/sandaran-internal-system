@@ -228,6 +228,7 @@ exports.Prisma.ProjectDocumentScalarFieldEnum = {
   url: 'url',
   fileSize: 'fileSize',
   mimeType: 'mimeType',
+  resourceType: 'resourceType',
   title: 'title',
   description: 'description',
   version: 'version',

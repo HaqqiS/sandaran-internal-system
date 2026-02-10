@@ -23,6 +23,7 @@ interface FileUploadProps {
     originalFilename: string,
     size: number,
     mimeType: string,
+    resourceType: string,
   ) => void
   /** Callback when file is removed */
   onRemove?: () => void
@@ -68,14 +69,12 @@ export function FileUpload({
         const isImage = file.type.startsWith("image/")
         const resourceType = isImage ? "image" : "raw"
 
-        console.log(
-          "Uploading file:",
-          file.name,
-          "Type:",
-          file.type,
-          "ResourceType:",
+        console.log("📤 Uploading file:", {
+          name: file.name,
+          type: file.type,
+          size: file.size,
           resourceType,
-        )
+        })
 
         // Debug toast
         toast.info(`Uploading as ${resourceType}...`)
@@ -87,14 +86,21 @@ export function FileUpload({
           resourceType,
         })
 
-        console.log("Upload success! Result URL:", result.secureUrl)
+        console.log("✅ Upload success:", {
+          url: result.secureUrl,
+          publicId: result.publicId,
+          resourceType: result.resourceType,
+          format: result.format,
+          bytes: result.bytes,
+        })
 
         onChange(
           result.secureUrl,
           result.publicId,
           file.name,
           result.bytes,
-          result.format,
+          file.type,
+          result.resourceType,
         )
       } catch (err) {
         console.error("Upload failed:", err)
