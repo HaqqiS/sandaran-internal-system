@@ -1,6 +1,7 @@
 "use client"
 
 import {
+  IconArrowLeft,
   IconCoin,
   IconDashboard,
   IconFileText,
@@ -12,6 +13,7 @@ import {
   IconUsers,
 } from "@tabler/icons-react"
 import type { GlobalRole } from "generated/prisma"
+import { useParams } from "next/navigation"
 import type { ReactNode } from "react"
 import { DashboardLayout } from "~/components/layout"
 import {
@@ -39,6 +41,7 @@ function getSidebarConfig(
     image?: string | null
   },
   role: GlobalRole,
+  projectSlug?: string,
 ): SidebarConfig {
   // Base configuration
   const baseConfig: SidebarConfig = {
@@ -68,23 +71,45 @@ function getSidebarConfig(
           ...baseConfig.navMain,
           {
             title: "My Reports",
-            url: "/reports",
+            url: projectSlug ? `/projects/${projectSlug}/reports` : "/reports",
             icon: IconReport,
           },
           {
             title: "Emergency Funds",
-            url: "/emergency",
+            url: projectSlug
+              ? `/projects/${projectSlug}/emergency`
+              : "/emergency",
             icon: IconCoin,
           },
           {
             title: "Logistics",
-            url: "/logistics",
+            url: projectSlug
+              ? `/projects/${projectSlug}/logistics`
+              : "/logistics",
             icon: IconPackage,
           },
         ],
       }
 
     case "CEO":
+      if (projectSlug) {
+        return {
+          ...baseConfig,
+          navMain: [
+            {
+              title: "Back to All Projects",
+              url: "/ceo/projects",
+              icon: IconArrowLeft,
+            },
+            {
+              title: "Project Reports",
+              url: `/projects/${projectSlug}/reports`,
+              icon: IconNews,
+            },
+          ],
+        }
+      }
+
       return {
         ...baseConfig,
         navMain: [
@@ -137,6 +162,10 @@ function LayoutContent({ children }: { children: ReactNode }) {
   // Get layout config from context
   const { config } = useLayout()
 
+  // Get current project context from URL
+  const params = useParams()
+  const projectSlug = params?.slug as string | undefined
+
   // Ensure we have user data (should always be true due to layout auth guard)
   if (!user) {
     return null
@@ -151,6 +180,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
       image: user.image,
     },
     validRole,
+    projectSlug,
   )
 
   return (

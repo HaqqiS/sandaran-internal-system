@@ -16,6 +16,7 @@ import type { GlobalRole } from "generated/prisma"
 import Link from "next/link"
 import { useState } from "react"
 import { toast } from "sonner"
+import { CommentList } from "~/components/comment/comment-list"
 import { PageLayout } from "~/components/layout"
 import { MediaGallery } from "~/components/report/media-gallery"
 import { MediaUpload } from "~/components/report/media-upload"
@@ -259,6 +260,13 @@ export function ReportDetailClient({
                 canDelete={canEdit}
               />
             )}
+          </CardContent>
+        </Card>
+
+        {/* Comments Section */}
+        <Card>
+          <CardContent className="pt-6">
+            <CommentList projectId={project.id} reportId={report.id} />
           </CardContent>
         </Card>
       </div>

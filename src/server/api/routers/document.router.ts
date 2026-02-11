@@ -1,8 +1,8 @@
-import { TRPCError } from "@trpc/server";
-import { z } from "zod";
-import { getSignedDownloadUrl } from "~/lib/cloudinary";
-import { requireOwnership } from "~/server/api/helpers/permission";
-import { createTRPCRouter, projectProcedure } from "~/server/api/trpc";
+import { TRPCError } from "@trpc/server"
+import { z } from "zod"
+import { getSignedDownloadUrl } from "~/lib/cloudinary"
+import { requireOwnership } from "~/server/api/helpers/permission"
+import { createTRPCRouter, projectProcedure } from "~/server/api/trpc"
 
 /**
  * Project Document Router
@@ -16,14 +16,14 @@ import { createTRPCRouter, projectProcedure } from "~/server/api/trpc";
  */
 
 // Only ARCHITECT can upload/manage documents
-const architectProcedure = projectProcedure(["ARCHITECT"]);
+const architectProcedure = projectProcedure(["ARCHITECT"])
 
 // All project members can view
 const projectMemberProcedure = projectProcedure([
   "MANDOR",
   "ARCHITECT",
   "FINANCE",
-]);
+])
 
 export const documentRouter = createTRPCRouter({
   /**
@@ -80,9 +80,9 @@ export const documentRouter = createTRPCRouter({
             },
           },
         },
-      });
+      })
 
-      return document;
+      return document
     }),
 
   /**
@@ -116,9 +116,9 @@ export const documentRouter = createTRPCRouter({
         orderBy: {
           createdAt: "desc",
         },
-      });
+      })
 
-      return documents;
+      return documents
     }),
 
   /**
@@ -147,16 +147,16 @@ export const documentRouter = createTRPCRouter({
             },
           },
         },
-      });
+      })
 
       if (!document) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Document not found",
-        });
+        })
       }
 
-      return document;
+      return document
     }),
 
   /**
@@ -176,36 +176,36 @@ export const documentRouter = createTRPCRouter({
           id: input.documentId,
           projectId: ctx.projectId,
         },
-      });
+      })
 
       if (!document) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Document not found",
-        });
+        })
       }
 
       const cleanPublicId = document.publicId.replace(
         /\.(pdf|xlsx?|png|jpe?g|webp)$/i,
         "",
-      );
+      )
       const resourceType = (document.resourceType || "raw") as
         | "image"
         | "video"
-        | "raw";
+        | "raw"
 
       // Generate signed URL with 1-hour expiry
-      const url = getSignedDownloadUrl(cleanPublicId, resourceType);
+      const url = getSignedDownloadUrl(cleanPublicId, resourceType)
 
       console.log("📥 Document details:", {
         originalPublicId: document.publicId,
         cleanPublicId,
         mimeType: document.mimeType,
         resourceType,
-      });
-      console.log("🔗 Generated URL:", url);
+      })
+      console.log("🔗 Generated URL:", url)
 
-      return { url };
+      return { url }
     }),
 
   /**
@@ -232,14 +232,14 @@ export const documentRouter = createTRPCRouter({
           id: input.documentId,
           projectId: ctx.projectId,
         },
-      });
+      })
 
       // Check ownership (ADMIN bypasses this)
       requireOwnership(
         document,
         ctx.session.user.id,
         ctx.session.user.roleGlobal,
-      );
+      )
 
       const updated = await ctx.db.projectDocument.update({
         where: { id: input.documentId },
@@ -258,9 +258,9 @@ export const documentRouter = createTRPCRouter({
             },
           },
         },
-      });
+      })
 
-      return updated;
+      return updated
     }),
 
   /**
@@ -281,19 +281,19 @@ export const documentRouter = createTRPCRouter({
           id: input.documentId,
           projectId: ctx.projectId,
         },
-      });
+      })
 
       // Check ownership (ADMIN bypasses this)
       requireOwnership(
         document,
         ctx.session.user.id,
         ctx.session.user.roleGlobal,
-      );
+      )
 
       await ctx.db.projectDocument.delete({
         where: { id: input.documentId },
-      });
+      })
 
-      return { success: true };
+      return { success: true }
     }),
-});
+})
