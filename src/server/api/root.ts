@@ -1,4 +1,5 @@
 import { commentRouter } from "~/server/api/routers/comment.router"
+import { dashboardRouter } from "~/server/api/routers/dashboard.router"
 import { documentRouter } from "~/server/api/routers/document.router"
 import { emergencyRouter } from "~/server/api/routers/emergency.router"
 import { logisticRouter } from "~/server/api/routers/logistic.router"
@@ -13,6 +14,7 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc"
  *
  * All routers added in /api/routers should be manually added here.
  */
+
 export const appRouter = createTRPCRouter({
   project: projectRouter,
   user: userRouter,
@@ -22,6 +24,7 @@ export const appRouter = createTRPCRouter({
   emergency: emergencyRouter,
   logistic: logisticRouter,
   upload: uploadRouter,
+  dashboard: dashboardRouter,
 })
 
 // export type definition of API

@@ -7,13 +7,16 @@ import {
   IconLoader2,
   IconMapPin,
   IconPencil,
+  IconPlus,
   IconUsers,
 } from "@tabler/icons-react"
 import { format } from "date-fns"
 import type { GlobalRole, ProjectRole } from "generated/prisma"
 import { useState } from "react"
-import { FundOverviewCard } from "~/components/emergency/fund-overview-card"
+import { FundDialog } from "~/components/emergency/fund-dialog"
+import { FundOverview } from "~/components/emergency/fund-overview"
 import { TransactionList } from "~/components/emergency/transaction-list"
+import { WithdrawDialog } from "~/components/emergency/withdraw-dialog"
 import { PageLayout } from "~/components/layout"
 import { MemberManagement } from "~/components/project/member-management"
 import { ProjectDialog } from "~/components/project/project-dialog"
@@ -35,6 +38,8 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
   const { data: project, isLoading, error } = useProjectBySlug(slug)
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isCreateReportOpen, setIsCreateReportOpen] = useState(false)
+  const [isFundOpen, setIsFundOpen] = useState(false)
+  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false)
   const session = useSessionStore((state) => state.session)
   const canManage = isAdmin(
     session?.user?.roleGlobal as GlobalRole | null | undefined,
@@ -160,11 +165,27 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
           </Card>
 
           {/* Emergency Fund Stat - New */}
-          <FundOverviewCard
+          <FundOverview
             projectId={project.id}
-            projectSlug={project.slug}
-            canAddFund={canAddFund}
-            canWithdraw={canWithdraw}
+            actions={
+              <>
+                {canWithdraw && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsWithdrawOpen(true)}
+                  >
+                    Withdraw
+                  </Button>
+                )}
+                {canAddFund && (
+                  <Button size="sm" onClick={() => setIsFundOpen(true)}>
+                    <IconPlus className="mr-2 h-4 w-4" />
+                    Add Funds
+                  </Button>
+                )}
+              </>
+            }
           />
         </div>
 
@@ -250,6 +271,19 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
         projectId={project.id}
         open={isCreateReportOpen}
         onOpenChange={setIsCreateReportOpen}
+      />
+
+      <FundDialog
+        projectId={project.id}
+        open={isFundOpen}
+        onOpenChange={setIsFundOpen}
+      />
+
+      <WithdrawDialog
+        projectId={project.id}
+        projectSlug={project.slug}
+        open={isWithdrawOpen}
+        onOpenChange={setIsWithdrawOpen}
       />
     </PageLayout>
   )
