@@ -1,32 +1,41 @@
 "use client"
 
 import {
-  IconCalendar,
-  IconCheckbox,
-  IconFileText,
+  IconActivity,
   IconLoader2,
-  IconMapPin,
   IconPencil,
-  IconPlus,
+  IconTrendingUp,
   IconUsers,
+  IconWallet,
 } from "@tabler/icons-react"
-import { format } from "date-fns"
+import { formatDistanceToNow } from "date-fns"
 import type { GlobalRole, ProjectRole } from "generated/prisma"
 import { useState } from "react"
 import { FundDialog } from "~/components/emergency/fund-dialog"
-import { FundOverview } from "~/components/emergency/fund-overview"
-import { TransactionList } from "~/components/emergency/transaction-list"
 import { WithdrawDialog } from "~/components/emergency/withdraw-dialog"
 import { PageLayout } from "~/components/layout"
 import { MemberManagement } from "~/components/project/member-management"
+import {
+  DocumentsSection,
+  EmergencyFundSection,
+  LogisticsSection,
+  ProjectInfoSection,
+  RecentReportsSection,
+} from "~/components/project/overview"
 import { ProjectDialog } from "~/components/project/project-dialog"
 import { ReportDialog } from "~/components/report/report-dialog"
-import { ReportList } from "~/components/report/report-list"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
-import { useProjectBySlug } from "~/hooks"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "~/components/ui/sheet"
+import { useProjectBySlug, useReportsByProject } from "~/hooks"
+import { useEmergencyFund } from "~/hooks/useEmergency"
 import { isAdmin } from "~/lib/auth-guards"
 import { useSessionStore } from "~/stores/use-session-store"
 
@@ -36,10 +45,13 @@ interface ProjectDetailClientProps {
 
 export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
   const { data: project, isLoading, error } = useProjectBySlug(slug)
+  const { data: reportsData } = useReportsByProject(project?.id ?? "")
+  const { data: emergencyFund } = useEmergencyFund(project?.id ?? "")
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isCreateReportOpen, setIsCreateReportOpen] = useState(false)
   const [isFundOpen, setIsFundOpen] = useState(false)
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false)
+  const [isTeamOpen, setIsTeamOpen] = useState(false)
   const session = useSessionStore((state) => state.session)
   const canManage = isAdmin(
     session?.user?.roleGlobal as GlobalRole | null | undefined,
@@ -48,20 +60,14 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
   // Check user roles
   const userRole = session?.user?.roleGlobal as GlobalRole | undefined
   const isAdminRole = userRole === "ADMIN" || userRole === "CEO"
-  const isSuperAdmin = userRole === "ADMIN" // CEO is read-only for emergency fund
 
   const projectMember = project?.members.find(
     (m) => m.userId === session?.user?.id,
   )
   const memberRole = projectMember?.role as ProjectRole | undefined
 
-  // Permissions
   const canCreateReport =
     isAdminRole || memberRole === "MANDOR" || memberRole === "ARCHITECT"
-
-  const canAddFund = isSuperAdmin || memberRole === "FINANCE"
-  const canWithdraw = isSuperAdmin || memberRole === "MANDOR"
-  const canReview = isSuperAdmin || memberRole === "FINANCE"
 
   if (isLoading) {
     return (
@@ -90,173 +96,157 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
       title={project.name}
       actions={
         canManage && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsEditOpen(true)}
-          >
-            <IconPencil className="mr-2 h-4 w-4" />
-            Edit Project
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsTeamOpen(true)}
+            >
+              <IconUsers className="mr-2 h-4 w-4" />
+              Manage Team
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsEditOpen(true)}
+            >
+              <IconPencil className="mr-2 h-4 w-4" />
+              Edit Project
+            </Button>
+          </div>
         )
       }
     >
       <div className="flex flex-col gap-6 p-4 md:p-6">
-        {/* Header Stats */}
+        {/* Enhanced Stat Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {/* Overall Progress */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Status</CardTitle>
-              <IconCheckbox className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <Badge
-                variant={
-                  project.status === "ACTIVE"
-                    ? "default"
-                    : project.status === "DONE"
-                      ? "secondary"
-                      : "outline"
-                }
-              >
-                {project.status}
-              </Badge>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Reports</CardTitle>
-              <IconFileText className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">
+                Overall Progress
+              </CardTitle>
+              <IconTrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {project._count.dailyReports}
+                {reportsData?.reports && reportsData.reports.length > 0
+                  ? Math.round(
+                      reportsData.reports.reduce(
+                        (acc, r) => acc + r.progressPercent,
+                        0,
+                      ) / reportsData.reports.length,
+                    )
+                  : 0}
+                %
               </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Based on {project._count.dailyReports} reports
+              </p>
             </CardContent>
           </Card>
+
+          {/* Team Members */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Team Count</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Team Members
+              </CardTitle>
               <IconUsers className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{project.members.length}</div>
+              <div className="mt-2 flex flex-wrap gap-1">
+                {[
+                  {
+                    role: "MANDOR",
+                    count: project.members.filter((m) => m.role === "MANDOR")
+                      .length,
+                  },
+                  {
+                    role: "ARCHITECT",
+                    count: project.members.filter((m) => m.role === "ARCHITECT")
+                      .length,
+                  },
+                  {
+                    role: "FINANCE",
+                    count: project.members.filter((m) => m.role === "FINANCE")
+                      .length,
+                  },
+                ]
+                  .filter((r) => r.count > 0)
+                  .map((r) => (
+                    <Badge key={r.role} variant="outline" className="text-xs">
+                      {r.role}: {r.count}
+                    </Badge>
+                  ))}
+              </div>
             </CardContent>
           </Card>
+
+          {/* Recent Activity */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Timeline</CardTitle>
-              <IconCalendar className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">
+                Recent Activity
+              </CardTitle>
+              <IconActivity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-xs text-muted-foreground">
-                Start:{" "}
-                {project.startDate
-                  ? format(new Date(project.startDate), "PP")
-                  : "-"}
+              <div className="text-base font-medium">
+                {reportsData?.reports && reportsData.reports.length > 0
+                  ? formatDistanceToNow(
+                      new Date(reportsData?.reports[0]?.reportDate ?? ""),
+                      { addSuffix: true },
+                    )
+                  : "No activity"}
               </div>
-              <div className="text-xs text-muted-foreground">
-                End:{" "}
-                {project.endDate
-                  ? format(new Date(project.endDate), "PP")
-                  : "-"}
-              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Last report submitted
+              </p>
             </CardContent>
           </Card>
 
-          {/* Emergency Fund Stat - New */}
-          <FundOverview
-            projectId={project.id}
-            actions={
-              <>
-                {canWithdraw && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsWithdrawOpen(true)}
-                  >
-                    Withdraw
-                  </Button>
+          {/* Budget Status */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Budget Status
+              </CardTitle>
+              <IconWallet className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                Rp{" "}
+                {Number(emergencyFund?.currentBalance || 0).toLocaleString(
+                  "id-ID",
+                  { maximumFractionDigits: 0 },
                 )}
-                {canAddFund && (
-                  <Button size="sm" onClick={() => setIsFundOpen(true)}>
-                    <IconPlus className="mr-2 h-4 w-4" />
-                    Add Funds
-                  </Button>
-                )}
-              </>
-            }
-          />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Emergency Fund Balance
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Main Content Tabs */}
-        <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="team">Team</TabsTrigger>
-            <TabsTrigger value="reports">Reports</TabsTrigger>
-            <TabsTrigger value="emergency">Emergency Fund</TabsTrigger>
-            <TabsTrigger value="documents" disabled>
-              Documents
-            </TabsTrigger>
-          </TabsList>
+        {/* Overview Sections */}
+        <ProjectInfoSection project={project} />
 
-          <TabsContent value="overview" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Project Details</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {project.description ? (
-                  <div>
-                    <h4 className="mb-1 text-sm font-semibold">Description</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {project.description}
-                    </p>
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    No description provided.
-                  </p>
-                )}
-                {project.location && (
-                  <div>
-                    <h4 className="mb-1 flex items-center gap-1 text-sm font-semibold">
-                      <IconMapPin className="h-3 w-3" /> Location
-                    </h4>
-                    <p className="text-sm text-muted-foreground">
-                      {project.location}
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
+        <RecentReportsSection
+          projectId={project.id}
+          projectSlug={project.slug}
+          canCreate={canCreateReport}
+        />
 
-          <TabsContent value="team" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Team Management</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <MemberManagement projectId={project.id} />
-              </CardContent>
-            </Card>
-          </TabsContent>
+        <EmergencyFundSection
+          projectId={project.id}
+          projectSlug={project.slug}
+        />
 
-          <TabsContent value="reports">
-            <ReportList
-              projectId={project.id}
-              projectSlug={project.slug}
-              canCreate={canCreateReport}
-              onCreateClick={() => setIsCreateReportOpen(true)}
-            />
-          </TabsContent>
+        <LogisticsSection projectId={project.id} projectSlug={project.slug} />
 
-          <TabsContent value="emergency" className="space-y-4">
-            <TransactionList projectId={project.id} canReview={canReview} />
-          </TabsContent>
-        </Tabs>
+        <DocumentsSection projectId={project.id} projectSlug={project.slug} />
       </div>
 
       {canManage && (
@@ -285,6 +275,21 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
         open={isWithdrawOpen}
         onOpenChange={setIsWithdrawOpen}
       />
+
+      {/* Team Management Sheet */}
+      <Sheet open={isTeamOpen} onOpenChange={setIsTeamOpen}>
+        <SheetContent className="w-full overflow-y-auto sm:max-w-2xl">
+          <SheetHeader>
+            <SheetTitle>Team Management</SheetTitle>
+            <SheetDescription>
+              Add, remove, and manage roles for project members
+            </SheetDescription>
+          </SheetHeader>
+          <div className="mt-6">
+            <MemberManagement projectId={project.id} />
+          </div>
+        </SheetContent>
+      </Sheet>
     </PageLayout>
   )
 }

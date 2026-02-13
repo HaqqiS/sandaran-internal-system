@@ -1,3 +1,4 @@
+import { z } from "zod"
 import {
   adminProcedure,
   createTRPCRouter,
@@ -47,6 +48,7 @@ export const dashboardRouter = createTRPCRouter({
       select: {
         id: true,
         name: true,
+        slug: true,
         status: true,
         _count: {
           select: {
@@ -64,7 +66,47 @@ export const dashboardRouter = createTRPCRouter({
   }),
 
   /**
-   * Get stats for MNDOR dashboard
+   * Get recent reports across all projects (CEO only)
+   */
+  getCEORecentReports: protectedProcedure
+    .input(z.object({ limit: z.number().default(5).optional() }))
+    .query(async ({ ctx, input }) => {
+      // Check if CEO
+      if (ctx.session.user.roleGlobal !== "CEO") {
+        throw new Error("Unauthorized")
+      }
+
+      const reports = await ctx.db.dailyReport.findMany({
+        take: input.limit ?? 5,
+        orderBy: { reportDate: "desc" },
+        select: {
+          id: true,
+          slug: true,
+          reportDate: true,
+          taskDescription: true,
+          progressPercent: true,
+          project: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+      })
+
+      return reports
+    }),
+
+  /**
+   * Get stats for MANDOR dashboard
    * Returns data for projects where user is MANDOR
    */
   getMandorStats: protectedProcedure.query(async ({ ctx }) => {
@@ -98,6 +140,56 @@ export const dashboardRouter = createTRPCRouter({
   }),
 
   /**
+   * Get recent reports for MANDOR with media thumbnails
+   */
+  getMandorRecentReports: protectedProcedure
+    .input(z.object({ limit: z.number().default(3).optional() }))
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id
+
+      // Get projects where user is MANDOR
+      const projectIds = await ctx.db.projectMember
+        .findMany({
+          where: { userId, role: "MANDOR" },
+          select: { projectId: true },
+        })
+        .then((members) => members.map((m) => m.projectId))
+
+      if (!projectIds.length) return []
+
+      const reports = await ctx.db.dailyReport.findMany({
+        where: { projectId: { in: projectIds } },
+        take: input.limit ?? 3,
+        orderBy: { reportDate: "desc" },
+        select: {
+          id: true,
+          slug: true,
+          reportDate: true,
+          taskDescription: true,
+          project: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
+          media: {
+            take: 1,
+            select: {
+              url: true,
+              publicId: true,
+            },
+          },
+        },
+      })
+
+      return reports.map((report) => ({
+        ...report,
+        thumbnail: report.media[0]?.url ?? null,
+      }))
+    }),
+
+  /**
    * Get stats for ARCHITECT dashboard
    */
   getArchitectStats: protectedProcedure.query(async ({ ctx }) => {
@@ -121,6 +213,76 @@ export const dashboardRouter = createTRPCRouter({
     return {
       projectCount: projects.length,
       uploadedDocuments: myDocuments,
+    }
+  }),
+
+  /**
+   * Get architect dashboard data: documents by project + recent reports
+   */
+  getArchitectDashboard: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id
+
+    // Get projects where user is ARCHITECT
+    const projectIds = await ctx.db.projectMember
+      .findMany({
+        where: { userId, role: "ARCHITECT" },
+        select: { projectId: true },
+      })
+      .then((members) => members.map((m) => m.projectId))
+
+    if (!projectIds.length) {
+      return { documentsByProject: [], recentReports: [] }
+    }
+
+    // Get documents grouped by project
+    const projects = await ctx.db.project.findMany({
+      where: { id: { in: projectIds } },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        _count: {
+          select: { documents: true },
+        },
+      },
+    })
+
+    const documentsByProject = projects.map((p) => ({
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      documentCount: p._count.documents,
+    }))
+
+    // Get recent reports from these projects
+    const recentReports = await ctx.db.dailyReport.findMany({
+      where: { projectId: { in: projectIds } },
+      take: 5,
+      orderBy: { reportDate: "desc" },
+      select: {
+        id: true,
+        slug: true,
+        reportDate: true,
+        taskDescription: true,
+        project: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    })
+
+    return {
+      documentsByProject,
+      recentReports,
     }
   }),
 
@@ -156,5 +318,45 @@ export const dashboardRouter = createTRPCRouter({
     return {
       pendingApprovals: pendingEmergency,
     }
+  }),
+
+  /**
+   * Get emergency fund breakdown by project (Finance only)
+   */
+  getEmergencyFundBreakdown: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id
+
+    // Get projects where user is FINANCE
+    const projectIds = await ctx.db.projectMember
+      .findMany({
+        where: { userId, role: "FINANCE" },
+        select: { projectId: true },
+      })
+      .then((members) => members.map((m) => m.projectId))
+
+    if (!projectIds.length) return []
+
+    // Get emergency funds for these projects
+    const funds = await ctx.db.emergencyFund.findMany({
+      where: { projectId: { in: projectIds } },
+      select: {
+        id: true,
+        currentBalance: true,
+        project: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+      },
+    })
+
+    return funds.map((fund) => ({
+      projectId: fund.project.id,
+      projectName: fund.project.name,
+      projectSlug: fund.project.slug,
+      currentBalance: fund.currentBalance,
+    }))
   }),
 })

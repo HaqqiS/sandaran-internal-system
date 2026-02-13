@@ -1,20 +1,75 @@
-# 🗂️ Permission System Documentation — Index
+# 📚 Sandaran Internal System - Dokumentasi
 
-> **Master index for all permission-related documentation**
+> **Index utama untuk semua dokumentasi sistem**
 
 ---
 
-## 📚 Document Overview
+## 📖 Daftar Dokumen
 
-| #   | Document                                                                                                                                      | Purpose                                            | Audience               | Status     |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ---------------------- | ---------- |
-| 1   | [Permission Matrix](file:///C:/Users/haqqi/.gemini/antigravity/brain/e7ca4093-7a8e-446d-92a7-8ac291978fb5/permission-matrix.md)               | Complete permission table with all roles & actions | All                    | ✅ v2.0    |
-| 2   | [Permission Flows](file:///C:/Users/haqqi/.gemini/antigravity/brain/e7ca4093-7a8e-446d-92a7-8ac291978fb5/permission-flows.md)                 | Visual diagrams of permission logic                | Architects, Developers | ✅ Final   |
-| 3   | [Quick Reference](file:///C:/Users/haqqi/.gemini/antigravity/brain/e7ca4093-7a8e-446d-92a7-8ac291978fb5/permission-quick-reference.md)        | Code examples & patterns                           | Developers             | ✅ Final   |
-| 4   | [Status Summary](file:///C:/Users/haqqi/.gemini/antigravity/brain/e7ca4093-7a8e-446d-92a7-8ac291978fb5/permission-status.md)                  | Current implementation status                      | All                    | ✅ Updated |
-| 5   | [Implementation Checklist](file:///C:/Users/haqqi/.gemini/antigravity/brain/e7ca4093-7a8e-446d-92a7-8ac291978fb5/implementation-checklist.md) | Detailed task breakdown                            | Developers, PM         | ✅ Final   |
-| 6   | [Schema Updates](file:///C:/Users/haqqi/.gemini/antigravity/brain/e7ca4093-7a8e-446d-92a7-8ac291978fb5/schema-updates.md)                     | Database schema changes required                   | Developers, DBA        | ✅ New     |
-| 7   | **Index** (this file)                                                                                                                         | Navigation & overview                              | All                    | ✅ Updated |
+### [auth-guards-usage.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/auth-guards-usage.md)
+
+**Contoh lengkap penggunaan fungsiAuth Guards** - Panduan praktis untuk menggunakan fungsi-fungsi autentikasi seperti `isAuthorizedRole`, `isAdmin`, `validateSessionAccess`, dan helper functions lainnya. Berisi code examples untuk protected pages, conditional UI, dan server actions.
+
+---
+
+### [frontend-implementation-plan.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/frontend-implementation-plan.md)
+
+**Rencana implementasi frontend UI** - Dokumen perencanaan bertahap (9 fase) untuk membangun UI lengkap sistem, dari Project Management, Daily Reports dengan media upload, Emergency Fund, hingga Logistics dan Documents. Termasuk tech stack (Next.js 15, shadcn/ui, TanStack Form, Cloudinary).
+
+---
+
+### [permission-flows.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/permission-flows.md)
+
+**Diagram alur sistem permission** - Visual flowchart menggunakan Mermaid untuk menjelaskan 3-Layer Permission System (Authentication → Global Role → Project Context). Berisi 9 diagram termasuk ownership guard, role-specific flows, dan workflow emergency fund & logistics.
+
+---
+
+### [permission-matrix.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/permission-matrix.md)
+
+**Tabel permission lengkap** - Dokumen referensi utama yang mendefinisikan 28 action codes (4 global + 24 project-scoped), 6 roles (ADMIN, CEO, USER, MANDOR, ARCHITECT, FINANCE), dan permission matrix detail untuk setiap fitur. Termasuk special rules untuk CEO read-only dan ownership guards.
+
+---
+
+### [permission-quick-reference.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/permission-quick-reference.md)
+
+**Cheat sheet untuk developer** - Panduan cepat memilih procedure yang tepat (`publicProcedure`, `protectedProcedure`, `adminProcedure`, `projectProcedure`) dengan decision tree, code examples, helper functions, dan debugging tips untuk implementasi tRPC permission guards.
+
+---
+
+### [roles-and-permissions.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/roles-and-permissions.md)
+
+**Panduan role dan hak akses (Bahasa Indonesia)** - Penjelasan konsep Global Role vs Project Role, detail permission per fitur (Laporan Harian, Dana Darurat, Logistik, Dokumen), dan matriks ringkasan yang mudah dipahami untuk stakeholder non-teknis.
+
+---
+
+### [ui-flow-map.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/ui-flow-map.md)
+
+**Peta navigasi UI per role** - Diagram Mermaid yang menampilkan user flow dan struktur navigasi untuk masing-masing role (ADMIN, CEO, MANDOR, ARCHITECT, FINANCE). Menjelaskan halaman apa saja yang dapat diakses dan aksi apa yang bisa dilakukan setiap role di setiap modul.
+
+---
+
+## 🎯 Quick Start Guide
+
+### Untuk Developer Baru
+
+1. Mulai dengan [roles-and-permissions.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/roles-and-permissions.md) untuk memahami konsep dasar
+2. Lihat [permission-flows.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/permission-flows.md) untuk visualisasi sistem
+3. Gunakan [permission-quick-reference.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/permission-quick-reference.md) saat coding
+4. Referensi [auth-guards-usage.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/auth-guards-usage.md) untuk contoh implementasi
+
+### Untuk Frontend Developer
+
+1. Baca [frontend-implementation-plan.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/frontend-implementation-plan.md) untuk roadmap UI
+2. Lihat [ui-flow-map.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/ui-flow-map.md) untuk memahami navigasi
+
+### Untuk Project Manager / Stakeholder
+
+1. [roles-and-permissions.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/roles-and-permissions.md) - Ringkasan hak akses yang mudah dipahami
+2. [ui-flow-map.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/ui-flow-map.md) - Visual flow untuk setiap role
+
+---
+
+**Terakhir diperbarui:** 2026-02-11
 
 ---
 

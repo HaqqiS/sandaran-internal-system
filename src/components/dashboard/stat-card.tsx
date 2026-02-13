@@ -14,6 +14,8 @@ interface StatCardProps {
   }
   className?: string
   action?: React.ReactNode
+  variant?: "default" | "success" | "warning" | "error"
+  isLoading?: boolean
 }
 
 export function StatCard({
@@ -24,9 +26,33 @@ export function StatCard({
   trend,
   className,
   action,
+  variant = "default",
+  isLoading = false,
 }: StatCardProps) {
+  const variantStyles = {
+    default: "",
+    success: "border-green-200 bg-green-50/50",
+    warning: "border-amber-200 bg-amber-50/50",
+    error: "border-red-200 bg-red-50/50",
+  }
+
+  if (isLoading) {
+    return (
+      <Card className={cn("overflow-hidden", className)}>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+          <div className="h-4 w-4 animate-pulse rounded bg-muted" />
+        </CardHeader>
+        <CardContent>
+          <div className="h-8 w-32 animate-pulse rounded bg-muted" />
+          <div className="mt-2 h-3 w-40 animate-pulse rounded bg-muted" />
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
-    <Card className={cn("overflow-hidden", className)}>
+    <Card className={cn("overflow-hidden", variantStyles[variant], className)}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <Icon className="h-4 w-4 text-muted-foreground" />

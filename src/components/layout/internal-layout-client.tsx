@@ -70,7 +70,7 @@ function getSidebarConfig(
         navMain: [
           ...baseConfig.navMain,
           {
-            title: "My Reports",
+            title: "Reports",
             url: projectSlug ? `/projects/${projectSlug}/reports` : "/reports",
             icon: IconReport,
           },
@@ -87,6 +87,13 @@ function getSidebarConfig(
               ? `/projects/${projectSlug}/logistics`
               : "/logistics",
             icon: IconPackage,
+          },
+          {
+            title: "Documents",
+            url: projectSlug
+              ? `/projects/${projectSlug}/documents`
+              : "/documents",
+            icon: IconFileText,
           },
         ],
       }

@@ -1,6 +1,10 @@
 import { TRPCError } from "@trpc/server"
 import { z } from "zod"
-import { createTRPCRouter, projectProcedure } from "~/server/api/trpc"
+import {
+  createTRPCRouter,
+  projectProcedure,
+  protectedProcedure,
+} from "~/server/api/trpc"
 
 /**
  * Emergency Fund Router
@@ -325,5 +329,91 @@ export const emergencyRouter = createTRPCRouter({
       })
 
       return transactions
+    }),
+
+  /**
+   * Get recent transactions for Finance dashboard
+   * Returns transactions with project context for all projects where user is FINANCE
+   */
+  getRecentTransactions: protectedProcedure
+    .input(
+      z.object({
+        limit: z.number().default(15).optional(),
+        status: z.enum(["UNREVIEWED", "REVIEWED"]).optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id
+
+      // Get projects where user is FINANCE
+      const projectIds = await ctx.db.projectMember
+        .findMany({
+          where: { userId, role: "FINANCE" },
+          select: { projectId: true },
+        })
+        .then((members) => members.map((m) => m.projectId))
+
+      if (!projectIds.length) return []
+
+      // Get emergency funds for these projects
+      const fundIds = await ctx.db.emergencyFund
+        .findMany({
+          where: { projectId: { in: projectIds } },
+          select: { id: true },
+        })
+        .then((funds) => funds.map((f) => f.id))
+
+      if (!fundIds.length) return []
+
+      // Get transactions
+      const transactions = await ctx.db.emergencyTransaction.findMany({
+        where: {
+          fundId: { in: fundIds },
+          ...(input.status && { status: input.status }),
+        },
+        take: input.limit ?? 15,
+        orderBy: { createdAt: "desc" },
+        include: {
+          fund: {
+            select: {
+              project: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                },
+              },
+            },
+          },
+          requester: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+          verifier: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+      })
+
+      return transactions.map((tx) => ({
+        id: tx.id,
+        amount: tx.amount,
+        description: tx.description,
+        type: tx.type,
+        status: tx.status,
+        proofPublicId: tx.proofPublicId,
+        createdAt: tx.createdAt,
+        verifiedAt: tx.verifiedAt,
+        project: tx.fund.project,
+        requester: tx.requester,
+        verifier: tx.verifier,
+      }))
     }),
 })

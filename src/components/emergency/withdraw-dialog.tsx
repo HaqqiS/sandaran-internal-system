@@ -14,7 +14,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "~/components/ui/drawer"
-import { useMediaQuery } from "~/hooks/use-media-query"
+import { useIsMobile } from "~/hooks/use-mobile"
 import { RequestForm } from "./request-form"
 
 interface WithdrawDialogProps {
@@ -30,12 +30,12 @@ export function WithdrawDialog({
   open,
   onOpenChange,
 }: WithdrawDialogProps) {
-  const isDesktop = useMediaQuery("(min-width: 768px)")
+  const isMobile = useIsMobile()
   const title = "Request Withdrawal"
   const description =
     "Request funds from the project budget. Please attach proof if available."
 
-  if (isDesktop) {
+  if (!isMobile) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent>

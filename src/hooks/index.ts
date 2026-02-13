@@ -4,7 +4,7 @@
  * Central export for all custom hooks
  */
 
-export { useMediaQuery } from "./use-media-query"
+export { useIsMobile } from "./use-mobile"
 // Comment hooks
 export {
   useCommentsByReport,
@@ -12,6 +12,20 @@ export {
   useDeleteComment,
   useUpdateComment,
 } from "./useComment"
+// Dashboard hooks
+export {
+  useAdminPendingUsers,
+  useAdminStats,
+  useArchitectDashboard,
+  useArchitectStats,
+  useCEORecentReports,
+  useCEOStats,
+  useFinanceFundBreakdown,
+  useFinanceRecentTransactions,
+  useFinanceStats,
+  useMandorRecentReports,
+  useMandorStats,
+} from "./useDashboard"
 // Document hooks
 export {
   useDeleteDocument,

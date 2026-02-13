@@ -17,7 +17,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "~/components/ui/drawer"
-import { useMediaQuery } from "~/hooks/use-media-query"
+import { useIsMobile } from "~/hooks/use-mobile"
 import { ProjectForm } from "./project-form"
 
 interface ProjectDialogProps {
@@ -42,7 +42,7 @@ export function ProjectDialog({
   onOpenChange,
   children,
 }: ProjectDialogProps) {
-  const isDesktop = useMediaQuery("(min-width: 768px)")
+  const isMobile = useIsMobile()
   const isEditMode = !!project
 
   const title = isEditMode ? "Edit Project" : "New Project"
@@ -50,7 +50,7 @@ export function ProjectDialog({
     ? "Make changes to your project."
     : "Create a new construction project."
 
-  if (isDesktop) {
+  if (!isMobile) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         {children && <DialogTrigger asChild>{children}</DialogTrigger>}

@@ -12,7 +12,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "~/components/ui/drawer"
-import { useMediaQuery } from "~/hooks/use-media-query"
+import { useIsMobile } from "~/hooks/use-mobile"
 import { ReportForm } from "./report-form"
 
 interface ReportDialogProps {
@@ -37,7 +37,7 @@ export function ReportDialog({
   open,
   onOpenChange,
 }: ReportDialogProps) {
-  const isDesktop = useMediaQuery("(min-width: 768px)")
+  const isMobile = useIsMobile()
   const isEditMode = !!report
 
   const title = isEditMode ? "Edit Report" : "Create New Report"
@@ -45,7 +45,7 @@ export function ReportDialog({
     ? "Update the daily report details"
     : "Fill in the daily report for this project"
 
-  if (isDesktop) {
+  if (!isMobile) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-lg">

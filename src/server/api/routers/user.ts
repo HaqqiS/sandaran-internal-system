@@ -160,4 +160,28 @@ export const userRouter = createTRPCRouter({
       },
     })
   }),
+
+  /**
+   * Get pending users for Admin dashboard
+   * Returns limited list of users pending approval
+   */
+  getPendingUsers: adminProcedure
+    .input(z.object({ limit: z.number().default(10).optional() }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db.user.findMany({
+        where: {
+          isActive: false,
+        },
+        take: input.limit ?? 10,
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+          roleGlobal: true,
+          createdAt: true,
+        },
+      })
+    }),
 })

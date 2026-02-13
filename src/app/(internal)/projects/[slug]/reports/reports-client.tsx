@@ -32,7 +32,7 @@ export function ReportsClient({ projectSlug }: ReportsClientProps) {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex h-full items-center justify-center">
         <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     )
@@ -41,7 +41,7 @@ export function ReportsClient({ projectSlug }: ReportsClientProps) {
   if (error || !project) {
     return (
       <PageLayout title="Reports">
-        <div className="flex h-[50vh] flex-col items-center justify-center gap-4 text-center">
+        <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
           <h2 className="text-xl font-semibold">Project not found</h2>
           <p className="text-muted-foreground">
             The project you are looking for does not exist.

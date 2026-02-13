@@ -1,6 +1,7 @@
 "use client"
 
-import { IconPlus } from "@tabler/icons-react"
+import { IconArrowLeft, IconLoader2, IconPlus } from "@tabler/icons-react"
+import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useState } from "react"
 import { FundDialog } from "~/components/emergency/fund-dialog"
@@ -30,16 +31,27 @@ export function EmergencyClient() {
 
   if (isProjectLoading) {
     return (
-      <PageLayout title="Emergency Fund">
-        <div>Loading emergency fund details...</div>
-      </PageLayout>
+      <div className="flex h-full items-center justify-center">
+        <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
     )
   }
 
   if (error || !project) {
     return (
       <PageLayout title="Emergency Fund">
-        <div>Project not found</div>
+        <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
+          <h2 className="text-xl font-semibold">Project not found</h2>
+          <p className="text-muted-foreground">
+            The project you are looking for does not exist.
+          </p>
+          <Button asChild variant="outline">
+            <Link href="/projects">
+              <IconArrowLeft className="mr-2 h-4 w-4" />
+              Back to Projects
+            </Link>
+          </Button>
+        </div>
       </PageLayout>
     )
   }
@@ -54,7 +66,7 @@ export function EmergencyClient() {
 
   return (
     <PageLayout
-      title="Emergency Fund"
+      title={`${project.name} - Emergency Fund`}
       actions={
         <>
           {canWithdraw && (

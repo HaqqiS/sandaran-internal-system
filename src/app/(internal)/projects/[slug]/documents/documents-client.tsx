@@ -1,7 +1,8 @@
 "use client"
 
-import { IconPlus } from "@tabler/icons-react"
+import { IconArrowLeft, IconLoader2, IconPlus } from "@tabler/icons-react"
 import type { ProjectDocument } from "generated/prisma"
+import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useState } from "react"
 import { toast } from "sonner"
@@ -59,14 +60,28 @@ export function DocumentsClient() {
     }
   }
 
-  if (error) {
+  if (isLoading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
+  if (error || !project) {
     return (
       <PageLayout title="Project Documents">
-        <div className="flex h-[50vh] flex-col items-center justify-center gap-4 text-center">
-          <h2 className="text-xl font-semibold text-destructive">
-            Failed to load project
-          </h2>
-          <p className="text-muted-foreground">{error.message}</p>
+        <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
+          <h2 className="text-xl font-semibold">Project not found</h2>
+          <p className="text-muted-foreground">
+            The project you are looking for does not exist.
+          </p>
+          <Button asChild variant="outline">
+            <Link href="/projects">
+              <IconArrowLeft className="mr-2 h-4 w-4" />
+              Back to Projects
+            </Link>
+          </Button>
         </div>
       </PageLayout>
     )
@@ -74,7 +89,7 @@ export function DocumentsClient() {
 
   return (
     <PageLayout
-      title="Project Documents"
+      title={`${project.name} - Documents`}
       actions={
         canUpload && (
           <Button onClick={() => setShowUploadDialog(true)}>
@@ -91,27 +106,15 @@ export function DocumentsClient() {
           </p>
         </div>
 
-        {isLoading ? (
-          <div className="flex h-64 items-center justify-center">
-            <span className="text-muted-foreground">Loading...</span>
-          </div>
-        ) : !project ? (
-          <div className="flex h-[50vh] flex-col items-center justify-center gap-4 text-center">
-            <h2 className="text-xl font-semibold text-destructive">
-              Project not found
-            </h2>
-          </div>
-        ) : (
-          <DocumentList
-            projectId={project.id}
-            currentUserId={session?.user?.id ?? ""}
-            onEdit={(doc) => {
-              // TODO: Implement Edit
-              toast.info("Edit functionality coming soon")
-            }}
-            onDelete={(doc) => setDeleteDialogDoc(doc)}
-          />
-        )}
+        <DocumentList
+          projectId={project.id}
+          currentUserId={session?.user?.id ?? ""}
+          onEdit={(_doc) => {
+            // TODO: Implement Edit
+            toast.info("Edit functionality coming soon")
+          }}
+          onDelete={(doc) => setDeleteDialogDoc(doc)}
+        />
       </div>
 
       {project && (

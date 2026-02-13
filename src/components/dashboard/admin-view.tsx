@@ -3,6 +3,7 @@
 import {
   IconAlertTriangle,
   IconBuildingSkyscraper,
+  IconCloud,
   IconPlus,
   IconUserCheck,
   IconUsers,
@@ -16,97 +17,171 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card"
-import { api } from "~/trpc/react"
+import { Separator } from "~/components/ui/separator"
+import { useAdminPendingUsers, useAdminStats } from "~/hooks"
+import { DashboardLayout } from "./shared/DashboardLayout"
+import { QuickActionCard } from "./shared/QuickActionCard"
+import { StatsGrid } from "./shared/StatsGrid"
 import { StatCard } from "./stat-card"
 
 export function AdminView() {
-  const { data: stats, isLoading } = api.dashboard.getAdminStats.useQuery()
+  const { data: stats, isLoading: statsLoading } = useAdminStats()
+  const { data: pendingUsers, isLoading: usersLoading } =
+    useAdminPendingUsers(5)
 
-  if (isLoading) {
-    return <div>Loading admin stats...</div>
-  }
+  const isLoading = statsLoading || usersLoading
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <DashboardLayout
+      title="Admin Dashboard"
+      description="System management and oversight"
+    >
+      {/* Top Stats */}
+      <StatsGrid cols={{ mobile: 2, tablet: 2, desktop: 5 }}>
         <StatCard
           title="Active Projects"
           value={stats?.activeProjects ?? 0}
           icon={IconBuildingSkyscraper}
           description="Currently in progress"
+          isLoading={statsLoading}
         />
         <StatCard
           title="Pending Users"
           value={stats?.pendingUsers ?? 0}
           icon={IconUserCheck}
           description="Awaiting approval"
-          trend={
+          variant={
             stats?.pendingUsers && stats.pendingUsers > 0
-              ? {
-                  value: stats.pendingUsers,
-                  label: "users waiting",
-                  positive: false, // red if pending
-                }
-              : undefined
+              ? "warning"
+              : "default"
           }
+          isLoading={statsLoading}
         />
         <StatCard
           title="Total Users"
           value={stats?.totalUsers ?? 0}
           icon={IconUsers}
+          isLoading={statsLoading}
         />
         <StatCard
           title="Logistics Alerts"
           value={stats?.lowStockItems ?? 0}
           icon={IconAlertTriangle}
           description="Items needing attention"
+          isLoading={statsLoading}
         />
-      </div>
+        <StatCard
+          title="Storage Used"
+          value="2.4 GB"
+          icon={IconCloud}
+          description="Cloudinary storage"
+          trend={{ value: "+12%", label: "this month", positive: false }}
+          isLoading={statsLoading}
+        />
+      </StatsGrid>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        {/* Pending Users Preview */}
         <Card className="col-span-4">
           <CardHeader>
-            <CardTitle>System Overview</CardTitle>
-            <CardDescription>
-              Manage your system resources and users.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Placeholder for future charts or lists */}
-            <div className="rounded-md border p-4">
-              <p className="text-sm text-muted-foreground">
-                System activity chart will go here.
-              </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Pending User Approvals</CardTitle>
+                <CardDescription>
+                  Recent users awaiting activation
+                </CardDescription>
+              </div>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/users?tab=pending">View All</Link>
+              </Button>
             </div>
-          </CardContent>
-        </Card>
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-            <CardDescription>Common administrative tasks</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-4">
-            <Button asChild className="w-full" variant="outline">
-              <Link href="/users?tab=pending">
-                <IconUserCheck className="mr-2 h-4 w-4" />
-                Review Pending Users
-              </Link>
-            </Button>
-            <Button asChild className="w-full" variant="outline">
-              <Link href="/projects/new">
-                <IconPlus className="mr-2 h-4 w-4" />
-                Create New Project
-              </Link>
-            </Button>
-            <Button asChild className="w-full" variant="outline">
-              <Link href="/logistics">
-                <IconAlertTriangle className="mr-2 h-4 w-4" />
-                Check Low Stock
-              </Link>
-            </Button>
+          <CardContent>
+            {usersLoading ? (
+              <div className="flex items-center justify-center p-8">
+                <p className="text-sm text-muted-foreground">
+                  Loading pending users...
+                </p>
+              </div>
+            ) : !pendingUsers?.length ? (
+              <div className="flex items-center justify-center p-8">
+                <p className="text-sm text-muted-foreground">
+                  No pending users at this time
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {pendingUsers.map((user, index) => (
+                  <div key={user.id}>
+                    <div className="flex items-center justify-between">
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium">{user.name}</p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                      <Button size="sm" asChild>
+                        <Link href={`/users?highlight=${user.id}`}>Review</Link>
+                      </Button>
+                    </div>
+                    {index < pendingUsers.length - 1 && (
+                      <Separator className="mt-3" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
+
+        {/* Quick Actions */}
+        <div className="col-span-3">
+          <QuickActionCard
+            title="Quick Actions"
+            description="Common administrative tasks"
+            actions={[
+              {
+                label: "Review Pending Users",
+                icon: <IconUserCheck className="h-4 w-4" />,
+                href: "/users?tab=pending",
+                variant: "outline",
+              },
+              {
+                label: "Create New Project",
+                icon: <IconPlus className="h-4 w-4" />,
+                href: "/projects/new",
+                variant: "outline",
+              },
+              {
+                label: "Check Low Stock",
+                icon: <IconAlertTriangle className="h-4 w-4" />,
+                href: "/logistics",
+                variant: "outline",
+              },
+            ]}
+          />
+        </div>
       </div>
-    </div>
+
+      {/* System Overview Placeholder */}
+      <Card className="opacity-60">
+        <CardHeader>
+          <CardTitle>System Overview</CardTitle>
+          <CardDescription>Activity metrics and system health</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
+            <IconBuildingSkyscraper className="h-12 w-12 text-muted-foreground/50" />
+            <p className="text-sm text-muted-foreground">
+              System activity chart coming soon...
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Real-time monitoring and analytics will be added in a future
+              update
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </DashboardLayout>
   )
 }
