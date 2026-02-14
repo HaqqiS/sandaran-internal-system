@@ -211,6 +211,49 @@ export const adminProcedure = t.procedure
   })
 
 /**
+ * Admin or CEO procedure (read-only for CEO)
+ *
+ * Allows both ADMIN and CEO to access procedures.
+ * Use this for read-only operations like viewing users, reports, etc.
+ * CEO can query but cannot mutate.
+ */
+export const adminOrCeoProcedure = t.procedure
+  .use(timingMiddleware)
+  .use(({ ctx, next }) => {
+    if (!ctx.session?.user) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Not authenticated",
+      })
+    }
+
+    const { roleGlobal, isActive } = ctx.session.user
+
+    // Check if user is active
+    if (!isActive) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Account is not active.",
+      })
+    }
+
+    // Check if user has admin or CEO role
+    if (roleGlobal !== "ADMIN" && roleGlobal !== "CEO") {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Admin or CEO access required.",
+      })
+    }
+
+    return next({
+      ctx: {
+        // infers the `session` as non-nullable with admin/CEO role
+        session: { ...ctx.session, user: ctx.session.user },
+      },
+    })
+  })
+
+/**
  * Project-scoped procedure factory (Layer 3: Project Context Guard)
  *
  * Creates procedures that require project membership and specific roles.

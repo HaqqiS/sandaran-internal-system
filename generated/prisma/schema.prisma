@@ -70,10 +70,10 @@ model User {
   // custom fields
   roleGlobal   GlobalRole @default(NONE)
   isActive     Boolean    @default(false)
-  approvedAt   DateTime?
-  approvedById String?
-  approvedBy   User?      @relation("UserApproval", fields: [approvedById], references: [id])
-  approvals    User[]     @relation("UserApproval")
+  reviewedAt   DateTime?
+  reviewedById String?
+  reviewedBy   User?      @relation("UserReviewed", fields: [reviewedById], references: [id])
+  reviews      User[]     @relation("UserReviewed")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -221,12 +221,13 @@ model ProjectDocument {
   userId    String // ARCHITECT who uploaded
 
   // File info
-  fileName String // Original filename
-  fileType DocumentType @default(OTHER)
-  publicId String // Cloudinary Public ID
-  url      String // Cloudinary Secure URL
-  fileSize Int? // File size in bytes
-  mimeType String? // e.g., "application/pdf", "image/png"
+  fileName     String // Original filename
+  fileType     DocumentType @default(OTHER)
+  publicId     String // Cloudinary Public ID
+  url          String // Cloudinary Secure URL
+  fileSize     Int? // File size in bytes
+  mimeType     String? // e.g., "application/pdf", "image/png"
+  resourceType String?
 
   // Metadata
   title       String? // Optional title/description

@@ -19,10 +19,10 @@ export function isActiveUser(isActive: boolean | null | undefined): boolean {
 }
 
 /**
- * Check if user is approved (has approvedAt timestamp)
+ * Check if user is reviewed (has reviewedAt timestamp)
  */
-export function isApprovedUser(approvedAt: Date | null | undefined): boolean {
-  return approvedAt !== null && approvedAt !== undefined
+export function isReviewedUser(reviewedAt: Date | null | undefined): boolean {
+  return reviewedAt !== null && reviewedAt !== undefined
 }
 
 /**

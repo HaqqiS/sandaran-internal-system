@@ -2231,7 +2231,7 @@ export namespace Prisma {
    */
 
   export type UserCountOutputType = {
-    approvals: number
+    reviews: number
     sessions: number
     accounts: number
     projectMembers: number
@@ -2244,7 +2244,7 @@ export namespace Prisma {
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    approvals?: boolean | UserCountOutputTypeCountApprovalsArgs
+    reviews?: boolean | UserCountOutputTypeCountReviewsArgs
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
     accounts?: boolean | UserCountOutputTypeCountAccountsArgs
     projectMembers?: boolean | UserCountOutputTypeCountProjectMembersArgs
@@ -2270,7 +2270,7 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
-  export type UserCountOutputTypeCountApprovalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type UserCountOutputTypeCountReviewsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: UserWhereInput
   }
 
@@ -2529,8 +2529,8 @@ export namespace Prisma {
     image: string | null
     roleGlobal: $Enums.GlobalRole | null
     isActive: boolean | null
-    approvedAt: Date | null
-    approvedById: string | null
+    reviewedAt: Date | null
+    reviewedById: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2543,8 +2543,8 @@ export namespace Prisma {
     image: string | null
     roleGlobal: $Enums.GlobalRole | null
     isActive: boolean | null
-    approvedAt: Date | null
-    approvedById: string | null
+    reviewedAt: Date | null
+    reviewedById: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2557,8 +2557,8 @@ export namespace Prisma {
     image: number
     roleGlobal: number
     isActive: number
-    approvedAt: number
-    approvedById: number
+    reviewedAt: number
+    reviewedById: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -2573,8 +2573,8 @@ export namespace Prisma {
     image?: true
     roleGlobal?: true
     isActive?: true
-    approvedAt?: true
-    approvedById?: true
+    reviewedAt?: true
+    reviewedById?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2587,8 +2587,8 @@ export namespace Prisma {
     image?: true
     roleGlobal?: true
     isActive?: true
-    approvedAt?: true
-    approvedById?: true
+    reviewedAt?: true
+    reviewedById?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2601,8 +2601,8 @@ export namespace Prisma {
     image?: true
     roleGlobal?: true
     isActive?: true
-    approvedAt?: true
-    approvedById?: true
+    reviewedAt?: true
+    reviewedById?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -2688,8 +2688,8 @@ export namespace Prisma {
     image: string | null
     roleGlobal: $Enums.GlobalRole
     isActive: boolean
-    approvedAt: Date | null
-    approvedById: string | null
+    reviewedAt: Date | null
+    reviewedById: string | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -2719,12 +2719,12 @@ export namespace Prisma {
     image?: boolean
     roleGlobal?: boolean
     isActive?: boolean
-    approvedAt?: boolean
-    approvedById?: boolean
+    reviewedAt?: boolean
+    reviewedById?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    approvedBy?: boolean | User$approvedByArgs<ExtArgs>
-    approvals?: boolean | User$approvalsArgs<ExtArgs>
+    reviewedBy?: boolean | User$reviewedByArgs<ExtArgs>
+    reviews?: boolean | User$reviewsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
     projectMembers?: boolean | User$projectMembersArgs<ExtArgs>
@@ -2745,11 +2745,11 @@ export namespace Prisma {
     image?: boolean
     roleGlobal?: boolean
     isActive?: boolean
-    approvedAt?: boolean
-    approvedById?: boolean
+    reviewedAt?: boolean
+    reviewedById?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    approvedBy?: boolean | User$approvedByArgs<ExtArgs>
+    reviewedBy?: boolean | User$reviewedByArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2760,11 +2760,11 @@ export namespace Prisma {
     image?: boolean
     roleGlobal?: boolean
     isActive?: boolean
-    approvedAt?: boolean
-    approvedById?: boolean
+    reviewedAt?: boolean
+    reviewedById?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    approvedBy?: boolean | User$approvedByArgs<ExtArgs>
+    reviewedBy?: boolean | User$reviewedByArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -2775,16 +2775,16 @@ export namespace Prisma {
     image?: boolean
     roleGlobal?: boolean
     isActive?: boolean
-    approvedAt?: boolean
-    approvedById?: boolean
+    reviewedAt?: boolean
+    reviewedById?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "roleGlobal" | "isActive" | "approvedAt" | "approvedById" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "roleGlobal" | "isActive" | "reviewedAt" | "reviewedById" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    approvedBy?: boolean | User$approvedByArgs<ExtArgs>
-    approvals?: boolean | User$approvalsArgs<ExtArgs>
+    reviewedBy?: boolean | User$reviewedByArgs<ExtArgs>
+    reviews?: boolean | User$reviewsArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     accounts?: boolean | User$accountsArgs<ExtArgs>
     projectMembers?: boolean | User$projectMembersArgs<ExtArgs>
@@ -2797,17 +2797,17 @@ export namespace Prisma {
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    approvedBy?: boolean | User$approvedByArgs<ExtArgs>
+    reviewedBy?: boolean | User$reviewedByArgs<ExtArgs>
   }
   export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    approvedBy?: boolean | User$approvedByArgs<ExtArgs>
+    reviewedBy?: boolean | User$reviewedByArgs<ExtArgs>
   }
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
     objects: {
-      approvedBy: Prisma.$UserPayload<ExtArgs> | null
-      approvals: Prisma.$UserPayload<ExtArgs>[]
+      reviewedBy: Prisma.$UserPayload<ExtArgs> | null
+      reviews: Prisma.$UserPayload<ExtArgs>[]
       sessions: Prisma.$SessionPayload<ExtArgs>[]
       accounts: Prisma.$AccountPayload<ExtArgs>[]
       projectMembers: Prisma.$ProjectMemberPayload<ExtArgs>[]
@@ -2826,8 +2826,8 @@ export namespace Prisma {
       image: string | null
       roleGlobal: $Enums.GlobalRole
       isActive: boolean
-      approvedAt: Date | null
-      approvedById: string | null
+      reviewedAt: Date | null
+      reviewedById: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -3224,8 +3224,8 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    approvedBy<T extends User$approvedByArgs<ExtArgs> = {}>(args?: Subset<T, User$approvedByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-    approvals<T extends User$approvalsArgs<ExtArgs> = {}>(args?: Subset<T, User$approvalsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    reviewedBy<T extends User$reviewedByArgs<ExtArgs> = {}>(args?: Subset<T, User$reviewedByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    reviews<T extends User$reviewsArgs<ExtArgs> = {}>(args?: Subset<T, User$reviewsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     accounts<T extends User$accountsArgs<ExtArgs> = {}>(args?: Subset<T, User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     projectMembers<T extends User$projectMembersArgs<ExtArgs> = {}>(args?: Subset<T, User$projectMembersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProjectMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3271,8 +3271,8 @@ export namespace Prisma {
     readonly image: FieldRef<"User", 'String'>
     readonly roleGlobal: FieldRef<"User", 'GlobalRole'>
     readonly isActive: FieldRef<"User", 'Boolean'>
-    readonly approvedAt: FieldRef<"User", 'DateTime'>
-    readonly approvedById: FieldRef<"User", 'String'>
+    readonly reviewedAt: FieldRef<"User", 'DateTime'>
+    readonly reviewedById: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -3671,9 +3671,9 @@ export namespace Prisma {
   }
 
   /**
-   * User.approvedBy
+   * User.reviewedBy
    */
-  export type User$approvedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type User$reviewedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the User
      */
@@ -3690,9 +3690,9 @@ export namespace Prisma {
   }
 
   /**
-   * User.approvals
+   * User.reviews
    */
-  export type User$approvalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type User$reviewsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the User
      */
@@ -19869,8 +19869,8 @@ export namespace Prisma {
     image: 'image',
     roleGlobal: 'roleGlobal',
     isActive: 'isActive',
-    approvedAt: 'approvedAt',
-    approvedById: 'approvedById',
+    reviewedAt: 'reviewedAt',
+    reviewedById: 'reviewedById',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -20296,12 +20296,12 @@ export namespace Prisma {
     image?: StringNullableFilter<"User"> | string | null
     roleGlobal?: EnumGlobalRoleFilter<"User"> | $Enums.GlobalRole
     isActive?: BoolFilter<"User"> | boolean
-    approvedAt?: DateTimeNullableFilter<"User"> | Date | string | null
-    approvedById?: StringNullableFilter<"User"> | string | null
+    reviewedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    reviewedById?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
-    approvedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-    approvals?: UserListRelationFilter
+    reviewedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    reviews?: UserListRelationFilter
     sessions?: SessionListRelationFilter
     accounts?: AccountListRelationFilter
     projectMembers?: ProjectMemberListRelationFilter
@@ -20321,12 +20321,12 @@ export namespace Prisma {
     image?: SortOrderInput | SortOrder
     roleGlobal?: SortOrder
     isActive?: SortOrder
-    approvedAt?: SortOrderInput | SortOrder
-    approvedById?: SortOrderInput | SortOrder
+    reviewedAt?: SortOrderInput | SortOrder
+    reviewedById?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
-    approvedBy?: UserOrderByWithRelationInput
-    approvals?: UserOrderByRelationAggregateInput
+    reviewedBy?: UserOrderByWithRelationInput
+    reviews?: UserOrderByRelationAggregateInput
     sessions?: SessionOrderByRelationAggregateInput
     accounts?: AccountOrderByRelationAggregateInput
     projectMembers?: ProjectMemberOrderByRelationAggregateInput
@@ -20349,12 +20349,12 @@ export namespace Prisma {
     image?: StringNullableFilter<"User"> | string | null
     roleGlobal?: EnumGlobalRoleFilter<"User"> | $Enums.GlobalRole
     isActive?: BoolFilter<"User"> | boolean
-    approvedAt?: DateTimeNullableFilter<"User"> | Date | string | null
-    approvedById?: StringNullableFilter<"User"> | string | null
+    reviewedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    reviewedById?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
-    approvedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
-    approvals?: UserListRelationFilter
+    reviewedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    reviews?: UserListRelationFilter
     sessions?: SessionListRelationFilter
     accounts?: AccountListRelationFilter
     projectMembers?: ProjectMemberListRelationFilter
@@ -20374,8 +20374,8 @@ export namespace Prisma {
     image?: SortOrderInput | SortOrder
     roleGlobal?: SortOrder
     isActive?: SortOrder
-    approvedAt?: SortOrderInput | SortOrder
-    approvedById?: SortOrderInput | SortOrder
+    reviewedAt?: SortOrderInput | SortOrder
+    reviewedById?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -20394,8 +20394,8 @@ export namespace Prisma {
     image?: StringNullableWithAggregatesFilter<"User"> | string | null
     roleGlobal?: EnumGlobalRoleWithAggregatesFilter<"User"> | $Enums.GlobalRole
     isActive?: BoolWithAggregatesFilter<"User"> | boolean
-    approvedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
-    approvedById?: StringNullableWithAggregatesFilter<"User"> | string | null
+    reviewedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    reviewedById?: StringNullableWithAggregatesFilter<"User"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -21468,11 +21468,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
+    reviewedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvedBy?: UserCreateNestedOneWithoutApprovalsInput
-    approvals?: UserCreateNestedManyWithoutApprovedByInput
+    reviewedBy?: UserCreateNestedOneWithoutReviewsInput
+    reviews?: UserCreateNestedManyWithoutReviewedByInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberCreateNestedManyWithoutUserInput
@@ -21492,11 +21492,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
-    approvedById?: string | null
+    reviewedAt?: Date | string | null
+    reviewedById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvals?: UserUncheckedCreateNestedManyWithoutApprovedByInput
+    reviews?: UserUncheckedCreateNestedManyWithoutReviewedByInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberUncheckedCreateNestedManyWithoutUserInput
@@ -21516,11 +21516,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvedBy?: UserUpdateOneWithoutApprovalsNestedInput
-    approvals?: UserUpdateManyWithoutApprovedByNestedInput
+    reviewedBy?: UserUpdateOneWithoutReviewsNestedInput
+    reviews?: UserUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUpdateManyWithoutUserNestedInput
@@ -21540,11 +21540,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvals?: UserUncheckedUpdateManyWithoutApprovedByNestedInput
+    reviews?: UserUncheckedUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -21564,8 +21564,8 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
-    approvedById?: string | null
+    reviewedAt?: Date | string | null
+    reviewedById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -21578,7 +21578,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -21591,8 +21591,8 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -22896,8 +22896,8 @@ export namespace Prisma {
     image?: SortOrder
     roleGlobal?: SortOrder
     isActive?: SortOrder
-    approvedAt?: SortOrder
-    approvedById?: SortOrder
+    reviewedAt?: SortOrder
+    reviewedById?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -22910,8 +22910,8 @@ export namespace Prisma {
     image?: SortOrder
     roleGlobal?: SortOrder
     isActive?: SortOrder
-    approvedAt?: SortOrder
-    approvedById?: SortOrder
+    reviewedAt?: SortOrder
+    reviewedById?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -22924,8 +22924,8 @@ export namespace Prisma {
     image?: SortOrder
     roleGlobal?: SortOrder
     isActive?: SortOrder
-    approvedAt?: SortOrder
-    approvedById?: SortOrder
+    reviewedAt?: SortOrder
+    reviewedById?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -23823,16 +23823,16 @@ export namespace Prisma {
     _max?: NestedFloatFilter<$PrismaModel>
   }
 
-  export type UserCreateNestedOneWithoutApprovalsInput = {
-    create?: XOR<UserCreateWithoutApprovalsInput, UserUncheckedCreateWithoutApprovalsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutApprovalsInput
+  export type UserCreateNestedOneWithoutReviewsInput = {
+    create?: XOR<UserCreateWithoutReviewsInput, UserUncheckedCreateWithoutReviewsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutReviewsInput
     connect?: UserWhereUniqueInput
   }
 
-  export type UserCreateNestedManyWithoutApprovedByInput = {
-    create?: XOR<UserCreateWithoutApprovedByInput, UserUncheckedCreateWithoutApprovedByInput> | UserCreateWithoutApprovedByInput[] | UserUncheckedCreateWithoutApprovedByInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutApprovedByInput | UserCreateOrConnectWithoutApprovedByInput[]
-    createMany?: UserCreateManyApprovedByInputEnvelope
+  export type UserCreateNestedManyWithoutReviewedByInput = {
+    create?: XOR<UserCreateWithoutReviewedByInput, UserUncheckedCreateWithoutReviewedByInput> | UserCreateWithoutReviewedByInput[] | UserUncheckedCreateWithoutReviewedByInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutReviewedByInput | UserCreateOrConnectWithoutReviewedByInput[]
+    createMany?: UserCreateManyReviewedByInputEnvelope
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
   }
 
@@ -23899,10 +23899,10 @@ export namespace Prisma {
     connect?: ReportCommentWhereUniqueInput | ReportCommentWhereUniqueInput[]
   }
 
-  export type UserUncheckedCreateNestedManyWithoutApprovedByInput = {
-    create?: XOR<UserCreateWithoutApprovedByInput, UserUncheckedCreateWithoutApprovedByInput> | UserCreateWithoutApprovedByInput[] | UserUncheckedCreateWithoutApprovedByInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutApprovedByInput | UserCreateOrConnectWithoutApprovedByInput[]
-    createMany?: UserCreateManyApprovedByInputEnvelope
+  export type UserUncheckedCreateNestedManyWithoutReviewedByInput = {
+    create?: XOR<UserCreateWithoutReviewedByInput, UserUncheckedCreateWithoutReviewedByInput> | UserCreateWithoutReviewedByInput[] | UserUncheckedCreateWithoutReviewedByInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutReviewedByInput | UserCreateOrConnectWithoutReviewedByInput[]
+    createMany?: UserCreateManyReviewedByInputEnvelope
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
   }
 
@@ -23993,27 +23993,27 @@ export namespace Prisma {
     set?: Date | string
   }
 
-  export type UserUpdateOneWithoutApprovalsNestedInput = {
-    create?: XOR<UserCreateWithoutApprovalsInput, UserUncheckedCreateWithoutApprovalsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutApprovalsInput
-    upsert?: UserUpsertWithoutApprovalsInput
+  export type UserUpdateOneWithoutReviewsNestedInput = {
+    create?: XOR<UserCreateWithoutReviewsInput, UserUncheckedCreateWithoutReviewsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutReviewsInput
+    upsert?: UserUpsertWithoutReviewsInput
     disconnect?: UserWhereInput | boolean
     delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutApprovalsInput, UserUpdateWithoutApprovalsInput>, UserUncheckedUpdateWithoutApprovalsInput>
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutReviewsInput, UserUpdateWithoutReviewsInput>, UserUncheckedUpdateWithoutReviewsInput>
   }
 
-  export type UserUpdateManyWithoutApprovedByNestedInput = {
-    create?: XOR<UserCreateWithoutApprovedByInput, UserUncheckedCreateWithoutApprovedByInput> | UserCreateWithoutApprovedByInput[] | UserUncheckedCreateWithoutApprovedByInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutApprovedByInput | UserCreateOrConnectWithoutApprovedByInput[]
-    upsert?: UserUpsertWithWhereUniqueWithoutApprovedByInput | UserUpsertWithWhereUniqueWithoutApprovedByInput[]
-    createMany?: UserCreateManyApprovedByInputEnvelope
+  export type UserUpdateManyWithoutReviewedByNestedInput = {
+    create?: XOR<UserCreateWithoutReviewedByInput, UserUncheckedCreateWithoutReviewedByInput> | UserCreateWithoutReviewedByInput[] | UserUncheckedCreateWithoutReviewedByInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutReviewedByInput | UserCreateOrConnectWithoutReviewedByInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutReviewedByInput | UserUpsertWithWhereUniqueWithoutReviewedByInput[]
+    createMany?: UserCreateManyReviewedByInputEnvelope
     set?: UserWhereUniqueInput | UserWhereUniqueInput[]
     disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
     delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    update?: UserUpdateWithWhereUniqueWithoutApprovedByInput | UserUpdateWithWhereUniqueWithoutApprovedByInput[]
-    updateMany?: UserUpdateManyWithWhereWithoutApprovedByInput | UserUpdateManyWithWhereWithoutApprovedByInput[]
+    update?: UserUpdateWithWhereUniqueWithoutReviewedByInput | UserUpdateWithWhereUniqueWithoutReviewedByInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutReviewedByInput | UserUpdateManyWithWhereWithoutReviewedByInput[]
     deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
@@ -24143,17 +24143,17 @@ export namespace Prisma {
     deleteMany?: ReportCommentScalarWhereInput | ReportCommentScalarWhereInput[]
   }
 
-  export type UserUncheckedUpdateManyWithoutApprovedByNestedInput = {
-    create?: XOR<UserCreateWithoutApprovedByInput, UserUncheckedCreateWithoutApprovedByInput> | UserCreateWithoutApprovedByInput[] | UserUncheckedCreateWithoutApprovedByInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutApprovedByInput | UserCreateOrConnectWithoutApprovedByInput[]
-    upsert?: UserUpsertWithWhereUniqueWithoutApprovedByInput | UserUpsertWithWhereUniqueWithoutApprovedByInput[]
-    createMany?: UserCreateManyApprovedByInputEnvelope
+  export type UserUncheckedUpdateManyWithoutReviewedByNestedInput = {
+    create?: XOR<UserCreateWithoutReviewedByInput, UserUncheckedCreateWithoutReviewedByInput> | UserCreateWithoutReviewedByInput[] | UserUncheckedCreateWithoutReviewedByInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutReviewedByInput | UserCreateOrConnectWithoutReviewedByInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutReviewedByInput | UserUpsertWithWhereUniqueWithoutReviewedByInput[]
+    createMany?: UserCreateManyReviewedByInputEnvelope
     set?: UserWhereUniqueInput | UserWhereUniqueInput[]
     disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
     delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
     connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    update?: UserUpdateWithWhereUniqueWithoutApprovedByInput | UserUpdateWithWhereUniqueWithoutApprovedByInput[]
-    updateMany?: UserUpdateManyWithWhereWithoutApprovedByInput | UserUpdateManyWithWhereWithoutApprovedByInput[]
+    update?: UserUpdateWithWhereUniqueWithoutReviewedByInput | UserUpdateWithWhereUniqueWithoutReviewedByInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutReviewedByInput | UserUpdateManyWithWhereWithoutReviewedByInput[]
     deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
@@ -25380,7 +25380,7 @@ export namespace Prisma {
     _max?: NestedFloatFilter<$PrismaModel>
   }
 
-  export type UserCreateWithoutApprovalsInput = {
+  export type UserCreateWithoutReviewsInput = {
     id: string
     name: string
     email: string
@@ -25388,10 +25388,10 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
+    reviewedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvedBy?: UserCreateNestedOneWithoutApprovalsInput
+    reviewedBy?: UserCreateNestedOneWithoutReviewsInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberCreateNestedManyWithoutUserInput
@@ -25403,7 +25403,7 @@ export namespace Prisma {
     comments?: ReportCommentCreateNestedManyWithoutAuthorInput
   }
 
-  export type UserUncheckedCreateWithoutApprovalsInput = {
+  export type UserUncheckedCreateWithoutReviewsInput = {
     id: string
     name: string
     email: string
@@ -25411,8 +25411,8 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
-    approvedById?: string | null
+    reviewedAt?: Date | string | null
+    reviewedById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
@@ -25426,12 +25426,12 @@ export namespace Prisma {
     comments?: ReportCommentUncheckedCreateNestedManyWithoutAuthorInput
   }
 
-  export type UserCreateOrConnectWithoutApprovalsInput = {
+  export type UserCreateOrConnectWithoutReviewsInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutApprovalsInput, UserUncheckedCreateWithoutApprovalsInput>
+    create: XOR<UserCreateWithoutReviewsInput, UserUncheckedCreateWithoutReviewsInput>
   }
 
-  export type UserCreateWithoutApprovedByInput = {
+  export type UserCreateWithoutReviewedByInput = {
     id: string
     name: string
     email: string
@@ -25439,10 +25439,10 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
+    reviewedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvals?: UserCreateNestedManyWithoutApprovedByInput
+    reviews?: UserCreateNestedManyWithoutReviewedByInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberCreateNestedManyWithoutUserInput
@@ -25454,7 +25454,7 @@ export namespace Prisma {
     comments?: ReportCommentCreateNestedManyWithoutAuthorInput
   }
 
-  export type UserUncheckedCreateWithoutApprovedByInput = {
+  export type UserUncheckedCreateWithoutReviewedByInput = {
     id: string
     name: string
     email: string
@@ -25462,10 +25462,10 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
+    reviewedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvals?: UserUncheckedCreateNestedManyWithoutApprovedByInput
+    reviews?: UserUncheckedCreateNestedManyWithoutReviewedByInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberUncheckedCreateNestedManyWithoutUserInput
@@ -25477,13 +25477,13 @@ export namespace Prisma {
     comments?: ReportCommentUncheckedCreateNestedManyWithoutAuthorInput
   }
 
-  export type UserCreateOrConnectWithoutApprovedByInput = {
+  export type UserCreateOrConnectWithoutReviewedByInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutApprovedByInput, UserUncheckedCreateWithoutApprovedByInput>
+    create: XOR<UserCreateWithoutReviewedByInput, UserUncheckedCreateWithoutReviewedByInput>
   }
 
-  export type UserCreateManyApprovedByInputEnvelope = {
-    data: UserCreateManyApprovedByInput | UserCreateManyApprovedByInput[]
+  export type UserCreateManyReviewedByInputEnvelope = {
+    data: UserCreateManyReviewedByInput | UserCreateManyReviewedByInput[]
     skipDuplicates?: boolean
   }
 
@@ -25795,18 +25795,18 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type UserUpsertWithoutApprovalsInput = {
-    update: XOR<UserUpdateWithoutApprovalsInput, UserUncheckedUpdateWithoutApprovalsInput>
-    create: XOR<UserCreateWithoutApprovalsInput, UserUncheckedCreateWithoutApprovalsInput>
+  export type UserUpsertWithoutReviewsInput = {
+    update: XOR<UserUpdateWithoutReviewsInput, UserUncheckedUpdateWithoutReviewsInput>
+    create: XOR<UserCreateWithoutReviewsInput, UserUncheckedCreateWithoutReviewsInput>
     where?: UserWhereInput
   }
 
-  export type UserUpdateToOneWithWhereWithoutApprovalsInput = {
+  export type UserUpdateToOneWithWhereWithoutReviewsInput = {
     where?: UserWhereInput
-    data: XOR<UserUpdateWithoutApprovalsInput, UserUncheckedUpdateWithoutApprovalsInput>
+    data: XOR<UserUpdateWithoutReviewsInput, UserUncheckedUpdateWithoutReviewsInput>
   }
 
-  export type UserUpdateWithoutApprovalsInput = {
+  export type UserUpdateWithoutReviewsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -25814,10 +25814,10 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvedBy?: UserUpdateOneWithoutApprovalsNestedInput
+    reviewedBy?: UserUpdateOneWithoutReviewsNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUpdateManyWithoutUserNestedInput
@@ -25829,7 +25829,7 @@ export namespace Prisma {
     comments?: ReportCommentUpdateManyWithoutAuthorNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutApprovalsInput = {
+  export type UserUncheckedUpdateWithoutReviewsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -25837,8 +25837,8 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
@@ -25852,20 +25852,20 @@ export namespace Prisma {
     comments?: ReportCommentUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
-  export type UserUpsertWithWhereUniqueWithoutApprovedByInput = {
+  export type UserUpsertWithWhereUniqueWithoutReviewedByInput = {
     where: UserWhereUniqueInput
-    update: XOR<UserUpdateWithoutApprovedByInput, UserUncheckedUpdateWithoutApprovedByInput>
-    create: XOR<UserCreateWithoutApprovedByInput, UserUncheckedCreateWithoutApprovedByInput>
+    update: XOR<UserUpdateWithoutReviewedByInput, UserUncheckedUpdateWithoutReviewedByInput>
+    create: XOR<UserCreateWithoutReviewedByInput, UserUncheckedCreateWithoutReviewedByInput>
   }
 
-  export type UserUpdateWithWhereUniqueWithoutApprovedByInput = {
+  export type UserUpdateWithWhereUniqueWithoutReviewedByInput = {
     where: UserWhereUniqueInput
-    data: XOR<UserUpdateWithoutApprovedByInput, UserUncheckedUpdateWithoutApprovedByInput>
+    data: XOR<UserUpdateWithoutReviewedByInput, UserUncheckedUpdateWithoutReviewedByInput>
   }
 
-  export type UserUpdateManyWithWhereWithoutApprovedByInput = {
+  export type UserUpdateManyWithWhereWithoutReviewedByInput = {
     where: UserScalarWhereInput
-    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutApprovedByInput>
+    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutReviewedByInput>
   }
 
   export type UserScalarWhereInput = {
@@ -25879,8 +25879,8 @@ export namespace Prisma {
     image?: StringNullableFilter<"User"> | string | null
     roleGlobal?: EnumGlobalRoleFilter<"User"> | $Enums.GlobalRole
     isActive?: BoolFilter<"User"> | boolean
-    approvedAt?: DateTimeNullableFilter<"User"> | Date | string | null
-    approvedById?: StringNullableFilter<"User"> | string | null
+    reviewedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    reviewedById?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
   }
@@ -26162,11 +26162,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
+    reviewedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvedBy?: UserCreateNestedOneWithoutApprovalsInput
-    approvals?: UserCreateNestedManyWithoutApprovedByInput
+    reviewedBy?: UserCreateNestedOneWithoutReviewsInput
+    reviews?: UserCreateNestedManyWithoutReviewedByInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberCreateNestedManyWithoutUserInput
     reports?: DailyReportCreateNestedManyWithoutUserInput
@@ -26185,11 +26185,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
-    approvedById?: string | null
+    reviewedAt?: Date | string | null
+    reviewedById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvals?: UserUncheckedCreateNestedManyWithoutApprovedByInput
+    reviews?: UserUncheckedCreateNestedManyWithoutReviewedByInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberUncheckedCreateNestedManyWithoutUserInput
     reports?: DailyReportUncheckedCreateNestedManyWithoutUserInput
@@ -26224,11 +26224,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvedBy?: UserUpdateOneWithoutApprovalsNestedInput
-    approvals?: UserUpdateManyWithoutApprovedByNestedInput
+    reviewedBy?: UserUpdateOneWithoutReviewsNestedInput
+    reviews?: UserUpdateManyWithoutReviewedByNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUpdateManyWithoutUserNestedInput
     reports?: DailyReportUpdateManyWithoutUserNestedInput
@@ -26247,11 +26247,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvals?: UserUncheckedUpdateManyWithoutApprovedByNestedInput
+    reviews?: UserUncheckedUpdateManyWithoutReviewedByNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUncheckedUpdateManyWithoutUserNestedInput
     reports?: DailyReportUncheckedUpdateManyWithoutUserNestedInput
@@ -26270,11 +26270,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
+    reviewedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvedBy?: UserCreateNestedOneWithoutApprovalsInput
-    approvals?: UserCreateNestedManyWithoutApprovedByInput
+    reviewedBy?: UserCreateNestedOneWithoutReviewsInput
+    reviews?: UserCreateNestedManyWithoutReviewedByInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberCreateNestedManyWithoutUserInput
     reports?: DailyReportCreateNestedManyWithoutUserInput
@@ -26293,11 +26293,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
-    approvedById?: string | null
+    reviewedAt?: Date | string | null
+    reviewedById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvals?: UserUncheckedCreateNestedManyWithoutApprovedByInput
+    reviews?: UserUncheckedCreateNestedManyWithoutReviewedByInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberUncheckedCreateNestedManyWithoutUserInput
     reports?: DailyReportUncheckedCreateNestedManyWithoutUserInput
@@ -26332,11 +26332,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvedBy?: UserUpdateOneWithoutApprovalsNestedInput
-    approvals?: UserUpdateManyWithoutApprovedByNestedInput
+    reviewedBy?: UserUpdateOneWithoutReviewsNestedInput
+    reviews?: UserUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUpdateManyWithoutUserNestedInput
     reports?: DailyReportUpdateManyWithoutUserNestedInput
@@ -26355,11 +26355,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvals?: UserUncheckedUpdateManyWithoutApprovedByNestedInput
+    reviews?: UserUncheckedUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUncheckedUpdateManyWithoutUserNestedInput
     reports?: DailyReportUncheckedUpdateManyWithoutUserNestedInput
@@ -26638,11 +26638,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
+    reviewedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvedBy?: UserCreateNestedOneWithoutApprovalsInput
-    approvals?: UserCreateNestedManyWithoutApprovedByInput
+    reviewedBy?: UserCreateNestedOneWithoutReviewsInput
+    reviews?: UserCreateNestedManyWithoutReviewedByInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     reports?: DailyReportCreateNestedManyWithoutUserInput
@@ -26661,11 +26661,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
-    approvedById?: string | null
+    reviewedAt?: Date | string | null
+    reviewedById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvals?: UserUncheckedCreateNestedManyWithoutApprovedByInput
+    reviews?: UserUncheckedCreateNestedManyWithoutReviewedByInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     reports?: DailyReportUncheckedCreateNestedManyWithoutUserInput
@@ -26739,11 +26739,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvedBy?: UserUpdateOneWithoutApprovalsNestedInput
-    approvals?: UserUpdateManyWithoutApprovedByNestedInput
+    reviewedBy?: UserUpdateOneWithoutReviewsNestedInput
+    reviews?: UserUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     reports?: DailyReportUpdateManyWithoutUserNestedInput
@@ -26762,11 +26762,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvals?: UserUncheckedUpdateManyWithoutApprovedByNestedInput
+    reviews?: UserUncheckedUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     reports?: DailyReportUncheckedUpdateManyWithoutUserNestedInput
@@ -26869,11 +26869,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
+    reviewedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvedBy?: UserCreateNestedOneWithoutApprovalsInput
-    approvals?: UserCreateNestedManyWithoutApprovedByInput
+    reviewedBy?: UserCreateNestedOneWithoutReviewsInput
+    reviews?: UserCreateNestedManyWithoutReviewedByInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberCreateNestedManyWithoutUserInput
@@ -26892,11 +26892,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
-    approvedById?: string | null
+    reviewedAt?: Date | string | null
+    reviewedById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvals?: UserUncheckedCreateNestedManyWithoutApprovedByInput
+    reviews?: UserUncheckedCreateNestedManyWithoutReviewedByInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberUncheckedCreateNestedManyWithoutUserInput
@@ -27056,11 +27056,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvedBy?: UserUpdateOneWithoutApprovalsNestedInput
-    approvals?: UserUpdateManyWithoutApprovedByNestedInput
+    reviewedBy?: UserUpdateOneWithoutReviewsNestedInput
+    reviews?: UserUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUpdateManyWithoutUserNestedInput
@@ -27079,11 +27079,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvals?: UserUncheckedUpdateManyWithoutApprovedByNestedInput
+    reviews?: UserUncheckedUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -27298,11 +27298,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
+    reviewedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvedBy?: UserCreateNestedOneWithoutApprovalsInput
-    approvals?: UserCreateNestedManyWithoutApprovedByInput
+    reviewedBy?: UserCreateNestedOneWithoutReviewsInput
+    reviews?: UserCreateNestedManyWithoutReviewedByInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberCreateNestedManyWithoutUserInput
@@ -27321,11 +27321,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
-    approvedById?: string | null
+    reviewedAt?: Date | string | null
+    reviewedById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvals?: UserUncheckedCreateNestedManyWithoutApprovedByInput
+    reviews?: UserUncheckedCreateNestedManyWithoutReviewedByInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberUncheckedCreateNestedManyWithoutUserInput
@@ -27405,11 +27405,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvedBy?: UserUpdateOneWithoutApprovalsNestedInput
-    approvals?: UserUpdateManyWithoutApprovedByNestedInput
+    reviewedBy?: UserUpdateOneWithoutReviewsNestedInput
+    reviews?: UserUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUpdateManyWithoutUserNestedInput
@@ -27428,11 +27428,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvals?: UserUncheckedUpdateManyWithoutApprovedByNestedInput
+    reviews?: UserUncheckedUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -27574,11 +27574,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
+    reviewedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvedBy?: UserCreateNestedOneWithoutApprovalsInput
-    approvals?: UserCreateNestedManyWithoutApprovedByInput
+    reviewedBy?: UserCreateNestedOneWithoutReviewsInput
+    reviews?: UserCreateNestedManyWithoutReviewedByInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberCreateNestedManyWithoutUserInput
@@ -27597,11 +27597,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
-    approvedById?: string | null
+    reviewedAt?: Date | string | null
+    reviewedById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvals?: UserUncheckedCreateNestedManyWithoutApprovedByInput
+    reviews?: UserUncheckedCreateNestedManyWithoutReviewedByInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberUncheckedCreateNestedManyWithoutUserInput
@@ -27681,11 +27681,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvedBy?: UserUpdateOneWithoutApprovalsNestedInput
-    approvals?: UserUpdateManyWithoutApprovedByNestedInput
+    reviewedBy?: UserUpdateOneWithoutReviewsNestedInput
+    reviews?: UserUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUpdateManyWithoutUserNestedInput
@@ -27704,11 +27704,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvals?: UserUncheckedUpdateManyWithoutApprovedByNestedInput
+    reviews?: UserUncheckedUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -27882,11 +27882,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
+    reviewedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvedBy?: UserCreateNestedOneWithoutApprovalsInput
-    approvals?: UserCreateNestedManyWithoutApprovedByInput
+    reviewedBy?: UserCreateNestedOneWithoutReviewsInput
+    reviews?: UserCreateNestedManyWithoutReviewedByInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberCreateNestedManyWithoutUserInput
@@ -27905,11 +27905,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
-    approvedById?: string | null
+    reviewedAt?: Date | string | null
+    reviewedById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvals?: UserUncheckedCreateNestedManyWithoutApprovedByInput
+    reviews?: UserUncheckedCreateNestedManyWithoutReviewedByInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberUncheckedCreateNestedManyWithoutUserInput
@@ -27933,11 +27933,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
+    reviewedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvedBy?: UserCreateNestedOneWithoutApprovalsInput
-    approvals?: UserCreateNestedManyWithoutApprovedByInput
+    reviewedBy?: UserCreateNestedOneWithoutReviewsInput
+    reviews?: UserCreateNestedManyWithoutReviewedByInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberCreateNestedManyWithoutUserInput
@@ -27956,11 +27956,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
-    approvedById?: string | null
+    reviewedAt?: Date | string | null
+    reviewedById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvals?: UserUncheckedCreateNestedManyWithoutApprovedByInput
+    reviews?: UserUncheckedCreateNestedManyWithoutReviewedByInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberUncheckedCreateNestedManyWithoutUserInput
@@ -28020,11 +28020,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvedBy?: UserUpdateOneWithoutApprovalsNestedInput
-    approvals?: UserUpdateManyWithoutApprovedByNestedInput
+    reviewedBy?: UserUpdateOneWithoutReviewsNestedInput
+    reviews?: UserUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUpdateManyWithoutUserNestedInput
@@ -28043,11 +28043,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvals?: UserUncheckedUpdateManyWithoutApprovedByNestedInput
+    reviews?: UserUncheckedUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -28077,11 +28077,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvedBy?: UserUpdateOneWithoutApprovalsNestedInput
-    approvals?: UserUpdateManyWithoutApprovedByNestedInput
+    reviewedBy?: UserUpdateOneWithoutReviewsNestedInput
+    reviews?: UserUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUpdateManyWithoutUserNestedInput
@@ -28100,11 +28100,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvals?: UserUncheckedUpdateManyWithoutApprovedByNestedInput
+    reviews?: UserUncheckedUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -28274,11 +28274,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
+    reviewedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvedBy?: UserCreateNestedOneWithoutApprovalsInput
-    approvals?: UserCreateNestedManyWithoutApprovedByInput
+    reviewedBy?: UserCreateNestedOneWithoutReviewsInput
+    reviews?: UserCreateNestedManyWithoutReviewedByInput
     sessions?: SessionCreateNestedManyWithoutUserInput
     accounts?: AccountCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberCreateNestedManyWithoutUserInput
@@ -28297,11 +28297,11 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
-    approvedById?: string | null
+    reviewedAt?: Date | string | null
+    reviewedById?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    approvals?: UserUncheckedCreateNestedManyWithoutApprovedByInput
+    reviews?: UserUncheckedCreateNestedManyWithoutReviewedByInput
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput
     projectMembers?: ProjectMemberUncheckedCreateNestedManyWithoutUserInput
@@ -28365,11 +28365,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvedBy?: UserUpdateOneWithoutApprovalsNestedInput
-    approvals?: UserUpdateManyWithoutApprovedByNestedInput
+    reviewedBy?: UserUpdateOneWithoutReviewsNestedInput
+    reviews?: UserUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUpdateManyWithoutUserNestedInput
@@ -28388,11 +28388,11 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    approvedById?: NullableStringFieldUpdateOperationsInput | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvals?: UserUncheckedUpdateManyWithoutApprovedByNestedInput
+    reviews?: UserUncheckedUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -28403,7 +28403,7 @@ export namespace Prisma {
     comments?: ReportCommentUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
-  export type UserCreateManyApprovedByInput = {
+  export type UserCreateManyReviewedByInput = {
     id: string
     name: string
     email: string
@@ -28411,7 +28411,7 @@ export namespace Prisma {
     image?: string | null
     roleGlobal?: $Enums.GlobalRole
     isActive?: boolean
-    approvedAt?: Date | string | null
+    reviewedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -28522,7 +28522,7 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
-  export type UserUpdateWithoutApprovedByInput = {
+  export type UserUpdateWithoutReviewedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -28530,10 +28530,10 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvals?: UserUpdateManyWithoutApprovedByNestedInput
+    reviews?: UserUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUpdateManyWithoutUserNestedInput
     accounts?: AccountUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUpdateManyWithoutUserNestedInput
@@ -28545,7 +28545,7 @@ export namespace Prisma {
     comments?: ReportCommentUpdateManyWithoutAuthorNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutApprovedByInput = {
+  export type UserUncheckedUpdateWithoutReviewedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -28553,10 +28553,10 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    approvals?: UserUncheckedUpdateManyWithoutApprovedByNestedInput
+    reviews?: UserUncheckedUpdateManyWithoutReviewedByNestedInput
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput
     projectMembers?: ProjectMemberUncheckedUpdateManyWithoutUserNestedInput
@@ -28568,7 +28568,7 @@ export namespace Prisma {
     comments?: ReportCommentUncheckedUpdateManyWithoutAuthorNestedInput
   }
 
-  export type UserUncheckedUpdateManyWithoutApprovedByInput = {
+  export type UserUncheckedUpdateManyWithoutReviewedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
@@ -28576,7 +28576,7 @@ export namespace Prisma {
     image?: NullableStringFieldUpdateOperationsInput | string | null
     roleGlobal?: EnumGlobalRoleFieldUpdateOperationsInput | $Enums.GlobalRole
     isActive?: BoolFieldUpdateOperationsInput | boolean
-    approvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

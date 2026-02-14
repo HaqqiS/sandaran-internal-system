@@ -72,10 +72,10 @@ model User {
   // custom fields
   roleGlobal    GlobalRole @default(NONE)
   isActive      Boolean    @default(false)
-  approvedAt    DateTime?
-  approvedById  String?
-  approvedBy    User?      @relation("UserApproval", fields: [approvedById], references: [id])
-  approvals     User[]     @relation("UserApproval")
+  reviewedAt    DateTime?
+  reviewedById  String?
+  reviewedBy    User?      @relation("UserReviewed", fields: [reviewedById], references: [id])
+  reviews       User[]     @relation("UserReviewed")
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @default(now()) @updatedAt

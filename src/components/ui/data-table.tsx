@@ -9,6 +9,8 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  type OnChangeFn,
+  type RowSelectionState,
   type SortingState,
   useReactTable,
   type VisibilityState,
@@ -37,6 +39,10 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   filterColumn?: string
   filterPlaceholder?: string
+  state?: {
+    rowSelection?: RowSelectionState
+  }
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>
 }
 
 export function DataTable<TData, TValue>({
@@ -44,6 +50,8 @@ export function DataTable<TData, TValue>({
   data,
   filterColumn = "name",
   filterPlaceholder = "Filter...",
+  state: externalState,
+  onRowSelectionChange: externalOnRowSelectionChange,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -51,7 +59,13 @@ export function DataTable<TData, TValue>({
   )
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
+  const [internalRowSelection, setInternalRowSelection] =
+    React.useState<RowSelectionState>({})
+
+  // Use external or internal row selection
+  const rowSelection = externalState?.rowSelection ?? internalRowSelection
+  const setRowSelection =
+    externalOnRowSelectionChange ?? setInternalRowSelection
 
   const table = useReactTable({
     data,

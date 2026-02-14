@@ -129,8 +129,8 @@ exports.Prisma.UserScalarFieldEnum = {
   image: 'image',
   roleGlobal: 'roleGlobal',
   isActive: 'isActive',
-  approvedAt: 'approvedAt',
-  approvedById: 'approvedById',
+  reviewedAt: 'reviewedAt',
+  reviewedById: 'reviewedById',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
