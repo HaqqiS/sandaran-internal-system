@@ -190,17 +190,23 @@ export const userRouter = createTRPCRouter({
     }),
 
   /**
-   * Approve user and assign role (simple version without project assignment)
+   * Approve user and optionally assign to project
    */
-  approveUserSimple: adminProcedure
+  approveUser: adminProcedure
     .input(
       z.object({
         userId: z.string(),
-        roleGlobal: z.enum(["ADMIN", "CEO", "USER"]).default("USER"),
+        roleGlobal: z.enum(["ADMIN", "CEO", "USER", "NONE"]).default("USER"),
+        projectAssignment: z
+          .object({
+            projectId: z.string(),
+            role: z.enum(["MANDOR", "ARCHITECT", "FINANCE"]),
+          })
+          .optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { userId, roleGlobal } = input
+      const { userId, roleGlobal, projectAssignment } = input
       const approverId = ctx.session.user.id
 
       // Validation: cannot approve self to ADMIN unless already ADMIN
@@ -213,7 +219,8 @@ export const userRouter = createTRPCRouter({
         }
       }
 
-      return ctx.db.user.update({
+      // Update user global role & status
+      const user = await ctx.db.user.update({
         where: { id: userId },
         data: {
           roleGlobal,
@@ -222,6 +229,41 @@ export const userRouter = createTRPCRouter({
           reviewedById: approverId,
         },
       })
+
+      // Handle project assignment if provided
+      if (projectAssignment) {
+        // Check if project exists
+        const project = await ctx.db.project.findUnique({
+          where: { id: projectAssignment.projectId },
+        })
+
+        if (!project) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Project not found",
+          })
+        }
+
+        // Upsert project member
+        await ctx.db.projectMember.upsert({
+          where: {
+            userId_projectId: {
+              userId,
+              projectId: projectAssignment.projectId,
+            },
+          },
+          create: {
+            userId,
+            projectId: projectAssignment.projectId,
+            role: projectAssignment.role,
+          },
+          update: {
+            role: projectAssignment.role,
+          },
+        })
+      }
+
+      return user
     }),
 
   /**

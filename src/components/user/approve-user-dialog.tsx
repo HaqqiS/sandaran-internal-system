@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { toast } from "sonner"
 import { Button } from "~/components/ui/button"
+import { Checkbox } from "~/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
@@ -13,6 +14,13 @@ import {
 } from "~/components/ui/dialog"
 import { Label } from "~/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select"
 import { api } from "~/trpc/react"
 
 interface ApproveUserDialogProps {
@@ -31,14 +39,29 @@ export function ApproveUserDialog({
   onOpenChange,
 }: ApproveUserDialogProps) {
   const [role, setRole] = useState<"USER" | "CEO" | "ADMIN">("USER")
+  const [assignProject, setAssignProject] = useState(false)
+  const [projectId, setProjectId] = useState<string>("")
+  const [projectRole, setProjectRole] = useState<
+    "MANDOR" | "ARCHITECT" | "FINANCE"
+  >("MANDOR")
+
   const utils = api.useUtils()
 
-  const approve = api.user.approveUserSimple.useMutation({
+  // Fetch projects only when needed
+  const { data: projects } = api.project.getAll.useQuery(undefined, {
+    enabled: open && role === "USER" && assignProject,
+  })
+
+  const approve = api.user.approveUser.useMutation({
     onSuccess: () => {
       toast.success(`${user?.name} has been approved successfully`)
       utils.user.getAllUsersWithFilter.invalidate()
       onOpenChange(false)
-      setRole("USER") // Reset to default
+      // Reset state
+      setRole("USER")
+      setAssignProject(false)
+      setProjectId("")
+      setProjectRole("MANDOR")
     },
     onError: (error) => {
       toast.error(error.message || "Failed to approve user")
@@ -46,6 +69,25 @@ export function ApproveUserDialog({
   })
 
   if (!user) return null
+
+  const handleApprove = () => {
+    if (assignProject && !projectId) {
+      toast.error("Please select a project")
+      return
+    }
+
+    approve.mutate({
+      userId: user.id,
+      roleGlobal: role,
+      projectAssignment:
+        assignProject && projectId
+          ? {
+              projectId,
+              role: projectRole,
+            }
+          : undefined,
+    })
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -70,7 +112,10 @@ export function ApproveUserDialog({
             <Label>Select Global Role</Label>
             <RadioGroup
               value={role}
-              onValueChange={(v) => setRole(v as "USER" | "CEO" | "ADMIN")}
+              onValueChange={(v) => {
+                setRole(v as "USER" | "CEO" | "ADMIN")
+                if (v !== "USER") setAssignProject(false)
+              }}
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="USER" id="user" />
@@ -95,6 +140,59 @@ export function ApproveUserDialog({
               </div>
             </RadioGroup>
           </div>
+
+          {role === "USER" && (
+            <div className="space-y-4 border-t pt-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="assignProject"
+                  checked={assignProject}
+                  onCheckedChange={(checked) => setAssignProject(!!checked)}
+                />
+                <Label htmlFor="assignProject">
+                  Assign to Project (Optional)
+                </Label>
+              </div>
+
+              {assignProject && (
+                <div className="grid gap-4 pl-6">
+                  <div className="grid gap-2">
+                    <Label>Project</Label>
+                    <Select value={projectId} onValueChange={setProjectId}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select project" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {projects?.map((project) => (
+                          <SelectItem key={project.id} value={project.id}>
+                            {project.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Project Role</Label>
+                    <Select
+                      value={projectRole}
+                      onValueChange={(v) =>
+                        setProjectRole(v as "MANDOR" | "ARCHITECT" | "FINANCE")
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="MANDOR">Mandor</SelectItem>
+                        <SelectItem value="ARCHITECT">Architect</SelectItem>
+                        <SelectItem value="FINANCE">Finance</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <DialogFooter>
@@ -105,15 +203,7 @@ export function ApproveUserDialog({
           >
             Cancel
           </Button>
-          <Button
-            onClick={() =>
-              approve.mutate({
-                userId: user.id,
-                roleGlobal: role,
-              })
-            }
-            disabled={approve.isPending}
-          >
+          <Button onClick={handleApprove} disabled={approve.isPending}>
             {approve.isPending ? "Approving..." : "Approve User"}
           </Button>
         </DialogFooter>

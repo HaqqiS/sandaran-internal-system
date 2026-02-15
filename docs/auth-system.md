@@ -14,13 +14,14 @@ Panduan lengkap penggunaan sistem autentikasi dan autorisasi di aplikasi ini.
 
 ## 🎯 Overview
 
-Sistem auth terdiri dari 3 file utama dengan tujuan berbeda:
+Sistem auth terdiri dari 4 file utama dengan tujuan berbeda:
 
-| File               | Type            | Usage                         | Server/Client      |
-| ------------------ | --------------- | ----------------------------- | ------------------ |
-| `auth-guards.ts`   | Pure Functions  | Validasi role sederhana       | ✅ Server & Client |
-| `server-auth.ts`   | Async Functions | Page protection               | ✅ Server only     |
-| `use-user-role.ts` | React Hook      | UI logic dengan project roles | ✅ Client only     |
+| File                   | Type            | Usage                         | Server/Client      |
+| ---------------------- | --------------- | ----------------------------- | ------------------ |
+| `auth-guards.ts`       | Pure Functions  | Validasi role sederhana       | ✅ Server & Client |
+| `server-auth.ts`       | Async Functions | Page protection               | ✅ Server only     |
+| `use-session-store.ts` | Zustand Store   | Client-side session state     | ✅ Client only     |
+| `use-user-role.ts`     | React Hook      | UI logic dengan project roles | ✅ Client only     |
 
 ---
 
@@ -63,7 +64,45 @@ requireAdmin(); // Admin-only protection, redirect jika bukan admin
 - ✅ Auto redirect jika gagal validasi
 - ✅ Digunakan di Server Components
 
-### 3. `hooks/use-user-role.ts`
+### 3. `stores/use-session-store.ts`
+
+**Client-side global state management untuk session**
+
+```typescript
+// Usage:
+// 1. Mengambil data user
+const { user, role } = useSession();
+
+// 2. Mengambil active status
+const { isActive } = useSession();
+```
+
+**Cara Kerja (Hydration Pattern):**
+
+1.  **Server (`layout.tsx`)**: Fetch session dari database.
+2.  **Provider (`SessionInitializer`)**: Menerima session dari props.
+3.  **Client Store (`session-store`)**: `setSession(data)` dipanggil saat mount.
+4.  **Components**: Component di mana saja bisa pakai `useSession()` tanpa prop drilling.
+
+**Karakteristik:**
+
+- ✅ **Zustand Store**: State manager ringan.
+- ✅ **Client-only**: Hanya bisa dipakai di component `.tsx` dengan `"use client"`.
+- ✅ **Single Source of Truth**: Menghindari duplikasi request session di client.
+- ✅ **Reactive**: Jika session berubah, semua UI update otomatis.
+
+**Kapan pakai ini?**
+
+- Saat butuh data user dasar (`name`, `email`, `image`).
+- Saat butuh global role (`ADMIN`, `CEO`).
+- Saat butuh cek statis (`isActive`).
+
+**Jangan pakai ini jika:**
+
+- Butuh role per proyek (Gunakan `useUserRole`).
+- Di Server Component (Gunakan `requireAuth`).
+
+### 4. `hooks/use-user-role.ts`
 
 **React hook untuk mendapatkan role information**
 
@@ -368,15 +407,15 @@ export function MemberList({ project }) {
 │                   │  │ (MANDOR, ARCHITECT, FINANCE) │
 │ requireAuth()     │  └────────┬─────────────────────┘
 │ requireAdmin()    │           │
-└───────────────────┘  ┌────────┴─────────┐
-                       │ YA               │ TIDAK
-                       ▼                  ▼
-              ┌─────────────────┐  ┌─────────────────┐
-              │ use-user-role.ts│  │ auth-guards.ts  │
-              │                 │  │                 │
-              │ useUserRole()   │  │ isAdmin()       │
-              │ (React Hook)    │  │ (Pure Function) │
-              └─────────────────┘  └─────────────────┘
+│                   │  ┌────────┴─────────┐
+│                   │  │ YA               │ TIDAK
+│                   │  ▼                  ▼
+│                   │ ┌─────────────────┐  ┌─────────────────┐
+└───────────────────┘ │ use-user-role.ts│  │ auth-guards.ts  │
+                      │                 │  │                 │
+                      │ useUserRole()   │  │ isAdmin()       │
+                      │ (React Hook)    │  │ (Pure Function) │
+                      └─────────────────┘  └─────────────────┘
 ```
 
 ---
@@ -467,4 +506,4 @@ const isMandor = projects.some(...)
 
 ---
 
-**Last Updated:** 2026-02-11
+**Last Updated:** 2026-02-15

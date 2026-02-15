@@ -121,18 +121,6 @@ export function getUserColumns(): ColumnDef<UserListItem>[] {
         )
       },
     },
-    {
-      id: "projects",
-      header: "Projects",
-      cell: ({ row }) => {
-        const count = row.original._count.projectMembers
-        return (
-          <span className="text-sm text-muted-foreground">
-            {count} {count === 1 ? "project" : "projects"}
-          </span>
-        )
-      },
-    },
   ]
 }
 

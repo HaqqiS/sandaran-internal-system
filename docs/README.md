@@ -6,7 +6,7 @@
 
 ## 📖 Daftar Dokumen
 
-### [auth-guards-usage.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/auth-guards-usage.md)
+### [auth-system.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/auth-system.md)
 
 **Contoh lengkap penggunaan fungsiAuth Guards** - Panduan praktis untuk menggunakan fungsi-fungsi autentikasi seperti `isAuthorizedRole`, `isAdmin`, `validateSessionAccess`, dan helper functions lainnya. Berisi code examples untuk protected pages, conditional UI, dan server actions.
 
@@ -55,7 +55,7 @@
 1. Mulai dengan [roles-and-permissions.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/roles-and-permissions.md) untuk memahami konsep dasar
 2. Lihat [permission-flows.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/permission-flows.md) untuk visualisasi sistem
 3. Gunakan [permission-quick-reference.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/permission-quick-reference.md) saat coding
-4. Referensi [auth-guards-usage.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/auth-guards-usage.md) untuk contoh implementasi
+4. Referensi [auth-system.md](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/auth-system.md) untuk contoh implementasi
 
 ### Untuk Frontend Developer
 
