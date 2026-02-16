@@ -7,6 +7,10 @@ import { api } from "~/trpc/react"
  * tRPC hooks for emergency fund management
  */
 
+export function useEmergencyAnalytics() {
+  return api.emergency.getAnalytics.useQuery()
+}
+
 export function useEmergencyFund(projectId: string) {
   return api.emergency.getByProject.useQuery(
     { projectId },

@@ -23,11 +23,11 @@ import {
   RecentReportsSection,
 } from "~/components/project/overview"
 import { ProjectDialog } from "~/components/project/project-dialog"
+import { TeamManagementDialog } from "~/components/project/team-management-dialog"
 import { ReportDialog } from "~/components/report/report-dialog"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import { TeamManagementDialog } from "~/components/project/team-management-dialog"
 import { useProjectBySlug, useReportsByProject } from "~/hooks"
 import { useEmergencyFund } from "~/hooks/useEmergency"
 import { isAdmin } from "~/lib/auth-guards"

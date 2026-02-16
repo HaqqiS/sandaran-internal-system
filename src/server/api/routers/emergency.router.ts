@@ -32,6 +32,115 @@ const projectMemberProcedure = projectProcedure([
 
 export const emergencyRouter = createTRPCRouter({
   /**
+   * Get emergency fund analytics: Balances & Monthly Activity per Project
+   */
+  getAnalytics: protectedProcedure.query(async ({ ctx }) => {
+    const user = ctx.session.user
+    const isAdminOrCEO =
+      user.roleGlobal === "ADMIN" || user.roleGlobal === "CEO"
+
+    const projects = await ctx.db.project.findMany({
+      where: isAdminOrCEO
+        ? { status: "ACTIVE" }
+        : {
+            status: "ACTIVE",
+            members: {
+              some: {
+                userId: user.id,
+                role: "FINANCE",
+              },
+            },
+          },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        emergencyFund: {
+          select: {
+            currentBalance: true,
+          },
+        },
+      },
+    })
+
+    const projectIds = projects.map((p) => p.id)
+
+    const sixMonthsAgo = new Date()
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5)
+    sixMonthsAgo.setDate(1)
+    sixMonthsAgo.setHours(0, 0, 0, 0)
+
+    const transactions = await ctx.db.emergencyTransaction.findMany({
+      where: {
+        fund: { projectId: { in: projectIds } },
+        createdAt: { gte: sixMonthsAgo },
+        status: "REVIEWED",
+      },
+      select: {
+        amount: true,
+        type: true,
+        createdAt: true,
+        fund: {
+          select: { projectId: true },
+        },
+      },
+      orderBy: { createdAt: "asc" },
+    })
+
+    const getEmptyMonths = () => {
+      const months = []
+      for (let i = 0; i < 6; i++) {
+        const d = new Date()
+        d.setMonth(d.getMonth() - (5 - i))
+        months.push({
+          month: d.toLocaleString("default", { month: "short" }),
+          key: `${d.getFullYear()}-${d.getMonth()}`,
+          deposit: 0,
+          withdrawal: 0,
+          order: i,
+        })
+      }
+      return months
+    }
+
+    const projectsWithAnalytics = projects.map((project) => {
+      const monthlyData = getEmptyMonths()
+      const monthMap = new Map(monthlyData.map((m) => [m.key, m]))
+
+      const projectTx = transactions.filter(
+        (tx) => tx.fund.projectId === project.id,
+      )
+
+      projectTx.forEach((tx) => {
+        const d = new Date(tx.createdAt)
+        const key = `${d.getFullYear()}-${d.getMonth()}`
+        const entry = monthMap.get(key)
+
+        if (entry) {
+          if (tx.type === "DEPOSIT") {
+            entry.deposit += Number(tx.amount)
+          } else if (tx.type === "WITHDRAWAL") {
+            entry.withdrawal += Number(tx.amount)
+          }
+        }
+      })
+
+      return {
+        id: project.id,
+        name: project.name,
+        slug: project.slug,
+        balance: project.emergencyFund?.currentBalance ?? 0,
+        monthlyActivity: Array.from(monthMap.values()).sort(
+          (a, b) => a.order - b.order,
+        ),
+      }
+    })
+
+    return {
+      projects: projectsWithAnalytics,
+    }
+  }),
+  /**
    * Get emergency fund for a project
    * All project members can view
    */

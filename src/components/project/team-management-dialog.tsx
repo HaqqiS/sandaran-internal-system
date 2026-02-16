@@ -1,5 +1,6 @@
 "use client"
 
+import { MemberManagement } from "~/components/project/member-management"
 import {
   Dialog,
   DialogContent,
@@ -14,7 +15,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "~/components/ui/sheet"
-import { MemberManagement } from "~/components/project/member-management"
 import { useIsMobile } from "~/hooks/use-mobile"
 
 interface TeamManagementDialogProps {

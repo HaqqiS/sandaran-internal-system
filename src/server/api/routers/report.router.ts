@@ -1,12 +1,12 @@
-import { TRPCError } from "@trpc/server";
-import { z } from "zod";
-import { deleteCloudinaryAsset } from "~/lib/cloudinary";
-import { requireOwnership } from "~/server/api/helpers/permission";
+import { TRPCError } from "@trpc/server"
+import { z } from "zod"
+import { deleteCloudinaryAsset } from "~/lib/cloudinary"
+import { requireOwnership } from "~/server/api/helpers/permission"
 import {
   createTRPCRouter,
   projectProcedure,
   protectedProcedure,
-} from "~/server/api/trpc";
+} from "~/server/api/trpc"
 
 /**
  * Daily Report Router
@@ -20,12 +20,12 @@ import {
  */
 
 // Procedures for different role combinations
-const reportCreatorProcedure = projectProcedure(["MANDOR", "ARCHITECT"]);
+const reportCreatorProcedure = projectProcedure(["MANDOR", "ARCHITECT"])
 const projectMemberProcedure = projectProcedure([
   "MANDOR",
   "ARCHITECT",
   "FINANCE",
-]);
+])
 
 export const reportRouter = createTRPCRouter({
   /**
@@ -47,8 +47,8 @@ export const reportRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       // Generate slug from date
-      const date = input.reportDate || new Date();
-      const slug = `report-${date.toISOString().split("T")[0]}-${Date.now()}`;
+      const date = input.reportDate || new Date()
+      const slug = `report-${date.toISOString().split("T")[0]}-${Date.now()}`
 
       const report = await ctx.db.dailyReport.create({
         data: {
@@ -74,9 +74,9 @@ export const reportRouter = createTRPCRouter({
           tasks: true,
           media: true,
         },
-      });
+      })
 
-      return report;
+      return report
     }),
 
   /**
@@ -123,16 +123,16 @@ export const reportRouter = createTRPCRouter({
             orderBy: { createdAt: "desc" },
           },
         },
-      });
+      })
 
       if (!report) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Report not found",
-        });
+        })
       }
 
-      return report;
+      return report
     }),
 
   /**
@@ -171,18 +171,18 @@ export const reportRouter = createTRPCRouter({
             },
           },
         },
-      });
+      })
 
-      let nextCursor: string | undefined;
+      let nextCursor: string | undefined
       if (reports.length > input.limit) {
-        const nextItem = reports.pop();
-        nextCursor = nextItem?.id;
+        const nextItem = reports.pop()
+        nextCursor = nextItem?.id
       }
 
       return {
         reports,
         nextCursor,
-      };
+      }
     }),
 
   /**
@@ -191,10 +191,10 @@ export const reportRouter = createTRPCRouter({
    * User: Only member projects
    */
   getRecentByProject: protectedProcedure.query(async ({ ctx }) => {
-    const { id: userId, roleGlobal } = ctx.session.user;
+    const { id: userId, roleGlobal } = ctx.session.user
 
     // 1. Get projects based on role
-    const isAdmin = roleGlobal === "CEO" || roleGlobal === "ADMIN";
+    const isAdmin = roleGlobal === "CEO" || roleGlobal === "ADMIN"
     const projects = await ctx.db.project.findMany({
       where: {
         status: "ACTIVE",
@@ -210,7 +210,7 @@ export const reportRouter = createTRPCRouter({
       },
       select: { id: true, name: true, slug: true },
       orderBy: { createdAt: "desc" },
-    });
+    })
 
     // 2. Fetch 6 recent reports for each project
     const results = await Promise.all(
@@ -235,17 +235,17 @@ export const reportRouter = createTRPCRouter({
               },
             },
           },
-        });
+        })
 
         return {
           ...project,
           reports,
-        };
+        }
       }),
-    );
+    )
 
     // Filter out projects with no reports? (Optional - keeping them for now so users know they can add reports)
-    return results;
+    return results
   }),
 
   /**
@@ -292,16 +292,16 @@ export const reportRouter = createTRPCRouter({
             orderBy: { createdAt: "desc" },
           },
         },
-      });
+      })
 
       if (!report) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Report not found",
-        });
+        })
       }
 
-      return report;
+      return report
     }),
 
   /**
@@ -328,14 +328,10 @@ export const reportRouter = createTRPCRouter({
           id: input.reportId,
           projectId: ctx.projectId,
         },
-      });
+      })
 
       // Check ownership (ADMIN bypasses this)
-      requireOwnership(
-        report,
-        ctx.session.user.id,
-        ctx.session.user.roleGlobal,
-      );
+      requireOwnership(report, ctx.session.user.id, ctx.session.user.roleGlobal)
 
       const updated = await ctx.db.dailyReport.update({
         where: { id: input.reportId },
@@ -358,9 +354,9 @@ export const reportRouter = createTRPCRouter({
           tasks: true,
           media: true,
         },
-      });
+      })
 
-      return updated;
+      return updated
     }),
 
   /**
@@ -381,20 +377,16 @@ export const reportRouter = createTRPCRouter({
           id: input.reportId,
           projectId: ctx.projectId,
         },
-      });
+      })
 
       // Check ownership (ADMIN bypasses this)
-      requireOwnership(
-        report,
-        ctx.session.user.id,
-        ctx.session.user.roleGlobal,
-      );
+      requireOwnership(report, ctx.session.user.id, ctx.session.user.roleGlobal)
 
       await ctx.db.dailyReport.delete({
         where: { id: input.reportId },
-      });
+      })
 
-      return { success: true };
+      return { success: true }
     }),
 
   /**
@@ -419,14 +411,10 @@ export const reportRouter = createTRPCRouter({
           id: input.reportId,
           projectId: ctx.projectId,
         },
-      });
+      })
 
       // Check ownership
-      requireOwnership(
-        report,
-        ctx.session.user.id,
-        ctx.session.user.roleGlobal,
-      );
+      requireOwnership(report, ctx.session.user.id, ctx.session.user.roleGlobal)
 
       const task = await ctx.db.dailyReportTask.create({
         data: {
@@ -436,9 +424,9 @@ export const reportRouter = createTRPCRouter({
           progress: input.progress,
           notes: input.notes,
         },
-      });
+      })
 
-      return task;
+      return task
     }),
 
   /**
@@ -463,13 +451,13 @@ export const reportRouter = createTRPCRouter({
         include: {
           report: true,
         },
-      });
+      })
 
       if (!task) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Task not found",
-        });
+        })
       }
 
       // Check ownership of the report
@@ -477,7 +465,7 @@ export const reportRouter = createTRPCRouter({
         task.report,
         ctx.session.user.id,
         ctx.session.user.roleGlobal,
-      );
+      )
 
       const updated = await ctx.db.dailyReportTask.update({
         where: { id: input.taskId },
@@ -487,9 +475,9 @@ export const reportRouter = createTRPCRouter({
           progress: input.progress,
           notes: input.notes,
         },
-      });
+      })
 
-      return updated;
+      return updated
     }),
 
   /**
@@ -510,13 +498,13 @@ export const reportRouter = createTRPCRouter({
         include: {
           report: true,
         },
-      });
+      })
 
       if (!task) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Task not found",
-        });
+        })
       }
 
       // Check ownership of the report
@@ -524,13 +512,13 @@ export const reportRouter = createTRPCRouter({
         task.report,
         ctx.session.user.id,
         ctx.session.user.roleGlobal,
-      );
+      )
 
       await ctx.db.dailyReportTask.delete({
         where: { id: input.taskId },
-      });
+      })
 
-      return { success: true };
+      return { success: true }
     }),
 
   /**
@@ -556,14 +544,10 @@ export const reportRouter = createTRPCRouter({
           id: input.reportId,
           projectId: ctx.projectId,
         },
-      });
+      })
 
       // Check ownership
-      requireOwnership(
-        report,
-        ctx.session.user.id,
-        ctx.session.user.roleGlobal,
-      );
+      requireOwnership(report, ctx.session.user.id, ctx.session.user.roleGlobal)
 
       const media = await ctx.db.reportMedia.create({
         data: {
@@ -571,9 +555,9 @@ export const reportRouter = createTRPCRouter({
           publicId: input.publicId,
           url: input.url,
         },
-      });
+      })
 
-      return media;
+      return media
     }),
 
   /**
@@ -594,13 +578,13 @@ export const reportRouter = createTRPCRouter({
         include: {
           report: true,
         },
-      });
+      })
 
       if (!media) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Media not found",
-        });
+        })
       }
 
       // Check ownership of the report
@@ -608,20 +592,20 @@ export const reportRouter = createTRPCRouter({
         media.report,
         ctx.session.user.id,
         ctx.session.user.roleGlobal,
-      );
+      )
 
       // Delete from Cloudinary first
       if (media.publicId) {
         await deleteCloudinaryAsset(media.publicId).catch((err) => {
-          console.error("Failed to delete Cloudinary asset:", err);
+          console.error("Failed to delete Cloudinary asset:", err)
           // Continue to delete from DB even if Cloudinary fails
-        });
+        })
       }
 
       await ctx.db.reportMedia.delete({
         where: { id: input.mediaId },
-      });
+      })
 
-      return { success: true };
+      return { success: true }
     }),
-});
+})

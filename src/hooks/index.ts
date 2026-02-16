@@ -37,6 +37,7 @@ export {
 // Emergency hooks
 export {
   useAddEmergencyBalance,
+  useEmergencyAnalytics,
   useEmergencyFund,
   useEmergencyTransactions,
   useRequestEmergencyFund,
