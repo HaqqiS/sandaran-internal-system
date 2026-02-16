@@ -46,21 +46,15 @@ export function AdminView() {
           isLoading={statsLoading}
         />
         <StatCard
-          title="Pending Users"
-          value={stats?.pendingUsers ?? 0}
-          icon={IconUserCheck}
-          description="Awaiting approval"
+          title="Users"
+          value={stats?.totalUsers ?? 0}
+          icon={IconUsers}
+          description={`${stats?.activeUsers ?? 0} Active · ${stats?.pendingUsers ?? 0} Pending · ${stats?.rejectedUsers ?? 0} Rejected`}
           variant={
             stats?.pendingUsers && stats.pendingUsers > 0
               ? "warning"
               : "default"
           }
-          isLoading={statsLoading}
-        />
-        <StatCard
-          title="Total Users"
-          value={stats?.totalUsers ?? 0}
-          icon={IconUsers}
           isLoading={statsLoading}
         />
         <StatCard

@@ -1,6 +1,6 @@
 "use client"
 
-import { IconCashBanknote, IconGavel, IconWallet } from "@tabler/icons-react"
+import { IconGavel, IconWallet } from "@tabler/icons-react"
 import { format } from "date-fns"
 import Link from "next/link"
 import { useState } from "react"
@@ -97,10 +97,12 @@ export function FinanceView() {
           isLoading={statsLoading}
         />
         <StatCard
-          title="Budget Status"
-          value="Healthy"
-          icon={IconCashBanknote}
-          description="Overall fund utilization"
+          title="Monthly Withdrawals"
+          value={`Rp ${Number(stats?.monthlyWithdrawals ?? 0).toLocaleString(
+            "id-ID",
+          )}`}
+          icon={IconWallet}
+          description="Total approved this month"
           isLoading={statsLoading}
         />
       </StatsGrid>

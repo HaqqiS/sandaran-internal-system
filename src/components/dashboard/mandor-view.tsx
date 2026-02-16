@@ -44,7 +44,8 @@ export function MandorView() {
     setIsReportOpen(true)
   }
 
-  const handleWithdrawal = () => {
+  const handleWithdrawal = (project: { id: string; slug: string }) => {
+    setSelectedProject(project)
     setIsWithdrawOpen(true)
   }
 
@@ -111,7 +112,7 @@ export function MandorView() {
                 <div className="space-y-3">
                   {stats.projects.map((project, index) => (
                     <div key={project.id}>
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between gap-4">
                         <div className="min-w-0 flex-1">
                           <h4 className="truncate font-semibold">
                             {project.name}
@@ -120,17 +121,32 @@ export function MandorView() {
                             {project._count.dailyReports} reports submitted
                           </p>
                         </div>
-                        <Button
-                          size="sm"
-                          onClick={() =>
-                            handleCreateReport({
-                              id: project.id,
-                              slug: project.slug ?? "",
-                            })
-                          }
-                        >
-                          Create Report
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              handleWithdrawal({
+                                id: project.id,
+                                slug: project.slug ?? "",
+                              })
+                            }
+                          >
+                            <IconWallet className="mr-2 h-4 w-4" />
+                            Withdraw
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() =>
+                              handleCreateReport({
+                                id: project.id,
+                                slug: project.slug ?? "",
+                              })
+                            }
+                          >
+                            Create Report
+                          </Button>
+                        </div>
                       </div>
                       {index < stats.projects.length - 1 && (
                         <Separator className="mt-3" />
@@ -143,17 +159,21 @@ export function MandorView() {
           </Card>
         </div>
 
-        {/* Emergency Fund & Recent Reports */}
-        <div className="col-span-3 space-y-4">
+        {/* Recent Reports */}
+        <div className="lg:col-span-3 col-span-4 space-y-4">
           <QuickActionCard
-            title="Emergency Fund"
-            description="Request emergency withdrawal"
+            title="Navigation"
+            description="Quick access"
             actions={[
               {
-                label: "Request Withdrawal",
-                icon: <IconWallet className="h-4 w-4" />,
-                onClick: handleWithdrawal,
-                variant: "outline",
+                label: "View All Projects",
+                icon: <IconListCheck className="h-4 w-4" />,
+                href: "/projects",
+              },
+              {
+                label: "View Recent Reports",
+                icon: <IconClipboardCheck className="h-4 w-4" />,
+                href: "/reports",
               },
             ]}
           />
@@ -187,7 +207,7 @@ export function MandorView() {
                     >
                       <div className="flex gap-3 rounded-lg border p-3 transition-colors hover:bg-accent">
                         {report.thumbnail ? (
-                          <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded">
+                          <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded">
                             <Image
                               src={report.thumbnail}
                               alt="Report thumbnail"
@@ -196,7 +216,7 @@ export function MandorView() {
                             />
                           </div>
                         ) : (
-                          <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded bg-muted">
+                          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded bg-muted">
                             <IconPhoto className="h-6 w-6 text-muted-foreground" />
                           </div>
                         )}

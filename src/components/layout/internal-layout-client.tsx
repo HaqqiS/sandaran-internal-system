@@ -105,7 +105,7 @@ function getSidebarConfig(
           navMain: [
             {
               title: "Back to All Projects",
-              url: "/ceo/projects",
+              url: "/projects",
               icon: IconArrowLeft,
             },
             {
@@ -123,12 +123,12 @@ function getSidebarConfig(
           ...baseConfig.navMain,
           {
             title: "All Projects",
-            url: "/ceo/projects",
+            url: "/projects",
             icon: IconFolder,
           },
           {
             title: "Reports",
-            url: "/ceo/reports",
+            url: "/reports",
             icon: IconNews,
           },
         ],
