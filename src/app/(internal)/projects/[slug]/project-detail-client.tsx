@@ -14,7 +14,7 @@ import { useState } from "react"
 import { FundDialog } from "~/components/emergency/fund-dialog"
 import { WithdrawDialog } from "~/components/emergency/withdraw-dialog"
 import { PageLayout } from "~/components/layout"
-import { MemberManagement } from "~/components/project/member-management"
+
 import {
   DocumentsSection,
   EmergencyFundSection,
@@ -27,13 +27,7 @@ import { ReportDialog } from "~/components/report/report-dialog"
 import { Badge } from "~/components/ui/badge"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "~/components/ui/sheet"
+import { TeamManagementDialog } from "~/components/project/team-management-dialog"
 import { useProjectBySlug, useReportsByProject } from "~/hooks"
 import { useEmergencyFund } from "~/hooks/useEmergency"
 import { isAdmin } from "~/lib/auth-guards"
@@ -103,7 +97,8 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
               onClick={() => setIsTeamOpen(true)}
             >
               <IconUsers className="mr-2 h-4 w-4" />
-              Manage Team
+              <span className="hidden sm:inline">Manage Team</span>
+              <span className="inline sm:hidden">Team</span>
             </Button>
             <Button
               variant="outline"
@@ -111,7 +106,8 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
               onClick={() => setIsEditOpen(true)}
             >
               <IconPencil className="mr-2 h-4 w-4" />
-              Edit Project
+              <span className="hidden sm:inline">Edit Project</span>
+              <span className="inline sm:hidden">Project</span>
             </Button>
           </div>
         )
@@ -276,20 +272,11 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
         onOpenChange={setIsWithdrawOpen}
       />
 
-      {/* Team Management Sheet */}
-      <Sheet open={isTeamOpen} onOpenChange={setIsTeamOpen}>
-        <SheetContent className="w-full overflow-y-auto sm:max-w-2xl">
-          <SheetHeader>
-            <SheetTitle>Team Management</SheetTitle>
-            <SheetDescription>
-              Add, remove, and manage roles for project members
-            </SheetDescription>
-          </SheetHeader>
-          <div className="mt-6">
-            <MemberManagement projectId={project.id} />
-          </div>
-        </SheetContent>
-      </Sheet>
+      <TeamManagementDialog
+        projectId={project.id}
+        open={isTeamOpen}
+        onOpenChange={setIsTeamOpen}
+      />
     </PageLayout>
   )
 }

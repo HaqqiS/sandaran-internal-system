@@ -1,6 +1,6 @@
 "use client"
 
-import { IconCalendar, IconCheckbox, IconMapPin } from "@tabler/icons-react"
+import { IconCalendar, IconMapPin } from "@tabler/icons-react"
 import { format } from "date-fns"
 import type { ProjectStatus } from "generated/prisma"
 import { Badge } from "~/components/ui/badge"
@@ -20,69 +20,63 @@ interface ProjectInfoSectionProps {
 export function ProjectInfoSection({ project }: ProjectInfoSectionProps) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Project Details</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+        <CardTitle className="text-base font-semibold">
+          Project Details
+        </CardTitle>
+        <Badge
+          className="text-xs"
+          variant={
+            project.status === "ACTIVE"
+              ? "default"
+              : project.status === "DONE"
+                ? "secondary"
+                : "outline"
+          }
+        >
+          {project.status}
+        </Badge>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Status */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <IconCheckbox className="h-4 w-4" />
-            <span>Status</span>
-          </div>
-          <Badge
-            variant={
-              project.status === "ACTIVE"
-                ? "default"
-                : project.status === "DONE"
-                  ? "secondary"
-                  : "outline"
-            }
-          >
-            {project.status}
-          </Badge>
-        </div>
-
+      <CardContent className="grid gap-y-4 gap-x-6 text-sm sm:grid-cols-2">
         {/* Location */}
-        {project.location && (
-          <div className="flex items-start gap-2">
-            <IconMapPin className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" />
-            <div>
-              <p className="text-sm font-medium">Location</p>
-              <p className="text-sm text-muted-foreground">
-                {project.location}
-              </p>
-            </div>
+        <div className="flex items-start gap-2">
+          <IconMapPin className="mt-0.5 h-4 w-4 text-muted-foreground shrink-0" />
+          <div className="space-y-1">
+            <span className="font-medium text-muted-foreground text-xs uppercase tracking-wider block">
+              Location
+            </span>
+            <p className="font-medium leading-none">
+              {project.location || "-"}
+            </p>
           </div>
-        )}
+        </div>
 
         {/* Timeline */}
         <div className="flex items-start gap-2">
-          <IconCalendar className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" />
-          <div className="flex-1 space-y-1">
-            <p className="text-sm font-medium">Timeline</p>
-            <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
-              <div>
-                <span className="font-medium">Start:</span>{" "}
-                {project.startDate
-                  ? format(new Date(project.startDate), "dd MMM yyyy")
-                  : "-"}
-              </div>
-              <div>
-                <span className="font-medium">End:</span>{" "}
-                {project.endDate
-                  ? format(new Date(project.endDate), "dd MMM yyyy")
-                  : "-"}
-              </div>
-            </div>
+          <IconCalendar className="mt-0.5 h-4 w-4 text-muted-foreground shrink-0" />
+          <div className="space-y-1">
+            <span className="font-medium text-muted-foreground text-xs uppercase tracking-wider block">
+              Timeline
+            </span>
+            <p className="font-medium leading-none">
+              {project.startDate
+                ? format(new Date(project.startDate), "dd MMM yyyy")
+                : "-"}{" "}
+              —{" "}
+              {project.endDate
+                ? format(new Date(project.endDate), "dd MMM yyyy")
+                : "Ongoing"}
+            </p>
           </div>
         </div>
 
         {/* Description */}
         {project.description && (
-          <div className="pt-2 border-t">
-            <p className="text-sm font-medium mb-1">Description</p>
-            <p className="text-sm text-muted-foreground leading-relaxed">
+          <div className="col-span-2 border-t pt-3 mt-1">
+            <span className="font-medium text-muted-foreground text-xs uppercase tracking-wider block mb-1.5">
+              Description
+            </span>
+            <p className="text-muted-foreground leading-relaxed text-sm">
               {project.description}
             </p>
           </div>
