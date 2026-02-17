@@ -29,8 +29,6 @@ export function AdminView() {
   const { data: pendingUsers, isLoading: usersLoading } =
     useAdminPendingUsers(5);
 
-  const isLoading = statsLoading || usersLoading;
-
   return (
     <DashboardLayout
       title="Admin Dashboard"

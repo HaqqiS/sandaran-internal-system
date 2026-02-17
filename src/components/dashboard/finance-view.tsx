@@ -70,8 +70,6 @@ export function FinanceView() {
     });
   };
 
-  const isLoading = statsLoading || fundsLoading || txLoading;
-
   return (
     <DashboardLayout
       title="Finance Dashboard"

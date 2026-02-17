@@ -49,8 +49,6 @@ export function MandorView() {
     setIsWithdrawOpen(true);
   };
 
-  const isLoading = statsLoading || reportsLoading;
-
   return (
     <DashboardLayout
       title="Mandor Dashboard"

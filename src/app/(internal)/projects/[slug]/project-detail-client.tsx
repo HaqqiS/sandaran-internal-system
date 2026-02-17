@@ -233,6 +233,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
           projectId={project.id}
           projectSlug={project.slug}
           canCreate={canCreateReport}
+          onCreate={() => setIsCreateReportOpen(true)}
         />
 
         <EmergencyFundSection

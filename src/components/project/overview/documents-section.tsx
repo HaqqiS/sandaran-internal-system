@@ -71,7 +71,7 @@ export function DocumentsSection({
         <div className="flex items-center gap-2">
           <CardTitle>Documents</CardTitle>
           <span className="text-sm text-muted-foreground">
-            ({totalCount} files)
+            ({totalCount} files in {typeCount} categories)
           </span>
         </div>
         <Link href={`/projects/${projectSlug}/documents`}>

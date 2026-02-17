@@ -4,6 +4,7 @@ import {
   IconChevronRight,
   IconFileText,
   IconLoader2,
+  IconPlus,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { ReportCard } from "~/components/report/report-card";
@@ -15,12 +16,14 @@ interface RecentReportsSectionProps {
   projectId: string;
   projectSlug: string;
   canCreate?: boolean;
+  onCreate?: () => void;
 }
 
 export function RecentReportsSection({
   projectId,
   projectSlug,
   canCreate = false,
+  onCreate,
 }: RecentReportsSectionProps) {
   const { data, isLoading, error } = useReportsByProject(projectId);
 
@@ -46,7 +49,7 @@ export function RecentReportsSection({
           <CardTitle>Recent Reports</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground text-center py-8">
+          <p className="py-8 text-center text-sm text-muted-foreground">
             Failed to load reports
           </p>
         </CardContent>
@@ -65,12 +68,20 @@ export function RecentReportsSection({
           <CardTitle>Recent Reports</CardTitle>
           <span className="text-sm text-muted-foreground">({totalCount})</span>
         </div>
-        <Link href={`/projects/${projectSlug}/reports`}>
-          <Button variant="ghost" size="sm" className="gap-1">
-            View All
-            <IconChevronRight className="h-4 w-4" />
-          </Button>
-        </Link>
+        <div className="flex items-center gap-2">
+          {canCreate && (
+            <Button size="sm" onClick={onCreate}>
+              <IconPlus className="mr-2 h-4 w-4" />
+              Create
+            </Button>
+          )}
+          <Link href={`/projects/${projectSlug}/reports`}>
+            <Button variant="ghost" size="sm" className="gap-1">
+              View All
+              <IconChevronRight className="h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
       </CardHeader>
       <CardContent>
         {recentReports.length === 0 ? (

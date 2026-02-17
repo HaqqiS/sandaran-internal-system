@@ -27,8 +27,6 @@ export function ArchitectView() {
     slug: string;
   } | null>(null);
 
-  const isLoading = statsLoading || dashboardLoading;
-
   return (
     <DashboardLayout
       title="Architect Dashboard"
