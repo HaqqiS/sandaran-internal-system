@@ -2,8 +2,8 @@
 
 import { IconX, IconZoomIn } from "@tabler/icons-react";
 import { useState } from "react";
+import { MediaPreview } from "~/components/shared/media-preview";
 import { Button } from "~/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog";
 
 interface MediaGalleryProps {
   media: { id: string; url: string; publicId: string }[];
@@ -65,22 +65,11 @@ export function MediaGallery({
       </div>
 
       {/* Lightbox */}
-      <Dialog
+      <MediaPreview
+        url={lightboxImage}
         open={!!lightboxImage}
-        onOpenChange={() => setLightboxImage(null)}
-      >
-        <DialogContent className="max-w-4xl border-0 bg-transparent p-0 shadow-none">
-          <DialogTitle className="sr-only">Image Preview</DialogTitle>
-          {lightboxImage && (
-            // biome-ignore lint: using img for Cloudinary external URLs
-            <img
-              src={lightboxImage}
-              alt="Full size"
-              className="max-h-[90vh] w-auto rounded-lg object-contain"
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+        onOpenChange={(open) => !open && setLightboxImage(null)}
+      />
     </>
   );
 }

@@ -1,10 +1,11 @@
 "use client";
 
-import { IconLoader2, IconPlus, IconX } from "@tabler/icons-react";
-import NextImage from "next/image";
+import { IconLoader2, IconPlus, IconX, IconZoomIn } from "@tabler/icons-react";
+import Image from "next/image";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
+import { MediaPreview } from "~/components/shared/media-preview";
 import { Button } from "~/components/ui/button";
 import { Progress } from "~/components/ui/progress";
 import { useDeleteReportMedia, useUploadReportMedia } from "~/hooks";
@@ -27,6 +28,7 @@ export function MediaUpload({
   canEdit = true,
 }: MediaUploadProps) {
   const [uploading, setUploading] = useState(false);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const { upload, progress } = useCloudinaryUpload();
   const uploadMedia = useUploadReportMedia();
   const deleteMedia = useDeleteReportMedia();
@@ -91,13 +93,22 @@ export function MediaUpload({
               key={media.id}
               className="group relative aspect-square overflow-hidden rounded-lg border bg-muted"
             >
-              <NextImage
-                src={media.url}
-                alt="Report media"
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-              />
+              <button
+                type="button"
+                className="h-full w-full cursor-pointer border-0 bg-transparent p-0"
+                onClick={() => setLightboxImage(media.url)}
+              >
+                <Image
+                  src={media.url}
+                  alt="Report media"
+                  fill
+                  className="object-cover transition-transform group-hover:scale-105"
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/20">
+                  <IconZoomIn className="h-6 w-6 text-white opacity-0 transition-opacity group-hover:opacity-100" />
+                </div>
+              </button>
               {canEdit && (
                 <Button
                   type="button"
@@ -148,6 +159,12 @@ export function MediaUpload({
 
       {/* Progress */}
       {uploading && <Progress value={progress} className="h-2" />}
+
+      <MediaPreview
+        url={lightboxImage}
+        open={!!lightboxImage}
+        onOpenChange={(open) => !open && setLightboxImage(null)}
+      />
     </div>
   );
 }
