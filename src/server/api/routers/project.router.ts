@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { renameCloudinaryFolder } from "~/lib/cloudinary";
 import {
   adminProcedure,
   createTRPCRouter,
@@ -292,8 +293,21 @@ export const projectRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      // Get current project to check old slug
+      const currentProject = await ctx.db.project.findUnique({
+        where: { id: input.projectId },
+        select: { slug: true, id: true },
+      });
+
+      if (!currentProject) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Project not found",
+        });
+      }
+
       // Check slug uniqueness if updated
-      if (input.slug) {
+      if (input.slug && input.slug !== currentProject.slug) {
         const existing = await ctx.db.project.findUnique({
           where: { slug: input.slug },
         });
@@ -332,6 +346,11 @@ export const projectRouter = createTRPCRouter({
           },
         },
       });
+
+      // Sync Cloudinary folder if slug changed
+      if (input.slug && input.slug !== currentProject.slug) {
+        await renameCloudinaryFolder(currentProject.slug, input.slug);
+      }
 
       return project;
     }),

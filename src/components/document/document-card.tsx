@@ -10,6 +10,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { format } from "date-fns";
+import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -37,26 +38,26 @@ interface DocumentCardProps {
 }
 
 export function DocumentCard({
-  document,
+  document: doc,
   currentUserId,
   onEdit,
   onDelete,
 }: DocumentCardProps) {
-  const isOwner = document.userId === currentUserId;
+  const isOwner = doc.userId === currentUserId;
   const { mutateAsync: getDownloadUrl, isPending: isDownloading } =
     useGetDownloadUrl();
 
   // Determine icon based on mimeType or fileType
   const getFileIcon = () => {
-    if (document.mimeType?.startsWith("image/")) {
+    if (doc.mimeType?.startsWith("image/")) {
       return <IconPhoto className="h-8 w-8 text-blue-500" />;
     }
-    if (document.mimeType === "application/pdf") {
+    if (doc.mimeType === "application/pdf") {
       return <IconFileTypePdf className="h-8 w-8 text-red-500" />;
     }
     if (
-      document.mimeType?.includes("excel") ||
-      document.mimeType?.includes("spreadsheet")
+      doc.mimeType?.includes("excel") ||
+      doc.mimeType?.includes("spreadsheet")
     ) {
       return <IconFileTypeXls className="h-8 w-8 text-green-500" />;
     }
@@ -65,14 +66,35 @@ export function DocumentCard({
 
   const handleDownload = async () => {
     try {
-      console.log("Document data:", document);
+      const toastId = toast.loading("Downloading...");
+
       const { url } = await getDownloadUrl({
-        projectId: document.projectId,
-        documentId: document.id,
+        projectId: doc.projectId,
+        documentId: doc.id,
       });
-      window.open(url, "_blank", "noopener,noreferrer");
+
+      // Fetch blob to enforce filename
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Network response was not ok");
+
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = doc.fileName || "download"; // Force original filename
+      document.body.appendChild(link);
+      link.click();
+
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+
+      toast.dismiss(toastId);
+      toast.success("Download started");
     } catch (error) {
-      console.error("Failed to get download URL", error);
+      console.error("Failed to download", error);
+      toast.error("Failed to download file");
     }
   };
 
@@ -86,41 +108,41 @@ export function DocumentCard({
           <div className="flex items-center justify-between">
             <CardTitle
               className="text-base truncate"
-              title={document.title || document.fileName}
+              title={doc.title || doc.fileName}
             >
-              {document.title || document.fileName}
+              {doc.title || doc.fileName}
             </CardTitle>
-            {document.version && (
+            {doc.version && (
               <Badge variant="outline" className="ml-2 shrink-0">
-                {document.version}
+                {doc.version}
               </Badge>
             )}
           </div>
 
           <CardDescription
             className="truncate text-xs mt-1"
-            title={document.fileName}
+            title={doc.fileName}
           >
-            {document.fileName}
+            {doc.fileName}
           </CardDescription>
         </div>
       </CardHeader>
 
       <CardContent className="flex-1 pb-2">
-        {document.description && (
+        {doc.description && (
           <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-            {document.description}
+            {doc.description}
           </p>
         )}
 
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Avatar className="h-5 w-5">
-            <AvatarImage src={document.uploader.image || undefined} />
-            <AvatarFallback>{document.uploader.name.charAt(0)}</AvatarFallback>
+            <AvatarImage src={doc.uploader.image || undefined} />
+            <AvatarFallback>{doc.uploader.name.charAt(0)}</AvatarFallback>
           </Avatar>
-          <span>{document.uploader.name}</span>
+          <span>{doc.uploader.name}</span>
           <span>•</span>
-          <span>{format(new Date(document.createdAt), "dd MMM yyyy")}</span>
+          <span>{format(new Date(doc.createdAt), "dd MMM yyyy")}</span>
         </div>
       </CardContent>
 
@@ -146,7 +168,7 @@ export function DocumentCard({
               variant="ghost"
               size="icon-sm"
               className="h-8 w-8"
-              onClick={() => onEdit(document)}
+              onClick={() => onEdit(doc)}
             >
               <IconEdit className="h-3.5 w-3.5" />
             </Button>
@@ -154,7 +176,7 @@ export function DocumentCard({
               variant="ghost"
               size="icon-sm"
               className="h-8 w-8 text-destructive hover:text-destructive"
-              onClick={() => onDelete(document)}
+              onClick={() => onDelete(doc)}
             >
               <IconTrash className="h-3.5 w-3.5" />
             </Button>

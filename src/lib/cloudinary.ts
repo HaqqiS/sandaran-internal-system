@@ -62,6 +62,25 @@ export async function deleteCloudinaryAsset(publicId: string) {
 }
 
 /**
+ * Rename Cloudinary folder (e.g. when project slug changes)
+ * NOTE: This uses the Admin API which might have rate limits.
+ */
+export async function renameCloudinaryFolder(oldSlug: string, newSlug: string) {
+  const oldPath = `sandaran/${oldSlug}`;
+  const newPath = `sandaran/${newSlug}`;
+
+  try {
+    await cloudinary.api.rename_folder(oldPath, newPath);
+    console.log(`✅ Renamed Cloudinary folder: ${oldPath} -> ${newPath}`);
+  } catch (error) {
+    console.warn(
+      `⚠️ Failed to rename Cloudinary folder (${oldPath} -> ${newPath}):`,
+      error,
+    );
+  }
+}
+
+/**
  * Generate optimized image URL with transformations
  */
 export function getOptimizedImageUrl(
@@ -84,26 +103,6 @@ export function getOptimizedImageUrl(
         fetch_format: options?.format || "auto",
       },
     ],
-  });
-}
-
-/**
- * Generate signed download URL for private/restricted assets (like PDFs)
- */
-export function getSignedDownloadUrl(
-  publicId: string,
-  resourceType: "image" | "video" | "raw" = "raw",
-) {
-  // Use "authenticated" type if it was uploaded as such, otherwise try "upload" (public)
-  // Since we suspect strict ACLs, a signed URL is safer.
-  return cloudinary.url(publicId, {
-    resource_type: resourceType,
-    type: "authenticated",
-    sign_url: true,
-    secure: true,
-    // Add expiration to make it a valid signed URL
-    expires_at: Math.floor(Date.now() / 1000) + 3600,
-    flags: "attachment",
   });
 }
 

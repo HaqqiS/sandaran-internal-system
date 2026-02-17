@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { getSignedDownloadUrl } from "~/lib/cloudinary";
+
 import { requireOwnership } from "~/server/api/helpers/permission";
 import {
   createTRPCRouter,
@@ -250,27 +250,7 @@ export const documentRouter = createTRPCRouter({
         });
       }
 
-      const cleanPublicId = document.publicId.replace(
-        /\.(pdf|xlsx?|png|jpe?g|webp)$/i,
-        "",
-      );
-      const resourceType = (document.resourceType || "raw") as
-        | "image"
-        | "video"
-        | "raw";
-
-      // Generate signed URL with 1-hour expiry
-      const url = getSignedDownloadUrl(cleanPublicId, resourceType);
-
-      console.log("📥 Document details:", {
-        originalPublicId: document.publicId,
-        cleanPublicId,
-        mimeType: document.mimeType,
-        resourceType,
-      });
-      console.log("🔗 Generated URL:", url);
-
-      return { url };
+      return { url: document.url };
     }),
 
   /**
