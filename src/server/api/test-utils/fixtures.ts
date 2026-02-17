@@ -1,5 +1,5 @@
-import type { GlobalRole, ProjectRole, ProjectStatus } from "generated/prisma"
-import { db } from "~/server/db"
+import type { GlobalRole, ProjectRole, ProjectStatus } from "generated/prisma";
+import { db } from "~/server/db";
 
 /**
  * Test Data Fixtures
@@ -11,9 +11,9 @@ import { db } from "~/server/db"
 // ==================== USER FIXTURES ====================
 
 export async function createAdminUser(overrides?: {
-  id?: string
-  name?: string
-  email?: string
+  id?: string;
+  name?: string;
+  email?: string;
 }) {
   return await db.user.create({
     data: {
@@ -24,13 +24,13 @@ export async function createAdminUser(overrides?: {
       isActive: true,
       emailVerified: true,
     },
-  })
+  });
 }
 
 export async function createCEOUser(overrides?: {
-  id?: string
-  name?: string
-  email?: string
+  id?: string;
+  name?: string;
+  email?: string;
 }) {
   return await db.user.create({
     data: {
@@ -41,13 +41,13 @@ export async function createCEOUser(overrides?: {
       isActive: true,
       emailVerified: true,
     },
-  })
+  });
 }
 
 export async function createRegularUser(overrides?: {
-  id?: string
-  name?: string
-  email?: string
+  id?: string;
+  name?: string;
+  email?: string;
 }) {
   return await db.user.create({
     data: {
@@ -58,13 +58,13 @@ export async function createRegularUser(overrides?: {
       isActive: true,
       emailVerified: true,
     },
-  })
+  });
 }
 
 export async function createInactiveUser(overrides?: {
-  id?: string
-  name?: string
-  email?: string
+  id?: string;
+  name?: string;
+  email?: string;
 }) {
   return await db.user.create({
     data: {
@@ -75,18 +75,18 @@ export async function createInactiveUser(overrides?: {
       isActive: false,
       emailVerified: true,
     },
-  })
+  });
 }
 
 // ==================== PROJECT FIXTURES ====================
 
 export async function createProject(overrides?: {
-  id?: string
-  name?: string
-  slug?: string
-  status?: ProjectStatus
+  id?: string;
+  name?: string;
+  slug?: string;
+  status?: ProjectStatus;
 }) {
-  const timestamp = Date.now()
+  const timestamp = Date.now();
   return await db.project.create({
     data: {
       id: overrides?.id,
@@ -103,41 +103,41 @@ export async function createProject(overrides?: {
         },
       },
     },
-  })
+  });
 }
 
 export async function createProjectWithMembers(config?: {
-  mandor?: { id?: string; name?: string }
-  architect?: { id?: string; name?: string }
-  finance?: { id?: string; name?: string }
+  mandor?: { id?: string; name?: string };
+  architect?: { id?: string; name?: string };
+  finance?: { id?: string; name?: string };
 }) {
-  const project = await createProject()
+  const project = await createProject();
 
   const members: {
-    mandor?: Awaited<ReturnType<typeof createMandorMember>>
-    architect?: Awaited<ReturnType<typeof createArchitectMember>>
-    finance?: Awaited<ReturnType<typeof createFinanceMember>>
-  } = {}
+    mandor?: Awaited<ReturnType<typeof createMandorMember>>;
+    architect?: Awaited<ReturnType<typeof createArchitectMember>>;
+    finance?: Awaited<ReturnType<typeof createFinanceMember>>;
+  } = {};
 
   if (config?.mandor !== undefined) {
-    const user = await createRegularUser(config.mandor)
-    members.mandor = await createMandorMember(project.id, user.id)
+    const user = await createRegularUser(config.mandor);
+    members.mandor = await createMandorMember(project.id, user.id);
   }
 
   if (config?.architect !== undefined) {
-    const user = await createRegularUser(config.architect)
-    members.architect = await createArchitectMember(project.id, user.id)
+    const user = await createRegularUser(config.architect);
+    members.architect = await createArchitectMember(project.id, user.id);
   }
 
   if (config?.finance !== undefined) {
-    const user = await createRegularUser(config.finance)
-    members.finance = await createFinanceMember(project.id, user.id)
+    const user = await createRegularUser(config.finance);
+    members.finance = await createFinanceMember(project.id, user.id);
   }
 
   return {
     project,
     members,
-  }
+  };
 }
 
 // ==================== PROJECT MEMBER FIXTURES ====================
@@ -153,7 +153,7 @@ export async function createMandorMember(projectId: string, userId: string) {
       user: true,
       project: true,
     },
-  })
+  });
 }
 
 export async function createArchitectMember(projectId: string, userId: string) {
@@ -167,7 +167,7 @@ export async function createArchitectMember(projectId: string, userId: string) {
       user: true,
       project: true,
     },
-  })
+  });
 }
 
 export async function createFinanceMember(projectId: string, userId: string) {
@@ -181,7 +181,7 @@ export async function createFinanceMember(projectId: string, userId: string) {
       user: true,
       project: true,
     },
-  })
+  });
 }
 
 // ==================== DAILY REPORT FIXTURES ====================
@@ -190,12 +190,12 @@ export async function createDailyReport(
   projectId: string,
   userId: string,
   overrides?: {
-    slug?: string
-    taskDescription?: string
-    progressPercent?: number
+    slug?: string;
+    taskDescription?: string;
+    progressPercent?: number;
   },
 ) {
-  const timestamp = Date.now()
+  const timestamp = Date.now();
   return await db.dailyReport.create({
     data: {
       projectId,
@@ -213,11 +213,11 @@ export async function createDailyReport(
       media: true,
       comments: true,
     },
-  })
+  });
 }
 
 export async function createReportWithTasks(projectId: string, userId: string) {
-  const report = await createDailyReport(projectId, userId)
+  const report = await createDailyReport(projectId, userId);
 
   const tasks = await Promise.all([
     db.dailyReportTask.create({
@@ -236,16 +236,16 @@ export async function createReportWithTasks(projectId: string, userId: string) {
         progress: 75,
       },
     }),
-  ])
+  ]);
 
   return {
     report,
     tasks,
-  }
+  };
 }
 
 export async function createReportWithMedia(projectId: string, userId: string) {
-  const report = await createDailyReport(projectId, userId)
+  const report = await createDailyReport(projectId, userId);
 
   const media = await Promise.all([
     db.reportMedia.create({
@@ -262,12 +262,12 @@ export async function createReportWithMedia(projectId: string, userId: string) {
         url: "https://test.com/media2.jpg",
       },
     }),
-  ])
+  ]);
 
   return {
     report,
     media,
-  }
+  };
 }
 
 // ==================== COMMENT FIXTURES ====================
@@ -287,7 +287,7 @@ export async function createComment(
       author: true,
       report: true,
     },
-  })
+  });
 }
 
 // ==================== DOCUMENT FIXTURES ====================
@@ -296,11 +296,11 @@ export async function createDocument(
   projectId: string,
   userId: string,
   overrides?: {
-    fileName?: string
-    fileType?: "DESIGN" | "DRAWING" | "REFERENCE" | "SPECIFICATION" | "OTHER"
+    fileName?: string;
+    fileType?: "DESIGN" | "DRAWING" | "REFERENCE" | "SPECIFICATION" | "OTHER";
   },
 ) {
-  const timestamp = Date.now()
+  const timestamp = Date.now();
   return await db.projectDocument.create({
     data: {
       projectId,
@@ -317,7 +317,7 @@ export async function createDocument(
       uploader: true,
       project: true,
     },
-  })
+  });
 }
 
 // ==================== EMERGENCY FUND FIXTURES ====================
@@ -334,7 +334,7 @@ export async function createEmergencyFund(
     include: {
       transactions: true,
     },
-  })
+  });
 }
 
 export async function createEmergencyTransaction(
@@ -357,7 +357,7 @@ export async function createEmergencyTransaction(
       requester: true,
       verifier: true,
     },
-  })
+  });
 }
 
 // ==================== LOGISTIC FIXTURES ====================
@@ -365,12 +365,12 @@ export async function createEmergencyTransaction(
 export async function createLogisticItem(
   projectId: string,
   overrides?: {
-    name?: string
-    unit?: string
-    slug?: string
+    name?: string;
+    unit?: string;
+    slug?: string;
   },
 ) {
-  const timestamp = Date.now()
+  const timestamp = Date.now();
   return await db.logisticItem.create({
     data: {
       projectId,
@@ -381,7 +381,7 @@ export async function createLogisticItem(
     include: {
       transactions: true,
     },
-  })
+  });
 }
 
 export async function createLogisticTransaction(
@@ -402,13 +402,13 @@ export async function createLogisticTransaction(
       item: true,
       user: true,
     },
-  })
+  });
 }
 
 // ==================== SESSION FIXTURES ====================
 
 export async function createSession(userId: string) {
-  const timestamp = Date.now()
+  const timestamp = Date.now();
   return await db.session.create({
     data: {
       id: `session-${timestamp}`,
@@ -416,5 +416,5 @@ export async function createSession(userId: string) {
       token: `token-${timestamp}`,
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24), // 24 hours
     },
-  })
+  });
 }

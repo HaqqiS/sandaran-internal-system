@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import { IconFile, IconUpload, IconX } from "@tabler/icons-react"
-import { useCallback, useState } from "react"
-import { useDropzone } from "react-dropzone"
-import { toast } from "sonner"
-import { Button } from "~/components/ui/button"
-import { Progress } from "~/components/ui/progress"
-import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload"
-import { cn } from "~/lib/utils"
+import { IconFile, IconUpload, IconX } from "@tabler/icons-react";
+import { useCallback, useState } from "react";
+import { useDropzone } from "react-dropzone";
+import { toast } from "sonner";
+import { Button } from "~/components/ui/button";
+import { Progress } from "~/components/ui/progress";
+import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload";
+import { cn } from "~/lib/utils";
 
 interface FileUploadProps {
   /** Project slug for folder structure */
-  projectSlug: string
+  projectSlug: string;
   /** Upload type: documents */
-  type: "documents"
+  type: "documents";
   /** Current file URL */
-  value?: string
+  value?: string;
   /** Callback when file is uploaded */
   onChange: (
     url: string,
@@ -24,17 +24,17 @@ interface FileUploadProps {
     size: number,
     mimeType: string,
     resourceType: string,
-  ) => void
+  ) => void;
   /** Callback when file is removed */
-  onRemove?: () => void
+  onRemove?: () => void;
   /** Optional className */
-  className?: string
+  className?: string;
   /** Disable upload */
-  disabled?: boolean
+  disabled?: boolean;
   /** Max file size in MB */
-  maxSizeMB?: number
+  maxSizeMB?: number;
   /** Accepted file types */
-  accept?: Record<string, string[]>
+  accept?: Record<string, string[]>;
 }
 
 export function FileUpload({
@@ -55,36 +55,36 @@ export function FileUpload({
     "image/*": [".jpg", ".jpeg", ".png", ".webp"],
   },
 }: FileUploadProps) {
-  const [fileName, setFileName] = useState<string | null>(null)
-  const { upload, isLoading, progress, error, reset } = useCloudinaryUpload()
+  const [fileName, setFileName] = useState<string | null>(null);
+  const { upload, isLoading, progress, error, reset } = useCloudinaryUpload();
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
-      const file = acceptedFiles[0]
-      if (!file) return
+      const file = acceptedFiles[0];
+      if (!file) return;
 
-      setFileName(file.name)
+      setFileName(file.name);
 
       try {
-        const isImage = file.type.startsWith("image/")
-        const resourceType = isImage ? "image" : "raw"
+        const isImage = file.type.startsWith("image/");
+        const resourceType = isImage ? "image" : "raw";
 
         console.log("📤 Uploading file:", {
           name: file.name,
           type: file.type,
           size: file.size,
           resourceType,
-        })
+        });
 
         // Debug toast
-        toast.info(`Uploading as ${resourceType}...`)
+        toast.info(`Uploading as ${resourceType}...`);
 
         const result = await upload(file, {
           projectSlug,
           type,
           maxSizeMB,
           resourceType,
-        })
+        });
 
         console.log("✅ Upload success:", {
           url: result.secureUrl,
@@ -92,7 +92,7 @@ export function FileUpload({
           resourceType: result.resourceType,
           format: result.format,
           bytes: result.bytes,
-        })
+        });
 
         onChange(
           result.secureUrl,
@@ -101,27 +101,27 @@ export function FileUpload({
           result.bytes,
           file.type,
           result.resourceType,
-        )
+        );
       } catch (err) {
-        console.error("Upload failed:", err)
-        setFileName(null)
+        console.error("Upload failed:", err);
+        setFileName(null);
       }
     },
     [projectSlug, type, maxSizeMB, onChange, upload],
-  )
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept,
     maxFiles: 1,
     disabled: disabled || isLoading,
-  })
+  });
 
   const handleRemove = () => {
-    setFileName(null)
-    reset()
-    onRemove?.()
-  }
+    setFileName(null);
+    reset();
+    onRemove?.();
+  };
 
   return (
     <div className={cn("space-y-2", className)}>
@@ -195,5 +195,5 @@ export function FileUpload({
         <p className="text-sm text-destructive">Upload failed: {error}</p>
       )}
     </div>
-  )
+  );
 }

@@ -1,11 +1,11 @@
-import { create } from "zustand"
-import type { auth } from "~/server/better-auth"
+import { create } from "zustand";
+import type { auth } from "~/server/better-auth";
 
-type Session = typeof auth.$Infer.Session
+type Session = typeof auth.$Infer.Session;
 
 interface SessionState {
-  session: Session | null
-  setSession: (session: Session | null) => void
+  session: Session | null;
+  setSession: (session: Session | null) => void;
 }
 
 /**
@@ -24,7 +24,7 @@ interface SessionState {
 export const useSessionStore = create<SessionState>((set) => ({
   session: null,
   setSession: (session) => set({ session }),
-}))
+}));
 
 /**
  * Convenience hook to get session data
@@ -35,12 +35,12 @@ export const useSessionStore = create<SessionState>((set) => ({
  * ```
  */
 export function useSession() {
-  const session = useSessionStore((state) => state.session)
+  const session = useSessionStore((state) => state.session);
 
   return {
     session,
     user: session?.user ?? null,
     role: (session?.user?.roleGlobal as string) ?? null,
     isActive: session?.user?.isActive ?? false,
-  }
+  };
 }

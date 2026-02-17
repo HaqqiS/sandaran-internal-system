@@ -1,4 +1,4 @@
-import { api } from "~/trpc/react"
+import { api } from "~/trpc/react";
 
 /**
  * Dashboard Hooks
@@ -11,11 +11,11 @@ import { api } from "~/trpc/react"
 // ============================================
 
 export function useCEOStats() {
-  return api.dashboard.getCEOStats.useQuery()
+  return api.dashboard.getCEOStats.useQuery();
 }
 
 export function useCEORecentReports(limit?: number) {
-  return api.dashboard.getCEORecentReports.useQuery({ limit })
+  return api.dashboard.getCEORecentReports.useQuery({ limit });
 }
 
 // ============================================
@@ -23,11 +23,11 @@ export function useCEORecentReports(limit?: number) {
 // ============================================
 
 export function useAdminStats() {
-  return api.dashboard.getAdminStats.useQuery()
+  return api.dashboard.getAdminStats.useQuery();
 }
 
 export function useAdminPendingUsers(limit?: number) {
-  return api.user.getPendingUsers.useQuery({ limit })
+  return api.user.getPendingUsers.useQuery({ limit });
 }
 
 // ============================================
@@ -35,18 +35,18 @@ export function useAdminPendingUsers(limit?: number) {
 // ============================================
 
 export function useFinanceStats() {
-  return api.dashboard.getFinanceStats.useQuery()
+  return api.dashboard.getFinanceStats.useQuery();
 }
 
 export function useFinanceFundBreakdown() {
-  return api.dashboard.getEmergencyFundBreakdown.useQuery()
+  return api.dashboard.getEmergencyFundBreakdown.useQuery();
 }
 
 export function useFinanceRecentTransactions(
   limit?: number,
   status?: "UNREVIEWED" | "REVIEWED",
 ) {
-  return api.emergency.getRecentTransactions.useQuery({ limit, status })
+  return api.emergency.getRecentTransactions.useQuery({ limit, status });
 }
 
 // ============================================
@@ -54,11 +54,11 @@ export function useFinanceRecentTransactions(
 // ============================================
 
 export function useMandorStats() {
-  return api.dashboard.getMandorStats.useQuery()
+  return api.dashboard.getMandorStats.useQuery();
 }
 
 export function useMandorRecentReports(limit?: number) {
-  return api.dashboard.getMandorRecentReports.useQuery({ limit })
+  return api.dashboard.getMandorRecentReports.useQuery({ limit });
 }
 
 // ============================================
@@ -66,9 +66,9 @@ export function useMandorRecentReports(limit?: number) {
 // ============================================
 
 export function useArchitectStats() {
-  return api.dashboard.getArchitectStats.useQuery()
+  return api.dashboard.getArchitectStats.useQuery();
 }
 
 export function useArchitectDashboard() {
-  return api.dashboard.getArchitectDashboard.useQuery()
+  return api.dashboard.getArchitectDashboard.useQuery();
 }

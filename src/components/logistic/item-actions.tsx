@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
 import {
   IconDotsVertical,
   IconEdit,
   IconHistory,
   IconTrash,
-} from "@tabler/icons-react"
-import { useState } from "react"
-import { toast } from "sonner"
-import { Button } from "~/components/ui/button"
+} from "@tabler/icons-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "~/components/ui/dialog"
+} from "~/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,49 +23,49 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu"
-import { useDeleteLogisticItem } from "~/hooks/useLogistic"
-import { useProjectMembers } from "~/hooks/useProject"
-import { useSession } from "~/stores/use-session-store"
-import { LogisticItemForm } from "./item-form"
-import { TransactionHistory } from "./transaction-history"
+} from "~/components/ui/dropdown-menu";
+import { useDeleteLogisticItem } from "~/hooks/useLogistic";
+import { useProjectMembers } from "~/hooks/useProject";
+import { useSession } from "~/stores/use-session-store";
+import { LogisticItemForm } from "./item-form";
+import { TransactionHistory } from "./transaction-history";
 
 interface ItemActionsProps {
-  projectId: string
+  projectId: string;
   item: {
-    id: string
-    name: string
-    unit: string
-  }
+    id: string;
+    name: string;
+    unit: string;
+  };
 }
 
 export function ItemActions({ projectId, item }: ItemActionsProps) {
-  const { session } = useSession()
-  const { data: members } = useProjectMembers(projectId)
-  const [showEditDialog, setShowEditDialog] = useState(false)
-  const [showHistoryDialog, setShowHistoryDialog] = useState(false)
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const { session } = useSession();
+  const { data: members } = useProjectMembers(projectId);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const deleteItem = useDeleteLogisticItem()
+  const deleteItem = useDeleteLogisticItem();
 
   // Find user's role in this project
-  const projectMember = members?.find((m) => m.userId === session?.user?.id)
-  const role = projectMember?.role
+  const projectMember = members?.find((m) => m.userId === session?.user?.id);
+  const role = projectMember?.role;
 
-  const canManage = role === "FINANCE" || session?.user?.roleGlobal === "ADMIN"
+  const canManage = role === "FINANCE" || session?.user?.roleGlobal === "ADMIN";
 
   const handleDelete = async () => {
     try {
       await deleteItem.mutateAsync({
         projectId,
         itemId: item.id,
-      })
-      toast.success("Item deleted successfully")
-      setShowDeleteDialog(false)
+      });
+      toast.success("Item deleted successfully");
+      setShowDeleteDialog(false);
     } catch {
       // Error handled by mutation
     }
-  }
+  };
 
   return (
     <>
@@ -161,5 +161,5 @@ export function ItemActions({ projectId, item }: ItemActionsProps) {
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

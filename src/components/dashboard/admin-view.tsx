@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   IconAlertTriangle,
@@ -7,29 +7,29 @@ import {
   IconPlus,
   IconUserCheck,
   IconUsers,
-} from "@tabler/icons-react"
-import Link from "next/link"
-import { Button } from "~/components/ui/button"
+} from "@tabler/icons-react";
+import Link from "next/link";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/components/ui/card"
-import { Separator } from "~/components/ui/separator"
-import { useAdminPendingUsers, useAdminStats } from "~/hooks"
-import { DashboardLayout } from "./shared/DashboardLayout"
-import { QuickActionCard } from "./shared/QuickActionCard"
-import { StatsGrid } from "./shared/StatsGrid"
-import { StatCard } from "./stat-card"
+} from "~/components/ui/card";
+import { Separator } from "~/components/ui/separator";
+import { useAdminPendingUsers, useAdminStats } from "~/hooks";
+import { DashboardLayout } from "./shared/DashboardLayout";
+import { QuickActionCard } from "./shared/QuickActionCard";
+import { StatsGrid } from "./shared/StatsGrid";
+import { StatCard } from "./stat-card";
 
 export function AdminView() {
-  const { data: stats, isLoading: statsLoading } = useAdminStats()
+  const { data: stats, isLoading: statsLoading } = useAdminStats();
   const { data: pendingUsers, isLoading: usersLoading } =
-    useAdminPendingUsers(5)
+    useAdminPendingUsers(5);
 
-  const isLoading = statsLoading || usersLoading
+  const isLoading = statsLoading || usersLoading;
 
   return (
     <DashboardLayout
@@ -177,5 +177,5 @@ export function AdminView() {
         </CardContent>
       </Card>
     </DashboardLayout>
-  )
+  );
 }

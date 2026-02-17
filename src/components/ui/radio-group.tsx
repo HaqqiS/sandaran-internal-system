@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { IconCircle } from "@tabler/icons-react"
-import { RadioGroup as RadioGroupPrimitive } from "radix-ui"
-import type * as React from "react"
-import { cn } from "~/lib/utils"
+import { IconCircle } from "@tabler/icons-react";
+import { RadioGroup as RadioGroupPrimitive } from "radix-ui";
+import type * as React from "react";
+import { cn } from "~/lib/utils";
 
 function RadioGroup({
   className,
@@ -15,7 +15,7 @@ function RadioGroup({
       className={cn("grid gap-2 w-full", className)}
       {...props}
     />
-  )
+  );
 }
 
 function RadioGroupItem({
@@ -38,7 +38,7 @@ function RadioGroupItem({
         <IconCircle className="absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2 fill-current" />
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
-  )
+  );
 }
 
-export { RadioGroup, RadioGroupItem }
+export { RadioGroup, RadioGroupItem };

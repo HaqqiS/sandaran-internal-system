@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import { IconMessageCircle } from "@tabler/icons-react"
-import { Skeleton } from "~/components/ui/skeleton"
-import { api } from "~/trpc/react"
-import { CommentForm } from "./comment-form"
-import { CommentItem } from "./comment-item"
+import { IconMessageCircle } from "@tabler/icons-react";
+import { Skeleton } from "~/components/ui/skeleton";
+import { api } from "~/trpc/react";
+import { CommentForm } from "./comment-form";
+import { CommentItem } from "./comment-item";
 
 interface CommentListProps {
-  projectId: string
-  reportId: string
+  projectId: string;
+  reportId: string;
 }
 
 export function CommentList({ projectId, reportId }: CommentListProps) {
   const { data: comments, isLoading } = api.comment.getByReport.useQuery({
     projectId,
     reportId,
-  })
+  });
 
   if (isLoading) {
     return (
@@ -31,7 +31,7 @@ export function CommentList({ projectId, reportId }: CommentListProps) {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -61,5 +61,5 @@ export function CommentList({ projectId, reportId }: CommentListProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

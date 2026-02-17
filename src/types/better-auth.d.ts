@@ -1,8 +1,8 @@
-import type { GlobalRole } from "~/generated/prisma"
+import type { GlobalRole } from "~/generated/prisma";
 
 declare module "better-auth" {
   interface User {
-    roleGlobal: GlobalRole
-    isActive: boolean
+    roleGlobal: GlobalRole;
+    isActive: boolean;
   }
 }

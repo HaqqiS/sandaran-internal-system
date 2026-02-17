@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
 import {
   IconArrowUpRight,
   IconChartBar,
   IconChecklist,
   IconFolder,
-} from "@tabler/icons-react"
-import Link from "next/link"
-import { Button } from "~/components/ui/button"
+} from "@tabler/icons-react";
+import Link from "next/link";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/components/ui/card"
+} from "~/components/ui/card";
 import {
   Table,
   TableBody,
@@ -22,14 +22,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "~/components/ui/table"
-import { useCEOStats } from "~/hooks"
-import { DashboardLayout } from "./shared/DashboardLayout"
-import { StatsGrid } from "./shared/StatsGrid"
-import { StatCard } from "./stat-card"
+} from "~/components/ui/table";
+import { useCEOStats } from "~/hooks";
+import { DashboardLayout } from "./shared/DashboardLayout";
+import { StatsGrid } from "./shared/StatsGrid";
+import { StatCard } from "./stat-card";
 
 export function CEOView() {
-  const { data: stats, isLoading } = useCEOStats()
+  const { data: stats, isLoading } = useCEOStats();
 
   return (
     <DashboardLayout
@@ -159,5 +159,5 @@ export function CEOView() {
         </CardContent>
       </Card>
     </DashboardLayout>
-  )
+  );
 }

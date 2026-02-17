@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { toast } from "sonner"
-import { Button } from "~/components/ui/button"
-import { Checkbox } from "~/components/ui/checkbox"
+import { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -11,26 +11,26 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "~/components/ui/dialog"
-import { Label } from "~/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group"
+} from "~/components/ui/dialog";
+import { Label } from "~/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/components/ui/select"
-import { api } from "~/trpc/react"
+} from "~/components/ui/select";
+import { api } from "~/trpc/react";
 
 interface ApproveUserDialogProps {
   user: {
-    id: string
-    name: string
-    email: string
-  } | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function ApproveUserDialog({
@@ -38,42 +38,42 @@ export function ApproveUserDialog({
   open,
   onOpenChange,
 }: ApproveUserDialogProps) {
-  const [role, setRole] = useState<"USER" | "CEO" | "ADMIN">("USER")
-  const [assignProject, setAssignProject] = useState(false)
-  const [projectId, setProjectId] = useState<string>("")
+  const [role, setRole] = useState<"USER" | "CEO" | "ADMIN">("USER");
+  const [assignProject, setAssignProject] = useState(false);
+  const [projectId, setProjectId] = useState<string>("");
   const [projectRole, setProjectRole] = useState<
     "MANDOR" | "ARCHITECT" | "FINANCE"
-  >("MANDOR")
+  >("MANDOR");
 
-  const utils = api.useUtils()
+  const utils = api.useUtils();
 
   // Fetch projects only when needed
   const { data: projects } = api.project.getAll.useQuery(undefined, {
     enabled: open && role === "USER" && assignProject,
-  })
+  });
 
   const approve = api.user.approveUser.useMutation({
     onSuccess: () => {
-      toast.success(`${user?.name} has been approved successfully`)
-      utils.user.getAllUsersWithFilter.invalidate()
-      onOpenChange(false)
+      toast.success(`${user?.name} has been approved successfully`);
+      utils.user.getAllUsersWithFilter.invalidate();
+      onOpenChange(false);
       // Reset state
-      setRole("USER")
-      setAssignProject(false)
-      setProjectId("")
-      setProjectRole("MANDOR")
+      setRole("USER");
+      setAssignProject(false);
+      setProjectId("");
+      setProjectRole("MANDOR");
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to approve user")
+      toast.error(error.message || "Failed to approve user");
     },
-  })
+  });
 
-  if (!user) return null
+  if (!user) return null;
 
   const handleApprove = () => {
     if (assignProject && !projectId) {
-      toast.error("Please select a project")
-      return
+      toast.error("Please select a project");
+      return;
     }
 
     approve.mutate({
@@ -86,8 +86,8 @@ export function ApproveUserDialog({
               role: projectRole,
             }
           : undefined,
-    })
-  }
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -113,8 +113,8 @@ export function ApproveUserDialog({
             <RadioGroup
               value={role}
               onValueChange={(v) => {
-                setRole(v as "USER" | "CEO" | "ADMIN")
-                if (v !== "USER") setAssignProject(false)
+                setRole(v as "USER" | "CEO" | "ADMIN");
+                if (v !== "USER") setAssignProject(false);
               }}
             >
               <div className="flex items-center space-x-2">
@@ -209,5 +209,5 @@ export function ApproveUserDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

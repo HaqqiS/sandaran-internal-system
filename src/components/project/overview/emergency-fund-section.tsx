@@ -1,28 +1,28 @@
-"use client"
+"use client";
 
 import {
   IconChevronRight,
   IconLoader2,
   IconPlus,
   IconWallet,
-} from "@tabler/icons-react"
-import { format } from "date-fns"
-import Link from "next/link"
-import { Badge } from "~/components/ui/badge"
-import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+} from "@tabler/icons-react";
+import { format } from "date-fns";
+import Link from "next/link";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import {
   useEmergencyFund,
   useEmergencyTransactions,
-} from "~/hooks/useEmergency"
+} from "~/hooks/useEmergency";
 
 interface EmergencyFundSectionProps {
-  projectId: string
-  projectSlug: string
-  canAddFund?: boolean
-  canWithdraw?: boolean
-  onAddFund?: () => void
-  onWithdraw?: () => void
+  projectId: string;
+  projectSlug: string;
+  canAddFund?: boolean;
+  canWithdraw?: boolean;
+  onAddFund?: () => void;
+  onWithdraw?: () => void;
 }
 
 export function EmergencyFundSection({
@@ -33,12 +33,12 @@ export function EmergencyFundSection({
   onAddFund,
   onWithdraw,
 }: EmergencyFundSectionProps) {
-  const { data: fund, isLoading: fundLoading } = useEmergencyFund(projectId)
+  const { data: fund, isLoading: fundLoading } = useEmergencyFund(projectId);
   const { data: transactions, isLoading: transactionsLoading } =
-    useEmergencyTransactions(projectId)
+    useEmergencyTransactions(projectId);
 
-  const isLoading = fundLoading || transactionsLoading
-  const recentTransactions = transactions?.slice(0, 3) ?? []
+  const isLoading = fundLoading || transactionsLoading;
+  const recentTransactions = transactions?.slice(0, 3) ?? [];
 
   return (
     <Card>
@@ -143,5 +143,5 @@ export function EmergencyFundSection({
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -1,35 +1,35 @@
-"use client"
+"use client";
 
-import { useForm } from "@tanstack/react-form"
-import type { DailyReportTask } from "generated/prisma"
-import { toast } from "sonner"
-import { z } from "zod"
-import { Button } from "~/components/ui/button"
+import { useForm } from "@tanstack/react-form";
+import type { DailyReportTask } from "generated/prisma";
+import { toast } from "sonner";
+import { z } from "zod";
+import { Button } from "~/components/ui/button";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "~/components/ui/field"
-import { Input } from "~/components/ui/input"
-import { Textarea } from "~/components/ui/textarea"
-import { useAddReportTask, useUpdateReportTask } from "~/hooks"
+} from "~/components/ui/field";
+import { Input } from "~/components/ui/input";
+import { Textarea } from "~/components/ui/textarea";
+import { useAddReportTask, useUpdateReportTask } from "~/hooks";
 
 const taskSchema = z.object({
   taskName: z.string().min(1, "Task name is required"),
   workerCount: z.number().min(0),
   progress: z.number().min(0).max(100),
   notes: z.string().optional(),
-})
+});
 
-type TaskFormValues = z.infer<typeof taskSchema>
+type TaskFormValues = z.infer<typeof taskSchema>;
 
 interface TaskFormProps {
-  projectId: string
-  reportId: string
-  task?: DailyReportTask
-  onSuccess: () => void
-  onCancel: () => void
+  projectId: string;
+  reportId: string;
+  task?: DailyReportTask;
+  onSuccess: () => void;
+  onCancel: () => void;
 }
 
 export function TaskForm({
@@ -39,9 +39,9 @@ export function TaskForm({
   onSuccess,
   onCancel,
 }: TaskFormProps) {
-  const addTask = useAddReportTask()
-  const updateTask = useUpdateReportTask()
-  const isEditMode = !!task
+  const addTask = useAddReportTask();
+  const updateTask = useUpdateReportTask();
+  const isEditMode = !!task;
 
   const form = useForm({
     defaultValues: {
@@ -63,8 +63,8 @@ export function TaskForm({
             workerCount: value.workerCount,
             progress: value.progress,
             notes: value.notes || undefined,
-          })
-          toast.success("Task updated")
+          });
+          toast.success("Task updated");
         } else {
           await addTask.mutateAsync({
             projectId,
@@ -73,22 +73,22 @@ export function TaskForm({
             workerCount: value.workerCount,
             progress: value.progress,
             notes: value.notes || undefined,
-          })
-          toast.success("Task added")
+          });
+          toast.success("Task added");
         }
-        onSuccess()
+        onSuccess();
       } catch {
-        toast.error("Failed to save task")
+        toast.error("Failed to save task");
       }
     },
-  })
+  });
 
   return (
     <form
       onSubmit={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        void form.handleSubmit()
+        e.preventDefault();
+        e.stopPropagation();
+        void form.handleSubmit();
       }}
       className="space-y-4 rounded-lg border p-4 shadow-sm bg-muted/30"
     >
@@ -193,5 +193,5 @@ export function TaskForm({
         </form.Subscribe>
       </div>
     </form>
-  )
+  );
 }

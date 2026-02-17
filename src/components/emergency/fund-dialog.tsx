@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useForm } from "@tanstack/react-form"
-import { toast } from "sonner"
-import { z } from "zod"
-import { Button } from "~/components/ui/button"
+import { useForm } from "@tanstack/react-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,11 +11,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "~/components/ui/dialog"
-import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
-import { Textarea } from "~/components/ui/textarea"
-import { useAddEmergencyBalance } from "~/hooks/useEmergency"
+} from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { Textarea } from "~/components/ui/textarea";
+import { useAddEmergencyBalance } from "~/hooks/useEmergency";
 
 const fundSchema = z.object({
   amount: z
@@ -24,16 +24,16 @@ const fundSchema = z.object({
       message: "Amount must be a positive number",
     }),
   description: z.string().min(1, "Description is required"),
-})
+});
 
 interface FundDialogProps {
-  projectId: string
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  projectId: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function FundDialog({ projectId, open, onOpenChange }: FundDialogProps) {
-  const addBalance = useAddEmergencyBalance()
+  const addBalance = useAddEmergencyBalance();
 
   const form = useForm({
     defaultValues: {
@@ -49,16 +49,16 @@ export function FundDialog({ projectId, open, onOpenChange }: FundDialogProps) {
           projectId,
           amount: Number(value.amount),
           description: value.description,
-        })
-        toast.success("Funds added successfully")
-        onOpenChange(false)
-        form.reset()
+        });
+        toast.success("Funds added successfully");
+        onOpenChange(false);
+        form.reset();
       } catch (error) {
-        toast.error("Failed to add funds")
-        console.error(error)
+        toast.error("Failed to add funds");
+        console.error(error);
       }
     },
-  })
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -73,9 +73,9 @@ export function FundDialog({ projectId, open, onOpenChange }: FundDialogProps) {
 
         <form
           onSubmit={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            void form.handleSubmit()
+            e.preventDefault();
+            e.stopPropagation();
+            void form.handleSubmit();
           }}
           className="space-y-4"
         >
@@ -139,5 +139,5 @@ export function FundDialog({ projectId, open, onOpenChange }: FundDialogProps) {
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

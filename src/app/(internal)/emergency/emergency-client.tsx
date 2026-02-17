@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { IconLoader2 } from "@tabler/icons-react"
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
-import { PageLayout } from "~/components/layout"
+import { IconLoader2 } from "@tabler/icons-react";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { PageLayout } from "~/components/layout";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/components/ui/card"
+} from "~/components/ui/card";
 import {
   type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "~/components/ui/chart"
-import { useEmergencyAnalytics } from "~/hooks"
+} from "~/components/ui/chart";
+import { useEmergencyAnalytics } from "~/hooks";
 
 const chartConfig = {
   deposit: {
@@ -27,10 +27,10 @@ const chartConfig = {
     label: "Withdrawal",
     color: "var(--foreground)",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 export function EmergencyClient() {
-  const { data, isLoading } = useEmergencyAnalytics()
+  const { data, isLoading } = useEmergencyAnalytics();
 
   if (isLoading) {
     return (
@@ -39,7 +39,7 @@ export function EmergencyClient() {
           <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </PageLayout>
-    )
+    );
   }
 
   if (!data?.projects.length) {
@@ -49,7 +49,7 @@ export function EmergencyClient() {
           <p className="text-muted-foreground">No projects found.</p>
         </div>
       </PageLayout>
-    )
+    );
   }
 
   return (
@@ -101,5 +101,5 @@ export function EmergencyClient() {
         ))}
       </div>
     </PageLayout>
-  )
+  );
 }

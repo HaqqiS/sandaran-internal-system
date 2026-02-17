@@ -1,21 +1,21 @@
-import type { TablerIcon } from "@tabler/icons-react"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import { cn } from "~/lib/utils"
+import type { TablerIcon } from "@tabler/icons-react";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { cn } from "~/lib/utils";
 
 interface StatCardProps {
-  title: string
-  value: string | number
-  icon: TablerIcon
-  description?: string
+  title: string;
+  value: string | number;
+  icon: TablerIcon;
+  description?: string;
   trend?: {
-    value: number | string
-    label: string
-    positive?: boolean
-  }
-  className?: string
-  action?: React.ReactNode
-  variant?: "default" | "success" | "warning" | "error"
-  isLoading?: boolean
+    value: number | string;
+    label: string;
+    positive?: boolean;
+  };
+  className?: string;
+  action?: React.ReactNode;
+  variant?: "default" | "success" | "warning" | "error";
+  isLoading?: boolean;
 }
 
 export function StatCard({
@@ -34,7 +34,7 @@ export function StatCard({
     success: "border-green-200 bg-green-50/50",
     warning: "border-amber-200 bg-amber-50/50",
     error: "border-red-200 bg-red-50/50",
-  }
+  };
 
   if (isLoading) {
     return (
@@ -48,7 +48,7 @@ export function StatCard({
           <div className="mt-2 h-3 w-40 animate-pulse rounded bg-muted" />
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -83,5 +83,5 @@ export function StatCard({
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

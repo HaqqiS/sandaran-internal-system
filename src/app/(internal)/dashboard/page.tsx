@@ -1,27 +1,27 @@
-"use client"
+"use client";
 
-import { IconLoader2 } from "@tabler/icons-react"
+import { IconLoader2 } from "@tabler/icons-react";
 import {
   AdminView,
   ArchitectView,
   CEOView,
   FinanceView,
   MandorView,
-} from "~/components/dashboard"
-import { useUserRole } from "~/hooks/use-user-role"
-import { useSession } from "~/stores/use-session-store"
+} from "~/components/dashboard";
+import { useUserRole } from "~/hooks/use-user-role";
+import { useSession } from "~/stores/use-session-store";
 
 export default function DashboardPage() {
-  const { user } = useSession()
+  const { user } = useSession();
   const { isAdmin, isCEO, isMandor, isArchitect, isFinance, isLoading } =
-    useUserRole()
+    useUserRole();
 
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
-    )
+    );
   }
 
   // If user has a role, show their dashboard
@@ -34,7 +34,7 @@ export default function DashboardPage() {
         {isArchitect && <ArchitectView />}
         {isFinance && <FinanceView />}
       </>
-    )
+    );
   }
 
   // Fallback for users with no specific role
@@ -57,5 +57,5 @@ export default function DashboardPage() {
         </p>
       </div>
     </div>
-  )
+  );
 }

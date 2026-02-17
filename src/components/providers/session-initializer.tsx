@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import type { auth } from "~/server/better-auth"
-import { useSessionStore } from "~/stores/use-session-store"
+import { useEffect } from "react";
+import type { auth } from "~/server/better-auth";
+import { useSessionStore } from "~/stores/use-session-store";
 
-type Session = typeof auth.$Infer.Session
+type Session = typeof auth.$Infer.Session;
 
 interface SessionInitializerProps {
-  session: Session | null
+  session: Session | null;
 }
 
 /**
@@ -31,12 +31,12 @@ interface SessionInitializerProps {
  * ```
  */
 export function SessionInitializer({ session }: SessionInitializerProps) {
-  const setSession = useSessionStore((state) => state.setSession)
+  const setSession = useSessionStore((state) => state.setSession);
 
   useEffect(() => {
-    setSession(session)
-  }, [session, setSession])
+    setSession(session);
+  }, [session, setSession]);
 
   // This component doesn't render anything
-  return null
+  return null;
 }

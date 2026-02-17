@@ -1,37 +1,37 @@
-"use client"
+"use client";
 
-import { useForm } from "@tanstack/react-form"
-import { toast } from "sonner"
-import { z } from "zod"
-import { Button } from "~/components/ui/button"
+import { useForm } from "@tanstack/react-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import { Button } from "~/components/ui/button";
 import {
   Field,
   FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "~/components/ui/field"
-import { Input } from "~/components/ui/input"
+} from "~/components/ui/field";
+import { Input } from "~/components/ui/input";
 import {
   useCreateLogisticItem,
   useUpdateLogisticItem,
-} from "~/hooks/useLogistic"
+} from "~/hooks/useLogistic";
 
 const itemSchema = z.object({
   name: z.string().min(1, "Name is required"),
   unit: z.string().min(1, "Unit is required"),
-})
+});
 
-type ItemFormValues = z.infer<typeof itemSchema>
+type ItemFormValues = z.infer<typeof itemSchema>;
 
 interface ItemFormProps {
-  projectId: string
+  projectId: string;
   item?: {
-    id: string
-    name: string
-    unit: string
-  }
-  onSuccess?: () => void
+    id: string;
+    name: string;
+    unit: string;
+  };
+  onSuccess?: () => void;
 }
 
 const COMMON_UNITS = [
@@ -48,16 +48,16 @@ const COMMON_UNITS = [
   "Roll",
   "Batang",
   "Lembar",
-]
+];
 
 export function LogisticItemForm({
   projectId,
   item,
   onSuccess,
 }: ItemFormProps) {
-  const createItem = useCreateLogisticItem()
-  const updateItem = useUpdateLogisticItem()
-  const isEditMode = !!item
+  const createItem = useCreateLogisticItem();
+  const updateItem = useUpdateLogisticItem();
+  const isEditMode = !!item;
 
   const form = useForm({
     defaultValues: {
@@ -75,29 +75,29 @@ export function LogisticItemForm({
             itemId: item.id,
             name: value.name,
             unit: value.unit,
-          })
-          toast.success("Item updated successfully")
+          });
+          toast.success("Item updated successfully");
         } else {
           await createItem.mutateAsync({
             projectId,
             name: value.name,
             unit: value.unit,
-          })
-          toast.success("Item created successfully")
+          });
+          toast.success("Item created successfully");
         }
-        onSuccess?.()
+        onSuccess?.();
       } catch {
         // Error is handled by global mutation cache
       }
     },
-  })
+  });
 
   return (
     <form
       onSubmit={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        form.handleSubmit()
+        e.preventDefault();
+        e.stopPropagation();
+        form.handleSubmit();
       }}
       className="space-y-4"
     >
@@ -106,7 +106,7 @@ export function LogisticItemForm({
           name="name"
           children={(field) => {
             const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid
+              field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Item Name</FieldLabel>
@@ -122,7 +122,7 @@ export function LogisticItemForm({
                 />
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
-            )
+            );
           }}
         />
 
@@ -130,7 +130,7 @@ export function LogisticItemForm({
           name="unit"
           children={(field) => {
             const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid
+              field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Unit</FieldLabel>
@@ -157,7 +157,7 @@ export function LogisticItemForm({
                 </FieldDescription>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
-            )
+            );
           }}
         />
       </FieldGroup>
@@ -177,5 +177,5 @@ export function LogisticItemForm({
         />
       </div>
     </form>
-  )
+  );
 }

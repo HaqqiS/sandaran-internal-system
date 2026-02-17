@@ -4,14 +4,14 @@
  * Central export for all custom hooks
  */
 
-export { useIsMobile } from "./use-mobile"
+export { useIsMobile } from "./use-mobile";
 // Comment hooks
 export {
   useCommentsByReport,
   useCreateComment,
   useDeleteComment,
   useUpdateComment,
-} from "./useComment"
+} from "./useComment";
 // Dashboard hooks
 export {
   useAdminPendingUsers,
@@ -25,15 +25,16 @@ export {
   useFinanceStats,
   useMandorRecentReports,
   useMandorStats,
-} from "./useDashboard"
+} from "./useDashboard";
 // Document hooks
 export {
   useDeleteDocument,
   useDocument,
+  useDocumentsAnalytics,
   useDocumentsByProject,
   useUpdateDocument,
   useUploadDocument,
-} from "./useDocument"
+} from "./useDocument";
 // Emergency hooks
 export {
   useAddEmergencyBalance,
@@ -42,17 +43,18 @@ export {
   useEmergencyTransactions,
   useRequestEmergencyFund,
   useVerifyEmergencyRequest,
-} from "./useEmergency"
+} from "./useEmergency";
 // Logistic hooks
 export {
   useCreateLogisticItem,
   useDeleteLogisticItem,
   useLogisticItems,
   useLogisticStockSummary,
+  useLogisticsAnalytics,
   useLogisticTransactions,
   useRecordLogisticTransaction,
   useUpdateLogisticItem,
-} from "./useLogistic"
+} from "./useLogistic";
 // Project hooks
 export {
   useAddProjectMember,
@@ -65,7 +67,7 @@ export {
   useRemoveMember,
   useUpdateMemberRole,
   useUpdateProject,
-} from "./useProject"
+} from "./useProject";
 // Report hooks
 export {
   useAddReportTask,
@@ -79,6 +81,6 @@ export {
   useUpdateReport,
   useUpdateReportTask,
   useUploadReportMedia,
-} from "./useReport"
+} from "./useReport";
 // User hooks
-export { useSearchUsers } from "./useUser"
+export { useSearchUsers } from "./useUser";

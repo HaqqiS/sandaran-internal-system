@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { toast } from "sonner"
-import { Button } from "~/components/ui/button"
+import { toast } from "sonner";
+import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,18 +9,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "~/components/ui/dialog"
-import { api } from "~/trpc/react"
+} from "~/components/ui/dialog";
+import { api } from "~/trpc/react";
 
 interface DeleteUserDialogProps {
   user: {
-    id: string
-    name: string
-    email: string
-    isActive: boolean
-  } | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
+    id: string;
+    name: string;
+    email: string;
+    isActive: boolean;
+  } | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function DeleteUserDialog({
@@ -28,20 +28,20 @@ export function DeleteUserDialog({
   open,
   onOpenChange,
 }: DeleteUserDialogProps) {
-  const utils = api.useUtils()
+  const utils = api.useUtils();
 
   const deleteUser = api.user.deleteUser.useMutation({
     onSuccess: () => {
-      toast.success(`${user?.name} has been deleted`)
-      utils.user.getAllUsersWithFilter.invalidate()
-      onOpenChange(false)
+      toast.success(`${user?.name} has been deleted`);
+      utils.user.getAllUsersWithFilter.invalidate();
+      onOpenChange(false);
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to delete user")
+      toast.error(error.message || "Failed to delete user");
     },
-  })
+  });
 
-  if (!user) return null
+  if (!user) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -93,5 +93,5 @@ export function DeleteUserDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

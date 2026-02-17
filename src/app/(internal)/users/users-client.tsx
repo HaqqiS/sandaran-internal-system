@@ -1,93 +1,93 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { toast } from "sonner"
-import { PageLayout } from "~/components/layout"
-import { DataTable } from "~/components/ui/data-table"
-import { Skeleton } from "~/components/ui/skeleton"
-import { ApproveUserDialog } from "~/components/user/approve-user-dialog"
-import { BulkActionsToolbar } from "~/components/user/bulk-actions-toolbar"
-import { DeleteUserDialog } from "~/components/user/delete-user-dialog"
-import { EditRoleDialog } from "~/components/user/edit-role-dialog"
-import { RejectUserDialog } from "~/components/user/reject-user-dialog"
+import { useState } from "react";
+import { toast } from "sonner";
+import { PageLayout } from "~/components/layout";
+import { DataTable } from "~/components/ui/data-table";
+import { Skeleton } from "~/components/ui/skeleton";
+import { ApproveUserDialog } from "~/components/user/approve-user-dialog";
+import { BulkActionsToolbar } from "~/components/user/bulk-actions-toolbar";
+import { DeleteUserDialog } from "~/components/user/delete-user-dialog";
+import { EditRoleDialog } from "~/components/user/edit-role-dialog";
+import { RejectUserDialog } from "~/components/user/reject-user-dialog";
 import {
   getUserColumnsWithActions,
   type UserListItem,
-} from "~/components/user/user-columns"
-import { UserFilterDropdown } from "~/components/user/user-filter-dropdown"
-import { UserFilterTabs } from "~/components/user/user-filter-tabs"
-import { useIsMobile } from "~/hooks/use-mobile"
-import { api } from "~/trpc/react"
+} from "~/components/user/user-columns";
+import { UserFilterDropdown } from "~/components/user/user-filter-dropdown";
+import { UserFilterTabs } from "~/components/user/user-filter-tabs";
+import { useIsMobile } from "~/hooks/use-mobile";
+import { api } from "~/trpc/react";
 
-type FilterValue = "all" | "pending" | "active" | "rejected"
+type FilterValue = "all" | "pending" | "active" | "rejected";
 
 export function UsersClient() {
-  const isMobile = useIsMobile()
-  const [filter, setFilter] = useState<FilterValue>("all")
-  const [selectedUser, setSelectedUser] = useState<UserListItem | null>(null)
-  const [approveDialogOpen, setApproveDialogOpen] = useState(false)
-  const [rejectDialogOpen, setRejectDialogOpen] = useState(false)
-  const [editRoleDialogOpen, setEditRoleDialogOpen] = useState(false)
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({})
+  const isMobile = useIsMobile();
+  const [filter, setFilter] = useState<FilterValue>("all");
+  const [selectedUser, setSelectedUser] = useState<UserListItem | null>(null);
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [editRoleDialogOpen, setEditRoleDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
 
-  const utils = api.useUtils()
+  const utils = api.useUtils();
 
   const { data: users, isLoading } = api.user.getAllUsersWithFilter.useQuery({
     filter,
-  })
+  });
 
   const bulkApprove = api.user.bulkApprove.useMutation({
     onSuccess: (data) => {
-      toast.success(`Successfully approved ${data.count} user(s)`)
-      utils.user.getAllUsersWithFilter.invalidate()
-      setRowSelection({})
+      toast.success(`Successfully approved ${data.count} user(s)`);
+      utils.user.getAllUsersWithFilter.invalidate();
+      setRowSelection({});
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to approve users")
+      toast.error(error.message || "Failed to approve users");
     },
-  })
+  });
 
   const handleApprove = (user: UserListItem) => {
-    setSelectedUser(user)
-    setApproveDialogOpen(true)
-  }
+    setSelectedUser(user);
+    setApproveDialogOpen(true);
+  };
 
   const handleReject = (user: UserListItem) => {
-    setSelectedUser(user)
-    setRejectDialogOpen(true)
-  }
+    setSelectedUser(user);
+    setRejectDialogOpen(true);
+  };
 
   const handleEditRole = (user: UserListItem) => {
-    setSelectedUser(user)
-    setEditRoleDialogOpen(true)
-  }
+    setSelectedUser(user);
+    setEditRoleDialogOpen(true);
+  };
 
   const handleDelete = (user: UserListItem) => {
-    setSelectedUser(user)
-    setDeleteDialogOpen(true)
-  }
+    setSelectedUser(user);
+    setDeleteDialogOpen(true);
+  };
 
   const handleBulkApprove = () => {
     const selectedIds = Object.keys(rowSelection).filter(
       (id) => rowSelection[id],
-    )
-    if (selectedIds.length === 0) return
+    );
+    if (selectedIds.length === 0) return;
 
     bulkApprove.mutate({
       userIds: selectedIds,
       roleGlobal: "USER",
-    })
-  }
+    });
+  };
 
   const columns = getUserColumnsWithActions({
     onApprove: handleApprove,
     onReject: handleReject,
     onEditRole: handleEditRole,
     onDelete: handleDelete,
-  })
+  });
 
-  const selectedCount = Object.values(rowSelection).filter(Boolean).length
+  const selectedCount = Object.values(rowSelection).filter(Boolean).length;
 
   // Calculate counts for filter tabs
   const counts = users
@@ -97,7 +97,7 @@ export function UsersClient() {
         active: users.filter((u) => u.isActive && u.reviewedAt).length,
         rejected: users.filter((u) => !u.isActive && u.reviewedAt).length,
       }
-    : undefined
+    : undefined;
 
   return (
     <PageLayout title="User Management">
@@ -186,5 +186,5 @@ export function UsersClient() {
         onOpenChange={setDeleteDialogOpen}
       />
     </PageLayout>
-  )
+  );
 }

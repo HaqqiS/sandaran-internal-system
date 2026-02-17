@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   IconBox,
@@ -6,26 +6,26 @@ import {
   IconLoader2,
   IconMinus,
   IconPlus,
-} from "@tabler/icons-react"
-import Link from "next/link"
-import { Badge } from "~/components/ui/badge"
-import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import { useLogisticStockSummary } from "~/hooks/useLogistic"
+} from "@tabler/icons-react";
+import Link from "next/link";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { useLogisticStockSummary } from "~/hooks/useLogistic";
 
 interface LogisticsSectionProps {
-  projectId: string
-  projectSlug: string
+  projectId: string;
+  projectSlug: string;
 }
 
 export function LogisticsSection({
   projectId,
   projectSlug,
 }: LogisticsSectionProps) {
-  const { data: items, isLoading } = useLogisticStockSummary(projectId)
+  const { data: items, isLoading } = useLogisticStockSummary(projectId);
 
-  const lowStockItems = items?.filter((item) => item.currentStock < 10) ?? []
-  const totalItems = items?.length ?? 0
+  const lowStockItems = items?.filter((item) => item.currentStock < 10) ?? [];
+  const totalItems = items?.length ?? 0;
 
   return (
     <Card>
@@ -142,5 +142,5 @@ export function LogisticsSection({
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

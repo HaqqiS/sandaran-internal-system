@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   IconActivity,
@@ -7,13 +7,13 @@ import {
   IconTrendingUp,
   IconUsers,
   IconWallet,
-} from "@tabler/icons-react"
-import { formatDistanceToNow } from "date-fns"
-import type { GlobalRole, ProjectRole } from "generated/prisma"
-import { useState } from "react"
-import { FundDialog } from "~/components/emergency/fund-dialog"
-import { WithdrawDialog } from "~/components/emergency/withdraw-dialog"
-import { PageLayout } from "~/components/layout"
+} from "@tabler/icons-react";
+import { formatDistanceToNow } from "date-fns";
+import type { GlobalRole, ProjectRole } from "generated/prisma";
+import { useState } from "react";
+import { FundDialog } from "~/components/emergency/fund-dialog";
+import { WithdrawDialog } from "~/components/emergency/withdraw-dialog";
+import { PageLayout } from "~/components/layout";
 
 import {
   DocumentsSection,
@@ -21,54 +21,54 @@ import {
   LogisticsSection,
   ProjectInfoSection,
   RecentReportsSection,
-} from "~/components/project/overview"
-import { ProjectDialog } from "~/components/project/project-dialog"
-import { TeamManagementDialog } from "~/components/project/team-management-dialog"
-import { ReportDialog } from "~/components/report/report-dialog"
-import { Badge } from "~/components/ui/badge"
-import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import { useProjectBySlug, useReportsByProject } from "~/hooks"
-import { useEmergencyFund } from "~/hooks/useEmergency"
-import { isAdmin } from "~/lib/auth-guards"
-import { useSessionStore } from "~/stores/use-session-store"
+} from "~/components/project/overview";
+import { ProjectDialog } from "~/components/project/project-dialog";
+import { TeamManagementDialog } from "~/components/project/team-management-dialog";
+import { ReportDialog } from "~/components/report/report-dialog";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { useProjectBySlug, useReportsByProject } from "~/hooks";
+import { useEmergencyFund } from "~/hooks/useEmergency";
+import { isAdmin } from "~/lib/auth-guards";
+import { useSessionStore } from "~/stores/use-session-store";
 
 interface ProjectDetailClientProps {
-  slug: string
+  slug: string;
 }
 
 export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
-  const { data: project, isLoading, error } = useProjectBySlug(slug)
-  const { data: reportsData } = useReportsByProject(project?.id ?? "")
-  const { data: emergencyFund } = useEmergencyFund(project?.id ?? "")
-  const [isEditOpen, setIsEditOpen] = useState(false)
-  const [isCreateReportOpen, setIsCreateReportOpen] = useState(false)
-  const [isFundOpen, setIsFundOpen] = useState(false)
-  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false)
-  const [isTeamOpen, setIsTeamOpen] = useState(false)
-  const session = useSessionStore((state) => state.session)
+  const { data: project, isLoading, error } = useProjectBySlug(slug);
+  const { data: reportsData } = useReportsByProject(project?.id ?? "");
+  const { data: emergencyFund } = useEmergencyFund(project?.id ?? "");
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isCreateReportOpen, setIsCreateReportOpen] = useState(false);
+  const [isFundOpen, setIsFundOpen] = useState(false);
+  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
+  const [isTeamOpen, setIsTeamOpen] = useState(false);
+  const session = useSessionStore((state) => state.session);
   const canManage = isAdmin(
     session?.user?.roleGlobal as GlobalRole | null | undefined,
-  )
+  );
 
   // Check user roles
-  const userRole = session?.user?.roleGlobal as GlobalRole | undefined
-  const isAdminRole = userRole === "ADMIN" || userRole === "CEO"
+  const userRole = session?.user?.roleGlobal as GlobalRole | undefined;
+  const isAdminRole = userRole === "ADMIN" || userRole === "CEO";
 
   const projectMember = project?.members.find(
     (m) => m.userId === session?.user?.id,
-  )
-  const memberRole = projectMember?.role as ProjectRole | undefined
+  );
+  const memberRole = projectMember?.role as ProjectRole | undefined;
 
   const canCreateReport =
-    isAdminRole || memberRole === "MANDOR" || memberRole === "ARCHITECT"
+    isAdminRole || memberRole === "MANDOR" || memberRole === "ARCHITECT";
 
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
-    )
+    );
   }
 
   if (error || !project) {
@@ -82,7 +82,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
           </p>
         </div>
       </PageLayout>
-    )
+    );
   }
 
   return (
@@ -278,5 +278,5 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
         onOpenChange={setIsTeamOpen}
       />
     </PageLayout>
-  )
+  );
 }

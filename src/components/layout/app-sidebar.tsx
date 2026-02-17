@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import type * as React from "react"
+import Link from "next/link";
+import type * as React from "react";
 import {
   NavDocuments,
   NavMain,
   NavSecondary,
   NavUser,
-} from "~/components/navigation"
+} from "~/components/navigation";
 import {
   Sidebar,
   SidebarContent,
@@ -16,11 +16,11 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "~/components/ui/sidebar"
-import type { SidebarConfig } from "~/types/dashboard"
+} from "~/components/ui/sidebar";
+import type { SidebarConfig } from "~/types/dashboard";
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-  config: SidebarConfig
+  config: SidebarConfig;
 }
 
 export function AppSidebar({ config, ...props }: AppSidebarProps) {
@@ -31,7 +31,7 @@ export function AppSidebar({ config, ...props }: AppSidebarProps) {
     navSecondary = [],
     companyName = "Sandaran Home Living",
     companyIcon: CompanyIcon,
-  } = config
+  } = config;
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -61,5 +61,5 @@ export function AppSidebar({ config, ...props }: AppSidebarProps) {
         <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

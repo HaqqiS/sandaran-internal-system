@@ -1,33 +1,33 @@
-"use client"
+"use client";
 
-import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react"
-import NextImage from "next/image"
-import { useCallback, useState } from "react"
-import { useDropzone } from "react-dropzone"
-import { Button } from "~/components/ui/button"
-import { Progress } from "~/components/ui/progress"
-import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload"
-import { cn } from "~/lib/utils"
+import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
+import NextImage from "next/image";
+import { useCallback, useState } from "react";
+import { useDropzone } from "react-dropzone";
+import { Button } from "~/components/ui/button";
+import { Progress } from "~/components/ui/progress";
+import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload";
+import { cn } from "~/lib/utils";
 
 interface ImageUploadProps {
   /** Project slug for folder structure */
-  projectSlug: string
+  projectSlug: string;
   /** Upload type: reports, documents, or emergency */
-  type: "reports" | "documents" | "emergency"
+  type: "reports" | "documents" | "emergency";
   /** Current image URL */
-  value?: string
+  value?: string;
   /** Callback when image is uploaded */
-  onChange: (url: string, publicId: string) => void
+  onChange: (url: string, publicId: string) => void;
   /** Callback when image is removed */
-  onRemove?: () => void
+  onRemove?: () => void;
   /** Optional className */
-  className?: string
+  className?: string;
   /** Disable upload */
-  disabled?: boolean
+  disabled?: boolean;
   /** Max file size in MB */
-  maxSizeMB?: number
+  maxSizeMB?: number;
   /** Accepted file types */
-  accept?: Record<string, string[]>
+  accept?: Record<string, string[]>;
 }
 
 export function ImageUpload({
@@ -41,52 +41,52 @@ export function ImageUpload({
   maxSizeMB = 5,
   accept = { "image/*": [".jpg", ".jpeg", ".png", ".webp"] },
 }: ImageUploadProps) {
-  const [preview, setPreview] = useState<string | null>(null)
+  const [preview, setPreview] = useState<string | null>(null);
   const { upload, isLoading, isCompressing, progress, error, reset } =
-    useCloudinaryUpload()
+    useCloudinaryUpload();
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
-      const file = acceptedFiles[0]
-      if (!file) return
+      const file = acceptedFiles[0];
+      if (!file) return;
 
       // Show preview immediately
-      const previewUrl = URL.createObjectURL(file)
-      setPreview(previewUrl)
+      const previewUrl = URL.createObjectURL(file);
+      setPreview(previewUrl);
 
       try {
         const result = await upload(file, {
           projectSlug,
           type,
           maxSizeMB,
-        })
-        onChange(result.secureUrl, result.publicId)
+        });
+        onChange(result.secureUrl, result.publicId);
         // Cleanup preview URL
-        URL.revokeObjectURL(previewUrl)
-        setPreview(null)
+        URL.revokeObjectURL(previewUrl);
+        setPreview(null);
       } catch (err) {
-        console.error("Upload failed:", err)
-        URL.revokeObjectURL(previewUrl)
-        setPreview(null)
+        console.error("Upload failed:", err);
+        URL.revokeObjectURL(previewUrl);
+        setPreview(null);
       }
     },
     [projectSlug, type, maxSizeMB, onChange, upload],
-  )
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept,
     maxFiles: 1,
     disabled: disabled || isLoading,
-  })
+  });
 
   const handleRemove = () => {
-    setPreview(null)
-    reset()
-    onRemove?.()
-  }
+    setPreview(null);
+    reset();
+    onRemove?.();
+  };
 
-  const displayUrl = value || preview
+  const displayUrl = value || preview;
 
   return (
     <div className={cn("space-y-2", className)}>
@@ -155,5 +155,5 @@ export function ImageUpload({
         <p className="text-sm text-destructive">Upload failed: {error}</p>
       )}
     </div>
-  )
+  );
 }

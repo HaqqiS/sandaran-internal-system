@@ -1,26 +1,26 @@
-"use client"
+"use client";
 
-import { MemberManagement } from "~/components/project/member-management"
+import { MemberManagement } from "~/components/project/member-management";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "~/components/ui/dialog"
+} from "~/components/ui/dialog";
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "~/components/ui/sheet"
-import { useIsMobile } from "~/hooks/use-mobile"
+} from "~/components/ui/sheet";
+import { useIsMobile } from "~/hooks/use-mobile";
 
 interface TeamManagementDialogProps {
-  projectId: string
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  projectId: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function TeamManagementDialog({
@@ -28,7 +28,7 @@ export function TeamManagementDialog({
   open,
   onOpenChange,
 }: TeamManagementDialogProps) {
-  const isMobile = useIsMobile()
+  const isMobile = useIsMobile();
 
   if (isMobile) {
     return (
@@ -45,7 +45,7 @@ export function TeamManagementDialog({
           </div>
         </SheetContent>
       </Sheet>
-    )
+    );
   }
 
   return (
@@ -62,5 +62,5 @@ export function TeamManagementDialog({
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

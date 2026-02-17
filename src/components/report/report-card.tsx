@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   IconCalendar,
@@ -8,47 +8,47 @@ import {
   IconPhoto,
   IconSun,
   IconUsers,
-} from "@tabler/icons-react"
-import { format } from "date-fns"
-import Link from "next/link"
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
-import { Badge } from "~/components/ui/badge"
-import { Card, CardContent, CardHeader } from "~/components/ui/card"
-import { Progress } from "~/components/ui/progress"
+} from "@tabler/icons-react";
+import { format } from "date-fns";
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
+import { Card, CardContent, CardHeader } from "~/components/ui/card";
+import { Progress } from "~/components/ui/progress";
 
 interface ReportCardProps {
   report: {
-    id: string
-    slug: string
-    reportDate: Date | string
-    taskDescription: string
-    progressPercent: number
-    weather?: string | null
-    totalWorkers: number
-    user: { name: string; image?: string | null }
-    media: unknown[]
-    tasks: unknown[]
-    _count?: { comments: number }
-  }
-  projectSlug: string
+    id: string;
+    slug: string;
+    reportDate: Date | string;
+    taskDescription: string;
+    progressPercent: number;
+    weather?: string | null;
+    totalWorkers: number;
+    user: { name: string; image?: string | null };
+    media: unknown[];
+    tasks: unknown[];
+    _count?: { comments: number };
+  };
+  projectSlug: string;
 }
 
 function getWeatherIcon(weather?: string | null) {
-  if (!weather) return null
-  const lower = weather.toLowerCase()
-  if (lower.includes("hujan")) return <IconCloudRain className="h-4 w-4" />
-  if (lower.includes("mendung")) return <IconCloud className="h-4 w-4" />
-  return <IconSun className="h-4 w-4" />
+  if (!weather) return null;
+  const lower = weather.toLowerCase();
+  if (lower.includes("hujan")) return <IconCloudRain className="h-4 w-4" />;
+  if (lower.includes("mendung")) return <IconCloud className="h-4 w-4" />;
+  return <IconSun className="h-4 w-4" />;
 }
 
 export function ReportCard({ report, projectSlug }: ReportCardProps) {
-  const reportDate = new Date(report.reportDate)
+  const reportDate = new Date(report.reportDate);
   const initials = report.user.name
     .split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase()
-    .slice(0, 2)
+    .slice(0, 2);
 
   return (
     <Link href={`/projects/${projectSlug}/reports/${report.slug}`}>
@@ -108,5 +108,5 @@ export function ReportCard({ report, projectSlug }: ReportCardProps) {
         </CardContent>
       </Card>
     </Link>
-  )
+  );
 }

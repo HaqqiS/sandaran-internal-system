@@ -1,16 +1,16 @@
-import { headers } from "next/headers"
-import Link from "next/link"
-import { redirect } from "next/navigation"
-import { auth } from "~/server/better-auth"
+import { headers } from "next/headers";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { auth } from "~/server/better-auth";
 
 export default async function UnauthorizedPage() {
   const session = await auth.api.getSession({
     headers: await headers(),
-  })
+  });
 
   // If not logged in, redirect to home
   if (!session?.user) {
-    redirect("/")
+    redirect("/");
   }
 
   return (
@@ -80,11 +80,11 @@ export default async function UnauthorizedPage() {
               <button
                 type="submit"
                 formAction={async () => {
-                  "use server"
+                  "use server";
                   await auth.api.signOut({
                     headers: await headers(),
-                  })
-                  redirect("/")
+                  });
+                  redirect("/");
                 }}
                 className="w-full rounded-lg bg-gray-900 px-4 py-3 font-semibold text-white transition hover:bg-gray-800"
               >
@@ -102,5 +102,5 @@ export default async function UnauthorizedPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

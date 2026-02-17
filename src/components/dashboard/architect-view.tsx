@@ -1,33 +1,33 @@
-"use client"
+"use client";
 
-import { IconCloudUpload, IconFileText } from "@tabler/icons-react"
-import Link from "next/link"
-import { useState } from "react"
-import { UploadDialog } from "~/components/document/upload-dialog"
-import { Button } from "~/components/ui/button"
+import { IconCloudUpload, IconFileText } from "@tabler/icons-react";
+import Link from "next/link";
+import { useState } from "react";
+import { UploadDialog } from "~/components/document/upload-dialog";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/components/ui/card"
-import { useArchitectDashboard, useArchitectStats } from "~/hooks"
-import { DashboardLayout } from "./shared/DashboardLayout"
-import { StatsGrid } from "./shared/StatsGrid"
-import { StatCard } from "./stat-card"
+} from "~/components/ui/card";
+import { useArchitectDashboard, useArchitectStats } from "~/hooks";
+import { DashboardLayout } from "./shared/DashboardLayout";
+import { StatsGrid } from "./shared/StatsGrid";
+import { StatCard } from "./stat-card";
 
 export function ArchitectView() {
-  const { data: stats, isLoading: statsLoading } = useArchitectStats()
+  const { data: stats, isLoading: statsLoading } = useArchitectStats();
   const { data: dashboard, isLoading: dashboardLoading } =
-    useArchitectDashboard()
+    useArchitectDashboard();
 
   const [uploadProject, setUploadProject] = useState<{
-    id: string
-    slug: string
-  } | null>(null)
+    id: string;
+    slug: string;
+  } | null>(null);
 
-  const isLoading = statsLoading || dashboardLoading
+  const isLoading = statsLoading || dashboardLoading;
 
   return (
     <DashboardLayout
@@ -128,5 +128,5 @@ export function ArchitectView() {
         />
       )}
     </DashboardLayout>
-  )
+  );
 }

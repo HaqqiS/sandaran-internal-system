@@ -1,36 +1,36 @@
-import type { GlobalRole } from "generated/prisma"
-import type { auth } from "~/server/better-auth"
+import type { GlobalRole } from "generated/prisma";
+import type { auth } from "~/server/better-auth";
 
-type Session = typeof auth.$Infer.Session
+type Session = typeof auth.$Infer.Session;
 
 /**
  * Check if user has an authorized role (not NONE)
  */
 export function isAuthorizedRole(role: GlobalRole | null | undefined): boolean {
-  if (!role) return false
-  return role === "ADMIN" || role === "CEO" || role === "USER"
+  if (!role) return false;
+  return role === "ADMIN" || role === "CEO" || role === "USER";
 }
 
 /**
  * Check if user is active
  */
 export function isActiveUser(isActive: boolean | null | undefined): boolean {
-  return isActive === true
+  return isActive === true;
 }
 
 /**
  * Check if user is reviewed (has reviewedAt timestamp)
  */
 export function isReviewedUser(reviewedAt: Date | null | undefined): boolean {
-  return reviewedAt !== null && reviewedAt !== undefined
+  return reviewedAt !== null && reviewedAt !== undefined;
 }
 
 /**
  * Check if user has admin privileges
  */
 export function isAdmin(role: GlobalRole | null | undefined): boolean {
-  if (!role) return false
-  return role === "ADMIN" || role === "CEO"
+  if (!role) return false;
+  return role === "ADMIN" || role === "CEO";
 }
 
 /**
@@ -38,9 +38,9 @@ export function isAdmin(role: GlobalRole | null | undefined): boolean {
  * Returns object with validation result and reason
  */
 export function validateSessionAccess(session: Session | null): {
-  isValid: boolean
-  reason?: "no_session" | "inactive" | "unauthorized_role" | "not_approved"
-  redirectTo?: string
+  isValid: boolean;
+  reason?: "no_session" | "inactive" | "unauthorized_role" | "not_approved";
+  redirectTo?: string;
 } {
   // No session
   if (!session?.user) {
@@ -48,10 +48,10 @@ export function validateSessionAccess(session: Session | null): {
       isValid: false,
       reason: "no_session",
       redirectTo: "/",
-    }
+    };
   }
 
-  const { roleGlobal, isActive } = session.user
+  const { roleGlobal, isActive } = session.user;
 
   // Check if user is active
   if (!isActiveUser(isActive)) {
@@ -59,7 +59,7 @@ export function validateSessionAccess(session: Session | null): {
       isValid: false,
       reason: "inactive",
       redirectTo: "/waiting-approval",
-    }
+    };
   }
 
   // Check if user has authorized role
@@ -68,18 +68,18 @@ export function validateSessionAccess(session: Session | null): {
       isValid: false,
       reason: "unauthorized_role",
       redirectTo: "/unauthorized",
-    }
+    };
   }
 
-  return { isValid: true }
+  return { isValid: true };
 }
 
 /**
  * Get allowed roles as array
  */
-export const ALLOWED_ROLES: GlobalRole[] = ["ADMIN", "CEO", "USER"]
+export const ALLOWED_ROLES: GlobalRole[] = ["ADMIN", "CEO", "USER"];
 
 /**
  * Get admin roles as array
  */
-export const ADMIN_ROLES: GlobalRole[] = ["ADMIN", "CEO"]
+export const ADMIN_ROLES: GlobalRole[] = ["ADMIN", "CEO"];

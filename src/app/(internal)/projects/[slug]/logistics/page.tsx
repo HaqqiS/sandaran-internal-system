@@ -1,8 +1,8 @@
-import { requireAuth } from "~/lib/server-auth"
-import { LogisticsClient } from "./logistics-client"
+import { requireAuth } from "~/lib/server-auth";
+import { LogisticsClient } from "./logistics-client";
 
 export default async function LogisticsPage() {
-  await requireAuth()
+  await requireAuth();
 
-  return <LogisticsClient />
+  return <LogisticsClient />;
 }

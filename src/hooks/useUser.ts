@@ -1,4 +1,4 @@
-import { api } from "~/trpc/react"
+import { api } from "~/trpc/react";
 
 /**
  * User Hooks
@@ -6,5 +6,5 @@ import { api } from "~/trpc/react"
 
 export function useSearchUsers(query: string = "") {
   // Always enabled now, server handles empty string
-  return api.user.search.useQuery({ query })
+  return api.user.search.useQuery({ query });
 }

@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import { Button } from "~/components/ui/button"
+import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu"
+} from "~/components/ui/dropdown-menu";
 
-type FilterValue = "all" | "pending" | "active" | "rejected"
+type FilterValue = "all" | "pending" | "active" | "rejected";
 
 interface UserFilterDropdownProps {
-  value: FilterValue
-  onValueChange: (value: FilterValue) => void
+  value: FilterValue;
+  onValueChange: (value: FilterValue) => void;
 }
 
 const filterLabels: Record<FilterValue, string> = {
@@ -21,7 +21,7 @@ const filterLabels: Record<FilterValue, string> = {
   pending: "Pending",
   active: "Active",
   rejected: "Rejected",
-}
+};
 
 export function UserFilterDropdown({
   value,
@@ -48,5 +48,5 @@ export function UserFilterDropdown({
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

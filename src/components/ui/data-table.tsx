@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { IconChevronDown } from "@tabler/icons-react"
+import { IconChevronDown } from "@tabler/icons-react";
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -14,17 +14,17 @@ import {
   type SortingState,
   useReactTable,
   type VisibilityState,
-} from "@tanstack/react-table"
-import * as React from "react"
+} from "@tanstack/react-table";
+import * as React from "react";
 
-import { Button } from "~/components/ui/button"
+import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu"
-import { Input } from "~/components/ui/input"
+} from "~/components/ui/dropdown-menu";
+import { Input } from "~/components/ui/input";
 import {
   Table,
   TableBody,
@@ -32,17 +32,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "~/components/ui/table"
+} from "~/components/ui/table";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
-  filterColumn?: string
-  filterPlaceholder?: string
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  filterColumn?: string;
+  filterPlaceholder?: string;
   state?: {
-    rowSelection?: RowSelectionState
-  }
-  onRowSelectionChange?: OnChangeFn<RowSelectionState>
+    rowSelection?: RowSelectionState;
+  };
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>;
 }
 
 export function DataTable<TData, TValue>({
@@ -53,19 +53,19 @@ export function DataTable<TData, TValue>({
   state: externalState,
   onRowSelectionChange: externalOnRowSelectionChange,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
-  )
+  );
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
+    React.useState<VisibilityState>({});
   const [internalRowSelection, setInternalRowSelection] =
-    React.useState<RowSelectionState>({})
+    React.useState<RowSelectionState>({});
 
   // Use external or internal row selection
-  const rowSelection = externalState?.rowSelection ?? internalRowSelection
+  const rowSelection = externalState?.rowSelection ?? internalRowSelection;
   const setRowSelection =
-    externalOnRowSelectionChange ?? setInternalRowSelection
+    externalOnRowSelectionChange ?? setInternalRowSelection;
 
   const table = useReactTable({
     data,
@@ -84,7 +84,7 @@ export function DataTable<TData, TValue>({
       columnVisibility,
       rowSelection,
     },
-  })
+  });
 
   return (
     <div className="w-full space-y-4">
@@ -121,7 +121,7 @@ export function DataTable<TData, TValue>({
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -141,7 +141,7 @@ export function DataTable<TData, TValue>({
                             header.getContext(),
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -201,5 +201,5 @@ export function DataTable<TData, TValue>({
         </div>
       </div>
     </div>
-  )
+  );
 }

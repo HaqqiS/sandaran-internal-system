@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { IconTrash } from "@tabler/icons-react"
-import { formatDistanceToNow } from "date-fns"
-import { toast } from "sonner"
+import { IconTrash } from "@tabler/icons-react";
+import { formatDistanceToNow } from "date-fns";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,48 +13,48 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "~/components/ui/alert-dialog"
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
-import { Button } from "~/components/ui/button"
-import { useSessionStore } from "~/stores/use-session-store"
-import type { RouterOutputs } from "~/trpc/react"
-import { api } from "~/trpc/react"
+} from "~/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
+import { useSessionStore } from "~/stores/use-session-store";
+import type { RouterOutputs } from "~/trpc/react";
+import { api } from "~/trpc/react";
 
-type Comment = RouterOutputs["comment"]["getByReport"][number]
+type Comment = RouterOutputs["comment"]["getByReport"][number];
 
 interface CommentItemProps {
-  comment: Comment
-  projectId: string
+  comment: Comment;
+  projectId: string;
 }
 
 export function CommentItem({ comment, projectId }: CommentItemProps) {
-  const session = useSessionStore((state) => state.session)
-  const utils = api.useUtils()
+  const session = useSessionStore((state) => state.session);
+  const utils = api.useUtils();
 
   const deleteComment = api.comment.delete.useMutation({
     onSuccess: () => {
-      toast.success("Comment deleted")
+      toast.success("Comment deleted");
       utils.comment.getByReport.invalidate({
         projectId,
         reportId: comment.reportId,
-      })
+      });
     },
     onError: (error) => {
-      toast.error(error.message)
+      toast.error(error.message);
     },
-  })
+  });
 
   // Check permissions
-  const isAuthor = session?.user?.id === comment.userId
-  const isAdmin = session?.user?.roleGlobal === "ADMIN"
-  const canDelete = isAuthor || isAdmin
+  const isAuthor = session?.user?.id === comment.userId;
+  const isAdmin = session?.user?.roleGlobal === "ADMIN";
+  const canDelete = isAuthor || isAdmin;
 
   const initials = comment.author.name
     .split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase()
-    .slice(0, 2)
+    .slice(0, 2);
 
   return (
     <div className="flex gap-4 group">
@@ -115,5 +115,5 @@ export function CommentItem({ comment, projectId }: CommentItemProps) {
         </p>
       </div>
     </div>
-  )
+  );
 }

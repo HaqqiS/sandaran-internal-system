@@ -1,9 +1,9 @@
-import { z } from "zod"
+import { z } from "zod";
 import {
   deleteCloudinaryAsset,
   generateUploadSignature,
-} from "~/lib/cloudinary"
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc"
+} from "~/lib/cloudinary";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const uploadRouter = createTRPCRouter({
   /**
@@ -21,8 +21,8 @@ export const uploadRouter = createTRPCRouter({
       const params = generateUploadSignature({
         projectSlug: input.projectSlug,
         type: input.type,
-      })
-      return params
+      });
+      return params;
     }),
 
   /**
@@ -31,7 +31,7 @@ export const uploadRouter = createTRPCRouter({
   deleteAsset: protectedProcedure
     .input(z.object({ publicId: z.string() }))
     .mutation(async ({ input }) => {
-      await deleteCloudinaryAsset(input.publicId)
-      return { success: true }
+      await deleteCloudinaryAsset(input.publicId);
+      return { success: true };
     }),
-})
+});

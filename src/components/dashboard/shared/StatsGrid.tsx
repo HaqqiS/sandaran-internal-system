@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import type { ReactNode } from "react"
-import { cn } from "~/lib/utils"
+import type { ReactNode } from "react";
+import { cn } from "~/lib/utils";
 
 interface StatsGridProps {
-  children: ReactNode
+  children: ReactNode;
   cols?: {
-    mobile?: number
-    tablet?: number
-    desktop?: number
-  }
-  className?: string
+    mobile?: number;
+    tablet?: number;
+    desktop?: number;
+  };
+  className?: string;
 }
 
 export function StatsGrid({
@@ -22,17 +22,17 @@ export function StatsGrid({
     2: "grid-cols-2",
     3: "md:grid-cols-3",
     4: "lg:grid-cols-4",
-  }
+  };
 
   const mobileClass = cols.mobile
     ? (gridCols[cols.mobile] ?? "grid-cols-2")
-    : "grid-cols-2"
+    : "grid-cols-2";
   const tabletClass = cols.tablet
     ? (gridCols[cols.tablet] ?? "md:grid-cols-3")
-    : "md:grid-cols-3"
+    : "md:grid-cols-3";
   const desktopClass = cols.desktop
     ? (gridCols[cols.desktop] ?? "lg:grid-cols-4")
-    : "lg:grid-cols-4"
+    : "lg:grid-cols-4";
 
   return (
     <div
@@ -46,5 +46,5 @@ export function StatsGrid({
     >
       {children}
     </div>
-  )
+  );
 }

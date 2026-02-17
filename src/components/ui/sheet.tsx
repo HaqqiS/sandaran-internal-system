@@ -1,31 +1,31 @@
-"use client"
+"use client";
 
-import { IconX } from "@tabler/icons-react"
-import { Dialog as SheetPrimitive } from "radix-ui"
-import type * as React from "react"
-import { Button } from "~/components/ui/button"
-import { cn } from "~/lib/utils"
+import { IconX } from "@tabler/icons-react";
+import { Dialog as SheetPrimitive } from "radix-ui";
+import type * as React from "react";
+import { Button } from "~/components/ui/button";
+import { cn } from "~/lib/utils";
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
-  return <SheetPrimitive.Root data-slot="sheet" {...props} />
+  return <SheetPrimitive.Root data-slot="sheet" {...props} />;
 }
 
 function SheetTrigger({
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Trigger>) {
-  return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />
+  return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />;
 }
 
 function SheetClose({
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Close>) {
-  return <SheetPrimitive.Close data-slot="sheet-close" {...props} />
+  return <SheetPrimitive.Close data-slot="sheet-close" {...props} />;
 }
 
 function SheetPortal({
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Portal>) {
-  return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />
+  return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />;
 }
 
 function SheetOverlay({
@@ -41,7 +41,7 @@ function SheetOverlay({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function SheetContent({
@@ -51,8 +51,8 @@ function SheetContent({
   showCloseButton = true,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
-  side?: "top" | "right" | "bottom" | "left"
-  showCloseButton?: boolean
+  side?: "top" | "right" | "bottom" | "left";
+  showCloseButton?: boolean;
 }) {
   return (
     <SheetPortal>
@@ -81,7 +81,7 @@ function SheetContent({
         )}
       </SheetPrimitive.Content>
     </SheetPortal>
-  )
+  );
 }
 
 function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
@@ -91,7 +91,7 @@ function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
       className={cn("gap-0.5 p-4 flex flex-col", className)}
       {...props}
     />
-  )
+  );
 }
 
 function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
@@ -101,7 +101,7 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
       className={cn("gap-2 p-4 mt-auto flex flex-col", className)}
       {...props}
     />
-  )
+  );
 }
 
 function SheetTitle({
@@ -114,7 +114,7 @@ function SheetTitle({
       className={cn("text-foreground text-base font-medium", className)}
       {...props}
     />
-  )
+  );
 }
 
 function SheetDescription({
@@ -127,7 +127,7 @@ function SheetDescription({
       className={cn("text-muted-foreground text-sm", className)}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -139,4 +139,4 @@ export {
   SheetFooter,
   SheetTitle,
   SheetDescription,
-}
+};

@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
 import {
   IconDotsVertical,
   IconLogout,
   IconUserCircle,
-} from "@tabler/icons-react"
-import { redirect } from "next/navigation"
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
+} from "@tabler/icons-react";
+import { redirect } from "next/navigation";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,25 +15,25 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu"
+} from "~/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "~/components/ui/sidebar"
-import { authClient } from "~/server/better-auth/client"
+} from "~/components/ui/sidebar";
+import { authClient } from "~/server/better-auth/client";
 
 export function NavUser({
   user,
 }: {
   user: {
-    name: string
-    email: string
-    avatar?: string
-  }
+    name: string;
+    email: string;
+    avatar?: string;
+  };
 }) {
-  const { isMobile } = useSidebar()
+  const { isMobile } = useSidebar();
 
   return (
     <SidebarMenu>
@@ -89,8 +89,8 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={async () => {
-                await authClient.signOut()
-                redirect("/")
+                await authClient.signOut();
+                redirect("/");
               }}
             >
               <IconLogout />
@@ -100,5 +100,5 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

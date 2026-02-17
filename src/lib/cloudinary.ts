@@ -1,5 +1,5 @@
-import { v2 as cloudinary } from "cloudinary"
-import { env } from "~/env"
+import { v2 as cloudinary } from "cloudinary";
+import { env } from "~/env";
 
 // Configure Cloudinary
 cloudinary.config({
@@ -7,14 +7,14 @@ cloudinary.config({
   api_key: env.CLOUDINARY_API_KEY,
   api_secret: env.CLOUDINARY_API_SECRET,
   secure: true,
-})
+});
 
 interface SignatureParams {
-  folder: string
-  timestamp: number
-  type?: string
-  access_mode?: string
-  [key: string]: unknown
+  folder: string;
+  timestamp: number;
+  type?: string;
+  access_mode?: string;
+  [key: string]: unknown;
 }
 
 /**
@@ -23,11 +23,11 @@ interface SignatureParams {
  * Types: reports, documents, emergency
  */
 export function generateUploadSignature(options: {
-  projectSlug: string
-  type: "reports" | "documents" | "emergency"
+  projectSlug: string;
+  type: "reports" | "documents" | "emergency";
 }) {
-  const timestamp = Math.round(Date.now() / 1000)
-  const folder = `sandaran/${options.projectSlug}/${options.type}`
+  const timestamp = Math.round(Date.now() / 1000);
+  const folder = `sandaran/${options.projectSlug}/${options.type}`;
 
   const params: SignatureParams = {
     folder,
@@ -35,12 +35,12 @@ export function generateUploadSignature(options: {
     type: "authenticated",
     use_filename: false,
     unique_filename: true,
-  }
+  };
 
   const signature = cloudinary.utils.api_sign_request(
     params,
     env.CLOUDINARY_API_SECRET,
-  )
+  );
 
   return {
     timestamp,
@@ -51,14 +51,14 @@ export function generateUploadSignature(options: {
     type: "authenticated",
     use_filename: false,
     unique_filename: true,
-  }
+  };
 }
 
 /**
  * Delete asset by publicId
  */
 export async function deleteCloudinaryAsset(publicId: string) {
-  return cloudinary.uploader.destroy(publicId)
+  return cloudinary.uploader.destroy(publicId);
 }
 
 /**
@@ -67,10 +67,10 @@ export async function deleteCloudinaryAsset(publicId: string) {
 export function getOptimizedImageUrl(
   publicId: string,
   options?: {
-    width?: number
-    height?: number
-    quality?: "auto" | number
-    format?: "auto" | "webp" | "jpg" | "png"
+    width?: number;
+    height?: number;
+    quality?: "auto" | number;
+    format?: "auto" | "webp" | "jpg" | "png";
   },
 ) {
   return cloudinary.url(publicId, {
@@ -84,7 +84,7 @@ export function getOptimizedImageUrl(
         fetch_format: options?.format || "auto",
       },
     ],
-  })
+  });
 }
 
 /**
@@ -104,7 +104,7 @@ export function getSignedDownloadUrl(
     // Add expiration to make it a valid signed URL
     expires_at: Math.floor(Date.now() / 1000) + 3600,
     flags: "attachment",
-  })
+  });
 }
 
-export { cloudinary }
+export { cloudinary };

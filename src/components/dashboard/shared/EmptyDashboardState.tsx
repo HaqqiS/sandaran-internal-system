@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import type { ReactNode } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import type { ReactNode } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
 interface EmptyDashboardStateProps {
-  icon?: ReactNode
-  title: string
-  description?: string
-  action?: ReactNode
+  icon?: ReactNode;
+  title: string;
+  description?: string;
+  action?: ReactNode;
 }
 
 export function EmptyDashboardState({
@@ -36,5 +36,5 @@ export function EmptyDashboardState({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

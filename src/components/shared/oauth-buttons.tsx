@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { authClient } from "~/server/better-auth/client"
+import { authClient } from "~/server/better-auth/client";
 
 export function OAuthButtons() {
   const handleGoogleSignIn = async () => {
     await authClient.signIn.social({
       provider: "google",
       callbackURL: "/",
-    })
-  }
+    });
+  };
 
   return (
     <button
@@ -18,5 +18,5 @@ export function OAuthButtons() {
     >
       Sign in with Google
     </button>
-  )
+  );
 }

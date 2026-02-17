@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import type { GlobalRole } from "generated/prisma"
-import { Badge } from "~/components/ui/badge"
+import type { GlobalRole } from "generated/prisma";
+import { Badge } from "~/components/ui/badge";
 
 interface RoleBadgeProps {
-  role: GlobalRole
+  role: GlobalRole;
 }
 
 export function RoleBadge({ role }: RoleBadgeProps) {
@@ -16,7 +16,7 @@ export function RoleBadge({ role }: RoleBadgeProps) {
     CEO: { variant: "secondary" },
     USER: { variant: "outline" },
     NONE: { variant: "destructive" },
-  }
+  };
 
-  return <Badge variant={config[role].variant}>{role}</Badge>
+  return <Badge variant={config[role].variant}>{role}</Badge>;
 }

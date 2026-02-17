@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { IconCheck } from "@tabler/icons-react"
-import { Checkbox as CheckboxPrimitive } from "radix-ui"
-import type * as React from "react"
-import { cn } from "~/lib/utils"
+import { IconCheck } from "@tabler/icons-react";
+import { Checkbox as CheckboxPrimitive } from "radix-ui";
+import type * as React from "react";
+import { cn } from "~/lib/utils";
 
 function Checkbox({
   className,
@@ -25,7 +25,7 @@ function Checkbox({
         <IconCheck />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
-  )
+  );
 }
 
-export { Checkbox }
+export { Checkbox };

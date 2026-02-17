@@ -1,11 +1,11 @@
-import type * as React from "react"
+import type * as React from "react";
 
-import { Separator } from "~/components/ui/separator"
-import { SidebarTrigger } from "~/components/ui/sidebar"
+import { Separator } from "~/components/ui/separator";
+import { SidebarTrigger } from "~/components/ui/sidebar";
 
 interface SiteHeaderProps {
-  title?: string
-  actions?: React.ReactNode
+  title?: string;
+  actions?: React.ReactNode;
 }
 
 export function SiteHeader({ title = "Dashboard", actions }: SiteHeaderProps) {
@@ -23,5 +23,5 @@ export function SiteHeader({ title = "Dashboard", actions }: SiteHeaderProps) {
         )}
       </div>
     </header>
-  )
+  );
 }

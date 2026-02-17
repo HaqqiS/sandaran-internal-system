@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import type * as React from "react"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import type * as React from "react";
 
 import {
   SidebarGroup,
@@ -10,19 +10,19 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "~/components/ui/sidebar"
-import { ProjectSelector } from "./project-selector"
+} from "~/components/ui/sidebar";
+import { ProjectSelector } from "./project-selector";
 
 export function NavMain({
   items,
 }: {
   items: {
-    title: string
-    url: string
-    icon?: React.ComponentType<{ className?: string }>
-  }[]
+    title: string;
+    url: string;
+    icon?: React.ComponentType<{ className?: string }>;
+  }[];
 }) {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <SidebarGroup>
@@ -34,7 +34,7 @@ export function NavMain({
         </SidebarMenu>
         <SidebarMenu>
           {items.map((item) => {
-            const isActive = pathname === item.url
+            const isActive = pathname === item.url;
             return (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
@@ -48,10 +48,10 @@ export function NavMain({
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-            )
+            );
           })}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
-  )
+  );
 }

@@ -6,8 +6,8 @@
  *
  */
 
-import { TRPCError } from "@trpc/server"
-import type { GlobalRole, PrismaClient, ProjectRole } from "generated/prisma"
+import { TRPCError } from "@trpc/server";
+import type { GlobalRole, PrismaClient, ProjectRole } from "generated/prisma";
 
 /**
  * Get the project role of a user in a specific project.
@@ -32,9 +32,9 @@ export async function getProjectRole(
     where: {
       userId_projectId: { userId, projectId },
     },
-  })
+  });
 
-  return member?.role ?? null
+  return member?.role ?? null;
 }
 
 /**
@@ -56,16 +56,16 @@ export async function requireProjectMembership(
   userId: string,
   projectId: string,
 ): Promise<ProjectRole> {
-  const role = await getProjectRole(db, userId, projectId)
+  const role = await getProjectRole(db, userId, projectId);
 
   if (!role) {
     throw new TRPCError({
       code: "FORBIDDEN",
       message: "You are not a member of this project",
-    })
+    });
   }
 
-  return role
+  return role;
 }
 
 /**
@@ -94,16 +94,16 @@ export async function requireProjectRole(
   projectId: string,
   allowedRoles: ProjectRole[],
 ): Promise<ProjectRole> {
-  const role = await requireProjectMembership(db, userId, projectId)
+  const role = await requireProjectMembership(db, userId, projectId);
 
   if (!allowedRoles.includes(role)) {
     throw new TRPCError({
       code: "FORBIDDEN",
       message: `This action requires one of the following roles: ${allowedRoles.join(", ")}`,
-    })
+    });
   }
 
-  return role
+  return role;
 }
 
 /**
@@ -127,21 +127,21 @@ export function requireOwnership(
 ): void {
   // ADMIN bypasses ownership check
   if (globalRole === "ADMIN") {
-    return
+    return;
   }
 
   if (!entity) {
     throw new TRPCError({
       code: "NOT_FOUND",
       message: "Resource not found",
-    })
+    });
   }
 
   if (entity.userId !== currentUserId) {
     throw new TRPCError({
       code: "FORBIDDEN",
       message: "You can only modify your own resources",
-    })
+    });
   }
 }
 
@@ -157,7 +157,7 @@ export function requireOwnership(
  * }
  */
 export function isAdminOrCEO(globalRole: GlobalRole): boolean {
-  return globalRole === "ADMIN" || globalRole === "CEO"
+  return globalRole === "ADMIN" || globalRole === "CEO";
 }
 
 /**
@@ -176,7 +176,7 @@ export function requireAdmin(globalRole: GlobalRole): void {
     throw new TRPCError({
       code: "FORBIDDEN",
       message: "Admin access required",
-    })
+    });
   }
 }
 
@@ -200,7 +200,7 @@ export function checkCEORestriction(
   action: string,
 ): void {
   if (globalRole !== "CEO") {
-    return // Not CEO, no restriction
+    return; // Not CEO, no restriction
   }
 
   // Actions CEO is allowed to do
@@ -208,12 +208,12 @@ export function checkCEORestriction(
     "PROFILE_EDIT_OWN",
     "REPORT_COMMENT_CREATE",
     // Add more as needed
-  ]
+  ];
 
   if (!allowedCEOActions.includes(action)) {
     throw new TRPCError({
       code: "FORBIDDEN",
       message: "CEO has read-only access to project operations",
-    })
+    });
   }
 }

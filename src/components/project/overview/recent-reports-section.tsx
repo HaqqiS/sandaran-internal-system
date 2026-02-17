@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
 import {
   IconChevronRight,
   IconFileText,
   IconLoader2,
-} from "@tabler/icons-react"
-import Link from "next/link"
-import { ReportCard } from "~/components/report/report-card"
-import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import { useReportsByProject } from "~/hooks"
+} from "@tabler/icons-react";
+import Link from "next/link";
+import { ReportCard } from "~/components/report/report-card";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { useReportsByProject } from "~/hooks";
 
 interface RecentReportsSectionProps {
-  projectId: string
-  projectSlug: string
-  canCreate?: boolean
+  projectId: string;
+  projectSlug: string;
+  canCreate?: boolean;
 }
 
 export function RecentReportsSection({
@@ -22,7 +22,7 @@ export function RecentReportsSection({
   projectSlug,
   canCreate = false,
 }: RecentReportsSectionProps) {
-  const { data, isLoading, error } = useReportsByProject(projectId)
+  const { data, isLoading, error } = useReportsByProject(projectId);
 
   if (isLoading) {
     return (
@@ -36,7 +36,7 @@ export function RecentReportsSection({
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (error) {
@@ -51,12 +51,12 @@ export function RecentReportsSection({
           </p>
         </CardContent>
       </Card>
-    )
+    );
   }
 
-  const reports = data?.reports ?? []
-  const recentReports = reports.slice(0, 3) // Get only 3 most recent
-  const totalCount = reports.length
+  const reports = data?.reports ?? [];
+  const recentReports = reports.slice(0, 3); // Get only 3 most recent
+  const totalCount = reports.length;
 
   return (
     <Card>
@@ -91,5 +91,5 @@ export function RecentReportsSection({
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

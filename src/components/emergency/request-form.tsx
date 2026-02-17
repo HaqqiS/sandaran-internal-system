@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { useForm } from "@tanstack/react-form"
-import { useState } from "react"
-import { toast } from "sonner"
-import { z } from "zod"
-import { Button } from "~/components/ui/button"
-import { Input } from "~/components/ui/input"
-import { Label } from "~/components/ui/label"
-import { Textarea } from "~/components/ui/textarea"
-import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload"
-import { useRequestEmergencyFund } from "~/hooks/useEmergency"
+import { useForm } from "@tanstack/react-form";
+import { useState } from "react";
+import { toast } from "sonner";
+import { z } from "zod";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { Textarea } from "~/components/ui/textarea";
+import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload";
+import { useRequestEmergencyFund } from "~/hooks/useEmergency";
 
 const withdrawSchema = z.object({
   amount: z
@@ -18,13 +18,13 @@ const withdrawSchema = z.object({
       message: "Amount must be a positive number",
     }),
   description: z.string().min(1, "Description is required"),
-})
+});
 
 interface RequestFormProps {
-  projectId: string
-  projectSlug: string
-  onSuccess?: () => void
-  onCancel?: () => void
+  projectId: string;
+  projectSlug: string;
+  onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
 export function RequestForm({
@@ -33,9 +33,9 @@ export function RequestForm({
   onSuccess,
   onCancel,
 }: RequestFormProps) {
-  const requestFund = useRequestEmergencyFund()
-  const { upload, isUploading } = useCloudinaryUpload()
-  const [proofFile, setProofFile] = useState<File | null>(null)
+  const requestFund = useRequestEmergencyFund();
+  const { upload, isUploading } = useCloudinaryUpload();
+  const [proofFile, setProofFile] = useState<File | null>(null);
 
   const form = useForm({
     defaultValues: {
@@ -47,14 +47,14 @@ export function RequestForm({
     },
     onSubmit: async ({ value }) => {
       try {
-        let proofPublicId: string | undefined
+        let proofPublicId: string | undefined;
 
         if (proofFile) {
           const result = await upload(proofFile, {
             projectSlug,
             type: "emergency",
-          })
-          proofPublicId = result.publicId
+          });
+          proofPublicId = result.publicId;
         }
 
         await requestFund.mutateAsync({
@@ -62,25 +62,25 @@ export function RequestForm({
           amount: Number(value.amount),
           description: value.description,
           proofPublicId,
-        })
+        });
 
-        toast.success("Withdrawal requested successfully")
-        form.reset()
-        setProofFile(null)
-        onSuccess?.()
+        toast.success("Withdrawal requested successfully");
+        form.reset();
+        setProofFile(null);
+        onSuccess?.();
       } catch (error) {
-        toast.error("Failed to request funds")
-        console.error(error)
+        toast.error("Failed to request funds");
+        console.error(error);
       }
     },
-  })
+  });
 
   return (
     <form
       onSubmit={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        void form.handleSubmit()
+        e.preventDefault();
+        e.stopPropagation();
+        void form.handleSubmit();
       }}
       className="space-y-4"
     >
@@ -155,5 +155,5 @@ export function RequestForm({
         </Button>
       </div>
     </form>
-  )
+  );
 }

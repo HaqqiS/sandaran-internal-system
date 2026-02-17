@@ -1,8 +1,8 @@
-import { requireAuth } from "~/lib/server-auth"
-import { EmergencyClient } from "./emergency-client"
+import { requireAuth } from "~/lib/server-auth";
+import { EmergencyClient } from "./emergency-client";
 
 export default async function EmergencyPage() {
-  await requireAuth()
+  await requireAuth();
 
-  return <EmergencyClient />
+  return <EmergencyClient />;
 }

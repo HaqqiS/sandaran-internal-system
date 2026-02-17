@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { IconArrowDownLeft, IconArrowUpRight } from "@tabler/icons-react"
-import { format } from "date-fns"
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
-import { Badge } from "~/components/ui/badge"
+import { IconArrowDownLeft, IconArrowUpRight } from "@tabler/icons-react";
+import { format } from "date-fns";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -11,12 +11,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "~/components/ui/table"
-import { useLogisticTransactions } from "~/hooks/useLogistic"
+} from "~/components/ui/table";
+import { useLogisticTransactions } from "~/hooks/useLogistic";
 
 interface TransactionHistoryProps {
-  projectId: string
-  itemId: string
+  projectId: string;
+  itemId: string;
 }
 
 export function TransactionHistory({
@@ -26,14 +26,14 @@ export function TransactionHistory({
   const { data: transactions, isLoading } = useLogisticTransactions(
     projectId,
     itemId,
-  )
+  );
 
   if (isLoading) {
     return (
       <div className="p-4 text-center text-muted-foreground">
         Loading history...
       </div>
-    )
+    );
   }
 
   if (!transactions || transactions.length === 0) {
@@ -41,7 +41,7 @@ export function TransactionHistory({
       <div className="flex flex-col items-center justify-center p-8 text-muted-foreground">
         <p>No transactions found for this item.</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -109,5 +109,5 @@ export function TransactionHistory({
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }

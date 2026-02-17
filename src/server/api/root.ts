@@ -1,13 +1,13 @@
-import { commentRouter } from "~/server/api/routers/comment.router"
-import { dashboardRouter } from "~/server/api/routers/dashboard.router"
-import { documentRouter } from "~/server/api/routers/document.router"
-import { emergencyRouter } from "~/server/api/routers/emergency.router"
-import { logisticRouter } from "~/server/api/routers/logistic.router"
-import { projectRouter } from "~/server/api/routers/project.router"
-import { reportRouter } from "~/server/api/routers/report.router"
-import { uploadRouter } from "~/server/api/routers/upload.router"
-import { userRouter } from "~/server/api/routers/user"
-import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc"
+import { commentRouter } from "~/server/api/routers/comment.router";
+import { dashboardRouter } from "~/server/api/routers/dashboard.router";
+import { documentRouter } from "~/server/api/routers/document.router";
+import { emergencyRouter } from "~/server/api/routers/emergency.router";
+import { logisticRouter } from "~/server/api/routers/logistic.router";
+import { projectRouter } from "~/server/api/routers/project.router";
+import { reportRouter } from "~/server/api/routers/report.router";
+import { uploadRouter } from "~/server/api/routers/upload.router";
+import { userRouter } from "~/server/api/routers/user";
+import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**
  * This is the primary router for your server.
@@ -25,10 +25,10 @@ export const appRouter = createTRPCRouter({
   logistic: logisticRouter,
   upload: uploadRouter,
   dashboard: dashboardRouter,
-})
+});
 
 // export type definition of API
-export type AppRouter = typeof appRouter
+export type AppRouter = typeof appRouter;
 
 /**
  * Create a server-side caller for the tRPC API.
@@ -37,4 +37,4 @@ export type AppRouter = typeof appRouter
  * const res = await trpc.post.all();
  *       ^? Post[]
  */
-export const createCaller = createCallerFactory(appRouter)
+export const createCaller = createCallerFactory(appRouter);

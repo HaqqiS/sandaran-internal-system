@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { IconBox, IconMinus, IconPlus, IconSearch } from "@tabler/icons-react"
-import { useState } from "react"
-import { Button } from "~/components/ui/button"
+import { IconBox, IconMinus, IconPlus, IconSearch } from "@tabler/icons-react";
+import { useState } from "react";
+import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "~/components/ui/dialog"
-import { Input } from "~/components/ui/input"
+} from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
 import {
   Table,
   TableBody,
@@ -18,58 +18,58 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "~/components/ui/table"
-import { useLogisticStockSummary } from "~/hooks/useLogistic"
-import { useProjectMembers } from "~/hooks/useProject"
-import { useSession } from "~/stores/use-session-store"
-import { ItemActions } from "./item-actions"
-import { TransactionForm } from "./transaction-form"
+} from "~/components/ui/table";
+import { useLogisticStockSummary } from "~/hooks/useLogistic";
+import { useProjectMembers } from "~/hooks/useProject";
+import { useSession } from "~/stores/use-session-store";
+import { ItemActions } from "./item-actions";
+import { TransactionForm } from "./transaction-form";
 
 interface ItemListProps {
-  projectId: string
+  projectId: string;
 }
 
 export function ItemList({ projectId }: ItemListProps) {
-  const { data: items, isLoading } = useLogisticStockSummary(projectId)
-  const { data: members } = useProjectMembers(projectId)
-  const { session } = useSession()
-  const [searchQuery, setSearchQuery] = useState("")
+  const { data: items, isLoading } = useLogisticStockSummary(projectId);
+  const { data: members } = useProjectMembers(projectId);
+  const { session } = useSession();
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Transaction Dialog State
   const [transactionDialog, setTransactionDialog] = useState<{
-    isOpen: boolean
-    type: "IN" | "OUT"
-    item: { id: string; name: string; unit: string } | null
+    isOpen: boolean;
+    type: "IN" | "OUT";
+    item: { id: string; name: string; unit: string } | null;
   }>({
     isOpen: false,
     type: "OUT",
     item: null,
-  })
+  });
 
   // Find user's role
-  const projectMember = members?.find((m) => m.userId === session?.user?.id)
-  const role = projectMember?.role
+  const projectMember = members?.find((m) => m.userId === session?.user?.id);
+  const role = projectMember?.role;
 
   // MANDOR and FINANCE can record transactions
   const canRecordTransaction =
     role === "MANDOR" ||
     role === "FINANCE" ||
-    session?.user?.roleGlobal === "ADMIN"
+    session?.user?.roleGlobal === "ADMIN";
 
   const filteredItems = items?.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+  );
 
   const handleTransactionSuccess = () => {
-    setTransactionDialog((prev) => ({ ...prev, isOpen: false }))
-  }
+    setTransactionDialog((prev) => ({ ...prev, isOpen: false }));
+  };
 
   if (isLoading) {
     return (
       <div className="p-4 text-center text-muted-foreground">
         Loading items...
       </div>
-    )
+    );
   }
 
   if (!items || items.length === 0) {
@@ -83,7 +83,7 @@ export function ItemList({ projectId }: ItemListProps) {
           There are no logistic items in this project yet.
         </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -212,5 +212,5 @@ export function ItemList({ projectId }: ItemListProps) {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }

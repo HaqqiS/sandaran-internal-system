@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { DataTable } from "~/components/ui/data-table"
-import { getUserColumns, type UserListItem } from "./user-columns"
+import { DataTable } from "~/components/ui/data-table";
+import { getUserColumns, type UserListItem } from "./user-columns";
 
 interface UsersTableProps {
-  data: UserListItem[]
+  data: UserListItem[];
 }
 
 export function UsersTable({ data }: UsersTableProps) {
-  const columns = getUserColumns()
+  const columns = getUserColumns();
 
   return (
     <DataTable
@@ -17,5 +17,5 @@ export function UsersTable({ data }: UsersTableProps) {
       filterColumn="name"
       filterPlaceholder="Search users by name or email..."
     />
-  )
+  );
 }

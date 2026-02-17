@@ -1,41 +1,41 @@
-"use client"
+"use client";
 
-import { useForm } from "@tanstack/react-form"
-import { toast } from "sonner"
-import { z } from "zod"
-import { Button } from "~/components/ui/button"
+import { useForm } from "@tanstack/react-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import { Button } from "~/components/ui/button";
 import {
   Field,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "~/components/ui/field"
-import { Input } from "~/components/ui/input"
+} from "~/components/ui/field";
+import { Input } from "~/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/components/ui/select"
-import { Textarea } from "~/components/ui/textarea"
-import { useRecordLogisticTransaction } from "~/hooks/useLogistic"
+} from "~/components/ui/select";
+import { Textarea } from "~/components/ui/textarea";
+import { useRecordLogisticTransaction } from "~/hooks/useLogistic";
 
 const transactionSchema = z.object({
   type: z.enum(["IN", "OUT"]),
   quantity: z.number().positive("Quantity must be greater than 0"),
   notes: z.string().optional(),
-})
+});
 
-type TransactionFormValues = z.infer<typeof transactionSchema>
+type TransactionFormValues = z.infer<typeof transactionSchema>;
 
 interface TransactionFormProps {
-  projectId: string
-  itemId: string
-  itemName: string
-  unit: string
-  defaultType?: "IN" | "OUT"
-  onSuccess?: () => void
+  projectId: string;
+  itemId: string;
+  itemName: string;
+  unit: string;
+  defaultType?: "IN" | "OUT";
+  onSuccess?: () => void;
 }
 
 export function TransactionForm({
@@ -46,7 +46,7 @@ export function TransactionForm({
   defaultType = "OUT",
   onSuccess,
 }: TransactionFormProps) {
-  const recordTransaction = useRecordLogisticTransaction()
+  const recordTransaction = useRecordLogisticTransaction();
 
   const form = useForm({
     defaultValues: {
@@ -65,21 +65,21 @@ export function TransactionForm({
           type: value.type,
           quantity: value.quantity,
           notes: value.notes,
-        })
-        toast.success(`Transaction recorded for ${itemName}`)
-        onSuccess?.()
+        });
+        toast.success(`Transaction recorded for ${itemName}`);
+        onSuccess?.();
       } catch {
         // Error handled by mutation
       }
     },
-  })
+  });
 
   return (
     <form
       onSubmit={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        form.handleSubmit()
+        e.preventDefault();
+        e.stopPropagation();
+        form.handleSubmit();
       }}
       className="space-y-4"
     >
@@ -94,7 +94,7 @@ export function TransactionForm({
           name="type"
           children={(field) => {
             const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid
+              field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel>Transaction Type</FieldLabel>
@@ -116,7 +116,7 @@ export function TransactionForm({
                 </Select>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
-            )
+            );
           }}
         />
 
@@ -124,7 +124,7 @@ export function TransactionForm({
           name="quantity"
           children={(field) => {
             const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid
+              field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Quantity ({unit})</FieldLabel>
@@ -142,7 +142,7 @@ export function TransactionForm({
                 />
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
-            )
+            );
           }}
         />
 
@@ -150,7 +150,7 @@ export function TransactionForm({
           name="notes"
           children={(field) => {
             const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid
+              field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Notes (Optional)</FieldLabel>
@@ -166,7 +166,7 @@ export function TransactionForm({
                 />
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
-            )
+            );
           }}
         />
       </FieldGroup>
@@ -182,5 +182,5 @@ export function TransactionForm({
         />
       </div>
     </form>
-  )
+  );
 }

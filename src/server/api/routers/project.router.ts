@@ -1,11 +1,11 @@
-import { TRPCError } from "@trpc/server"
-import { z } from "zod"
+import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 import {
   adminProcedure,
   createTRPCRouter,
   projectProcedure,
   protectedProcedure,
-} from "~/server/api/trpc"
+} from "~/server/api/trpc";
 
 /**
  * Project Router
@@ -24,7 +24,7 @@ const projectMemberProcedure = projectProcedure([
   "MANDOR",
   "ARCHITECT",
   "FINANCE",
-])
+]);
 
 export const projectRouter = createTRPCRouter({
   /**
@@ -47,13 +47,13 @@ export const projectRouter = createTRPCRouter({
       // Check if slug already exists
       const existing = await ctx.db.project.findUnique({
         where: { slug: input.slug },
-      })
+      });
 
       if (existing) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Project with this slug already exists",
-        })
+        });
       }
 
       const project = await ctx.db.project.create({
@@ -80,9 +80,9 @@ export const projectRouter = createTRPCRouter({
             },
           },
         },
-      })
+      });
 
-      return project
+      return project;
     }),
 
   /**
@@ -91,7 +91,7 @@ export const projectRouter = createTRPCRouter({
    * - USER sees only their projects
    */
   getAll: protectedProcedure.query(async ({ ctx }) => {
-    const { id: userId, roleGlobal } = ctx.session.user
+    const { id: userId, roleGlobal } = ctx.session.user;
 
     // CEO and ADMIN can see all projects
     if (roleGlobal === "CEO" || roleGlobal === "ADMIN") {
@@ -119,9 +119,9 @@ export const projectRouter = createTRPCRouter({
         orderBy: {
           createdAt: "desc",
         },
-      })
+      });
 
-      return projects
+      return projects;
     }
 
     // Regular USER sees only their projects
@@ -156,9 +156,9 @@ export const projectRouter = createTRPCRouter({
       orderBy: {
         createdAt: "desc",
       },
-    })
+    });
 
-    return projects
+    return projects;
   }),
 
   /**
@@ -197,16 +197,16 @@ export const projectRouter = createTRPCRouter({
             },
           },
         },
-      })
+      });
 
       if (!project) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Project not found",
-        })
+        });
       }
 
-      return project
+      return project;
     }),
 
   /**
@@ -220,7 +220,7 @@ export const projectRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const { id: userId, roleGlobal } = ctx.session.user
+      const { id: userId, roleGlobal } = ctx.session.user;
 
       const project = await ctx.db.project.findUnique({
         where: { slug: input.slug },
@@ -247,31 +247,31 @@ export const projectRouter = createTRPCRouter({
             },
           },
         },
-      })
+      });
 
       if (!project) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Project not found",
-        })
+        });
       }
 
       // Check access: ADMIN/CEO or Project Member
       if (roleGlobal === "ADMIN" || roleGlobal === "CEO") {
-        return project
+        return project;
       }
 
       const isMember = project.members.some(
         (member) => member.userId === userId,
-      )
+      );
       if (!isMember) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "You are not a member of this project",
-        })
+        });
       }
 
-      return project
+      return project;
     }),
 
   /**
@@ -283,6 +283,7 @@ export const projectRouter = createTRPCRouter({
       z.object({
         projectId: z.string(),
         name: z.string().min(1).optional(),
+        slug: z.string().min(1).optional(),
         description: z.string().optional(),
         location: z.string().optional(),
         startDate: z.date().optional(),
@@ -291,10 +292,24 @@ export const projectRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      // Check slug uniqueness if updated
+      if (input.slug) {
+        const existing = await ctx.db.project.findUnique({
+          where: { slug: input.slug },
+        });
+        if (existing && existing.id !== input.projectId) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Project with this slug already exists",
+          });
+        }
+      }
+
       const project = await ctx.db.project.update({
         where: { id: input.projectId },
         data: {
           name: input.name,
+          slug: input.slug,
           description: input.description,
           location: input.location,
           startDate: input.startDate,
@@ -310,14 +325,15 @@ export const projectRouter = createTRPCRouter({
                   name: true,
                   email: true,
                   image: true,
+                  roleGlobal: true,
                 },
               },
             },
           },
         },
-      })
+      });
 
-      return project
+      return project;
     }),
 
   /**
@@ -333,9 +349,9 @@ export const projectRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       await ctx.db.project.delete({
         where: { id: input.projectId },
-      })
+      });
 
-      return { success: true }
+      return { success: true };
     }),
 
   /**
@@ -354,25 +370,25 @@ export const projectRouter = createTRPCRouter({
       // Check if user exists
       const user = await ctx.db.user.findUnique({
         where: { id: input.userId },
-      })
+      });
 
       if (!user) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "User not found",
-        })
+        });
       }
 
       // Check if project exists
       const project = await ctx.db.project.findUnique({
         where: { id: input.projectId },
-      })
+      });
 
       if (!project) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Project not found",
-        })
+        });
       }
 
       // Check if already a member
@@ -383,13 +399,13 @@ export const projectRouter = createTRPCRouter({
             projectId: input.projectId,
           },
         },
-      })
+      });
 
       if (existing) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "User is already a member of this project",
-        })
+        });
       }
 
       const member = await ctx.db.projectMember.create({
@@ -408,9 +424,9 @@ export const projectRouter = createTRPCRouter({
             },
           },
         },
-      })
+      });
 
-      return member
+      return member;
     }),
 
   /**
@@ -440,9 +456,9 @@ export const projectRouter = createTRPCRouter({
             },
           },
         },
-      })
+      });
 
-      return member
+      return member;
     }),
 
   /**
@@ -458,9 +474,9 @@ export const projectRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       await ctx.db.projectMember.delete({
         where: { id: input.memberId },
-      })
+      });
 
-      return { success: true }
+      return { success: true };
     }),
 
   /**
@@ -474,7 +490,7 @@ export const projectRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const { id: userId, roleGlobal } = ctx.session.user
+      const { id: userId, roleGlobal } = ctx.session.user;
 
       // Check access: ADMIN/CEO or Project Member
       if (roleGlobal !== "ADMIN" && roleGlobal !== "CEO") {
@@ -485,13 +501,13 @@ export const projectRouter = createTRPCRouter({
               projectId: input.projectId,
             },
           },
-        })
+        });
 
         if (!isMember) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "You are not a member of this project",
-          })
+          });
         }
       }
 
@@ -513,8 +529,8 @@ export const projectRouter = createTRPCRouter({
         orderBy: {
           createdAt: "asc",
         },
-      })
+      });
 
-      return members
+      return members;
     }),
-})
+});

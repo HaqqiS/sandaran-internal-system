@@ -1,17 +1,17 @@
-import { type GlobalRole, ProjectRole } from "generated/prisma"
-import { isAdmin, isAuthorizedRole } from "~/lib/auth-guards"
-import { useSession } from "~/stores/use-session-store"
-import { api } from "~/trpc/react"
+import { type GlobalRole, ProjectRole } from "generated/prisma";
+import { isAdmin, isAuthorizedRole } from "~/lib/auth-guards";
+import { useSession } from "~/stores/use-session-store";
+import { api } from "~/trpc/react";
 
 export function useUserRole() {
-  const { user, role } = useSession()
-  const globalRole = role as GlobalRole
+  const { user, role } = useSession();
+  const globalRole = role as GlobalRole;
 
   // Fetch projects to determine project-specific roles
   const { data: projects, isLoading } = api.project.getAll.useQuery(undefined, {
     enabled: !!user,
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-  })
+  });
 
   // Calculate project roles
   // We check if the user has a specific role in ANY active project
@@ -20,11 +20,11 @@ export function useUserRole() {
       project.members
         .filter((member) => member.userId === user?.id)
         .map((member) => member.role),
-    ) ?? []
+    ) ?? [];
 
-  const isMandor = projectRoles.includes(ProjectRole.MANDOR)
-  const isArchitect = projectRoles.includes(ProjectRole.ARCHITECT)
-  const isFinance = projectRoles.includes(ProjectRole.FINANCE)
+  const isMandor = projectRoles.includes(ProjectRole.MANDOR);
+  const isArchitect = projectRoles.includes(ProjectRole.ARCHITECT);
+  const isFinance = projectRoles.includes(ProjectRole.FINANCE);
 
   return {
     // Global Roles
@@ -42,5 +42,5 @@ export function useUserRole() {
     isLoading: isLoading,
     isAuthenticated: !!user,
     isAuthorized: isAuthorizedRole(globalRole),
-  }
+  };
 }

@@ -1,21 +1,21 @@
-import { headers } from "next/headers"
-import Link from "next/link"
-import { redirect } from "next/navigation"
-import { auth } from "~/server/better-auth"
+import { headers } from "next/headers";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { auth } from "~/server/better-auth";
 
 export default async function WaitingApprovalPage() {
   const session = await auth.api.getSession({
     headers: await headers(),
-  })
+  });
 
   // If not logged in, redirect to home
   if (!session?.user) {
-    redirect("/")
+    redirect("/");
   }
 
   // If already approved and active, redirect to dashboard or home
   if (session.user.isActive && session.user.roleGlobal !== "NONE") {
-    redirect("/dashboard")
+    redirect("/dashboard");
   }
 
   return (
@@ -72,11 +72,11 @@ export default async function WaitingApprovalPage() {
               <button
                 type="submit"
                 formAction={async () => {
-                  "use server"
+                  "use server";
                   await auth.api.signOut({
                     headers: await headers(),
-                  })
-                  redirect("/")
+                  });
+                  redirect("/");
                 }}
                 className="w-full rounded-lg bg-gray-900 px-4 py-3 font-semibold text-white transition hover:bg-gray-800"
               >
@@ -94,5 +94,5 @@ export default async function WaitingApprovalPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { Button } from "~/components/ui/button"
-import { Separator } from "~/components/ui/separator"
+import { Button } from "~/components/ui/button";
+import { Separator } from "~/components/ui/separator";
 
 interface BulkActionsToolbarProps {
-  selectedCount: number
-  onApproveAll: () => void
-  onClearSelection: () => void
-  isLoading?: boolean
+  selectedCount: number;
+  onApproveAll: () => void;
+  onClearSelection: () => void;
+  isLoading?: boolean;
 }
 
 export function BulkActionsToolbar({
@@ -16,7 +16,7 @@ export function BulkActionsToolbar({
   onClearSelection,
   isLoading = false,
 }: BulkActionsToolbarProps) {
-  if (selectedCount === 0) return null
+  if (selectedCount === 0) return null;
 
   return (
     <div className="flex items-center gap-4 rounded-md border bg-muted/50 p-3">
@@ -39,5 +39,5 @@ export function BulkActionsToolbar({
         </Button>
       </div>
     </div>
-  )
+  );
 }

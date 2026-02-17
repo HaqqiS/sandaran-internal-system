@@ -1,55 +1,55 @@
-"use client"
+"use client";
 
 import {
   IconClipboardCheck,
   IconListCheck,
   IconPhoto,
   IconWallet,
-} from "@tabler/icons-react"
-import { format } from "date-fns"
-import Image from "next/image"
-import Link from "next/link"
-import { useState } from "react"
-import { WithdrawDialog } from "~/components/emergency/withdraw-dialog"
-import { ReportDialog } from "~/components/report/report-dialog"
-import { Button } from "~/components/ui/button"
+} from "@tabler/icons-react";
+import { format } from "date-fns";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import { WithdrawDialog } from "~/components/emergency/withdraw-dialog";
+import { ReportDialog } from "~/components/report/report-dialog";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/components/ui/card"
-import { Separator } from "~/components/ui/separator"
-import { useMandorRecentReports, useMandorStats } from "~/hooks"
-import { DashboardLayout } from "./shared/DashboardLayout"
-import { QuickActionCard } from "./shared/QuickActionCard"
-import { StatsGrid } from "./shared/StatsGrid"
-import { StatCard } from "./stat-card"
+} from "~/components/ui/card";
+import { Separator } from "~/components/ui/separator";
+import { useMandorRecentReports, useMandorStats } from "~/hooks";
+import { DashboardLayout } from "./shared/DashboardLayout";
+import { QuickActionCard } from "./shared/QuickActionCard";
+import { StatsGrid } from "./shared/StatsGrid";
+import { StatCard } from "./stat-card";
 
 export function MandorView() {
-  const { data: stats, isLoading: statsLoading } = useMandorStats()
+  const { data: stats, isLoading: statsLoading } = useMandorStats();
   const { data: recentReports, isLoading: reportsLoading } =
-    useMandorRecentReports(3)
+    useMandorRecentReports(3);
 
   const [selectedProject, setSelectedProject] = useState<{
-    id: string
-    slug: string
-  } | null>(null)
-  const [isReportOpen, setIsReportOpen] = useState(false)
-  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false)
+    id: string;
+    slug: string;
+  } | null>(null);
+  const [isReportOpen, setIsReportOpen] = useState(false);
+  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
 
   const handleCreateReport = (project: { id: string; slug: string }) => {
-    setSelectedProject(project)
-    setIsReportOpen(true)
-  }
+    setSelectedProject(project);
+    setIsReportOpen(true);
+  };
 
   const handleWithdrawal = (project: { id: string; slug: string }) => {
-    setSelectedProject(project)
-    setIsWithdrawOpen(true)
-  }
+    setSelectedProject(project);
+    setIsWithdrawOpen(true);
+  };
 
-  const isLoading = statsLoading || reportsLoading
+  const isLoading = statsLoading || reportsLoading;
 
   return (
     <DashboardLayout
@@ -247,8 +247,8 @@ export function MandorView() {
           projectId={selectedProject.id}
           open={isReportOpen}
           onOpenChange={(open) => {
-            setIsReportOpen(open)
-            if (!open) setSelectedProject(null)
+            setIsReportOpen(open);
+            if (!open) setSelectedProject(null);
           }}
         />
       )}
@@ -262,5 +262,5 @@ export function MandorView() {
         />
       )}
     </DashboardLayout>
-  )
+  );
 }

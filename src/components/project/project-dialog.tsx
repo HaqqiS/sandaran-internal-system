@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import type * as React from "react"
+import type * as React from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "~/components/ui/dialog"
+} from "~/components/ui/dialog";
 import {
   Drawer,
   DrawerContent,
@@ -16,24 +16,24 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "~/components/ui/drawer"
-import { useIsMobile } from "~/hooks/use-mobile"
-import { ProjectForm } from "./project-form"
+} from "~/components/ui/drawer";
+import { useIsMobile } from "~/hooks/use-mobile";
+import { ProjectForm } from "./project-form";
 
 interface ProjectDialogProps {
   project?: {
-    id: string
-    name: string
-    slug: string
-    description?: string | null
-    location?: string | null
-    startDate?: Date | null
-    endDate?: Date | null
-    status: "ACTIVE" | "DONE" | "PAUSED"
-  }
-  open?: boolean
-  onOpenChange?: (open: boolean) => void
-  children?: React.ReactNode
+    id: string;
+    name: string;
+    slug: string;
+    description?: string | null;
+    location?: string | null;
+    startDate?: Date | null;
+    endDate?: Date | null;
+    status: "ACTIVE" | "DONE" | "PAUSED";
+  };
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: React.ReactNode;
 }
 
 export function ProjectDialog({
@@ -42,13 +42,13 @@ export function ProjectDialog({
   onOpenChange,
   children,
 }: ProjectDialogProps) {
-  const isMobile = useIsMobile()
-  const isEditMode = !!project
+  const isMobile = useIsMobile();
+  const isEditMode = !!project;
 
-  const title = isEditMode ? "Edit Project" : "New Project"
+  const title = isEditMode ? "Edit Project" : "New Project";
   const description = isEditMode
     ? "Make changes to your project."
-    : "Create a new construction project."
+    : "Create a new construction project.";
 
   if (!isMobile) {
     return (
@@ -65,7 +65,7 @@ export function ProjectDialog({
           />
         </DialogContent>
       </Dialog>
-    )
+    );
   }
 
   return (
@@ -84,5 +84,5 @@ export function ProjectDialog({
         </div>
       </DrawerContent>
     </Drawer>
-  )
+  );
 }

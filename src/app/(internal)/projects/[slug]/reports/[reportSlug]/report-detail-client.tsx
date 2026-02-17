@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   IconArrowLeft,
@@ -10,42 +10,42 @@ import {
   IconPencil,
   IconSun,
   IconUsers,
-} from "@tabler/icons-react"
-import { format } from "date-fns"
-import type { GlobalRole } from "generated/prisma"
-import Link from "next/link"
-import { useState } from "react"
-import { toast } from "sonner"
-import { CommentList } from "~/components/comment/comment-list"
-import { PageLayout } from "~/components/layout"
-import { MediaGallery } from "~/components/report/media-gallery"
-import { MediaUpload } from "~/components/report/media-upload"
-import { ReportDialog } from "~/components/report/report-dialog"
-import { TaskList } from "~/components/report/task-list"
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
-import { Badge } from "~/components/ui/badge"
-import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import { Progress } from "~/components/ui/progress"
+} from "@tabler/icons-react";
+import { format } from "date-fns";
+import type { GlobalRole } from "generated/prisma";
+import Link from "next/link";
+import { useState } from "react";
+import { toast } from "sonner";
+import { CommentList } from "~/components/comment/comment-list";
+import { PageLayout } from "~/components/layout";
+import { MediaGallery } from "~/components/report/media-gallery";
+import { MediaUpload } from "~/components/report/media-upload";
+import { ReportDialog } from "~/components/report/report-dialog";
+import { TaskList } from "~/components/report/task-list";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Progress } from "~/components/ui/progress";
 
 import {
   useDeleteReportMedia,
   useProjectBySlug,
   useReportBySlug,
-} from "~/hooks"
-import { useSessionStore } from "~/stores/use-session-store"
+} from "~/hooks";
+import { useSessionStore } from "~/stores/use-session-store";
 
 interface ReportDetailClientProps {
-  projectSlug: string
-  reportSlug: string
+  projectSlug: string;
+  reportSlug: string;
 }
 
 function getWeatherIcon(weather?: string | null) {
-  if (!weather) return null
-  const lower = weather.toLowerCase()
-  if (lower.includes("hujan")) return <IconCloudRain className="h-4 w-4" />
-  if (lower.includes("mendung")) return <IconCloud className="h-4 w-4" />
-  return <IconSun className="h-4 w-4" />
+  if (!weather) return null;
+  const lower = weather.toLowerCase();
+  if (lower.includes("hujan")) return <IconCloudRain className="h-4 w-4" />;
+  if (lower.includes("mendung")) return <IconCloud className="h-4 w-4" />;
+  return <IconSun className="h-4 w-4" />;
 }
 
 export function ReportDetailClient({
@@ -53,41 +53,41 @@ export function ReportDetailClient({
   reportSlug,
 }: ReportDetailClientProps) {
   const { data: project, isLoading: projectLoading } =
-    useProjectBySlug(projectSlug)
+    useProjectBySlug(projectSlug);
   const {
     data: report,
     isLoading: reportLoading,
     error,
-  } = useReportBySlug(project?.id ?? "", reportSlug)
-  const [isEditOpen, setIsEditOpen] = useState(false)
-  const session = useSessionStore((state) => state.session)
-  const deleteMedia = useDeleteReportMedia()
+  } = useReportBySlug(project?.id ?? "", reportSlug);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const session = useSessionStore((state) => state.session);
+  const deleteMedia = useDeleteReportMedia();
 
-  const isLoading = projectLoading || reportLoading
-  const userRole = session?.user?.roleGlobal as GlobalRole | undefined
-  const isAdmin = userRole === "ADMIN" || userRole === "CEO"
-  const isOwner = report?.userId === session?.user?.id
-  const canEdit = isAdmin || isOwner
+  const isLoading = projectLoading || reportLoading;
+  const userRole = session?.user?.roleGlobal as GlobalRole | undefined;
+  const isAdmin = userRole === "ADMIN" || userRole === "CEO";
+  const isOwner = report?.userId === session?.user?.id;
+  const canEdit = isAdmin || isOwner;
 
   const handleDeleteMedia = async (mediaId: string) => {
-    if (!project) return
+    if (!project) return;
     try {
       await deleteMedia.mutateAsync({
         projectId: project.id,
         mediaId,
-      })
-      toast.success("Image deleted")
+      });
+      toast.success("Image deleted");
     } catch {
-      toast.error("Failed to delete image")
+      toast.error("Failed to delete image");
     }
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
-    )
+    );
   }
 
   if (error || !project || !report) {
@@ -106,16 +106,16 @@ export function ReportDetailClient({
           </Button>
         </div>
       </PageLayout>
-    )
+    );
   }
 
-  const reportDate = new Date(report.reportDate)
+  const reportDate = new Date(report.reportDate);
   const initials = report.user.name
     .split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase()
-    .slice(0, 2)
+    .slice(0, 2);
 
   return (
     <PageLayout
@@ -279,5 +279,5 @@ export function ReportDetailClient({
         onOpenChange={setIsEditOpen}
       />
     </PageLayout>
-  )
+  );
 }

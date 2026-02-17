@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { IconCheck, IconSelector, IconUserSearch } from "@tabler/icons-react"
-import { useState } from "react"
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
-import { Button } from "~/components/ui/button"
+import { IconCheck, IconSelector, IconUserSearch } from "@tabler/icons-react";
+import { useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -11,47 +11,47 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "~/components/ui/command"
+} from "~/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "~/components/ui/popover"
-import { useSearchUsers } from "~/hooks"
-import { useDebounce } from "~/hooks/use-debounce"
-import { cn } from "~/lib/utils"
+} from "~/components/ui/popover";
+import { useSearchUsers } from "~/hooks";
+import { useDebounce } from "~/hooks/use-debounce";
+import { cn } from "~/lib/utils";
 
 interface UserSelectProps {
-  onSelect: (userId: string) => void
-  disabled?: boolean
-  placeholder?: string
+  onSelect: (userId: string) => void;
+  disabled?: boolean;
+  placeholder?: string;
 }
 
 type UserItem = {
-  id: string
-  name: string | null
-  email: string
-  image: string | null
-}
+  id: string;
+  name: string | null;
+  email: string;
+  image: string | null;
+};
 
 export function UserSelect({
   onSelect,
   disabled = false,
   placeholder = "Select a user...",
 }: UserSelectProps) {
-  const [open, setOpen] = useState(false)
-  const [search, setSearch] = useState("")
-  const [selectedUser, setSelectedUser] = useState<UserItem | null>(null)
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [selectedUser, setSelectedUser] = useState<UserItem | null>(null);
 
-  const debouncedSearch = useDebounce(search, 300)
-  const { data: users, isLoading } = useSearchUsers(debouncedSearch)
+  const debouncedSearch = useDebounce(search, 300);
+  const { data: users, isLoading } = useSearchUsers(debouncedSearch);
 
   const handleSelect = (user: UserItem) => {
-    setSelectedUser(user)
-    onSelect(user.id)
-    setOpen(false)
-    setSearch("")
-  }
+    setSelectedUser(user);
+    onSelect(user.id);
+    setOpen(false);
+    setSearch("");
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -137,5 +137,5 @@ export function UserSelect({
         </Command>
       </PopoverContent>
     </Popover>
-  )
+  );
 }

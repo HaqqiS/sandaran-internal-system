@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Dialog,
@@ -6,22 +6,22 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "~/components/ui/dialog"
+} from "~/components/ui/dialog";
 import {
   Drawer,
   DrawerContent,
   DrawerDescription,
   DrawerHeader,
   DrawerTitle,
-} from "~/components/ui/drawer"
-import { useIsMobile } from "~/hooks/use-mobile"
-import { RequestForm } from "./request-form"
+} from "~/components/ui/drawer";
+import { useIsMobile } from "~/hooks/use-mobile";
+import { RequestForm } from "./request-form";
 
 interface WithdrawDialogProps {
-  projectId: string
-  projectSlug: string
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  projectId: string;
+  projectSlug: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function WithdrawDialog({
@@ -30,10 +30,10 @@ export function WithdrawDialog({
   open,
   onOpenChange,
 }: WithdrawDialogProps) {
-  const isMobile = useIsMobile()
-  const title = "Request Withdrawal"
+  const isMobile = useIsMobile();
+  const title = "Request Withdrawal";
   const description =
-    "Request funds from the project budget. Please attach proof if available."
+    "Request funds from the project budget. Please attach proof if available.";
 
   if (!isMobile) {
     return (
@@ -51,7 +51,7 @@ export function WithdrawDialog({
           />
         </DialogContent>
       </Dialog>
-    )
+    );
   }
 
   return (
@@ -71,5 +71,5 @@ export function WithdrawDialog({
         </div>
       </DrawerContent>
     </Drawer>
-  )
+  );
 }

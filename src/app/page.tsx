@@ -1,15 +1,15 @@
-import { headers } from "next/headers"
-import Link from "next/link"
-import { redirect } from "next/navigation"
+import { headers } from "next/headers";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
-import { OAuthButtons } from "~/components/shared/oauth-buttons"
-import { Button } from "~/components/ui/button"
-import { auth } from "~/server/better-auth"
-import { getSession } from "~/server/better-auth/server"
-import { HydrateClient } from "~/trpc/server"
+import { OAuthButtons } from "~/components/shared/oauth-buttons";
+import { Button } from "~/components/ui/button";
+import { auth } from "~/server/better-auth";
+import { getSession } from "~/server/better-auth/server";
+import { HydrateClient } from "~/trpc/server";
 
 export default async function Home() {
-  const session = await getSession()
+  const session = await getSession();
 
   return (
     <HydrateClient>
@@ -36,11 +36,11 @@ export default async function Home() {
                     <Button
                       type="submit"
                       formAction={async () => {
-                        "use server"
+                        "use server";
                         await auth.api.signOut({
                           headers: await headers(),
-                        })
-                        redirect("/")
+                        });
+                        redirect("/");
                       }}
                     >
                       Sign out
@@ -56,5 +56,5 @@ export default async function Home() {
         </div>
       </main>
     </HydrateClient>
-  )
+  );
 }

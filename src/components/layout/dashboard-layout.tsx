@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import type * as React from "react"
-import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar"
-import type { SidebarConfig } from "~/types/dashboard"
-import { AppSidebar } from "./app-sidebar"
-import { SiteHeader } from "./site-header"
+import type * as React from "react";
+import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar";
+import type { SidebarConfig } from "~/types/dashboard";
+import { AppSidebar } from "./app-sidebar";
+import { SiteHeader } from "./site-header";
 
 interface DashboardLayoutProps {
-  children: React.ReactNode
-  sidebarConfig: SidebarConfig
-  headerTitle?: string
-  headerActions?: React.ReactNode
-  sidebarVariant?: "sidebar" | "floating" | "inset"
+  children: React.ReactNode;
+  sidebarConfig: SidebarConfig;
+  headerTitle?: string;
+  headerActions?: React.ReactNode;
+  sidebarVariant?: "sidebar" | "floating" | "inset";
 }
 
 export function DashboardLayout({
@@ -40,5 +40,5 @@ export function DashboardLayout({
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
-type FilterValue = "all" | "pending" | "active" | "rejected"
+type FilterValue = "all" | "pending" | "active" | "rejected";
 
 interface UserFilterTabsProps {
-  value: FilterValue
-  onValueChange: (value: FilterValue) => void
+  value: FilterValue;
+  onValueChange: (value: FilterValue) => void;
   counts?: {
-    all: number
-    pending: number
-    active: number
-    rejected: number
-  }
+    all: number;
+    pending: number;
+    active: number;
+    rejected: number;
+  };
 }
 
 export function UserFilterTabs({
@@ -35,5 +35,5 @@ export function UserFilterTabs({
         </TabsTrigger>
       </TabsList>
     </Tabs>
-  )
+  );
 }

@@ -1,40 +1,40 @@
-"use client"
+"use client";
 
-import { IconArrowLeft, IconLoader2, IconPlus } from "@tabler/icons-react"
-import Link from "next/link"
-import { useParams } from "next/navigation"
-import { useState } from "react"
-import { FundDialog } from "~/components/emergency/fund-dialog"
-import { FundOverview } from "~/components/emergency/fund-overview"
-import { TransactionList } from "~/components/emergency/transaction-list"
-import { WithdrawDialog } from "~/components/emergency/withdraw-dialog"
-import { PageLayout } from "~/components/layout"
-import { Button } from "~/components/ui/button"
-import { useProjectBySlug } from "~/hooks"
-import { useUserRole } from "~/hooks/use-user-role"
-import { useSession } from "~/stores/use-session-store"
+import { IconArrowLeft, IconLoader2, IconPlus } from "@tabler/icons-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useState } from "react";
+import { FundDialog } from "~/components/emergency/fund-dialog";
+import { FundOverview } from "~/components/emergency/fund-overview";
+import { TransactionList } from "~/components/emergency/transaction-list";
+import { WithdrawDialog } from "~/components/emergency/withdraw-dialog";
+import { PageLayout } from "~/components/layout";
+import { Button } from "~/components/ui/button";
+import { useProjectBySlug } from "~/hooks";
+import { useUserRole } from "~/hooks/use-user-role";
+import { useSession } from "~/stores/use-session-store";
 
 export function EmergencyClient() {
-  const params = useParams()
-  const slug = params?.slug as string
+  const params = useParams();
+  const slug = params?.slug as string;
 
   const {
     data: project,
     isLoading: isProjectLoading,
     error,
-  } = useProjectBySlug(slug)
-  const { user } = useSession()
-  const { isAdmin } = useUserRole()
+  } = useProjectBySlug(slug);
+  const { user } = useSession();
+  const { isAdmin } = useUserRole();
 
-  const [isFundOpen, setIsFundOpen] = useState(false)
-  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false)
+  const [isFundOpen, setIsFundOpen] = useState(false);
+  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
 
   if (isProjectLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
-    )
+    );
   }
 
   if (error || !project) {
@@ -53,16 +53,16 @@ export function EmergencyClient() {
           </Button>
         </div>
       </PageLayout>
-    )
+    );
   }
 
   // Determine permissions based on project membership
-  const projectMember = project.members.find((m) => m.userId === user?.id)
-  const memberRole = projectMember?.role
+  const projectMember = project.members.find((m) => m.userId === user?.id);
+  const memberRole = projectMember?.role;
 
-  const canAddFund = isAdmin || memberRole === "FINANCE"
-  const canWithdraw = isAdmin || memberRole === "MANDOR"
-  const canReview = isAdmin || memberRole === "FINANCE"
+  const canAddFund = isAdmin || memberRole === "FINANCE";
+  const canWithdraw = isAdmin || memberRole === "MANDOR";
+  const canReview = isAdmin || memberRole === "FINANCE";
 
   return (
     <PageLayout
@@ -115,5 +115,5 @@ export function EmergencyClient() {
         onOpenChange={setIsWithdrawOpen}
       />
     </PageLayout>
-  )
+  );
 }

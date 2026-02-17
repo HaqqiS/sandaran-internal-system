@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import { IconCalendar, IconMapPin } from "@tabler/icons-react"
-import { format } from "date-fns"
-import type { ProjectStatus } from "generated/prisma"
-import { Badge } from "~/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import { IconCalendar, IconMapPin } from "@tabler/icons-react";
+import { format } from "date-fns";
+import type { ProjectStatus } from "generated/prisma";
+import { Badge } from "~/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 
 interface ProjectInfoSectionProps {
   project: {
-    name: string
-    description: string | null
-    location: string | null
-    startDate: Date | string | null
-    endDate: Date | string | null
-    status: ProjectStatus
-  }
+    name: string;
+    description: string | null;
+    location: string | null;
+    startDate: Date | string | null;
+    endDate: Date | string | null;
+    status: ProjectStatus;
+  };
 }
 
 export function ProjectInfoSection({ project }: ProjectInfoSectionProps) {
@@ -83,5 +83,5 @@ export function ProjectInfoSection({ project }: ProjectInfoSectionProps) {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

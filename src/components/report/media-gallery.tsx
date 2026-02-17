@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { IconX, IconZoomIn } from "@tabler/icons-react"
-import { useState } from "react"
-import { Button } from "~/components/ui/button"
-import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog"
+import { IconX, IconZoomIn } from "@tabler/icons-react";
+import { useState } from "react";
+import { Button } from "~/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog";
 
 interface MediaGalleryProps {
-  media: { id: string; url: string; publicId: string }[]
-  onDelete?: (mediaId: string) => void
-  canDelete?: boolean
+  media: { id: string; url: string; publicId: string }[];
+  onDelete?: (mediaId: string) => void;
+  canDelete?: boolean;
 }
 
 export function MediaGallery({
@@ -16,14 +16,14 @@ export function MediaGallery({
   onDelete,
   canDelete = false,
 }: MediaGalleryProps) {
-  const [lightboxImage, setLightboxImage] = useState<string | null>(null)
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
   if (media.length === 0) {
     return (
       <div className="flex h-32 items-center justify-center rounded-lg border border-dashed">
         <p className="text-sm text-muted-foreground">No images</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -53,8 +53,8 @@ export function MediaGallery({
                 size="icon"
                 className="absolute right-1 top-1 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
                 onClick={(e) => {
-                  e.stopPropagation()
-                  onDelete(item.id)
+                  e.stopPropagation();
+                  onDelete(item.id);
                 }}
               >
                 <IconX className="h-3 w-3" />
@@ -82,5 +82,5 @@ export function MediaGallery({
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

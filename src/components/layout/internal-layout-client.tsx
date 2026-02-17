@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   IconArrowLeft,
@@ -11,17 +11,17 @@ import {
   IconPackage,
   IconReport,
   IconUsers,
-} from "@tabler/icons-react"
-import type { GlobalRole } from "generated/prisma"
-import { useParams } from "next/navigation"
-import type { ReactNode } from "react"
-import { DashboardLayout } from "~/components/layout"
+} from "@tabler/icons-react";
+import type { GlobalRole } from "generated/prisma";
+import { useParams } from "next/navigation";
+import type { ReactNode } from "react";
+import { DashboardLayout } from "~/components/layout";
 import {
   LayoutProvider,
   useLayout,
-} from "~/components/providers/layout-provider"
-import { useSession } from "~/stores/use-session-store"
-import type { SidebarConfig } from "~/types/dashboard"
+} from "~/components/providers/layout-provider";
+import { useSession } from "~/stores/use-session-store";
+import type { SidebarConfig } from "~/types/dashboard";
 
 /**
  * Internal Layout Client Component
@@ -31,14 +31,14 @@ import type { SidebarConfig } from "~/types/dashboard"
  */
 
 interface InternalLayoutClientProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 function getSidebarConfig(
   user: {
-    name: string | null
-    email: string
-    image?: string | null
+    name: string | null;
+    email: string;
+    image?: string | null;
   },
   role: GlobalRole,
   projectSlug?: string,
@@ -60,7 +60,7 @@ function getSidebarConfig(
     navDocuments: [],
     companyName: "Sandaran Home Living",
     companyIcon: IconInnerShadowTop,
-  }
+  };
 
   // Role-specific navigation
   switch (role) {
@@ -96,7 +96,7 @@ function getSidebarConfig(
             icon: IconFileText,
           },
         ],
-      }
+      };
 
     case "CEO":
       if (projectSlug) {
@@ -114,7 +114,7 @@ function getSidebarConfig(
               icon: IconNews,
             },
           ],
-        }
+        };
       }
 
       return {
@@ -132,7 +132,7 @@ function getSidebarConfig(
             icon: IconNews,
           },
         ],
-      }
+      };
 
     case "ADMIN":
       return {
@@ -155,31 +155,31 @@ function getSidebarConfig(
             icon: IconFileText,
           },
         ],
-      }
+      };
 
     default:
-      return baseConfig
+      return baseConfig;
   }
 }
 
 function LayoutContent({ children }: { children: ReactNode }) {
   // Get session from Zustand store
-  const { user, role } = useSession()
+  const { user, role } = useSession();
 
   // Get layout config from context
-  const { config } = useLayout()
+  const { config } = useLayout();
 
   // Get current project context from URL
-  const params = useParams()
-  const projectSlug = params?.slug as string | undefined
+  const params = useParams();
+  const projectSlug = params?.slug as string | undefined;
 
   // Ensure we have user data (should always be true due to layout auth guard)
   if (!user) {
-    return null
+    return null;
   }
 
   // Ensure roleGlobal is a valid GlobalRole, fallback to "USER"
-  const validRole = (role ?? "USER") as GlobalRole
+  const validRole = (role ?? "USER") as GlobalRole;
   const sidebarConfig = getSidebarConfig(
     {
       name: user.name,
@@ -188,7 +188,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
     },
     validRole,
     projectSlug,
-  )
+  );
 
   return (
     <DashboardLayout
@@ -198,7 +198,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
     >
       {children}
     </DashboardLayout>
-  )
+  );
 }
 
 export function InternalLayoutClient({ children }: InternalLayoutClientProps) {
@@ -206,5 +206,5 @@ export function InternalLayoutClient({ children }: InternalLayoutClientProps) {
     <LayoutProvider>
       <LayoutContent>{children}</LayoutContent>
     </LayoutProvider>
-  )
+  );
 }

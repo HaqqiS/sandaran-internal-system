@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { IconLoader2, IconPlus, IconX } from "@tabler/icons-react"
-import NextImage from "next/image"
-import { useCallback, useState } from "react"
-import { useDropzone } from "react-dropzone"
-import { toast } from "sonner"
-import { Button } from "~/components/ui/button"
-import { Progress } from "~/components/ui/progress"
-import { useDeleteReportMedia, useUploadReportMedia } from "~/hooks"
-import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload"
-import { cn } from "~/lib/utils"
+import { IconLoader2, IconPlus, IconX } from "@tabler/icons-react";
+import NextImage from "next/image";
+import { useCallback, useState } from "react";
+import { useDropzone } from "react-dropzone";
+import { toast } from "sonner";
+import { Button } from "~/components/ui/button";
+import { Progress } from "~/components/ui/progress";
+import { useDeleteReportMedia, useUploadReportMedia } from "~/hooks";
+import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload";
+import { cn } from "~/lib/utils";
 
 interface MediaUploadProps {
-  projectId: string
-  projectSlug: string
-  reportId: string
-  existingMedia: { id: string; publicId: string; url: string }[]
-  canEdit?: boolean
+  projectId: string;
+  projectSlug: string;
+  reportId: string;
+  existingMedia: { id: string; publicId: string; url: string }[];
+  canEdit?: boolean;
 }
 
 export function MediaUpload({
@@ -26,23 +26,23 @@ export function MediaUpload({
   existingMedia,
   canEdit = true,
 }: MediaUploadProps) {
-  const [uploading, setUploading] = useState(false)
-  const { upload, progress } = useCloudinaryUpload()
-  const uploadMedia = useUploadReportMedia()
-  const deleteMedia = useDeleteReportMedia()
+  const [uploading, setUploading] = useState(false);
+  const { upload, progress } = useCloudinaryUpload();
+  const uploadMedia = useUploadReportMedia();
+  const deleteMedia = useDeleteReportMedia();
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
-      if (!canEdit) return
+      if (!canEdit) return;
 
-      setUploading(true)
+      setUploading(true);
       try {
         for (const file of acceptedFiles) {
           // Upload to Cloudinary
           const result = await upload(file, {
             projectSlug,
             type: "reports",
-          })
+          });
 
           // Save to database
           await uploadMedia.mutateAsync({
@@ -50,36 +50,36 @@ export function MediaUpload({
             reportId,
             publicId: result.publicId,
             url: result.secureUrl,
-          })
+          });
         }
-        toast.success(`${acceptedFiles.length} image(s) uploaded successfully`)
+        toast.success(`${acceptedFiles.length} image(s) uploaded successfully`);
       } catch (error) {
-        console.error("Upload failed:", error)
-        toast.error("Failed to upload images")
+        console.error("Upload failed:", error);
+        toast.error("Failed to upload images");
       } finally {
-        setUploading(false)
+        setUploading(false);
       }
     },
     [canEdit, projectSlug, projectId, reportId, upload, uploadMedia],
-  )
+  );
 
   const handleDelete = async (mediaId: string) => {
     try {
       await deleteMedia.mutateAsync({
         projectId,
         mediaId,
-      })
-      toast.success("Image deleted")
+      });
+      toast.success("Image deleted");
     } catch {
-      toast.error("Failed to delete image")
+      toast.error("Failed to delete image");
     }
-  }
+  };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: { "image/*": [".jpg", ".jpeg", ".png", ".webp"] },
     disabled: !canEdit || uploading,
-  })
+  });
 
   return (
     <div className="space-y-4">
@@ -149,5 +149,5 @@ export function MediaUpload({
       {/* Progress */}
       {uploading && <Progress value={progress} className="h-2" />}
     </div>
-  )
+  );
 }

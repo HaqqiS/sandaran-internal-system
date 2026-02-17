@@ -1,40 +1,40 @@
-"use client"
+"use client";
 
-import { IconDots } from "@tabler/icons-react"
-import type { ColumnDef } from "@tanstack/react-table"
-import { formatDistanceToNow } from "date-fns"
-import type { GlobalRole } from "generated/prisma"
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
-import { Button } from "~/components/ui/button"
-import { Checkbox } from "~/components/ui/checkbox"
+import { IconDots } from "@tabler/icons-react";
+import type { ColumnDef } from "@tanstack/react-table";
+import { formatDistanceToNow } from "date-fns";
+import type { GlobalRole } from "generated/prisma";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
+import { Checkbox } from "~/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu"
-import { RoleBadge } from "./role-badge"
-import { UserStatusBadge } from "./user-status-badge"
+} from "~/components/ui/dropdown-menu";
+import { RoleBadge } from "./role-badge";
+import { UserStatusBadge } from "./user-status-badge";
 
 export type UserListItem = {
-  id: string
-  name: string
-  email: string
-  image: string | null
-  roleGlobal: GlobalRole
-  isActive: boolean
-  reviewedAt: Date | null
-  reviewedBy: { name: string; email: string } | null
-  createdAt: Date
-  _count: { projectMembers: number }
-}
+  id: string;
+  name: string;
+  email: string;
+  image: string | null;
+  roleGlobal: GlobalRole;
+  isActive: boolean;
+  reviewedAt: Date | null;
+  reviewedBy: { name: string; email: string } | null;
+  createdAt: Date;
+  _count: { projectMembers: number };
+};
 
-type UserStatus = "pending" | "approved" | "rejected"
+type UserStatus = "pending" | "approved" | "rejected";
 
 function getUserStatus(isActive: boolean, reviewedAt: Date | null): UserStatus {
-  if (!reviewedAt) return "pending"
-  return isActive ? "approved" : "rejected"
+  if (!reviewedAt) return "pending";
+  return isActive ? "approved" : "rejected";
 }
 
 export function getUserColumns(): ColumnDef<UserListItem>[] {
@@ -62,7 +62,7 @@ export function getUserColumns(): ColumnDef<UserListItem>[] {
       accessorKey: "name",
       header: "Name",
       cell: ({ row }) => {
-        const user = row.original
+        const user = row.original;
         return (
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8">
@@ -73,7 +73,7 @@ export function getUserColumns(): ColumnDef<UserListItem>[] {
             </Avatar>
             <span className="font-medium">{user.name}</span>
           </div>
-        )
+        );
       },
     },
     {
@@ -87,9 +87,9 @@ export function getUserColumns(): ColumnDef<UserListItem>[] {
       id: "status",
       header: "Status",
       cell: ({ row }) => {
-        const { isActive, reviewedAt } = row.original
-        const status = getUserStatus(isActive, reviewedAt)
-        return <UserStatusBadge status={status} />
+        const { isActive, reviewedAt } = row.original;
+        const status = getUserStatus(isActive, reviewedAt);
+        return <UserStatusBadge status={status} />;
       },
     },
     {
@@ -101,35 +101,35 @@ export function getUserColumns(): ColumnDef<UserListItem>[] {
       accessorKey: "createdAt",
       header: "Registered",
       cell: ({ row }) => {
-        const date = row.original.createdAt
+        const date = row.original.createdAt;
         return (
           <span className="text-sm text-muted-foreground">
             {formatDistanceToNow(new Date(date), { addSuffix: true })}
           </span>
-        )
+        );
       },
     },
     {
       id: "projects",
       header: "Projects",
       cell: ({ row }) => {
-        const count = row.original._count.projectMembers
+        const count = row.original._count.projectMembers;
         return (
           <span className="text-sm text-muted-foreground">
             {count} {count === 1 ? "project" : "projects"}
           </span>
-        )
+        );
       },
     },
-  ]
+  ];
 }
 
 // Version with actions for page usage
 interface GetUserColumnsWithActionsProps {
-  onApprove?: (user: UserListItem) => void
-  onReject?: (user: UserListItem) => void
-  onEditRole?: (user: UserListItem) => void
-  onDelete?: (user: UserListItem) => void
+  onApprove?: (user: UserListItem) => void;
+  onReject?: (user: UserListItem) => void;
+  onEditRole?: (user: UserListItem) => void;
+  onDelete?: (user: UserListItem) => void;
 }
 
 export function getUserColumnsWithActions({
@@ -138,14 +138,14 @@ export function getUserColumnsWithActions({
   onEditRole,
   onDelete,
 }: GetUserColumnsWithActionsProps): ColumnDef<UserListItem>[] {
-  const baseColumns = getUserColumns()
+  const baseColumns = getUserColumns();
 
   const actionsColumn: ColumnDef<UserListItem> = {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
-      const user = row.original
-      const status = getUserStatus(user.isActive, user.reviewedAt)
+      const user = row.original;
+      const status = getUserStatus(user.isActive, user.reviewedAt);
 
       // Show approve/reject buttons for pending users
       if (status === "pending") {
@@ -166,7 +166,7 @@ export function getUserColumnsWithActions({
               Reject
             </Button>
           </div>
-        )
+        );
       }
 
       // Show dropdown menu for approved/rejected users
@@ -196,9 +196,9 @@ export function getUserColumnsWithActions({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
-  }
+  };
 
-  return [...baseColumns, actionsColumn]
+  return [...baseColumns, actionsColumn];
 }

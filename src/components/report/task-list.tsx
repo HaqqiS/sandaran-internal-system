@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react"
-import type { DailyReportTask } from "generated/prisma"
-import { useState } from "react"
-import { toast } from "sonner"
-import { Button } from "~/components/ui/button"
+import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
+import type { DailyReportTask } from "generated/prisma";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "~/components/ui/button";
 import {
   Table,
   TableBody,
@@ -12,16 +12,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "~/components/ui/table"
-import { useDeleteReportTask } from "~/hooks"
-import { cn } from "~/lib/utils"
-import { TaskForm } from "./task-form"
+} from "~/components/ui/table";
+import { useDeleteReportTask } from "~/hooks";
+import { cn } from "~/lib/utils";
+import { TaskForm } from "./task-form";
 
 interface TaskListProps {
-  projectId: string
-  reportId: string
-  tasks: DailyReportTask[]
-  canEdit: boolean
+  projectId: string;
+  reportId: string;
+  tasks: DailyReportTask[];
+  canEdit: boolean;
 }
 
 export function TaskList({
@@ -30,19 +30,19 @@ export function TaskList({
   tasks,
   canEdit,
 }: TaskListProps) {
-  const [isAdding, setIsAdding] = useState(false)
-  const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
-  const deleteTask = useDeleteReportTask()
+  const [isAdding, setIsAdding] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const deleteTask = useDeleteReportTask();
 
   const handleDelete = async (taskId: string) => {
-    if (!confirm("Are you sure you want to delete this task?")) return
+    if (!confirm("Are you sure you want to delete this task?")) return;
     try {
-      await deleteTask.mutateAsync({ projectId, taskId })
-      toast.success("Task deleted")
+      await deleteTask.mutateAsync({ projectId, taskId });
+      toast.success("Task deleted");
     } catch {
-      toast.error("Failed to delete task")
+      toast.error("Failed to delete task");
     }
-  }
+  };
 
   return (
     <div className="space-y-4">
@@ -219,5 +219,5 @@ export function TaskList({
         </div>
       )}
     </div>
-  )
+  );
 }

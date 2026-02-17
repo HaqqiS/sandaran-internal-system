@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { IconLoader2, IconPlus } from "@tabler/icons-react"
-import { useState } from "react"
-import { toast } from "sonner"
-import { PageLayout } from "~/components/layout"
-import type { ProjectListItem } from "~/components/project/project-columns"
-import { ProjectDialog } from "~/components/project/project-dialog"
-import { ProjectTable } from "~/components/project/project-table"
+import { IconLoader2, IconPlus } from "@tabler/icons-react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { PageLayout } from "~/components/layout";
+import type { ProjectListItem } from "~/components/project/project-columns";
+import { ProjectDialog } from "~/components/project/project-dialog";
+import { ProjectTable } from "~/components/project/project-table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,37 +16,37 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "~/components/ui/alert-dialog"
-import { Button } from "~/components/ui/button"
-import { useDeleteProject, useProjectList } from "~/hooks"
-import { isAdmin } from "~/lib/auth-guards"
-import { useSessionStore } from "~/stores/use-session-store"
-import type { GlobalRole } from "../../../../generated/prisma"
+} from "~/components/ui/alert-dialog";
+import { Button } from "~/components/ui/button";
+import { useDeleteProject, useProjectList } from "~/hooks";
+import { isAdmin } from "~/lib/auth-guards";
+import { useSessionStore } from "~/stores/use-session-store";
+import type { GlobalRole } from "../../../../generated/prisma";
 
 export function ProjectsClient() {
-  const { data: projects, isLoading, error } = useProjectList()
-  const deleteProject = useDeleteProject()
-  const session = useSessionStore((state) => state.session)
+  const { data: projects, isLoading, error } = useProjectList();
+  const deleteProject = useDeleteProject();
+  const session = useSessionStore((state) => state.session);
 
-  const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [editProject, setEditProject] = useState<ProjectListItem | null>(null)
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [editProject, setEditProject] = useState<ProjectListItem | null>(null);
   const [deleteDialogProject, setDeleteDialogProject] =
-    useState<ProjectListItem | null>(null)
+    useState<ProjectListItem | null>(null);
 
   const canManage = isAdmin(
     session?.user?.roleGlobal as GlobalRole | null | undefined,
-  )
+  );
 
   const handleDelete = async () => {
-    if (!deleteDialogProject) return
+    if (!deleteDialogProject) return;
     try {
-      await deleteProject.mutateAsync({ projectId: deleteDialogProject.id })
-      toast.success("Project deleted successfully")
-      setDeleteDialogProject(null)
+      await deleteProject.mutateAsync({ projectId: deleteDialogProject.id });
+      toast.success("Project deleted successfully");
+      setDeleteDialogProject(null);
     } catch {
       // Error handled by global mutation cache
     }
-  }
+  };
 
   if (error) {
     return (
@@ -58,7 +58,7 @@ export function ProjectsClient() {
           <p className="text-muted-foreground">{error.message}</p>
         </div>
       </PageLayout>
-    )
+    );
   }
 
   return (
@@ -150,5 +150,5 @@ export function ProjectsClient() {
         </AlertDialogContent>
       </AlertDialog>
     </PageLayout>
-  )
+  );
 }

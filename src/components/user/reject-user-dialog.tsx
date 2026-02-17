@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { toast } from "sonner"
-import { Button } from "~/components/ui/button"
+import { toast } from "sonner";
+import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,17 +9,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "~/components/ui/dialog"
-import { api } from "~/trpc/react"
+} from "~/components/ui/dialog";
+import { api } from "~/trpc/react";
 
 interface RejectUserDialogProps {
   user: {
-    id: string
-    name: string
-    email: string
-  } | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
+    id: string;
+    name: string;
+    email: string;
+  } | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function RejectUserDialog({
@@ -27,20 +27,20 @@ export function RejectUserDialog({
   open,
   onOpenChange,
 }: RejectUserDialogProps) {
-  const utils = api.useUtils()
+  const utils = api.useUtils();
 
   const reject = api.user.rejectUser.useMutation({
     onSuccess: () => {
-      toast.success(`${user?.name} has been rejected`)
-      utils.user.getAllUsersWithFilter.invalidate()
-      onOpenChange(false)
+      toast.success(`${user?.name} has been rejected`);
+      utils.user.getAllUsersWithFilter.invalidate();
+      onOpenChange(false);
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to reject user")
+      toast.error(error.message || "Failed to reject user");
     },
-  })
+  });
 
-  if (!user) return null
+  if (!user) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -81,5 +81,5 @@ export function RejectUserDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

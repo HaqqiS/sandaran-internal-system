@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { IconLoader2 } from "@tabler/icons-react"
-import Link from "next/link"
-import { PageLayout } from "~/components/layout"
-import { ReportCard } from "~/components/report/report-card"
-import { Button } from "~/components/ui/button"
-import { api } from "~/trpc/react"
+import { IconLoader2 } from "@tabler/icons-react";
+import Link from "next/link";
+import { PageLayout } from "~/components/layout";
+import { ReportCard } from "~/components/report/report-card";
+import { Button } from "~/components/ui/button";
+import { api } from "~/trpc/react";
 
 export function RecentReportsClient() {
   const {
     data: projects,
     isLoading,
     error,
-  } = api.report.getRecentByProject.useQuery()
+  } = api.report.getRecentByProject.useQuery();
 
   if (isLoading) {
     return (
@@ -21,7 +21,7 @@ export function RecentReportsClient() {
           <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       </PageLayout>
-    )
+    );
   }
 
   if (error) {
@@ -34,7 +34,7 @@ export function RecentReportsClient() {
           <p className="text-muted-foreground">{error.message}</p>
         </div>
       </PageLayout>
-    )
+    );
   }
 
   return (
@@ -80,5 +80,5 @@ export function RecentReportsClient() {
         )}
       </div>
     </PageLayout>
-  )
+  );
 }

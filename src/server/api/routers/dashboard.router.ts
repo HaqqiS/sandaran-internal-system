@@ -1,9 +1,9 @@
-import { z } from "zod"
+import { z } from "zod";
 import {
   adminProcedure,
   createTRPCRouter,
   protectedProcedure,
-} from "~/server/api/trpc"
+} from "~/server/api/trpc";
 
 export const dashboardRouter = createTRPCRouter({
   /**
@@ -13,7 +13,7 @@ export const dashboardRouter = createTRPCRouter({
     // 1. Count active projects
     const activeProjects = await ctx.db.project.count({
       where: { status: "ACTIVE" },
-    })
+    });
 
     // 2. Count users by status
     const [activeUsers, pendingUsers, rejectedUsers] = await Promise.all([
@@ -22,13 +22,13 @@ export const dashboardRouter = createTRPCRouter({
       ctx.db.user.count({
         where: { isActive: false, reviewedAt: { not: null } },
       }),
-    ])
+    ]);
 
-    const totalUsers = activeUsers + pendingUsers + rejectedUsers
+    const totalUsers = activeUsers + pendingUsers + rejectedUsers;
 
     // 3. Get recent logistics alerts (low stock - placeholder logic for now)
     // For now just return count of items
-    const lowStockItems = await ctx.db.logisticItem.count()
+    const lowStockItems = await ctx.db.logisticItem.count();
 
     return {
       activeProjects,
@@ -37,7 +37,7 @@ export const dashboardRouter = createTRPCRouter({
       rejectedUsers,
       totalUsers,
       lowStockItems,
-    }
+    };
   }),
 
   /**
@@ -46,7 +46,7 @@ export const dashboardRouter = createTRPCRouter({
   getCEOStats: protectedProcedure.query(async ({ ctx }) => {
     // Check if CEO
     if (ctx.session.user.roleGlobal !== "CEO") {
-      throw new Error("Unauthorized")
+      throw new Error("Unauthorized");
     }
 
     const projects = await ctx.db.project.findMany({
@@ -61,13 +61,13 @@ export const dashboardRouter = createTRPCRouter({
           },
         },
       },
-    })
+    });
 
     return {
       totalProjects: projects.length,
       activeProjects: projects.filter((p) => p.status === "ACTIVE").length,
       projects,
-    }
+    };
   }),
 
   /**
@@ -78,7 +78,7 @@ export const dashboardRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       // Check if CEO
       if (ctx.session.user.roleGlobal !== "CEO") {
-        throw new Error("Unauthorized")
+        throw new Error("Unauthorized");
       }
 
       const reports = await ctx.db.dailyReport.findMany({
@@ -105,9 +105,9 @@ export const dashboardRouter = createTRPCRouter({
             },
           },
         },
-      })
+      });
 
-      return reports
+      return reports;
     }),
 
   /**
@@ -115,13 +115,13 @@ export const dashboardRouter = createTRPCRouter({
    * Returns data for projects where user is MANDOR
    */
   getMandorStats: protectedProcedure.query(async ({ ctx }) => {
-    const userId = ctx.session.user.id
+    const userId = ctx.session.user.id;
 
-    const startOfDay = new Date()
-    startOfDay.setHours(0, 0, 0, 0)
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
 
-    const endOfDay = new Date()
-    endOfDay.setHours(23, 59, 59, 999)
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
 
     // Find projects where user is MANDOR
     const projects = await ctx.db.project.findMany({
@@ -151,17 +151,18 @@ export const dashboardRouter = createTRPCRouter({
           take: 1,
         },
       },
-    })
+    });
 
     // Calculate reports due: Active projects minus those that already have a report today
     const reportsDue =
-      projects.length - projects.filter((p) => p.dailyReports.length > 0).length
+      projects.length -
+      projects.filter((p) => p.dailyReports.length > 0).length;
 
     return {
       projectCount: projects.length,
       projects,
       reportsDue,
-    }
+    };
   }),
 
   /**
@@ -170,7 +171,7 @@ export const dashboardRouter = createTRPCRouter({
   getMandorRecentReports: protectedProcedure
     .input(z.object({ limit: z.number().default(3).optional() }))
     .query(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id
+      const userId = ctx.session.user.id;
 
       // Get projects where user is MANDOR
       const projectIds = await ctx.db.projectMember
@@ -178,9 +179,9 @@ export const dashboardRouter = createTRPCRouter({
           where: { userId, role: "MANDOR" },
           select: { projectId: true },
         })
-        .then((members) => members.map((m) => m.projectId))
+        .then((members) => members.map((m) => m.projectId));
 
-      if (!projectIds.length) return []
+      if (!projectIds.length) return [];
 
       const reports = await ctx.db.dailyReport.findMany({
         where: {
@@ -209,19 +210,19 @@ export const dashboardRouter = createTRPCRouter({
             },
           },
         },
-      })
+      });
 
       return reports.map((report) => ({
         ...report,
         thumbnail: report.media[0]?.url ?? null,
-      }))
+      }));
     }),
 
   /**
    * Get stats for ARCHITECT dashboard
    */
   getArchitectStats: protectedProcedure.query(async ({ ctx }) => {
-    const userId = ctx.session.user.id
+    const userId = ctx.session.user.id;
 
     const projects = await ctx.db.project.findMany({
       where: {
@@ -232,23 +233,23 @@ export const dashboardRouter = createTRPCRouter({
           },
         },
       },
-    })
+    });
 
     const myDocuments = await ctx.db.projectDocument.count({
       where: { userId },
-    })
+    });
 
     return {
       projectCount: projects.length,
       uploadedDocuments: myDocuments,
-    }
+    };
   }),
 
   /**
    * Get architect dashboard data: documents by project + recent reports
    */
   getArchitectDashboard: protectedProcedure.query(async ({ ctx }) => {
-    const userId = ctx.session.user.id
+    const userId = ctx.session.user.id;
 
     // Get projects where user is ARCHITECT
     const projectIds = await ctx.db.projectMember
@@ -256,10 +257,10 @@ export const dashboardRouter = createTRPCRouter({
         where: { userId, role: "ARCHITECT" },
         select: { projectId: true },
       })
-      .then((members) => members.map((m) => m.projectId))
+      .then((members) => members.map((m) => m.projectId));
 
     if (!projectIds.length) {
-      return { documentsByProject: [], recentReports: [] }
+      return { documentsByProject: [], recentReports: [] };
     }
 
     // Get documents grouped by project
@@ -273,14 +274,14 @@ export const dashboardRouter = createTRPCRouter({
           select: { documents: true },
         },
       },
-    })
+    });
 
     const documentsByProject = projects.map((p) => ({
       id: p.id,
       name: p.name,
       slug: p.slug,
       documentCount: p._count.documents,
-    }))
+    }));
 
     // Get recent reports from these projects
     const recentReports = await ctx.db.dailyReport.findMany({
@@ -306,19 +307,19 @@ export const dashboardRouter = createTRPCRouter({
           },
         },
       },
-    })
+    });
 
     return {
       documentsByProject,
       recentReports,
-    }
+    };
   }),
 
   /**
    * Get stats for FINANCE dashboard
    */
   getFinanceStats: protectedProcedure.query(async ({ ctx }) => {
-    const userId = ctx.session.user.id
+    const userId = ctx.session.user.id;
 
     // Projects where user is FINANCE
     const projects = await ctx.db.project.findMany({
@@ -331,12 +332,12 @@ export const dashboardRouter = createTRPCRouter({
         },
       },
       select: { id: true },
-    })
+    });
 
-    const projectIds = projects.map((p) => p.id)
+    const projectIds = projects.map((p) => p.id);
 
-    const now = new Date()
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
     // Count pending emergency requests for these projects
     const pendingEmergency = await ctx.db.emergencyTransaction.count({
@@ -344,7 +345,7 @@ export const dashboardRouter = createTRPCRouter({
         fund: { projectId: { in: projectIds } },
         status: "UNREVIEWED",
       },
-    })
+    });
 
     // Sum monthly withdrawals (approved/reviewed only)
     const monthlyWithdrawals = await ctx.db.emergencyTransaction.aggregate({
@@ -357,19 +358,19 @@ export const dashboardRouter = createTRPCRouter({
       _sum: {
         amount: true,
       },
-    })
+    });
 
     return {
       pendingApprovals: pendingEmergency,
       monthlyWithdrawals: monthlyWithdrawals._sum.amount ?? 0,
-    }
+    };
   }),
 
   /**
    * Get emergency fund breakdown by project (Finance only)
    */
   getEmergencyFundBreakdown: protectedProcedure.query(async ({ ctx }) => {
-    const userId = ctx.session.user.id
+    const userId = ctx.session.user.id;
 
     // Get projects where user is FINANCE
     const projectIds = await ctx.db.projectMember
@@ -377,9 +378,9 @@ export const dashboardRouter = createTRPCRouter({
         where: { userId, role: "FINANCE" },
         select: { projectId: true },
       })
-      .then((members) => members.map((m) => m.projectId))
+      .then((members) => members.map((m) => m.projectId));
 
-    if (!projectIds.length) return []
+    if (!projectIds.length) return [];
 
     // Get emergency funds for these projects
     const funds = await ctx.db.emergencyFund.findMany({
@@ -395,13 +396,13 @@ export const dashboardRouter = createTRPCRouter({
           },
         },
       },
-    })
+    });
 
     return funds.map((fund) => ({
       projectId: fund.project.id,
       projectName: fund.project.name,
       projectSlug: fund.project.slug,
       currentBalance: fund.currentBalance,
-    }))
+    }));
   }),
-})
+});

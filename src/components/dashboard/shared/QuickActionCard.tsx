@@ -1,28 +1,28 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import type { ReactNode } from "react"
-import { Button } from "~/components/ui/button"
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/components/ui/card"
+} from "~/components/ui/card";
 
 interface ActionItem {
-  label: string
-  icon?: ReactNode
-  onClick?: () => void
-  href?: string
-  variant?: "default" | "outline" | "secondary" | "ghost"
+  label: string;
+  icon?: ReactNode;
+  onClick?: () => void;
+  href?: string;
+  variant?: "default" | "outline" | "secondary" | "ghost";
 }
 
 interface QuickActionCardProps {
-  title: string
-  description?: string
-  actions: ActionItem[]
+  title: string;
+  description?: string;
+  actions: ActionItem[];
 }
 
 export function QuickActionCard({
@@ -43,7 +43,7 @@ export function QuickActionCard({
               {action.icon && <span className="mr-2">{action.icon}</span>}
               {action.label}
             </>
-          )
+          );
 
           if (action.href) {
             return (
@@ -55,7 +55,7 @@ export function QuickActionCard({
               >
                 <Link href={action.href}>{buttonContent}</Link>
               </Button>
-            )
+            );
           }
 
           return (
@@ -67,9 +67,9 @@ export function QuickActionCard({
             >
               {buttonContent}
             </Button>
-          )
+          );
         })}
       </CardContent>
     </Card>
-  )
+  );
 }

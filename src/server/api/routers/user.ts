@@ -1,11 +1,11 @@
-import { TRPCError } from "@trpc/server"
-import { z } from "zod"
+import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 import {
   adminOrCeoProcedure,
   adminProcedure,
   createTRPCRouter,
   protectedProcedure,
-} from "~/server/api/trpc"
+} from "~/server/api/trpc";
 
 export const userRouter = createTRPCRouter({
   /**
@@ -33,7 +33,7 @@ export const userRouter = createTRPCRouter({
         createdAt: true,
         updatedAt: true,
       },
-    })
+    });
   }),
 
   /**
@@ -49,23 +49,23 @@ export const userRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       // Build where clause based on filter
       const where: {
-        isActive?: boolean
-        reviewedAt?: { not: null } | null
+        isActive?: boolean;
+        reviewedAt?: { not: null } | null;
         OR?: Array<{
-          name?: { contains: string; mode: "insensitive" }
-          email?: { contains: string; mode: "insensitive" }
-        }>
-      } = {}
+          name?: { contains: string; mode: "insensitive" };
+          email?: { contains: string; mode: "insensitive" };
+        }>;
+      } = {};
 
       if (input.filter === "pending") {
-        where.isActive = false
-        where.reviewedAt = null
+        where.isActive = false;
+        where.reviewedAt = null;
       } else if (input.filter === "active") {
-        where.isActive = true
-        where.reviewedAt = { not: null }
+        where.isActive = true;
+        where.reviewedAt = { not: null };
       } else if (input.filter === "rejected") {
-        where.isActive = false
-        where.reviewedAt = { not: null }
+        where.isActive = false;
+        where.reviewedAt = { not: null };
       }
       // if filter === 'all' or undefined, no filter applied
 
@@ -74,7 +74,7 @@ export const userRouter = createTRPCRouter({
         where.OR = [
           { name: { contains: input.search, mode: "insensitive" } },
           { email: { contains: input.search, mode: "insensitive" } },
-        ]
+        ];
       }
 
       return ctx.db.user.findMany({
@@ -101,7 +101,7 @@ export const userRouter = createTRPCRouter({
             },
           },
         },
-      })
+      });
     }),
 
   /**
@@ -138,7 +138,7 @@ export const userRouter = createTRPCRouter({
             },
           },
         },
-      })
+      });
     }),
 
   /**
@@ -159,7 +159,7 @@ export const userRouter = createTRPCRouter({
         isActive: true,
         createdAt: true,
       },
-    })
+    });
   }),
 
   /**
@@ -169,7 +169,7 @@ export const userRouter = createTRPCRouter({
   search: protectedProcedure
     .input(z.object({ query: z.string().optional() }))
     .query(async ({ ctx, input }) => {
-      const query = input.query || ""
+      const query = input.query || "";
 
       return ctx.db.user.findMany({
         where: {
@@ -186,7 +186,7 @@ export const userRouter = createTRPCRouter({
           email: true,
           image: true,
         },
-      })
+      });
     }),
 
   /**
@@ -206,8 +206,8 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { userId, roleGlobal, projectAssignment } = input
-      const approverId = ctx.session.user.id
+      const { userId, roleGlobal, projectAssignment } = input;
+      const approverId = ctx.session.user.id;
 
       // Validation: cannot approve self to ADMIN unless already ADMIN
       if (roleGlobal === "ADMIN" && userId === approverId) {
@@ -215,7 +215,7 @@ export const userRouter = createTRPCRouter({
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "Cannot self-promote to ADMIN",
-          })
+          });
         }
       }
 
@@ -228,20 +228,20 @@ export const userRouter = createTRPCRouter({
           reviewedAt: new Date(),
           reviewedById: approverId,
         },
-      })
+      });
 
       // Handle project assignment if provided
       if (projectAssignment) {
         // Check if project exists
         const project = await ctx.db.project.findUnique({
           where: { id: projectAssignment.projectId },
-        })
+        });
 
         if (!project) {
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Project not found",
-          })
+          });
         }
 
         // Upsert project member
@@ -260,10 +260,10 @@ export const userRouter = createTRPCRouter({
           update: {
             role: projectAssignment.role,
           },
-        })
+        });
       }
 
-      return user
+      return user;
     }),
 
   /**
@@ -272,15 +272,15 @@ export const userRouter = createTRPCRouter({
   rejectUser: adminProcedure
     .input(z.object({ userId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const { userId } = input
-      const reviewerId = ctx.session.user.id
+      const { userId } = input;
+      const reviewerId = ctx.session.user.id;
 
       // Validation: cannot reject self
       if (userId === reviewerId) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "Cannot reject yourself",
-        })
+        });
       }
 
       return ctx.db.user.update({
@@ -291,7 +291,7 @@ export const userRouter = createTRPCRouter({
           reviewedAt: new Date(),
           reviewedById: reviewerId,
         },
-      })
+      });
     }),
 
   /**
@@ -305,20 +305,20 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { userIds, roleGlobal } = input
-      const approverId = ctx.session.user.id
+      const { userIds, roleGlobal } = input;
+      const approverId = ctx.session.user.id;
 
       // Filter out self if trying to approve self to ADMIN
       const validUserIds =
         roleGlobal === "ADMIN"
           ? userIds.filter((id) => id !== approverId)
-          : userIds
+          : userIds;
 
       if (validUserIds.length === 0) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "No valid users to approve",
-        })
+        });
       }
 
       return ctx.db.user.updateMany({
@@ -331,7 +331,7 @@ export const userRouter = createTRPCRouter({
           reviewedAt: new Date(),
           reviewedById: approverId,
         },
-      })
+      });
     }),
 
   /**
@@ -345,20 +345,20 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { userId, roleGlobal } = input
-      const currentUserId = ctx.session.user.id
+      const { userId, roleGlobal } = input;
+      const currentUserId = ctx.session.user.id;
 
       // Get the target user
       const targetUser = await ctx.db.user.findUnique({
         where: { id: userId },
         select: { roleGlobal: true },
-      })
+      });
 
       if (!targetUser) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "User not found",
-        })
+        });
       }
 
       // Validation 1: Prevent self-demotion from ADMIN
@@ -367,7 +367,7 @@ export const userRouter = createTRPCRouter({
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "Cannot demote yourself from ADMIN role",
-          })
+          });
         }
       }
 
@@ -378,21 +378,21 @@ export const userRouter = createTRPCRouter({
             roleGlobal: "ADMIN",
             isActive: true,
           },
-        })
+        });
 
         if (adminCount <= 1) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message:
               "Cannot demote the last admin. Promote another user to ADMIN first.",
-          })
+          });
         }
       }
 
       return ctx.db.user.update({
         where: { id: userId },
         data: { roleGlobal },
-      })
+      });
     }),
 
   /**
@@ -401,28 +401,28 @@ export const userRouter = createTRPCRouter({
   deleteUser: adminProcedure
     .input(z.object({ userId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const { userId } = input
-      const currentUserId = ctx.session.user.id
+      const { userId } = input;
+      const currentUserId = ctx.session.user.id;
 
       // Validation: Cannot delete self
       if (userId === currentUserId) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "Cannot delete yourself",
-        })
+        });
       }
 
       // Get user to validate inactive status
       const user = await ctx.db.user.findUnique({
         where: { id: userId },
         select: { isActive: true, roleGlobal: true },
-      })
+      });
 
       if (!user) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "User not found",
-        })
+        });
       }
 
       // Validation: Only delete inactive users
@@ -430,13 +430,13 @@ export const userRouter = createTRPCRouter({
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "Can only delete inactive users. Reject the user first.",
-        })
+        });
       }
 
       // Delete the user (hard delete or you can mark as deleted)
       return ctx.db.user.delete({
         where: { id: userId },
-      })
+      });
     }),
 
   /**
@@ -456,7 +456,7 @@ export const userRouter = createTRPCRouter({
         reviewedAt: true,
         createdAt: true,
       },
-    })
+    });
   }),
 
   /**
@@ -480,6 +480,6 @@ export const userRouter = createTRPCRouter({
           roleGlobal: true,
           createdAt: true,
         },
-      })
+      });
     }),
-})
+});

@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { IconWallet } from "@tabler/icons-react"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import { useEmergencyFund } from "~/hooks/useEmergency"
+import { IconWallet } from "@tabler/icons-react";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { useEmergencyFund } from "~/hooks/useEmergency";
 
 interface FundOverviewProps {
-  projectId: string
-  actions?: React.ReactNode
+  projectId: string;
+  actions?: React.ReactNode;
 }
 
 export function FundOverview({ projectId, actions }: FundOverviewProps) {
-  const { data: fund, isLoading } = useEmergencyFund(projectId)
+  const { data: fund, isLoading } = useEmergencyFund(projectId);
 
   return (
     <Card>
@@ -41,5 +41,5 @@ export function FundOverview({ projectId, actions }: FundOverviewProps) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

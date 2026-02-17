@@ -1,36 +1,36 @@
 /** biome-ignore-all lint/correctness/noChildrenProp: <children prop used by Field> */
-"use client"
+"use client";
 
-import { IconCalendar } from "@tabler/icons-react"
-import { useForm } from "@tanstack/react-form"
-import { format } from "date-fns"
-import { toast } from "sonner"
-import { z } from "zod"
-import { Button } from "~/components/ui/button"
-import { Calendar } from "~/components/ui/calendar"
+import { IconCalendar } from "@tabler/icons-react";
+import { useForm } from "@tanstack/react-form";
+import { format } from "date-fns";
+import { toast } from "sonner";
+import { z } from "zod";
+import { Button } from "~/components/ui/button";
+import { Calendar } from "~/components/ui/calendar";
 import {
   Field,
   FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "~/components/ui/field"
-import { Input } from "~/components/ui/input"
+} from "~/components/ui/field";
+import { Input } from "~/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "~/components/ui/popover"
+} from "~/components/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/components/ui/select"
-import { Textarea } from "~/components/ui/textarea"
-import { useCreateReport, useUpdateReport } from "~/hooks"
-import { cn } from "~/lib/utils"
+} from "~/components/ui/select";
+import { Textarea } from "~/components/ui/textarea";
+import { useCreateReport, useUpdateReport } from "~/hooks";
+import { cn } from "~/lib/utils";
 
 const WEATHER_OPTIONS = [
   { value: "Cerah", label: "Cerah (Clear)" },
@@ -38,7 +38,7 @@ const WEATHER_OPTIONS = [
   { value: "Hujan", label: "Hujan (Rain)" },
   { value: "Hujan Deras", label: "Hujan Deras (Heavy Rain)" },
   { value: "custom", label: "Lainnya (Custom)" },
-]
+];
 
 const reportSchema = z.object({
   reportDate: z.date(),
@@ -49,34 +49,34 @@ const reportSchema = z.object({
   customWeather: z.string().optional(),
   totalWorkers: z.number().min(0),
   location: z.string().optional(),
-})
+});
 
-type ReportFormValues = z.infer<typeof reportSchema>
+type ReportFormValues = z.infer<typeof reportSchema>;
 
 interface ReportFormProps {
-  projectId: string
+  projectId: string;
   report?: {
-    id: string
-    reportDate: Date | string
-    taskDescription: string
-    progressPercent: number
-    issues?: string | null
-    weather?: string | null
-    totalWorkers: number
-    location?: string | null
-  }
-  onSuccess?: () => void
+    id: string;
+    reportDate: Date | string;
+    taskDescription: string;
+    progressPercent: number;
+    issues?: string | null;
+    weather?: string | null;
+    totalWorkers: number;
+    location?: string | null;
+  };
+  onSuccess?: () => void;
 }
 
 export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
-  const createReport = useCreateReport()
-  const updateReport = useUpdateReport()
-  const isEditMode = !!report
+  const createReport = useCreateReport();
+  const updateReport = useUpdateReport();
+  const isEditMode = !!report;
 
   // Check if existing weather is a custom value
   const isCustomWeather =
     report?.weather &&
-    !WEATHER_OPTIONS.slice(0, -1).some((opt) => opt.value === report.weather)
+    !WEATHER_OPTIONS.slice(0, -1).some((opt) => opt.value === report.weather);
 
   const form = useForm({
     defaultValues: {
@@ -96,7 +96,7 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
       try {
         // Determine final weather value
         const weather =
-          value.weather === "custom" ? value.customWeather : value.weather
+          value.weather === "custom" ? value.customWeather : value.weather;
 
         if (isEditMode && report) {
           await updateReport.mutateAsync({
@@ -108,8 +108,8 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
             weather: weather || undefined,
             totalWorkers: value.totalWorkers,
             location: value.location || undefined,
-          })
-          toast.success("Report updated successfully")
+          });
+          toast.success("Report updated successfully");
         } else {
           await createReport.mutateAsync({
             projectId,
@@ -120,22 +120,22 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
             weather: weather || undefined,
             totalWorkers: value.totalWorkers,
             location: value.location || undefined,
-          })
-          toast.success("Report created successfully")
+          });
+          toast.success("Report created successfully");
         }
-        onSuccess?.()
+        onSuccess?.();
       } catch {
         // Error is handled by global mutation cache
       }
     },
-  })
+  });
 
   return (
     <form
       onSubmit={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        void form.handleSubmit()
+        e.preventDefault();
+        e.stopPropagation();
+        void form.handleSubmit();
       }}
       className="space-y-4"
     >
@@ -347,5 +347,5 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
         </form.Subscribe>
       </div>
     </form>
-  )
+  );
 }

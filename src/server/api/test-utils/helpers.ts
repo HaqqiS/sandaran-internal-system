@@ -1,25 +1,25 @@
-import { TRPCError } from "@trpc/server"
-import type { Session } from "generated/prisma"
-import { expect } from "vitest"
-import { db } from "~/server/db"
+import { TRPCError } from "@trpc/server";
+import type { Session } from "generated/prisma";
+import { expect } from "vitest";
+import { db } from "~/server/db";
 
 // Define Context type locally since it's not exported from trpc.ts
 type Context = {
-  headers: Headers
-  db: typeof db
+  headers: Headers;
+  db: typeof db;
   session: {
-    session: Session
+    session: Session;
     user: {
-      id: string
-      name: string
-      email: string
-      roleGlobal: "ADMIN" | "CEO" | "USER" | "NONE"
-      isActive: boolean
-    }
-  } | null
-  projectId?: string
-  projectRole?: "MANDOR" | "ARCHITECT" | "FINANCE" | null
-}
+      id: string;
+      name: string;
+      email: string;
+      roleGlobal: "ADMIN" | "CEO" | "USER" | "NONE";
+      isActive: boolean;
+    };
+  } | null;
+  projectId?: string;
+  projectRole?: "MANDOR" | "ARCHITECT" | "FINANCE" | null;
+};
 
 /**
  * Test Helper Functions
@@ -34,17 +34,17 @@ type Context = {
  */
 export function createMockContext(
   user: {
-    id: string
-    name: string
-    email: string
-    roleGlobal: "ADMIN" | "CEO" | "USER" | "NONE"
-    isActive: boolean
+    id: string;
+    name: string;
+    email: string;
+    roleGlobal: "ADMIN" | "CEO" | "USER" | "NONE";
+    isActive: boolean;
   },
   projectId?: string,
   projectRole?: "MANDOR" | "ARCHITECT" | "FINANCE" | null,
 ): Context {
   const session: Session & {
-    user: typeof user
+    user: typeof user;
   } = {
     id: `session-${Date.now()}`,
     token: `token-${Date.now()}`,
@@ -55,7 +55,7 @@ export function createMockContext(
     userAgent: "test-agent",
     userId: user.id,
     user,
-  }
+  };
 
   const ctx: Context = {
     headers: new Headers(),
@@ -64,7 +64,7 @@ export function createMockContext(
       session,
       user,
     },
-  }
+  };
 
   // If projectId and projectRole are provided, extend context
   if (projectId && projectRole !== undefined) {
@@ -72,40 +72,40 @@ export function createMockContext(
       ...ctx,
       projectId,
       projectRole,
-    }
+    };
   }
 
-  return ctx
+  return ctx;
 }
 
 /**
  * Create ADMIN context
  */
 export function createAdminContext(user: {
-  id: string
-  name: string
-  email: string
+  id: string;
+  name: string;
+  email: string;
 }): Context {
   return createMockContext({
     ...user,
     roleGlobal: "ADMIN",
     isActive: true,
-  })
+  });
 }
 
 /**
  * Create CEO context
  */
 export function createCEOContext(user: {
-  id: string
-  name: string
-  email: string
+  id: string;
+  name: string;
+  email: string;
 }): Context {
   return createMockContext({
     ...user,
     roleGlobal: "CEO",
     isActive: true,
-  })
+  });
 }
 
 /**
@@ -113,9 +113,9 @@ export function createCEOContext(user: {
  */
 export function createUserContext(
   user: {
-    id: string
-    name: string
-    email: string
+    id: string;
+    name: string;
+    email: string;
   },
   projectId?: string,
   projectRole?: "MANDOR" | "ARCHITECT" | "FINANCE",
@@ -129,29 +129,29 @@ export function createUserContext(
       },
       projectId,
       projectRole,
-    )
+    );
   }
 
   return createMockContext({
     ...user,
     roleGlobal: "USER",
     isActive: true,
-  })
+  });
 }
 
 /**
  * Create inactive user context
  */
 export function createInactiveContext(user: {
-  id: string
-  name: string
-  email: string
+  id: string;
+  name: string;
+  email: string;
 }): Context {
   return createMockContext({
     ...user,
     roleGlobal: "USER",
     isActive: false,
-  })
+  });
 }
 
 /**
@@ -162,7 +162,7 @@ export function createUnauthenticatedContext(): Context {
     headers: new Headers(),
     db,
     session: null,
-  }
+  };
 }
 
 // ==================== ASSERTION HELPERS ====================
@@ -174,11 +174,11 @@ export async function expectForbidden(
   promise: Promise<unknown>,
   message?: string,
 ) {
-  await expect(promise).rejects.toThrow(TRPCError)
+  await expect(promise).rejects.toThrow(TRPCError);
   await expect(promise).rejects.toMatchObject({
     code: "FORBIDDEN",
     ...(message && { message }),
-  })
+  });
 }
 
 /**
@@ -188,11 +188,11 @@ export async function expectUnauthorized(
   promise: Promise<unknown>,
   message?: string,
 ) {
-  await expect(promise).rejects.toThrow(TRPCError)
+  await expect(promise).rejects.toThrow(TRPCError);
   await expect(promise).rejects.toMatchObject({
     code: "UNAUTHORIZED",
     ...(message && { message }),
-  })
+  });
 }
 
 /**
@@ -202,11 +202,11 @@ export async function expectNotFound(
   promise: Promise<unknown>,
   message?: string,
 ) {
-  await expect(promise).rejects.toThrow(TRPCError)
+  await expect(promise).rejects.toThrow(TRPCError);
   await expect(promise).rejects.toMatchObject({
     code: "NOT_FOUND",
     ...(message && { message }),
-  })
+  });
 }
 
 /**
@@ -216,20 +216,20 @@ export async function expectBadRequest(
   promise: Promise<unknown>,
   message?: string,
 ) {
-  await expect(promise).rejects.toThrow(TRPCError)
+  await expect(promise).rejects.toThrow(TRPCError);
   await expect(promise).rejects.toMatchObject({
     code: "BAD_REQUEST",
     ...(message && { message }),
-  })
+  });
 }
 
 /**
  * Assert that a promise resolves successfully
  */
 export async function expectSuccess<T>(promise: Promise<T>): Promise<T> {
-  const result = await promise
-  expect(result).toBeDefined()
-  return result
+  const result = await promise;
+  expect(result).toBeDefined();
+  return result;
 }
 
 /**
@@ -238,7 +238,7 @@ export async function expectSuccess<T>(promise: Promise<T>): Promise<T> {
 export function expectTruthy<T>(
   value: T | null | undefined,
 ): asserts value is T {
-  expect(value).toBeTruthy()
+  expect(value).toBeTruthy();
 }
 
 /**
@@ -247,6 +247,6 @@ export function expectTruthy<T>(
 export function expectDefined<T>(
   value: T | null | undefined,
 ): asserts value is T {
-  expect(value).toBeDefined()
-  expect(value).not.toBeNull()
+  expect(value).toBeDefined();
+  expect(value).not.toBeNull();
 }

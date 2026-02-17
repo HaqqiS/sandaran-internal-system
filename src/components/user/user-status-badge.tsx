@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { Badge } from "~/components/ui/badge"
+import { Badge } from "~/components/ui/badge";
 
-type Status = "pending" | "approved" | "rejected"
+type Status = "pending" | "approved" | "rejected";
 
 interface UserStatusBadgeProps {
-  status: Status
+  status: Status;
 }
 
 export function UserStatusBadge({ status }: UserStatusBadgeProps) {
@@ -16,9 +16,9 @@ export function UserStatusBadge({ status }: UserStatusBadgeProps) {
     pending: { label: "Pending", variant: "outline" },
     approved: { label: "Active", variant: "default" },
     rejected: { label: "Rejected", variant: "destructive" },
-  }
+  };
 
-  const { label, variant } = config[status]
+  const { label, variant } = config[status];
 
-  return <Badge variant={variant}>{label}</Badge>
+  return <Badge variant={variant}>{label}</Badge>;
 }

@@ -1,8 +1,8 @@
-import { requireAuth } from "~/lib/server-auth"
-import { DocumentsClient } from "./documents-client"
+import { requireAuth } from "~/lib/server-auth";
+import { DocumentsClient } from "./documents-client";
 
 export default async function DocumentsPage() {
-  await requireAuth()
+  await requireAuth();
 
-  return <DocumentsClient />
+  return <DocumentsClient />;
 }

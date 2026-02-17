@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { useMemo } from "react"
-import { DataTable } from "~/components/ui/data-table"
-import { getProjectColumns, type ProjectListItem } from "./project-columns"
+import { useMemo } from "react";
+import { DataTable } from "~/components/ui/data-table";
+import { getProjectColumns, type ProjectListItem } from "./project-columns";
 
 interface ProjectTableProps {
-  data: ProjectListItem[]
-  onEdit?: (project: ProjectListItem) => void
-  onDelete?: (project: ProjectListItem) => void
-  canManage?: boolean
+  data: ProjectListItem[];
+  onEdit?: (project: ProjectListItem) => void;
+  onDelete?: (project: ProjectListItem) => void;
+  canManage?: boolean;
 }
 
 export function ProjectTable({
@@ -20,7 +20,7 @@ export function ProjectTable({
   const columns = useMemo(
     () => getProjectColumns({ onEdit, onDelete, canManage }),
     [onEdit, onDelete, canManage],
-  )
+  );
 
   return (
     <DataTable
@@ -29,5 +29,5 @@ export function ProjectTable({
       filterColumn="name"
       filterPlaceholder="Search projects..."
     />
-  )
+  );
 }

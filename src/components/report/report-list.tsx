@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { IconLoader2, IconPlus } from "@tabler/icons-react"
-import { Button } from "~/components/ui/button"
-import { useReportsByProject } from "~/hooks"
-import { ReportCard } from "./report-card"
+import { IconLoader2, IconPlus } from "@tabler/icons-react";
+import { Button } from "~/components/ui/button";
+import { useReportsByProject } from "~/hooks";
+import { ReportCard } from "./report-card";
 
 interface ReportListProps {
-  projectId: string
-  projectSlug: string
-  onCreateClick?: () => void
-  canCreate?: boolean
+  projectId: string;
+  projectSlug: string;
+  onCreateClick?: () => void;
+  canCreate?: boolean;
 }
 
 export function ReportList({
@@ -18,14 +18,14 @@ export function ReportList({
   onCreateClick,
   canCreate = false,
 }: ReportListProps) {
-  const { data, isLoading, error } = useReportsByProject(projectId)
+  const { data, isLoading, error } = useReportsByProject(projectId);
 
   if (isLoading) {
     return (
       <div className="flex h-48 items-center justify-center">
         <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -33,10 +33,10 @@ export function ReportList({
       <div className="flex h-48 flex-col items-center justify-center gap-2 text-center">
         <p className="text-sm text-muted-foreground">Failed to load reports</p>
       </div>
-    )
+    );
   }
 
-  const reports = data?.reports ?? []
+  const reports = data?.reports ?? [];
 
   if (reports.length === 0) {
     return (
@@ -49,7 +49,7 @@ export function ReportList({
           </Button>
         )}
       </div>
-    )
+    );
   }
 
   return (
@@ -84,5 +84,5 @@ export function ReportList({
         </div>
       )}
     </div>
-  )
+  );
 }

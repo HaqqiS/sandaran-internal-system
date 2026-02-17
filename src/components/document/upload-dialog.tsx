@@ -1,30 +1,30 @@
-"use client"
+"use client";
 
-import { useForm } from "@tanstack/react-form"
-import type { DocumentType } from "generated/prisma"
-import { useState } from "react"
-import { toast } from "sonner"
-import { z } from "zod"
-import { FileUpload } from "~/components/shared/file-upload"
-import { Button } from "~/components/ui/button"
+import { useForm } from "@tanstack/react-form";
+import type { DocumentType } from "generated/prisma";
+import { useState } from "react";
+import { toast } from "sonner";
+import { z } from "zod";
+import { FileUpload } from "~/components/shared/file-upload";
+import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "~/components/ui/dialog"
-import { Field, FieldGroup, FieldLabel } from "~/components/ui/field"
-import { Input } from "~/components/ui/input"
+} from "~/components/ui/dialog";
+import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
+import { Input } from "~/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/components/ui/select"
-import { Textarea } from "~/components/ui/textarea"
-import { useUploadDocument } from "~/hooks/useDocument"
+} from "~/components/ui/select";
+import { Textarea } from "~/components/ui/textarea";
+import { useUploadDocument } from "~/hooks/useDocument";
 
 const documentSchema = z.object({
   title: z.string().optional(),
@@ -38,16 +38,16 @@ const documentSchema = z.object({
   ]),
   version: z.string().optional(),
   // File fields will be handled separately but validated before submit
-})
+});
 
-type DocumentFormValues = z.infer<typeof documentSchema>
+type DocumentFormValues = z.infer<typeof documentSchema>;
 
 interface UploadDialogProps {
-  projectId: string
-  projectSlug: string
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSuccess?: () => void
+  projectId: string;
+  projectSlug: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
 export function UploadDialog({
@@ -57,17 +57,17 @@ export function UploadDialog({
   onOpenChange,
   onSuccess,
 }: UploadDialogProps) {
-  const uploadDocument = useUploadDocument()
+  const uploadDocument = useUploadDocument();
 
   // File state
   const [fileData, setFileData] = useState<{
-    url: string
-    publicId: string
-    fileName: string
-    fileSize: number
-    mimeType: string
-    resourceType: string
-  } | null>(null)
+    url: string;
+    publicId: string;
+    fileName: string;
+    fileSize: number;
+    mimeType: string;
+    resourceType: string;
+  } | null>(null);
 
   const form = useForm({
     defaultValues: {
@@ -81,8 +81,8 @@ export function UploadDialog({
     },
     onSubmit: async ({ value }) => {
       if (!fileData) {
-        toast.error("Please upload a file")
-        return
+        toast.error("Please upload a file");
+        return;
       }
 
       try {
@@ -98,18 +98,18 @@ export function UploadDialog({
           title: value.title || undefined,
           description: value.description || undefined,
           version: value.version || undefined,
-        })
-        toast.success("Document uploaded successfully")
-        onOpenChange(false)
-        onSuccess?.()
+        });
+        toast.success("Document uploaded successfully");
+        onOpenChange(false);
+        onSuccess?.();
 
         // Reset file state
-        setFileData(null)
+        setFileData(null);
       } catch {
         // Error handled by mutation
       }
     },
-  })
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -123,9 +123,9 @@ export function UploadDialog({
 
         <form
           onSubmit={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            form.handleSubmit()
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
           }}
           className="space-y-6"
         >
@@ -151,7 +151,7 @@ export function UploadDialog({
                   fileSize: size,
                   mimeType,
                   resourceType,
-                })
+                });
               }}
               onRemove={() => setFileData(null)}
             />
@@ -270,5 +270,5 @@ export function UploadDialog({
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

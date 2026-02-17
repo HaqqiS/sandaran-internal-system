@@ -1,10 +1,10 @@
-import { TRPCError } from "@trpc/server"
-import { z } from "zod"
+import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 import {
   createTRPCRouter,
   projectProcedure,
   protectedProcedure,
-} from "~/server/api/trpc"
+} from "~/server/api/trpc";
 
 /**
  * Emergency Fund Router
@@ -18,26 +18,26 @@ import {
  */
 
 // MANDOR can request
-const mandorProcedure = projectProcedure(["MANDOR"])
+const mandorProcedure = projectProcedure(["MANDOR"]);
 
 // FINANCE can manage
-const financeProcedure = projectProcedure(["FINANCE"])
+const financeProcedure = projectProcedure(["FINANCE"]);
 
 // All can view
 const projectMemberProcedure = projectProcedure([
   "MANDOR",
   "ARCHITECT",
   "FINANCE",
-])
+]);
 
 export const emergencyRouter = createTRPCRouter({
   /**
    * Get emergency fund analytics: Balances & Monthly Activity per Project
    */
   getAnalytics: protectedProcedure.query(async ({ ctx }) => {
-    const user = ctx.session.user
+    const user = ctx.session.user;
     const isAdminOrCEO =
-      user.roleGlobal === "ADMIN" || user.roleGlobal === "CEO"
+      user.roleGlobal === "ADMIN" || user.roleGlobal === "CEO";
 
     const projects = await ctx.db.project.findMany({
       where: isAdminOrCEO
@@ -61,14 +61,14 @@ export const emergencyRouter = createTRPCRouter({
           },
         },
       },
-    })
+    });
 
-    const projectIds = projects.map((p) => p.id)
+    const projectIds = projects.map((p) => p.id);
 
-    const sixMonthsAgo = new Date()
-    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5)
-    sixMonthsAgo.setDate(1)
-    sixMonthsAgo.setHours(0, 0, 0, 0)
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+    sixMonthsAgo.setDate(1);
+    sixMonthsAgo.setHours(0, 0, 0, 0);
 
     const transactions = await ctx.db.emergencyTransaction.findMany({
       where: {
@@ -85,45 +85,45 @@ export const emergencyRouter = createTRPCRouter({
         },
       },
       orderBy: { createdAt: "asc" },
-    })
+    });
 
     const getEmptyMonths = () => {
-      const months = []
+      const months = [];
       for (let i = 0; i < 6; i++) {
-        const d = new Date()
-        d.setMonth(d.getMonth() - (5 - i))
+        const d = new Date();
+        d.setMonth(d.getMonth() - (5 - i));
         months.push({
           month: d.toLocaleString("default", { month: "short" }),
           key: `${d.getFullYear()}-${d.getMonth()}`,
           deposit: 0,
           withdrawal: 0,
           order: i,
-        })
+        });
       }
-      return months
-    }
+      return months;
+    };
 
     const projectsWithAnalytics = projects.map((project) => {
-      const monthlyData = getEmptyMonths()
-      const monthMap = new Map(monthlyData.map((m) => [m.key, m]))
+      const monthlyData = getEmptyMonths();
+      const monthMap = new Map(monthlyData.map((m) => [m.key, m]));
 
       const projectTx = transactions.filter(
         (tx) => tx.fund.projectId === project.id,
-      )
+      );
 
       projectTx.forEach((tx) => {
-        const d = new Date(tx.createdAt)
-        const key = `${d.getFullYear()}-${d.getMonth()}`
-        const entry = monthMap.get(key)
+        const d = new Date(tx.createdAt);
+        const key = `${d.getFullYear()}-${d.getMonth()}`;
+        const entry = monthMap.get(key);
 
         if (entry) {
           if (tx.type === "DEPOSIT") {
-            entry.deposit += Number(tx.amount)
+            entry.deposit += Number(tx.amount);
           } else if (tx.type === "WITHDRAWAL") {
-            entry.withdrawal += Number(tx.amount)
+            entry.withdrawal += Number(tx.amount);
           }
         }
-      })
+      });
 
       return {
         id: project.id,
@@ -133,12 +133,12 @@ export const emergencyRouter = createTRPCRouter({
         monthlyActivity: Array.from(monthMap.values()).sort(
           (a, b) => a.order - b.order,
         ),
-      }
-    })
+      };
+    });
 
     return {
       projects: projectsWithAnalytics,
-    }
+    };
   }),
   /**
    * Get emergency fund for a project
@@ -178,17 +178,17 @@ export const emergencyRouter = createTRPCRouter({
             },
           },
         },
-      })
+      });
 
       // Create fund if doesn't exist
       if (!fund) {
         const newFund = await ctx.db.emergencyFund.create({
           data: { projectId: ctx.projectId, currentBalance: 0 },
           include: { transactions: true },
-        })
-        return newFund
+        });
+        return newFund;
       }
-      return fund
+      return fund;
     }),
 
   /**
@@ -207,7 +207,7 @@ export const emergencyRouter = createTRPCRouter({
       // Get or create fund
       let fund = await ctx.db.emergencyFund.findUnique({
         where: { projectId: ctx.projectId },
-      })
+      });
 
       if (!fund) {
         fund = await ctx.db.emergencyFund.create({
@@ -215,7 +215,7 @@ export const emergencyRouter = createTRPCRouter({
             projectId: ctx.projectId,
             currentBalance: 0,
           },
-        })
+        });
       }
 
       // Create transaction and update balance
@@ -230,7 +230,7 @@ export const emergencyRouter = createTRPCRouter({
           verifiedById: ctx.session.user.id,
           verifiedAt: new Date(),
         },
-      })
+      });
 
       // Update fund balance
       await ctx.db.emergencyFund.update({
@@ -240,9 +240,9 @@ export const emergencyRouter = createTRPCRouter({
             increment: input.amount,
           },
         },
-      })
+      });
 
-      return transaction
+      return transaction;
     }),
 
   /**
@@ -262,13 +262,13 @@ export const emergencyRouter = createTRPCRouter({
       // Get fund
       const fund = await ctx.db.emergencyFund.findUnique({
         where: { projectId: ctx.projectId },
-      })
+      });
 
       if (!fund) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Emergency fund not found for this project",
-        })
+        });
       }
 
       // Check if sufficient balance
@@ -277,7 +277,7 @@ export const emergencyRouter = createTRPCRouter({
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Insufficient emergency fund balance",
-        })
+        });
       }
 
       const transaction = await ctx.db.emergencyTransaction.create({
@@ -299,7 +299,7 @@ export const emergencyRouter = createTRPCRouter({
             },
           },
         },
-      })
+      });
 
       // Deduct balance immediately
       await ctx.db.emergencyFund.update({
@@ -309,9 +309,9 @@ export const emergencyRouter = createTRPCRouter({
             decrement: input.amount,
           },
         },
-      })
+      });
 
-      return transaction
+      return transaction;
     }),
 
   /**
@@ -333,13 +333,13 @@ export const emergencyRouter = createTRPCRouter({
         include: {
           fund: true,
         },
-      })
+      });
 
       if (!transaction) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Transaction not found",
-        })
+        });
       }
 
       // Verify transaction belongs to this project
@@ -347,7 +347,7 @@ export const emergencyRouter = createTRPCRouter({
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "Transaction does not belong to this project",
-        })
+        });
       }
 
       // Check if already verified
@@ -355,7 +355,7 @@ export const emergencyRouter = createTRPCRouter({
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Transaction already reviewed",
-        })
+        });
       }
 
       // Update transaction status
@@ -383,9 +383,9 @@ export const emergencyRouter = createTRPCRouter({
             },
           },
         },
-      })
+      });
 
-      return updated
+      return updated;
     }),
 
   /**
@@ -404,10 +404,10 @@ export const emergencyRouter = createTRPCRouter({
       // Get fund
       const fund = await ctx.db.emergencyFund.findUnique({
         where: { projectId: ctx.projectId },
-      })
+      });
 
       if (!fund) {
-        return []
+        return [];
       }
 
       const transactions = await ctx.db.emergencyTransaction.findMany({
@@ -435,9 +435,9 @@ export const emergencyRouter = createTRPCRouter({
         orderBy: {
           createdAt: "desc",
         },
-      })
+      });
 
-      return transactions
+      return transactions;
     }),
 
   /**
@@ -452,7 +452,7 @@ export const emergencyRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const userId = ctx.session.user.id
+      const userId = ctx.session.user.id;
 
       // Get projects where user is FINANCE
       const projectIds = await ctx.db.projectMember
@@ -460,9 +460,9 @@ export const emergencyRouter = createTRPCRouter({
           where: { userId, role: "FINANCE" },
           select: { projectId: true },
         })
-        .then((members) => members.map((m) => m.projectId))
+        .then((members) => members.map((m) => m.projectId));
 
-      if (!projectIds.length) return []
+      if (!projectIds.length) return [];
 
       // Get emergency funds for these projects
       const fundIds = await ctx.db.emergencyFund
@@ -470,9 +470,9 @@ export const emergencyRouter = createTRPCRouter({
           where: { projectId: { in: projectIds } },
           select: { id: true },
         })
-        .then((funds) => funds.map((f) => f.id))
+        .then((funds) => funds.map((f) => f.id));
 
-      if (!fundIds.length) return []
+      if (!fundIds.length) return [];
 
       // Get transactions
       const transactions = await ctx.db.emergencyTransaction.findMany({
@@ -509,7 +509,7 @@ export const emergencyRouter = createTRPCRouter({
             },
           },
         },
-      })
+      });
 
       return transactions.map((tx) => ({
         id: tx.id,
@@ -523,6 +523,6 @@ export const emergencyRouter = createTRPCRouter({
         project: tx.fund.project,
         requester: tx.requester,
         verifier: tx.verifier,
-      }))
+      }));
     }),
-})
+});

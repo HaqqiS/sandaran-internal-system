@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import { IconGavel, IconWallet } from "@tabler/icons-react"
-import { format } from "date-fns"
-import Link from "next/link"
-import { useState } from "react"
-import { toast } from "sonner"
-import { Badge } from "~/components/ui/badge"
-import { Button } from "~/components/ui/button"
+import { IconGavel, IconWallet } from "@tabler/icons-react";
+import { format } from "date-fns";
+import Link from "next/link";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "~/components/ui/card"
+} from "~/components/ui/card";
 import {
   Table,
   TableBody,
@@ -21,56 +21,56 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "~/components/ui/table"
+} from "~/components/ui/table";
 import {
   useFinanceFundBreakdown,
   useFinanceRecentTransactions,
   useFinanceStats,
-} from "~/hooks"
-import { api } from "~/trpc/react"
-import { DashboardLayout } from "./shared/DashboardLayout"
-import { StatsGrid } from "./shared/StatsGrid"
-import { StatCard } from "./stat-card"
+} from "~/hooks";
+import { api } from "~/trpc/react";
+import { DashboardLayout } from "./shared/DashboardLayout";
+import { StatsGrid } from "./shared/StatsGrid";
+import { StatCard } from "./stat-card";
 
 export function FinanceView() {
-  const { data: stats, isLoading: statsLoading } = useFinanceStats()
+  const { data: stats, isLoading: statsLoading } = useFinanceStats();
   const { data: fundBreakdown, isLoading: fundsLoading } =
-    useFinanceFundBreakdown()
+    useFinanceFundBreakdown();
   const { data: transactions, isLoading: txLoading } =
-    useFinanceRecentTransactions(15)
+    useFinanceRecentTransactions(15);
 
-  const utils = api.useUtils()
-  const [reviewingIds, setReviewingIds] = useState<Set<string>>(new Set())
+  const utils = api.useUtils();
+  const [reviewingIds, setReviewingIds] = useState<Set<string>>(new Set());
 
   const verifyMutation = api.emergency.verify.useMutation({
     onMutate: (variables) => {
-      setReviewingIds((prev) => new Set(prev).add(variables.transactionId))
+      setReviewingIds((prev) => new Set(prev).add(variables.transactionId));
     },
     onSuccess: () => {
-      toast.success("Transaction marked as reviewed")
-      void utils.emergency.getRecentTransactions.invalidate()
+      toast.success("Transaction marked as reviewed");
+      void utils.emergency.getRecentTransactions.invalidate();
     },
     onError: (error) => {
-      toast.error(error.message)
+      toast.error(error.message);
     },
     onSettled: (_data, _error, variables) => {
       setReviewingIds((prev) => {
-        const next = new Set(prev)
-        next.delete(variables.transactionId)
-        return next
-      })
+        const next = new Set(prev);
+        next.delete(variables.transactionId);
+        return next;
+      });
     },
-  })
+  });
 
   const handleMarkAsReviewed = (transactionId: string, projectId: string) => {
     verifyMutation.mutate({
       transactionId,
       projectId,
       status: "REVIEWED",
-    })
-  }
+    });
+  };
 
-  const isLoading = statsLoading || fundsLoading || txLoading
+  const isLoading = statsLoading || fundsLoading || txLoading;
 
   return (
     <DashboardLayout
@@ -262,5 +262,5 @@ export function FinanceView() {
         </CardContent>
       </Card>
     </DashboardLayout>
-  )
+  );
 }

@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { IconLoader2 } from "@tabler/icons-react"
-import { useState } from "react"
-import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs"
-import { useDocumentsByProject } from "~/hooks/useDocument"
-import type { DocumentType, ProjectDocument } from "../../../generated/prisma"
-import { DocumentCard } from "./document-card"
+import { IconLoader2 } from "@tabler/icons-react";
+import { useState } from "react";
+import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { useDocumentsByProject } from "~/hooks/useDocument";
+import type { DocumentType, ProjectDocument } from "../../../generated/prisma";
+import { DocumentCard } from "./document-card";
 
 interface DocumentListProps {
-  projectId: string
-  currentUserId: string
-  onEdit: (document: ProjectDocument) => void
-  onDelete: (document: ProjectDocument) => void
+  projectId: string;
+  currentUserId: string;
+  onEdit: (document: ProjectDocument) => void;
+  onDelete: (document: ProjectDocument) => void;
 }
 
 export function DocumentList({
@@ -20,21 +20,21 @@ export function DocumentList({
   onEdit,
   onDelete,
 }: DocumentListProps) {
-  const [activeTab, setActiveTab] = useState<string>("ALL")
+  const [activeTab, setActiveTab] = useState<string>("ALL");
   const { data: documents, isLoading } = useDocumentsByProject(
     projectId,
     activeTab === "ALL" ? undefined : (activeTab as DocumentType),
-  )
+  );
 
   if (isLoading) {
     return (
       <div className="flex h-40 items-center justify-center">
         <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
-    )
+    );
   }
 
-  const hasDocuments = documents && documents.length > 0
+  const hasDocuments = documents && documents.length > 0;
 
   return (
     <div className="space-y-6">
@@ -71,5 +71,5 @@ export function DocumentList({
         </div>
       </Tabs>
     </div>
-  )
+  );
 }

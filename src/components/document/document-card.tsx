@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   IconDownload,
@@ -8,11 +8,11 @@ import {
   IconFileTypeXls,
   IconPhoto,
   IconTrash,
-} from "@tabler/icons-react"
-import { format } from "date-fns"
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
-import { Badge } from "~/components/ui/badge"
-import { Button } from "~/components/ui/button"
+} from "@tabler/icons-react";
+import { format } from "date-fns";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import {
   Card,
   CardContent,
@@ -20,20 +20,20 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "~/components/ui/card"
-import { useGetDownloadUrl } from "~/hooks/useDocument"
-import type { ProjectDocument } from "../../../generated/prisma"
+} from "~/components/ui/card";
+import { useGetDownloadUrl } from "~/hooks/useDocument";
+import type { ProjectDocument } from "../../../generated/prisma";
 
 interface DocumentCardProps {
   document: ProjectDocument & {
     uploader: {
-      name: string
-      image: string | null
-    }
-  }
-  currentUserId: string
-  onEdit: (document: ProjectDocument) => void
-  onDelete: (document: ProjectDocument) => void
+      name: string;
+      image: string | null;
+    };
+  };
+  currentUserId: string;
+  onEdit: (document: ProjectDocument) => void;
+  onDelete: (document: ProjectDocument) => void;
 }
 
 export function DocumentCard({
@@ -42,39 +42,39 @@ export function DocumentCard({
   onEdit,
   onDelete,
 }: DocumentCardProps) {
-  const isOwner = document.userId === currentUserId
+  const isOwner = document.userId === currentUserId;
   const { mutateAsync: getDownloadUrl, isPending: isDownloading } =
-    useGetDownloadUrl()
+    useGetDownloadUrl();
 
   // Determine icon based on mimeType or fileType
   const getFileIcon = () => {
     if (document.mimeType?.startsWith("image/")) {
-      return <IconPhoto className="h-8 w-8 text-blue-500" />
+      return <IconPhoto className="h-8 w-8 text-blue-500" />;
     }
     if (document.mimeType === "application/pdf") {
-      return <IconFileTypePdf className="h-8 w-8 text-red-500" />
+      return <IconFileTypePdf className="h-8 w-8 text-red-500" />;
     }
     if (
       document.mimeType?.includes("excel") ||
       document.mimeType?.includes("spreadsheet")
     ) {
-      return <IconFileTypeXls className="h-8 w-8 text-green-500" />
+      return <IconFileTypeXls className="h-8 w-8 text-green-500" />;
     }
-    return <IconFile className="h-8 w-8 text-gray-500" />
-  }
+    return <IconFile className="h-8 w-8 text-gray-500" />;
+  };
 
   const handleDownload = async () => {
     try {
-      console.log("Document data:", document)
+      console.log("Document data:", document);
       const { url } = await getDownloadUrl({
         projectId: document.projectId,
         documentId: document.id,
-      })
-      window.open(url, "_blank", "noopener,noreferrer")
+      });
+      window.open(url, "_blank", "noopener,noreferrer");
     } catch (error) {
-      console.error("Failed to get download URL", error)
+      console.error("Failed to get download URL", error);
     }
-  }
+  };
 
   return (
     <Card className="flex flex-col h-full hover:shadow-md transition-shadow">
@@ -162,5 +162,5 @@ export function DocumentCard({
         )}
       </CardFooter>
     </Card>
-  )
+  );
 }

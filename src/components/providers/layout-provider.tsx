@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import type { ReactNode } from "react"
-import { createContext, useCallback, useContext, useState } from "react"
+import type { ReactNode } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 
 interface LayoutConfig {
-  headerTitle?: string
-  headerActions?: ReactNode
-  hideSidebar?: boolean
+  headerTitle?: string;
+  headerActions?: ReactNode;
+  hideSidebar?: boolean;
 }
 
 interface LayoutContextValue {
-  config: LayoutConfig
-  setConfig: (config: LayoutConfig) => void
-  updateConfig: (partial: Partial<LayoutConfig>) => void
+  config: LayoutConfig;
+  setConfig: (config: LayoutConfig) => void;
+  updateConfig: (partial: Partial<LayoutConfig>) => void;
 }
 
-const LayoutContext = createContext<LayoutContextValue | undefined>(undefined)
+const LayoutContext = createContext<LayoutContextValue | undefined>(undefined);
 
 /**
  * Layout Provider
@@ -30,17 +30,17 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
     headerTitle: "Dashboard",
     headerActions: undefined,
     hideSidebar: false,
-  })
+  });
 
   const updateConfig = useCallback((partial: Partial<LayoutConfig>) => {
-    setConfig((prev) => ({ ...prev, ...partial }))
-  }, [])
+    setConfig((prev) => ({ ...prev, ...partial }));
+  }, []);
 
   return (
     <LayoutContext.Provider value={{ config, setConfig, updateConfig }}>
       {children}
     </LayoutContext.Provider>
-  )
+  );
 }
 
 /**
@@ -66,9 +66,9 @@ export function LayoutProvider({ children }: { children: ReactNode }) {
  * ```
  */
 export function useLayout() {
-  const context = useContext(LayoutContext)
+  const context = useContext(LayoutContext);
   if (!context) {
-    throw new Error("useLayout must be used within LayoutProvider")
+    throw new Error("useLayout must be used within LayoutProvider");
   }
-  return context
+  return context;
 }

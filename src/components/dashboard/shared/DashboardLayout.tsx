@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import type { ReactNode } from "react"
-import { PageLayout } from "~/components/layout/page-layout"
+import type { ReactNode } from "react";
+import { PageLayout } from "~/components/layout/page-layout";
 
 interface DashboardLayoutProps {
-  title: string
-  description?: string
-  children: ReactNode
+  title: string;
+  description?: string;
+  children: ReactNode;
 }
 
 export function DashboardLayout({
@@ -26,5 +26,5 @@ export function DashboardLayout({
         <div className="space-y-8">{children}</div>
       </div>
     </PageLayout>
-  )
+  );
 }

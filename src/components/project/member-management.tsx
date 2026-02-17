@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { IconPlus, IconTrash } from "@tabler/icons-react"
-import type { GlobalRole, ProjectRole } from "generated/prisma"
-import { useState } from "react"
-import { toast } from "sonner"
+import { IconPlus, IconTrash } from "@tabler/icons-react";
+import type { GlobalRole, ProjectRole } from "generated/prisma";
+import { useState } from "react";
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,17 +13,17 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "~/components/ui/alert-dialog"
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
-import { Button } from "~/components/ui/button"
-import { Label } from "~/components/ui/label"
+} from "~/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Button } from "~/components/ui/button";
+import { Label } from "~/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/components/ui/select"
+} from "~/components/ui/select";
 import {
   Table,
   TableBody,
@@ -31,49 +31,49 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "~/components/ui/table"
+} from "~/components/ui/table";
 import {
   useAddProjectMember,
   useProjectMembers,
   useRemoveMember,
   useUpdateMemberRole,
-} from "~/hooks"
-import { isAdmin } from "~/lib/auth-guards"
-import { useSessionStore } from "~/stores/use-session-store"
-import { UserSelect } from "./user-select"
+} from "~/hooks";
+import { isAdmin } from "~/lib/auth-guards";
+import { useSessionStore } from "~/stores/use-session-store";
+import { UserSelect } from "./user-select";
 
 interface MemberManagementProps {
-  projectId: string
+  projectId: string;
 }
 
 const PROJECT_ROLES: { value: ProjectRole; label: string }[] = [
   { value: "MANDOR", label: "Mandor" },
   { value: "ARCHITECT", label: "Architect" },
   { value: "FINANCE", label: "Finance" },
-]
+];
 
 export function MemberManagement({ projectId }: MemberManagementProps) {
-  const session = useSessionStore((state) => state.session)
+  const session = useSessionStore((state) => state.session);
   const canManage = isAdmin(
     session?.user?.roleGlobal as GlobalRole | null | undefined,
-  )
+  );
 
-  const { data: members, isLoading } = useProjectMembers(projectId)
-  const addMember = useAddProjectMember()
-  const updateRole = useUpdateMemberRole()
-  const removeMember = useRemoveMember()
+  const { data: members, isLoading } = useProjectMembers(projectId);
+  const addMember = useAddProjectMember();
+  const updateRole = useUpdateMemberRole();
+  const removeMember = useRemoveMember();
 
-  const [selectedUserId, setSelectedUserId] = useState<string>("")
-  const [selectedRole, setSelectedRole] = useState<ProjectRole>("MANDOR")
+  const [selectedUserId, setSelectedUserId] = useState<string>("");
+  const [selectedRole, setSelectedRole] = useState<ProjectRole>("MANDOR");
   const [memberToRemove, setMemberToRemove] = useState<{
-    id: string
-    name: string | null
-  } | null>(null)
+    id: string;
+    name: string | null;
+  } | null>(null);
 
   const handleAddMember = async () => {
     if (!selectedUserId) {
-      toast.error("Please select a user")
-      return
+      toast.error("Please select a user");
+      return;
     }
 
     try {
@@ -81,44 +81,44 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
         projectId,
         userId: selectedUserId,
         role: selectedRole,
-      })
-      toast.success("Member added successfully")
-      setSelectedUserId("")
-      setSelectedRole("MANDOR")
+      });
+      toast.success("Member added successfully");
+      setSelectedUserId("");
+      setSelectedRole("MANDOR");
     } catch {
       // Error handled by global mutation cache
     }
-  }
+  };
 
   const handleRoleChange = async (memberId: string, newRole: ProjectRole) => {
     try {
       await updateRole.mutateAsync({
         memberId,
         role: newRole,
-      })
-      toast.success("Role updated successfully")
+      });
+      toast.success("Role updated successfully");
     } catch {
       // Error handled by global mutation cache
     }
-  }
+  };
 
   const handleRemoveMember = async () => {
-    if (!memberToRemove) return
+    if (!memberToRemove) return;
     try {
-      await removeMember.mutateAsync({ memberId: memberToRemove.id })
-      toast.success("Member removed successfully")
-      setMemberToRemove(null)
+      await removeMember.mutateAsync({ memberId: memberToRemove.id });
+      toast.success("Member removed successfully");
+      setMemberToRemove(null);
     } catch {
       // Error handled by global mutation cache
     }
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
         <div className="text-muted-foreground">Loading members...</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -281,5 +281,5 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  )
+  );
 }

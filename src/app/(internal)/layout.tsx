@@ -1,10 +1,10 @@
-import type { ReactNode } from "react"
-import { InternalLayoutClient } from "~/components/layout"
-import { SessionInitializer } from "~/components/providers/session-initializer"
-import { requireAuth } from "~/lib/server-auth"
+import type { ReactNode } from "react";
+import { InternalLayoutClient } from "~/components/layout";
+import { SessionInitializer } from "~/components/providers/session-initializer";
+import { requireAuth } from "~/lib/server-auth";
 
 interface InternalLayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 /**
@@ -22,7 +22,7 @@ export default async function InternalLayout({
 }: InternalLayoutProps) {
   // Validate session and redirect if unauthorized
   // This uses validateSessionAccess from auth-guards.ts
-  const session = await requireAuth()
+  const session = await requireAuth();
 
   return (
     <>
@@ -31,5 +31,5 @@ export default async function InternalLayout({
       {/* Render shared layout (sidebar, header) + child pages */}
       <InternalLayoutClient>{children}</InternalLayoutClient>
     </>
-  )
+  );
 }

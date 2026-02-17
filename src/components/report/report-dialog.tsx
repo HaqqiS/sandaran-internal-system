@@ -4,31 +4,31 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "~/components/ui/dialog"
+} from "~/components/ui/dialog";
 import {
   Drawer,
   DrawerContent,
   DrawerDescription,
   DrawerHeader,
   DrawerTitle,
-} from "~/components/ui/drawer"
-import { useIsMobile } from "~/hooks/use-mobile"
-import { ReportForm } from "./report-form"
+} from "~/components/ui/drawer";
+import { useIsMobile } from "~/hooks/use-mobile";
+import { ReportForm } from "./report-form";
 
 interface ReportDialogProps {
-  projectId: string
+  projectId: string;
   report?: {
-    id: string
-    reportDate: Date | string
-    taskDescription: string
-    progressPercent: number
-    issues?: string | null
-    weather?: string | null
-    totalWorkers: number
-    location?: string | null
-  }
-  open: boolean
-  onOpenChange: (open: boolean) => void
+    id: string;
+    reportDate: Date | string;
+    taskDescription: string;
+    progressPercent: number;
+    issues?: string | null;
+    weather?: string | null;
+    totalWorkers: number;
+    location?: string | null;
+  };
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function ReportDialog({
@@ -37,13 +37,13 @@ export function ReportDialog({
   open,
   onOpenChange,
 }: ReportDialogProps) {
-  const isMobile = useIsMobile()
-  const isEditMode = !!report
+  const isMobile = useIsMobile();
+  const isEditMode = !!report;
 
-  const title = isEditMode ? "Edit Report" : "Create New Report"
+  const title = isEditMode ? "Edit Report" : "Create New Report";
   const description = isEditMode
     ? "Update the daily report details"
-    : "Fill in the daily report for this project"
+    : "Fill in the daily report for this project";
 
   if (!isMobile) {
     return (
@@ -60,7 +60,7 @@ export function ReportDialog({
           />
         </DialogContent>
       </Dialog>
-    )
+    );
   }
 
   return (
@@ -79,5 +79,5 @@ export function ReportDialog({
         </div>
       </DrawerContent>
     </Drawer>
-  )
+  );
 }

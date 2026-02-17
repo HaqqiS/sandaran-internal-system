@@ -1,36 +1,36 @@
 /** biome-ignore-all lint/correctness/noChildrenProp: <children prop is used> */
-"use client"
+"use client";
 
-import { IconCalendar } from "@tabler/icons-react"
-import { useForm } from "@tanstack/react-form"
-import { format } from "date-fns"
-import { toast } from "sonner"
-import { z } from "zod"
-import { Button } from "~/components/ui/button"
-import { Calendar } from "~/components/ui/calendar"
+import { IconCalendar } from "@tabler/icons-react";
+import { useForm } from "@tanstack/react-form";
+import { format } from "date-fns";
+import { toast } from "sonner";
+import { z } from "zod";
+import { Button } from "~/components/ui/button";
+import { Calendar } from "~/components/ui/calendar";
 import {
   Field,
   FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "~/components/ui/field"
-import { Input } from "~/components/ui/input"
+} from "~/components/ui/field";
+import { Input } from "~/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "~/components/ui/popover"
+} from "~/components/ui/popover";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "~/components/ui/select"
-import { Textarea } from "~/components/ui/textarea"
-import { useCreateProject, useUpdateProject } from "~/hooks"
-import { cn } from "~/lib/utils"
+} from "~/components/ui/select";
+import { Textarea } from "~/components/ui/textarea";
+import { useCreateProject, useUpdateProject } from "~/hooks";
+import { cn } from "~/lib/utils";
 
 const projectSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -46,28 +46,28 @@ const projectSchema = z.object({
   startDate: z.date().optional(),
   endDate: z.date().optional(),
   status: z.enum(["ACTIVE", "DONE", "PAUSED"]),
-})
+});
 
-type ProjectFormValues = z.infer<typeof projectSchema>
+type ProjectFormValues = z.infer<typeof projectSchema>;
 
 interface ProjectFormProps {
   project?: {
-    id: string
-    name: string
-    slug: string
-    description?: string | null
-    location?: string | null
-    startDate?: Date | null
-    endDate?: Date | null
-    status: "ACTIVE" | "DONE" | "PAUSED"
-  }
-  onSuccess?: () => void
+    id: string;
+    name: string;
+    slug: string;
+    description?: string | null;
+    location?: string | null;
+    startDate?: Date | null;
+    endDate?: Date | null;
+    status: "ACTIVE" | "DONE" | "PAUSED";
+  };
+  onSuccess?: () => void;
 }
 
 export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
-  const createProject = useCreateProject()
-  const updateProject = useUpdateProject()
-  const isEditMode = !!project
+  const createProject = useCreateProject();
+  const updateProject = useUpdateProject();
+  const isEditMode = !!project;
 
   const form = useForm({
     defaultValues: {
@@ -88,13 +88,14 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
           await updateProject.mutateAsync({
             projectId: project.id,
             name: value.name,
+            slug: value.slug,
             description: value.description || undefined,
             location: value.location || undefined,
             startDate: value.startDate,
             endDate: value.endDate,
             status: value.status,
-          })
-          toast.success("Project updated successfully")
+          });
+          toast.success("Project updated successfully");
         } else {
           await createProject.mutateAsync({
             name: value.name,
@@ -104,21 +105,21 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
             startDate: value.startDate,
             endDate: value.endDate,
             status: value.status,
-          })
-          toast.success("Project created successfully")
+          });
+          toast.success("Project created successfully");
         }
-        onSuccess?.()
+        onSuccess?.();
       } catch {
         // Error is handled by global mutation cache
       }
     },
-  })
+  });
 
   return (
     <form
       onSubmit={(e) => {
-        e.preventDefault()
-        form.handleSubmit()
+        e.preventDefault();
+        form.handleSubmit();
       }}
       className="space-y-4"
     >
@@ -127,7 +128,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
           name="name"
           children={(field) => {
             const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid
+              field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Project Name</FieldLabel>
@@ -137,15 +138,15 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) => {
-                    const newName = e.target.value
-                    field.handleChange(newName)
+                    const newName = e.target.value;
+                    field.handleChange(newName);
 
                     // Auto-generate slug from name
                     const newSlug = newName
                       .toLowerCase()
                       .replace(/[^a-z0-9]+/g, "-")
-                      .replace(/^-|-$/g, "")
-                    form.setFieldValue("slug", newSlug)
+                      .replace(/^-|-$/g, "");
+                    form.setFieldValue("slug", newSlug);
                   }}
                   aria-invalid={isInvalid}
                   placeholder="My Construction Project"
@@ -156,7 +157,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                 </FieldDescription>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
-            )
+            );
           }}
         />
 
@@ -164,7 +165,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
           name="slug"
           children={(field) => {
             const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid
+              field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Slug</FieldLabel>
@@ -183,7 +184,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                 </FieldDescription>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
-            )
+            );
           }}
         />
 
@@ -191,7 +192,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
           name="description"
           children={(field) => {
             const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid
+              field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Description</FieldLabel>
@@ -207,7 +208,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                 />
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
-            )
+            );
           }}
         />
 
@@ -215,7 +216,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
           name="location"
           children={(field) => {
             const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid
+              field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Location</FieldLabel>
@@ -231,7 +232,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                 />
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
-            )
+            );
           }}
         />
 
@@ -240,7 +241,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
             name="startDate"
             children={(field) => {
               const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid
+                field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel>Start Date</FieldLabel>
@@ -270,7 +271,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                   </Popover>
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
-              )
+              );
             }}
           />
 
@@ -278,7 +279,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
             name="endDate"
             children={(field) => {
               const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid
+                field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel>End Date</FieldLabel>
@@ -308,7 +309,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                   </Popover>
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
-              )
+              );
             }}
           />
         </div>
@@ -317,7 +318,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
           name="status"
           children={(field) => {
             const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid
+              field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel>Status</FieldLabel>
@@ -338,7 +339,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                 </Select>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
-            )
+            );
           }}
         />
       </FieldGroup>
@@ -358,5 +359,5 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
         />
       </div>
     </form>
-  )
+  );
 }

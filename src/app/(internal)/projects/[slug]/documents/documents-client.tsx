@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { IconArrowLeft, IconLoader2, IconPlus } from "@tabler/icons-react"
-import type { ProjectDocument } from "generated/prisma"
-import Link from "next/link"
-import { useParams } from "next/navigation"
-import { useState } from "react"
-import { toast } from "sonner"
-import { DocumentList } from "~/components/document/document-list"
-import { UploadDialog } from "~/components/document/upload-dialog"
-import { PageLayout } from "~/components/layout"
+import { IconArrowLeft, IconLoader2, IconPlus } from "@tabler/icons-react";
+import type { ProjectDocument } from "generated/prisma";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { DocumentList } from "~/components/document/document-list";
+import { UploadDialog } from "~/components/document/upload-dialog";
+import { PageLayout } from "~/components/layout";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,54 +18,54 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "~/components/ui/alert-dialog"
-import { Button } from "~/components/ui/button"
-import { useDeleteDocument } from "~/hooks/useDocument"
-import { useProjectBySlug, useProjectMembers } from "~/hooks/useProject"
-import { useSession } from "~/stores/use-session-store"
+} from "~/components/ui/alert-dialog";
+import { Button } from "~/components/ui/button";
+import { useDeleteDocument } from "~/hooks/useDocument";
+import { useProjectBySlug, useProjectMembers } from "~/hooks/useProject";
+import { useSession } from "~/stores/use-session-store";
 
 export function DocumentsClient() {
-  const params = useParams()
-  const slug = params.slug as string
+  const params = useParams();
+  const slug = params.slug as string;
 
-  const { data: project, isLoading, error } = useProjectBySlug(slug)
-  const { data: members } = useProjectMembers(project?.id ?? "")
-  const { session } = useSession()
+  const { data: project, isLoading, error } = useProjectBySlug(slug);
+  const { data: members } = useProjectMembers(project?.id ?? "");
+  const { session } = useSession();
 
-  const deleteDocument = useDeleteDocument()
+  const deleteDocument = useDeleteDocument();
 
-  const [showUploadDialog, setShowUploadDialog] = useState(false)
+  const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [deleteDialogDoc, setDeleteDialogDoc] =
-    useState<ProjectDocument | null>(null)
+    useState<ProjectDocument | null>(null);
 
   // Find user's role
-  const projectMember = members?.find((m) => m.userId === session?.user?.id)
-  const role = projectMember?.role
+  const projectMember = members?.find((m) => m.userId === session?.user?.id);
+  const role = projectMember?.role;
 
   // Permission Check: ARCHITECT or Global ADMIN can upload
   const canUpload =
-    role === "ARCHITECT" || session?.user?.roleGlobal === "ADMIN"
+    role === "ARCHITECT" || session?.user?.roleGlobal === "ADMIN";
 
   const handleDelete = async () => {
-    if (!deleteDialogDoc || !project) return
+    if (!deleteDialogDoc || !project) return;
     try {
       await deleteDocument.mutateAsync({
         projectId: project.id,
         documentId: deleteDialogDoc.id,
-      })
-      toast.success("Document deleted successfully")
-      setDeleteDialogDoc(null)
+      });
+      toast.success("Document deleted successfully");
+      setDeleteDialogDoc(null);
     } catch {
       // Error handled by mutation
     }
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
-    )
+    );
   }
 
   if (error || !project) {
@@ -84,7 +84,7 @@ export function DocumentsClient() {
           </Button>
         </div>
       </PageLayout>
-    )
+    );
   }
 
   return (
@@ -111,7 +111,7 @@ export function DocumentsClient() {
           currentUserId={session?.user?.id ?? ""}
           onEdit={(_doc) => {
             // TODO: Implement Edit
-            toast.info("Edit functionality coming soon")
+            toast.info("Edit functionality coming soon");
           }}
           onDelete={(doc) => setDeleteDialogDoc(doc)}
         />
@@ -150,5 +150,5 @@ export function DocumentsClient() {
         </AlertDialogContent>
       </AlertDialog>
     </PageLayout>
-  )
+  );
 }

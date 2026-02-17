@@ -1,41 +1,41 @@
-"use client"
+"use client";
 
-import { IconArrowLeft, IconLoader2 } from "@tabler/icons-react"
-import type { GlobalRole, ProjectRole } from "generated/prisma"
-import Link from "next/link"
-import { useState } from "react"
-import { PageLayout } from "~/components/layout"
-import { ReportDialog } from "~/components/report/report-dialog"
-import { ReportList } from "~/components/report/report-list"
-import { Button } from "~/components/ui/button"
-import { useProjectBySlug } from "~/hooks"
-import { useSessionStore } from "~/stores/use-session-store"
+import { IconArrowLeft, IconLoader2 } from "@tabler/icons-react";
+import type { GlobalRole, ProjectRole } from "generated/prisma";
+import Link from "next/link";
+import { useState } from "react";
+import { PageLayout } from "~/components/layout";
+import { ReportDialog } from "~/components/report/report-dialog";
+import { ReportList } from "~/components/report/report-list";
+import { Button } from "~/components/ui/button";
+import { useProjectBySlug } from "~/hooks";
+import { useSessionStore } from "~/stores/use-session-store";
 
 interface ReportsClientProps {
-  projectSlug: string
+  projectSlug: string;
 }
 
 export function ReportsClient({ projectSlug }: ReportsClientProps) {
-  const { data: project, isLoading, error } = useProjectBySlug(projectSlug)
-  const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const session = useSessionStore((state) => state.session)
+  const { data: project, isLoading, error } = useProjectBySlug(projectSlug);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const session = useSessionStore((state) => state.session);
 
   // Check if user can create reports (MANDOR or ARCHITECT, or ADMIN)
-  const userRole = session?.user?.roleGlobal as GlobalRole | undefined
-  const isAdmin = userRole === "ADMIN" || userRole === "CEO"
+  const userRole = session?.user?.roleGlobal as GlobalRole | undefined;
+  const isAdmin = userRole === "ADMIN" || userRole === "CEO";
   const projectMember = project?.members.find(
     (m) => m.userId === session?.user?.id,
-  )
-  const memberRole = projectMember?.role as ProjectRole | undefined
+  );
+  const memberRole = projectMember?.role as ProjectRole | undefined;
   const canCreate =
-    isAdmin || memberRole === "MANDOR" || memberRole === "ARCHITECT"
+    isAdmin || memberRole === "MANDOR" || memberRole === "ARCHITECT";
 
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
-    )
+    );
   }
 
   if (error || !project) {
@@ -54,7 +54,7 @@ export function ReportsClient({ projectSlug }: ReportsClientProps) {
           </Button>
         </div>
       </PageLayout>
-    )
+    );
   }
 
   return (
@@ -84,5 +84,5 @@ export function ReportsClient({ projectSlug }: ReportsClientProps) {
         onOpenChange={setIsCreateOpen}
       />
     </PageLayout>
-  )
+  );
 }

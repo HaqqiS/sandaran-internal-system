@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { toast } from "sonner"
-import { Button } from "~/components/ui/button"
+import { toast } from "sonner";
+import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,14 +9,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "~/components/ui/dialog"
-import { useVerifyEmergencyRequest } from "~/hooks/useEmergency"
+} from "~/components/ui/dialog";
+import { useVerifyEmergencyRequest } from "~/hooks/useEmergency";
 
 interface VerifyDialogProps {
-  projectId: string
-  transactionId: string | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  projectId: string;
+  transactionId: string | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function VerifyDialog({
@@ -25,24 +25,24 @@ export function VerifyDialog({
   open,
   onOpenChange,
 }: VerifyDialogProps) {
-  const verifyRequest = useVerifyEmergencyRequest()
+  const verifyRequest = useVerifyEmergencyRequest();
 
   const handleVerify = async () => {
-    if (!transactionId) return
+    if (!transactionId) return;
 
     try {
       await verifyRequest.mutateAsync({
         projectId,
         transactionId,
         status: "REVIEWED",
-      })
-      toast.success("Transaction marked as reviewed")
-      onOpenChange(false)
+      });
+      toast.success("Transaction marked as reviewed");
+      onOpenChange(false);
     } catch (error) {
-      toast.error("Failed to verify transaction")
-      console.error(error)
+      toast.error("Failed to verify transaction");
+      console.error(error);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -65,5 +65,5 @@ export function VerifyDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import type { GlobalRole } from "generated/prisma"
-import { useState } from "react"
-import { toast } from "sonner"
-import { Button } from "~/components/ui/button"
+import type { GlobalRole } from "generated/prisma";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -11,20 +11,20 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "~/components/ui/dialog"
-import { Label } from "~/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group"
-import { api } from "~/trpc/react"
+} from "~/components/ui/dialog";
+import { Label } from "~/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import { api } from "~/trpc/react";
 
 interface EditRoleDialogProps {
   user: {
-    id: string
-    name: string
-    email: string
-    roleGlobal: GlobalRole
-  } | null
-  open: boolean
-  onOpenChange: (open: boolean) => void
+    id: string;
+    name: string;
+    email: string;
+    roleGlobal: GlobalRole;
+  } | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function EditRoleDialog({
@@ -32,30 +32,30 @@ export function EditRoleDialog({
   open,
   onOpenChange,
 }: EditRoleDialogProps) {
-  const [role, setRole] = useState<GlobalRole>("USER")
-  const utils = api.useUtils()
+  const [role, setRole] = useState<GlobalRole>("USER");
+  const utils = api.useUtils();
 
   // Update role when user changes
   useState(() => {
     if (user) {
-      setRole(user.roleGlobal)
+      setRole(user.roleGlobal);
     }
-  })
+  });
 
   const updateRole = api.user.updateGlobalRole.useMutation({
     onSuccess: () => {
-      toast.success(`Role updated successfully for ${user?.name}`)
-      utils.user.getAllUsersWithFilter.invalidate()
-      onOpenChange(false)
+      toast.success(`Role updated successfully for ${user?.name}`);
+      utils.user.getAllUsersWithFilter.invalidate();
+      onOpenChange(false);
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to update role")
+      toast.error(error.message || "Failed to update role");
     },
-  })
+  });
 
-  if (!user) return null
+  if (!user) return null;
 
-  const hasRoleChanged = role !== user.roleGlobal
+  const hasRoleChanged = role !== user.roleGlobal;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -139,5 +139,5 @@ export function EditRoleDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

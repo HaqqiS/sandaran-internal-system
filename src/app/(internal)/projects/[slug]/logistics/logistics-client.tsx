@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { IconArrowLeft, IconLoader2, IconPlus } from "@tabler/icons-react"
-import Link from "next/link"
-import { useParams } from "next/navigation"
-import { useState } from "react"
-import { PageLayout } from "~/components/layout"
-import { LogisticItemForm } from "~/components/logistic/item-form"
-import { ItemList } from "~/components/logistic/item-list"
-import { Button } from "~/components/ui/button"
+import { IconArrowLeft, IconLoader2, IconPlus } from "@tabler/icons-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useState } from "react";
+import { PageLayout } from "~/components/layout";
+import { LogisticItemForm } from "~/components/logistic/item-form";
+import { ItemList } from "~/components/logistic/item-list";
+import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -15,33 +15,33 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "~/components/ui/dialog"
-import { useProjectBySlug, useProjectMembers } from "~/hooks/useProject"
-import { useSession } from "~/stores/use-session-store"
+} from "~/components/ui/dialog";
+import { useProjectBySlug, useProjectMembers } from "~/hooks/useProject";
+import { useSession } from "~/stores/use-session-store";
 
 export function LogisticsClient() {
-  const params = useParams()
-  const slug = params.slug as string
+  const params = useParams();
+  const slug = params.slug as string;
 
-  const { data: project, isLoading, error } = useProjectBySlug(slug)
+  const { data: project, isLoading, error } = useProjectBySlug(slug);
   // useProjectBySlug might not return error based on previous view, but we can handle !project as error if not loading
-  const { data: members } = useProjectMembers(project?.id ?? "")
+  const { data: members } = useProjectMembers(project?.id ?? "");
 
-  const { session } = useSession()
-  const [showAddDialog, setShowAddDialog] = useState(false)
+  const { session } = useSession();
+  const [showAddDialog, setShowAddDialog] = useState(false);
 
   // Find user's role
-  const projectMember = members?.find((m) => m.userId === session?.user?.id)
-  const role = projectMember?.role
+  const projectMember = members?.find((m) => m.userId === session?.user?.id);
+  const role = projectMember?.role;
 
-  const canManage = role === "FINANCE" || session?.user?.roleGlobal === "ADMIN"
+  const canManage = role === "FINANCE" || session?.user?.roleGlobal === "ADMIN";
 
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
-    )
+    );
   }
 
   if (error || !project) {
@@ -60,7 +60,7 @@ export function LogisticsClient() {
           </Button>
         </div>
       </PageLayout>
-    )
+    );
   }
 
   return (
@@ -101,5 +101,5 @@ export function LogisticsClient() {
         <ItemList projectId={project.id} />
       </div>
     </PageLayout>
-  )
+  );
 }

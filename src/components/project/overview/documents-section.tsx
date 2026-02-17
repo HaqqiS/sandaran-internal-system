@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
 import {
   IconChevronRight,
   IconFile,
   IconFileText,
   IconLoader2,
-} from "@tabler/icons-react"
-import { format } from "date-fns"
-import type { DocumentType } from "generated/prisma"
-import Link from "next/link"
-import { Badge } from "~/components/ui/badge"
-import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
-import { useDocumentsByProject } from "~/hooks/useDocument"
+} from "@tabler/icons-react";
+import { format } from "date-fns";
+import type { DocumentType } from "generated/prisma";
+import Link from "next/link";
+import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { useDocumentsByProject } from "~/hooks/useDocument";
 
 interface DocumentsSectionProps {
-  projectId: string
-  projectSlug: string
+  projectId: string;
+  projectSlug: string;
 }
 
 // Helper to get document type label
@@ -27,9 +27,9 @@ const getDocumentTypeLabel = (type: DocumentType) => {
     SPECIFICATION: "Specification",
     REFERENCE: "Reference",
     OTHER: "Other",
-  }
-  return labels[type]
-}
+  };
+  return labels[type];
+};
 
 // Helper to get document type badge variant
 const getDocumentTypeBadge = (type: DocumentType) => {
@@ -39,30 +39,31 @@ const getDocumentTypeBadge = (type: DocumentType) => {
     SPECIFICATION: "outline",
     REFERENCE: "outline",
     OTHER: "outline",
-  }
-  return variants[type]
-}
+  };
+  return variants[type];
+};
 
 export function DocumentsSection({
   projectId,
   projectSlug,
 }: DocumentsSectionProps) {
-  const { data: allDocuments, isLoading } = useDocumentsByProject(projectId)
+  const { data: allDocuments, isLoading } = useDocumentsByProject(projectId);
 
   // Group documents by type and get recent ones
-  const documentsByType: Partial<Record<DocumentType, typeof allDocuments>> = {}
+  const documentsByType: Partial<Record<DocumentType, typeof allDocuments>> =
+    {};
 
   if (allDocuments) {
     allDocuments.forEach((doc) => {
       if (!documentsByType[doc.fileType]) {
-        documentsByType[doc.fileType] = []
+        documentsByType[doc.fileType] = [];
       }
-      documentsByType[doc.fileType]?.push(doc)
-    })
+      documentsByType[doc.fileType]?.push(doc);
+    });
   }
 
-  const totalCount = allDocuments?.length ?? 0
-  const typeCount = Object.keys(documentsByType).length
+  const totalCount = allDocuments?.length ?? 0;
+  const typeCount = Object.keys(documentsByType).length;
 
   return (
     <Card>
@@ -144,5 +145,5 @@ export function DocumentsSection({
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

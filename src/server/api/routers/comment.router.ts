@@ -1,7 +1,7 @@
-import { TRPCError } from "@trpc/server"
-import { z } from "zod"
-import { requireOwnership } from "~/server/api/helpers/permission"
-import { createTRPCRouter, projectProcedure } from "~/server/api/trpc"
+import { TRPCError } from "@trpc/server";
+import { z } from "zod";
+import { requireOwnership } from "~/server/api/helpers/permission";
+import { createTRPCRouter, projectProcedure } from "~/server/api/trpc";
 
 /**
  * Report Comment Router
@@ -17,14 +17,14 @@ import { createTRPCRouter, projectProcedure } from "~/server/api/trpc"
 // All project members can comment (CEO allowed!)
 const commentProcedure = projectProcedure(["MANDOR", "ARCHITECT", "FINANCE"], {
   allowCEO: true,
-})
+});
 
 // For viewing (no mutation, so CEO can access)
 const projectMemberProcedure = projectProcedure([
   "MANDOR",
   "ARCHITECT",
   "FINANCE",
-])
+]);
 
 export const commentRouter = createTRPCRouter({
   /**
@@ -46,13 +46,13 @@ export const commentRouter = createTRPCRouter({
           id: input.reportId,
           projectId: ctx.projectId,
         },
-      })
+      });
 
       if (!report) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Report not found in this project",
-        })
+        });
       }
 
       const comment = await ctx.db.reportComment.create({
@@ -71,9 +71,9 @@ export const commentRouter = createTRPCRouter({
             },
           },
         },
-      })
+      });
 
-      return comment
+      return comment;
     }),
 
   /**
@@ -94,13 +94,13 @@ export const commentRouter = createTRPCRouter({
           id: input.reportId,
           projectId: ctx.projectId,
         },
-      })
+      });
 
       if (!report) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Report not found in this project",
-        })
+        });
       }
 
       const comments = await ctx.db.reportComment.findMany({
@@ -120,9 +120,9 @@ export const commentRouter = createTRPCRouter({
         orderBy: {
           createdAt: "desc",
         },
-      })
+      });
 
-      return comments
+      return comments;
     }),
 
   /**
@@ -144,13 +144,13 @@ export const commentRouter = createTRPCRouter({
         include: {
           report: true,
         },
-      })
+      });
 
       if (!comment) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Comment not found",
-        })
+        });
       }
 
       // Verify comment belongs to a report in this project
@@ -158,7 +158,7 @@ export const commentRouter = createTRPCRouter({
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "Comment does not belong to this project",
-        })
+        });
       }
 
       // Check ownership (ADMIN bypasses this)
@@ -166,7 +166,7 @@ export const commentRouter = createTRPCRouter({
         comment,
         ctx.session.user.id,
         ctx.session.user.roleGlobal,
-      )
+      );
 
       const updated = await ctx.db.reportComment.update({
         where: { id: input.commentId },
@@ -183,9 +183,9 @@ export const commentRouter = createTRPCRouter({
             },
           },
         },
-      })
+      });
 
-      return updated
+      return updated;
     }),
 
   /**
@@ -206,13 +206,13 @@ export const commentRouter = createTRPCRouter({
         include: {
           report: true,
         },
-      })
+      });
 
       if (!comment) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Comment not found",
-        })
+        });
       }
 
       // Verify comment belongs to a report in this project
@@ -220,7 +220,7 @@ export const commentRouter = createTRPCRouter({
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "Comment does not belong to this project",
-        })
+        });
       }
 
       // Check ownership (ADMIN bypasses this)
@@ -228,12 +228,12 @@ export const commentRouter = createTRPCRouter({
         comment,
         ctx.session.user.id,
         ctx.session.user.roleGlobal,
-      )
+      );
 
       await ctx.db.reportComment.delete({
         where: { id: input.commentId },
-      })
+      });
 
-      return { success: true }
+      return { success: true };
     }),
-})
+});

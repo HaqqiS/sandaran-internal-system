@@ -1,6 +1,10 @@
-import { TRPCError } from "@trpc/server"
-import { z } from "zod"
-import { createTRPCRouter, projectProcedure } from "~/server/api/trpc"
+import { TRPCError } from "@trpc/server";
+import { z } from "zod";
+import {
+  createTRPCRouter,
+  projectProcedure,
+  protectedProcedure,
+} from "~/server/api/trpc";
 
 /**
  * Logistic Router
@@ -14,19 +18,82 @@ import { createTRPCRouter, projectProcedure } from "~/server/api/trpc"
  */
 
 // FINANCE manages items
-const financeProcedure = projectProcedure(["FINANCE"])
+const financeProcedure = projectProcedure(["FINANCE"]);
 
 // MANDOR and FINANCE record transactions
-const logisticProcedure = projectProcedure(["MANDOR", "FINANCE"])
+const logisticProcedure = projectProcedure(["MANDOR", "FINANCE"]);
 
 // All can view
 const projectMemberProcedure = projectProcedure([
   "MANDOR",
   "ARCHITECT",
   "FINANCE",
-])
+]);
 
 export const logisticRouter = createTRPCRouter({
+  /**
+   * Get logistics analytics for all accessible projects
+   */
+  getAnalytics: protectedProcedure.query(async ({ ctx }) => {
+    const user = ctx.session.user;
+    const isAdminOrCEO =
+      user.roleGlobal === "ADMIN" || user.roleGlobal === "CEO";
+
+    const projects = await ctx.db.project.findMany({
+      where: isAdminOrCEO
+        ? { status: "ACTIVE" }
+        : {
+            status: "ACTIVE",
+            members: {
+              some: {
+                userId: user.id,
+              },
+            },
+          },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        _count: {
+          select: {
+            logistics: true,
+          },
+        },
+      },
+    });
+
+    const projectIds = projects.map((p) => p.id);
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const transactions = await ctx.db.logisticTransaction.findMany({
+      where: {
+        item: { projectId: { in: projectIds } },
+        createdAt: { gte: thirtyDaysAgo },
+      },
+      select: {
+        item: {
+          select: { projectId: true },
+        },
+      },
+    });
+
+    const txCounts = new Map<string, number>();
+    transactions.forEach((tx) => {
+      const pid = tx.item.projectId;
+      txCounts.set(pid, (txCounts.get(pid) || 0) + 1);
+    });
+
+    return projects.map((project) => ({
+      id: project.id,
+      name: project.name,
+      slug: project.slug,
+      totalItems: project._count.logistics,
+      recentActivityCount: txCounts.get(project.id) || 0,
+    }));
+  }),
+
   /**
    * Create a new logistic item
    * Only FINANCE can create items
@@ -44,7 +111,7 @@ export const logisticRouter = createTRPCRouter({
       const slug = input.name
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "")
+        .replace(/(^-|-$)/g, "");
 
       const item = await ctx.db.logisticItem.create({
         data: {
@@ -53,9 +120,9 @@ export const logisticRouter = createTRPCRouter({
           unit: input.unit,
           slug: `${slug}-${Date.now()}`,
         },
-      })
+      });
 
-      return item
+      return item;
     }),
 
   /**
@@ -83,9 +150,9 @@ export const logisticRouter = createTRPCRouter({
         orderBy: {
           name: "asc",
         },
-      })
+      });
 
-      return items
+      return items;
     }),
 
   /**
@@ -108,13 +175,13 @@ export const logisticRouter = createTRPCRouter({
           id: input.itemId,
           projectId: ctx.projectId,
         },
-      })
+      });
 
       if (!item) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Logistic item not found in this project",
-        })
+        });
       }
 
       const updated = await ctx.db.logisticItem.update({
@@ -123,9 +190,9 @@ export const logisticRouter = createTRPCRouter({
           name: input.name,
           unit: input.unit,
         },
-      })
+      });
 
-      return updated
+      return updated;
     }),
 
   /**
@@ -146,20 +213,20 @@ export const logisticRouter = createTRPCRouter({
           id: input.itemId,
           projectId: ctx.projectId,
         },
-      })
+      });
 
       if (!item) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Logistic item not found in this project",
-        })
+        });
       }
 
       await ctx.db.logisticItem.delete({
         where: { id: input.itemId },
-      })
+      });
 
-      return { success: true }
+      return { success: true };
     }),
 
   /**
@@ -183,13 +250,13 @@ export const logisticRouter = createTRPCRouter({
           id: input.itemId,
           projectId: ctx.projectId,
         },
-      })
+      });
 
       if (!item) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Logistic item not found in this project",
-        })
+        });
       }
 
       const transaction = await ctx.db.logisticTransaction.create({
@@ -210,9 +277,9 @@ export const logisticRouter = createTRPCRouter({
           },
           item: true,
         },
-      })
+      });
 
-      return transaction
+      return transaction;
     }),
 
   /**
@@ -235,13 +302,13 @@ export const logisticRouter = createTRPCRouter({
             id: input.itemId,
             projectId: ctx.projectId,
           },
-        })
+        });
 
         if (!item) {
           throw new TRPCError({
             code: "NOT_FOUND",
             message: "Logistic item not found in this project",
-          })
+          });
         }
       }
 
@@ -249,9 +316,9 @@ export const logisticRouter = createTRPCRouter({
       const projectItems = await ctx.db.logisticItem.findMany({
         where: { projectId: ctx.projectId },
         select: { id: true },
-      })
+      });
 
-      const projectItemIds = projectItems.map((item) => item.id)
+      const projectItemIds = projectItems.map((item) => item.id);
 
       const transactions = await ctx.db.logisticTransaction.findMany({
         where: {
@@ -273,9 +340,9 @@ export const logisticRouter = createTRPCRouter({
         orderBy: {
           createdAt: "desc",
         },
-      })
+      });
 
-      return transactions
+      return transactions;
     }),
 
   /**
@@ -296,19 +363,19 @@ export const logisticRouter = createTRPCRouter({
         include: {
           transactions: true,
         },
-      })
+      });
 
       // Calculate stock for each item
       const summary = items.map((item) => {
         const totalIn = item.transactions
           .filter((t) => t.type === "IN")
-          .reduce((sum, t) => sum + Number(t.quantity), 0)
+          .reduce((sum, t) => sum + Number(t.quantity), 0);
 
         const totalOut = item.transactions
           .filter((t) => t.type === "OUT")
-          .reduce((sum, t) => sum + Number(t.quantity), 0)
+          .reduce((sum, t) => sum + Number(t.quantity), 0);
 
-        const currentStock = totalIn - totalOut
+        const currentStock = totalIn - totalOut;
 
         return {
           id: item.id,
@@ -318,9 +385,9 @@ export const logisticRouter = createTRPCRouter({
           totalIn,
           totalOut,
           currentStock,
-        }
-      })
+        };
+      });
 
-      return summary
+      return summary;
     }),
-})
+});
