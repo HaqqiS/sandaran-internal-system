@@ -16,8 +16,8 @@ import {
 } from "~/components/user/user-columns";
 import { UserFilterDropdown } from "~/components/user/user-filter-dropdown";
 import { UserFilterTabs } from "~/components/user/user-filter-tabs";
+import { useBulkApprove, useUserListWithFilter } from "~/hooks";
 import { useIsMobile } from "~/hooks/use-mobile";
-import { api } from "~/trpc/react";
 
 type FilterValue = "all" | "pending" | "active" | "rejected";
 
@@ -31,16 +31,14 @@ export function UsersClient() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
 
-  const utils = api.useUtils();
-
-  const { data: users, isLoading } = api.user.getAllUsersWithFilter.useQuery({
+  const { data: users, isLoading } = useUserListWithFilter({
     filter,
+    search: "",
   });
 
-  const bulkApprove = api.user.bulkApprove.useMutation({
+  const bulkApprove = useBulkApprove({
     onSuccess: (data) => {
       toast.success(`Successfully approved ${data.count} user(s)`);
-      utils.user.getAllUsersWithFilter.invalidate();
       setRowSelection({});
     },
     onError: (error) => {

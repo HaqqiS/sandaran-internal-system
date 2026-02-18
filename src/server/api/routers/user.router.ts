@@ -9,34 +9,6 @@ import {
 
 export const userRouter = createTRPCRouter({
   /**
-   * Get all users (admin only)
-   */
-  getAll: adminProcedure.query(async ({ ctx }) => {
-    return ctx.db.user.findMany({
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        emailVerified: true,
-        image: true,
-        roleGlobal: true,
-        isActive: true,
-        reviewedAt: true,
-        reviewedById: true,
-        reviewedBy: {
-          select: {
-            name: true,
-            email: true,
-          },
-        },
-        createdAt: true,
-        updatedAt: true,
-      },
-    });
-  }),
-
-  /**
    * Get all users with enhanced filtering (admin + CEO read-only)
    */
   getAllUsersWithFilter: adminOrCeoProcedure
@@ -142,21 +114,20 @@ export const userRouter = createTRPCRouter({
     }),
 
   /**
-   * Get pending users (not approved yet)
+   * Get current user info
    */
-  getPending: adminProcedure.query(async ({ ctx }) => {
-    return ctx.db.user.findMany({
-      where: {
-        OR: [{ isActive: false }, { roleGlobal: "NONE" }],
-      },
-      orderBy: { createdAt: "desc" },
+  getCurrentUser: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.user.findUnique({
+      where: { id: ctx.session.user.id },
       select: {
         id: true,
         name: true,
         email: true,
+        emailVerified: true,
         image: true,
         roleGlobal: true,
         isActive: true,
+        reviewedAt: true,
         createdAt: true,
       },
     });
@@ -436,50 +407,6 @@ export const userRouter = createTRPCRouter({
       // Delete the user (hard delete or you can mark as deleted)
       return ctx.db.user.delete({
         where: { id: userId },
-      });
-    }),
-
-  /**
-   * Get current user info
-   */
-  getCurrentUser: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db.user.findUnique({
-      where: { id: ctx.session.user.id },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        emailVerified: true,
-        image: true,
-        roleGlobal: true,
-        isActive: true,
-        reviewedAt: true,
-        createdAt: true,
-      },
-    });
-  }),
-
-  /**
-   * Get pending users for Admin dashboard
-   * Returns limited list of users pending approval
-   */
-  getPendingUsers: adminProcedure
-    .input(z.object({ limit: z.number().default(10).optional() }))
-    .query(async ({ ctx, input }) => {
-      return ctx.db.user.findMany({
-        where: {
-          isActive: false,
-        },
-        take: input.limit ?? 10,
-        orderBy: { createdAt: "desc" },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          image: true,
-          roleGlobal: true,
-          createdAt: true,
-        },
       });
     }),
 });

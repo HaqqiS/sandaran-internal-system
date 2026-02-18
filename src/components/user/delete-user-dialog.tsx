@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { api } from "~/trpc/react";
+import { useDeleteUser } from "~/hooks/useUser";
 
 interface DeleteUserDialogProps {
   user: {
@@ -28,18 +28,23 @@ export function DeleteUserDialog({
   open,
   onOpenChange,
 }: DeleteUserDialogProps) {
-  const utils = api.useUtils();
+  const deleteUser = useDeleteUser();
 
-  const deleteUser = api.user.deleteUser.useMutation({
-    onSuccess: () => {
-      toast.success(`${user?.name} has been deleted`);
-      utils.user.getAllUsersWithFilter.invalidate();
-      onOpenChange(false);
-    },
-    onError: (error) => {
-      toast.error(error.message || "Failed to delete user");
-    },
-  });
+  const handleDelete = () => {
+    if (!user) return;
+    deleteUser.mutate(
+      { userId: user.id },
+      {
+        onSuccess: () => {
+          toast.success(`${user.name} has been deleted`);
+          onOpenChange(false);
+        },
+        onError: (error) => {
+          toast.error(error.message || "Failed to delete user");
+        },
+      },
+    );
+  };
 
   if (!user) return null;
 
@@ -85,7 +90,7 @@ export function DeleteUserDialog({
           </Button>
           <Button
             variant="destructive"
-            onClick={() => deleteUser.mutate({ userId: user.id })}
+            onClick={handleDelete}
             disabled={deleteUser.isPending}
           >
             {deleteUser.isPending ? "Deleting..." : "Delete User"}

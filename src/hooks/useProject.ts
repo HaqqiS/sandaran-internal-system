@@ -6,8 +6,8 @@ import { api } from "~/trpc/react";
  * tRPC hooks for project CRUD and member management
  */
 
-export function useProjectList() {
-  return api.project.getAll.useQuery();
+export function useProjectList(options?: { enabled?: boolean }) {
+  return api.project.getAll.useQuery(undefined, options);
 }
 
 export function useProject(projectId: string) {

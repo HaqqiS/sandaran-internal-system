@@ -6,7 +6,7 @@ import { logisticRouter } from "~/server/api/routers/logistic.router";
 import { projectRouter } from "~/server/api/routers/project.router";
 import { reportRouter } from "~/server/api/routers/report.router";
 import { uploadRouter } from "~/server/api/routers/upload.router";
-import { userRouter } from "~/server/api/routers/user";
+import { userRouter } from "~/server/api/routers/user.router";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 
 /**

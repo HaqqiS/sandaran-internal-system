@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { api } from "~/trpc/react";
+import { useApproveUser, useProjectList } from "~/hooks";
 
 interface ApproveUserDialogProps {
   user: {
@@ -45,30 +45,11 @@ export function ApproveUserDialog({
     "MANDOR" | "ARCHITECT" | "FINANCE"
   >("MANDOR");
 
-  const utils = api.useUtils();
-
-  // Fetch projects only when needed
-  const { data: projects } = api.project.getAll.useQuery(undefined, {
+  const { data: projects } = useProjectList({
     enabled: open && role === "USER" && assignProject,
   });
 
-  const approve = api.user.approveUser.useMutation({
-    onSuccess: () => {
-      toast.success(`${user?.name} has been approved successfully`);
-      utils.user.getAllUsersWithFilter.invalidate();
-      onOpenChange(false);
-      // Reset state
-      setRole("USER");
-      setAssignProject(false);
-      setProjectId("");
-      setProjectRole("MANDOR");
-    },
-    onError: (error) => {
-      toast.error(error.message || "Failed to approve user");
-    },
-  });
-
-  if (!user) return null;
+  const approve = useApproveUser(); // Use the custom hook
 
   const handleApprove = () => {
     if (assignProject && !projectId) {
@@ -76,17 +57,35 @@ export function ApproveUserDialog({
       return;
     }
 
-    approve.mutate({
-      userId: user.id,
-      roleGlobal: role,
-      projectAssignment:
-        assignProject && projectId
-          ? {
-              projectId,
-              role: projectRole,
-            }
-          : undefined,
-    });
+    if (!user) return; // Guard clause
+
+    approve.mutate(
+      {
+        userId: user.id,
+        roleGlobal: role,
+        projectAssignment:
+          assignProject && projectId
+            ? {
+                projectId,
+                role: projectRole,
+              }
+            : undefined,
+      },
+      {
+        onSuccess: () => {
+          toast.success(`${user.name} has been approved successfully`);
+          onOpenChange(false);
+          // Reset state
+          setRole("USER");
+          setAssignProject(false);
+          setProjectId("");
+          setProjectRole("MANDOR");
+        },
+        onError: (error) => {
+          toast.error(error.message || "Failed to approve user");
+        },
+      },
+    );
   };
 
   return (
@@ -95,7 +94,7 @@ export function ApproveUserDialog({
         <DialogHeader>
           <DialogTitle>Approve User</DialogTitle>
           <DialogDescription>
-            Approve {user.name} and assign a global role
+            Approve {user?.name} and assign a global role
           </DialogDescription>
         </DialogHeader>
 
@@ -103,8 +102,8 @@ export function ApproveUserDialog({
           <div className="space-y-2">
             <Label>User Information</Label>
             <div className="rounded-md bg-muted p-3 text-sm">
-              <div className="font-medium">{user.name}</div>
-              <div className="text-muted-foreground">{user.email}</div>
+              <div className="font-medium">{user?.name}</div>
+              <div className="text-muted-foreground">{user?.email}</div>
             </div>
           </div>
 

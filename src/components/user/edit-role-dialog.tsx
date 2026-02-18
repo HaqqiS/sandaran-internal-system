@@ -14,7 +14,7 @@ import {
 } from "~/components/ui/dialog";
 import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
-import { api } from "~/trpc/react";
+import { useUpdateUserRole } from "~/hooks/useUser";
 
 interface EditRoleDialogProps {
   user: {
@@ -33,8 +33,6 @@ export function EditRoleDialog({
   onOpenChange,
 }: EditRoleDialogProps) {
   const [role, setRole] = useState<GlobalRole>("USER");
-  const utils = api.useUtils();
-
   // Update role when user changes
   useState(() => {
     if (user) {
@@ -42,16 +40,26 @@ export function EditRoleDialog({
     }
   });
 
-  const updateRole = api.user.updateGlobalRole.useMutation({
-    onSuccess: () => {
-      toast.success(`Role updated successfully for ${user?.name}`);
-      utils.user.getAllUsersWithFilter.invalidate();
-      onOpenChange(false);
-    },
-    onError: (error) => {
-      toast.error(error.message || "Failed to update role");
-    },
-  });
+  const updateRole = useUpdateUserRole();
+
+  const handleUpdateRole = () => {
+    if (!user) return;
+    updateRole.mutate(
+      {
+        userId: user.id,
+        roleGlobal: role,
+      },
+      {
+        onSuccess: () => {
+          toast.success(`Role updated successfully for ${user.name}`);
+          onOpenChange(false);
+        },
+        onError: (error) => {
+          toast.error(error.message || "Failed to update role");
+        },
+      },
+    );
+  };
 
   if (!user) return null;
 
@@ -126,12 +134,7 @@ export function EditRoleDialog({
             Cancel
           </Button>
           <Button
-            onClick={() =>
-              updateRole.mutate({
-                userId: user.id,
-                roleGlobal: role,
-              })
-            }
+            onClick={handleUpdateRole}
             disabled={updateRole.isPending || !hasRoleChanged}
           >
             {updateRole.isPending ? "Updating..." : "Update Role"}
