@@ -45,12 +45,18 @@ export function useCreateReport() {
 export function useUpdateReport() {
   const utils = api.useUtils();
   return api.report.update.useMutation({
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       void utils.report.getById.invalidate({
-        projectId: data.projectId,
-        reportId: data.id,
+        projectId: variables.projectId,
+        reportId: variables.reportId,
       });
-      void utils.report.getByProject.invalidate({ projectId: data.projectId });
+      void utils.report.getBySlug.invalidate({
+        projectId: variables.projectId,
+        reportSlug: data.slug,
+      });
+      void utils.report.getByProject.invalidate({
+        projectId: variables.projectId,
+      });
     },
   });
 }

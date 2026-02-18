@@ -2,7 +2,6 @@
 
 import { IconArrowLeft, IconLoader2, IconPlus } from "@tabler/icons-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import { useState } from "react";
 import { PageLayout } from "~/components/layout";
 import { LogisticItemForm } from "~/components/logistic/item-form";
@@ -19,11 +18,12 @@ import {
 import { useProjectBySlug, useProjectMembers } from "~/hooks/useProject";
 import { useSession } from "~/stores/use-session-store";
 
-export function LogisticsClient() {
-  const params = useParams();
-  const slug = params.slug as string;
+interface LogisticsClientProps {
+  projectSlug: string;
+}
 
-  const { data: project, isLoading, error } = useProjectBySlug(slug);
+export function LogisticsClient({ projectSlug }: LogisticsClientProps) {
+  const { data: project, isLoading, error } = useProjectBySlug(projectSlug);
   // useProjectBySlug might not return error based on previous view, but we can handle !project as error if not loading
   const { data: members } = useProjectMembers(project?.id ?? "");
 
@@ -67,28 +67,36 @@ export function LogisticsClient() {
     <PageLayout
       title={`${project.name} - Logistics & Inventory`}
       actions={
-        canManage && (
-          <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-            <DialogTrigger asChild>
-              <Button>
-                <IconPlus className="mr-2 size-4" />
-                Add Item
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Item</DialogTitle>
-                <DialogDescription>
-                  Create a new logistic item to track in this project.
-                </DialogDescription>
-              </DialogHeader>
-              <LogisticItemForm
-                projectId={project?.id ?? ""}
-                onSuccess={() => setShowAddDialog(false)}
-              />
-            </DialogContent>
-          </Dialog>
-        )
+        <div className="flex items-center gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/projects/${projectSlug}`}>
+              <IconArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Link>
+          </Button>
+          {canManage && (
+            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+              <DialogTrigger asChild>
+                <Button>
+                  <IconPlus className="mr-2 size-4" />
+                  Add Item
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Item</DialogTitle>
+                  <DialogDescription>
+                    Create a new logistic item to track in this project.
+                  </DialogDescription>
+                </DialogHeader>
+                <LogisticItemForm
+                  projectId={project?.id ?? ""}
+                  onSuccess={() => setShowAddDialog(false)}
+                />
+              </DialogContent>
+            </Dialog>
+          )}
+        </div>
       }
     >
       <div className="flex flex-col gap-4 p-4 md:gap-6 md:p-6">

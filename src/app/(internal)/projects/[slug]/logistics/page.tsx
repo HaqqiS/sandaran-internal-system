@@ -1,8 +1,13 @@
 import { requireAuth } from "~/lib/server-auth";
 import { LogisticsClient } from "./logistics-client";
 
-export default async function LogisticsPage() {
-  await requireAuth();
+interface LogisticsPageProps {
+  params: Promise<{ slug: string }>;
+}
 
-  return <LogisticsClient />;
+export default async function LogisticsPage({ params }: LogisticsPageProps) {
+  await requireAuth();
+  const slug = (await params).slug;
+
+  return <LogisticsClient projectSlug={slug} />;
 }

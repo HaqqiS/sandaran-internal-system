@@ -2,7 +2,6 @@
 
 import { IconArrowLeft, IconLoader2, IconPlus } from "@tabler/icons-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import { useState } from "react";
 import { FundDialog } from "~/components/emergency/fund-dialog";
 import { FundOverview } from "~/components/emergency/fund-overview";
@@ -14,15 +13,15 @@ import { useProjectBySlug } from "~/hooks";
 import { useUserRole } from "~/hooks/use-user-role";
 import { useSession } from "~/stores/use-session-store";
 
-export function EmergencyClient() {
-  const params = useParams();
-  const slug = params?.slug as string;
-
+interface EmergencyClientProps {
+  projectSlug: string;
+}
+export function EmergencyClient({ projectSlug }: EmergencyClientProps) {
   const {
     data: project,
     isLoading: isProjectLoading,
     error,
-  } = useProjectBySlug(slug);
+  } = useProjectBySlug(projectSlug);
   const { user } = useSession();
   const { isAdmin } = useUserRole();
 
@@ -68,7 +67,13 @@ export function EmergencyClient() {
     <PageLayout
       title={`${project.name} - Emergency Fund`}
       actions={
-        <>
+        <div className="flex items-center gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/projects/${projectSlug}`}>
+              <IconArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Link>
+          </Button>
           {canWithdraw && (
             <Button variant="outline" onClick={() => setIsWithdrawOpen(true)}>
               Withdraw
@@ -80,7 +85,7 @@ export function EmergencyClient() {
               Add Funds
             </Button>
           )}
-        </>
+        </div>
       }
     >
       <div className="flex flex-col gap-6 p-4 md:p-6">

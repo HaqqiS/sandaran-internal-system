@@ -24,11 +24,12 @@ import { useDeleteDocument } from "~/hooks/useDocument";
 import { useProjectBySlug, useProjectMembers } from "~/hooks/useProject";
 import { useSession } from "~/stores/use-session-store";
 
-export function DocumentsClient() {
-  const params = useParams();
-  const slug = params.slug as string;
+interface DocumentsClientProps {
+  projectSlug: string;
+}
 
-  const { data: project, isLoading, error } = useProjectBySlug(slug);
+export function DocumentsClient({ projectSlug }: DocumentsClientProps) {
+  const { data: project, isLoading, error } = useProjectBySlug(projectSlug);
   const { data: members } = useProjectMembers(project?.id ?? "");
   const { session } = useSession();
 
@@ -91,12 +92,20 @@ export function DocumentsClient() {
     <PageLayout
       title={`${project.name} - Documents`}
       actions={
-        canUpload && (
-          <Button onClick={() => setShowUploadDialog(true)}>
-            <IconPlus className="mr-2 size-4" />
-            Upload Document
+        <div className="flex items-center gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/projects/${projectSlug}`}>
+              <IconArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Link>
           </Button>
-        )
+          {canUpload && (
+            <Button onClick={() => setShowUploadDialog(true)}>
+              <IconPlus className="mr-2 size-4" />
+              Upload Document
+            </Button>
+          )}
+        </div>
       }
     >
       <div className="flex flex-col gap-4 p-4 md:gap-6 md:p-6">

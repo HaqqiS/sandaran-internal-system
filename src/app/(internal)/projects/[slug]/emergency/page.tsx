@@ -1,8 +1,13 @@
 import { requireAuth } from "~/lib/server-auth";
 import { EmergencyClient } from "./emergency-client";
 
-export default async function EmergencyPage() {
-  await requireAuth();
+interface EmergencyPageProps {
+  params: Promise<{ slug: string }>;
+}
 
-  return <EmergencyClient />;
+export default async function EmergencyPage({ params }: EmergencyPageProps) {
+  await requireAuth();
+  const slug = (await params).slug;
+
+  return <EmergencyClient projectSlug={slug} />;
 }

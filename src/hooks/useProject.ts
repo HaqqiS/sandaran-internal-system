@@ -39,6 +39,7 @@ export function useUpdateProject() {
   return api.project.update.useMutation({
     onSuccess: (data) => {
       void utils.project.getById.invalidate({ projectId: data.id });
+      void utils.project.getBySlug.invalidate({ slug: data.slug });
       void utils.project.getAll.invalidate();
     },
   });

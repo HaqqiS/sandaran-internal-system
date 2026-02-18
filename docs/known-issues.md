@@ -31,3 +31,18 @@ This requires a carefully orchestrated transaction to prevent data inconsistency
 ### Current Workaround
 
 Avoid renaming project slugs if they already contain uploaded files. If renaming is necessary, be aware that old file links will break.
+
+## 2. Improving form
+
+- **logistics Form**: error unknown value, amount can caracter.
+- **Sheet Form**: broken in mobile view, cannot scroll to bottom.
+
+## 3. Improving UI/UX
+
+**Sidebar Header**
+
+- just previus page
+
+**Project[slug]/\*\***
+
+- mobile view still broken, at header sidebar or even the data-table still overwidth
