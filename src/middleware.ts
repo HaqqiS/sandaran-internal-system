@@ -23,8 +23,9 @@ export async function middleware(request: NextRequest) {
   }
 
   // Get session token from cookies (edge-compatible)
-  const sessionToken = request.cookies.get("better-auth.session_token");
-
+  const sessionToken =
+    request.cookies.get("better-auth.session_token")?.value ||
+    request.cookies.get("__Secure-better-auth.session_token")?.value;
   // If no session token, redirect to login
   if (!sessionToken) {
     const redirectUrl = new URL("/", request.url);
