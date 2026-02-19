@@ -47,7 +47,7 @@ Avoid renaming project slugs if they already contain uploaded files. If renaming
 
 - mobile view still broken, at header sidebar or even the data-table still overwidth
 
-## 3. Broken Mobile UI
+## 4. Broken Mobile UI
 
 1. layout dashboard
 
@@ -81,4 +81,4 @@ Avoid renaming project slugs if they already contain uploaded files. If renaming
 - create still using modal
 - on the delete modal, the confirmation button is black. change to red
 
-## 4. Make Gallerys UI for each project and recent gallery all projects
+## 5. Make Gallerys UI for each project and recent gallery all projects

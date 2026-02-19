@@ -10,6 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "~/components/ui/sidebar";
 import { ProjectSelector } from "./project-selector";
 
@@ -23,6 +24,7 @@ export function NavMain({
   }[];
 }) {
   const pathname = usePathname();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   return (
     <SidebarGroup>
@@ -42,7 +44,10 @@ export function NavMain({
                   asChild
                   isActive={isActive}
                 >
-                  <Link href={item.url}>
+                  <Link
+                    href={item.url}
+                    onClick={() => isMobile && setOpenMobile(false)}
+                  >
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
                   </Link>

@@ -34,7 +34,7 @@ export function NavDocuments({
     icon?: React.ComponentType<{ className?: string }>;
   }[];
 }) {
-  const { isMobile } = useSidebar();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
@@ -43,7 +43,10 @@ export function NavDocuments({
         {items.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
+              <a
+                href={item.url}
+                onClick={() => isMobile && setOpenMobile(false)}
+              >
                 {item.icon && <item.icon />}
                 <span>{item.name}</span>
               </a>
