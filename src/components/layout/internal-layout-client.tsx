@@ -193,7 +193,7 @@ function LayoutContent({ children }: { children: ReactNode }) {
   return (
     <DashboardLayout
       sidebarConfig={sidebarConfig}
-      headerTitle={config.headerTitle}
+      // headerTitle={config.headerTitle}
       headerActions={config.headerActions}
     >
       {children}

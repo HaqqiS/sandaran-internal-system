@@ -51,13 +51,13 @@ Avoid renaming project slugs if they already contain uploaded files. If renaming
 
 1. layout dashboard
 
-- close sidebar after klick menu
-- select project broken if project's name to long
+- close sidebar after klick menu (fixed)
+- select project broken if project's name to long (fixed)
 - sidebar header broken if many content link 2 button and project's name to long
 
 2. admin dashboard
 
-- Quick Actions
+- Quick Actions (fixed)
 
 3. projects
 

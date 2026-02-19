@@ -1,6 +1,6 @@
 "use client";
 
-import { IconCheck, IconChevronDown } from "@tabler/icons-react";
+import { IconChevronDown } from "@tabler/icons-react";
 import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
 import { Avatar, AvatarFallback } from "~/components/ui/avatar";
@@ -21,7 +21,6 @@ import {
 import { Skeleton } from "~/components/ui/skeleton";
 import { useProjectList } from "~/hooks";
 import { cn } from "~/lib/utils";
-
 export function ProjectSelector() {
   const [open, setOpen] = React.useState(false);
   const router = useRouter();
@@ -139,11 +138,8 @@ export function ProjectSelector() {
           <IconChevronDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent
-        className="w-[--radix-popover-trigger-width] p-0"
-        align="start"
-      >
-        <Command>
+      <PopoverContent className="w-sm lg:w-lg p-0" align="start">
+        <Command defaultValue={selectedProject?.name}>
           <CommandInput placeholder="Search project..." />
           <CommandList>
             <CommandEmpty>No project found.</CommandEmpty>
@@ -159,7 +155,11 @@ export function ProjectSelector() {
                         setOpen(false);
                         router.push(`/projects/${project.slug}`);
                       }}
-                      className="gap-3 py-2 cursor-pointer"
+                      className={cn(
+                        "gap-3 py-2 cursor-pointer",
+                        "data-[checked=true]:bg-sidebar-accent data-[checked=true]:text-sidebar-accent-foreground",
+                      )}
+                      data-checked={selectedProjectId === project.id}
                     >
                       <Avatar className="h-6 w-6 rounded-md bg-muted text-muted-foreground">
                         <AvatarFallback className="rounded-md text-[10px]">
@@ -176,14 +176,6 @@ export function ProjectSelector() {
                           </span>
                         )}
                       </div>
-                      <IconCheck
-                        className={cn(
-                          "ml-auto h-4 w-4 text-primary transition-opacity",
-                          selectedProjectId === project.id
-                            ? "opacity-100"
-                            : "opacity-0",
-                        )}
-                      />
                     </CommandItem>
                   ))}
                 </CommandGroup>

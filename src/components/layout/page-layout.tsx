@@ -28,15 +28,22 @@ interface PageLayoutProps {
  * }
  * ```
  */
+import { PageHeader } from "~/components/layout/page-header";
+
 export function PageLayout({ title, actions, children }: PageLayoutProps) {
   const { updateConfig } = useLayout();
 
   useEffect(() => {
     updateConfig({
-      headerTitle: title,
+      // headerTitle: title, // Title is now handled locally by PageLayout
       headerActions: actions,
     });
-  }, [title, actions, updateConfig]);
+  }, [actions, updateConfig]);
 
-  return <>{children}</>;
+  return (
+    <>
+      <PageHeader title={title} />
+      {children}
+    </>
+  );
 }

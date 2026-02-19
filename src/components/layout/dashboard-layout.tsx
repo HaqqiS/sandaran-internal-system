@@ -9,7 +9,7 @@ import { SiteHeader } from "./site-header";
 interface DashboardLayoutProps {
   children: React.ReactNode;
   sidebarConfig: SidebarConfig;
-  headerTitle?: string;
+  // headerTitle?: string; // Unused
   headerActions?: React.ReactNode;
   sidebarVariant?: "sidebar" | "floating" | "inset";
 }
@@ -17,7 +17,7 @@ interface DashboardLayoutProps {
 export function DashboardLayout({
   children,
   sidebarConfig,
-  headerTitle,
+  // headerTitle, // Unused
   headerActions,
   sidebarVariant = "inset",
 }: DashboardLayoutProps) {
@@ -32,7 +32,7 @@ export function DashboardLayout({
     >
       <AppSidebar config={sidebarConfig} variant={sidebarVariant} />
       <SidebarInset>
-        <SiteHeader title={headerTitle} actions={headerActions} />
+        <SiteHeader actions={headerActions} />
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             {children}

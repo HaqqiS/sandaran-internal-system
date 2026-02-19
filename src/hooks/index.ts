@@ -14,7 +14,6 @@ export {
 } from "./useComment";
 // Dashboard hooks
 export {
-  useAdminPendingUsers,
   useAdminStats,
   useArchitectDashboard,
   useArchitectStats,

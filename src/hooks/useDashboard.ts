@@ -26,10 +26,6 @@ export function useAdminStats() {
   return api.dashboard.getAdminStats.useQuery();
 }
 
-export function useAdminPendingUsers(limit?: number) {
-  return api.user.getPendingUsers.useQuery({ limit });
-}
-
 // ============================================
 // Finance Dashboard Hooks
 // ============================================

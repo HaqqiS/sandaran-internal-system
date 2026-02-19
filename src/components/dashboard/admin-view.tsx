@@ -18,7 +18,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Separator } from "~/components/ui/separator";
-import { useAdminPendingUsers, useAdminStats } from "~/hooks";
+import { useAdminStats, useUserListWithFilter } from "~/hooks";
 import { DashboardLayout } from "./shared/DashboardLayout";
 import { QuickActionCard } from "./shared/QuickActionCard";
 import { StatsGrid } from "./shared/StatsGrid";
@@ -26,8 +26,9 @@ import { StatCard } from "./stat-card";
 
 export function AdminView() {
   const { data: stats, isLoading: statsLoading } = useAdminStats();
-  const { data: pendingUsers, isLoading: usersLoading } =
-    useAdminPendingUsers(5);
+  const { data: pendingUsers, isLoading: usersLoading } = useUserListWithFilter(
+    { filter: "pending", search: "" },
+  );
 
   return (
     <DashboardLayout
@@ -127,7 +128,7 @@ export function AdminView() {
         </Card>
 
         {/* Quick Actions */}
-        <div className="col-span-3">
+        <div className="col-span-4 lg:col-span-3">
           <QuickActionCard
             title="Quick Actions"
             description="Common administrative tasks"
