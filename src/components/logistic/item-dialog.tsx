@@ -18,50 +18,37 @@ import {
   DrawerTrigger,
 } from "~/components/ui/drawer";
 import { useIsMobile } from "~/hooks/use-mobile";
-import { UploadForm } from "./upload-form";
+import { LogisticItemForm } from "./item-form";
 
-interface UploadDialogProps {
+interface LogisticItemDialogProps {
   projectId: string;
-  projectSlug: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
+  onSuccess: () => void;
   children?: React.ReactNode;
 }
 
-export function UploadDialog({
+export function LogisticItemDialog({
   projectId,
-  projectSlug,
   open,
   onOpenChange,
   onSuccess,
   children,
-}: UploadDialogProps) {
+}: LogisticItemDialogProps) {
   const isMobile = useIsMobile();
-
-  const title = "Upload Document";
-  const descriptionText = "Upload design files, drawings, or specifications.";
+  const title = "Add New Item";
+  const description = "Create a new logistic item to track in this project.";
 
   if (!isMobile) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-        <DialogContent className="sm:max-w-xl">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>{descriptionText}</DialogDescription>
+            <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
-          <div className="overflow-y-auto no-scrollbar max-h-[80vh] px-1">
-            <UploadForm
-              projectId={projectId}
-              projectSlug={projectSlug}
-              onSuccess={() => {
-                onOpenChange(false);
-                onSuccess?.();
-              }}
-              onCancel={() => onOpenChange(false)}
-            />
-          </div>
+          <LogisticItemForm projectId={projectId} onSuccess={onSuccess} />
         </DialogContent>
       </Dialog>
     );
@@ -73,18 +60,10 @@ export function UploadDialog({
       <DrawerContent>
         <DrawerHeader className="text-left">
           <DrawerTitle>{title}</DrawerTitle>
-          <DrawerDescription>{descriptionText}</DrawerDescription>
+          <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
-        <div className="px-4 pb-6 overflow-y-auto no-scrollbar flex-1">
-          <UploadForm
-            projectId={projectId}
-            projectSlug={projectSlug}
-            onSuccess={() => {
-              onOpenChange(false);
-              onSuccess?.();
-            }}
-            onCancel={() => onOpenChange(false)}
-          />
+        <div className="px-4 pb-4 overflow-y-auto no-scrollbar flex-1">
+          <LogisticItemForm projectId={projectId} onSuccess={onSuccess} />
         </div>
       </DrawerContent>
     </Drawer>

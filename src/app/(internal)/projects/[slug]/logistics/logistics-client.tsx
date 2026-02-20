@@ -4,17 +4,9 @@ import { IconArrowLeft, IconLoader2, IconPlus } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState } from "react";
 import { PageLayout } from "~/components/layout";
-import { LogisticItemForm } from "~/components/logistic/item-form";
+import { LogisticItemDialog } from "~/components/logistic/item-dialog";
 import { ItemList } from "~/components/logistic/item-list";
 import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "~/components/ui/dialog";
 import { useProjectBySlug, useProjectMembers } from "~/hooks/useProject";
 import { useSession } from "~/stores/use-session-store";
 
@@ -75,26 +67,17 @@ export function LogisticsClient({ projectSlug }: LogisticsClientProps) {
             </Link>
           </Button>
           {canManage && (
-            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-              <DialogTrigger asChild>
-                <Button>
-                  <IconPlus className="mr-2 size-4" />
-                  Add Item
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add New Item</DialogTitle>
-                  <DialogDescription>
-                    Create a new logistic item to track in this project.
-                  </DialogDescription>
-                </DialogHeader>
-                <LogisticItemForm
-                  projectId={project?.id ?? ""}
-                  onSuccess={() => setShowAddDialog(false)}
-                />
-              </DialogContent>
-            </Dialog>
+            <LogisticItemDialog
+              projectId={project.id}
+              open={showAddDialog}
+              onOpenChange={setShowAddDialog}
+              onSuccess={() => setShowAddDialog(false)}
+            >
+              <Button>
+                <IconPlus className="mr-2 size-4" />
+                Add Item
+              </Button>
+            </LogisticItemDialog>
           )}
         </div>
       }

@@ -3,7 +3,6 @@
 import { IconArrowLeft, IconLoader2, IconPlus } from "@tabler/icons-react";
 import type { ProjectDocument } from "generated/prisma";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DocumentList } from "~/components/document/document-list";
@@ -99,22 +98,26 @@ export function DocumentsClient({ projectSlug }: DocumentsClientProps) {
               Back
             </Link>
           </Button>
-          {canUpload && (
-            <Button onClick={() => setShowUploadDialog(true)}>
-              <IconPlus className="mr-2 size-4" />
-              Upload Document
-            </Button>
+          {project && (
+            <UploadDialog
+              projectId={project.id}
+              projectSlug={project.slug}
+              open={showUploadDialog}
+              onOpenChange={setShowUploadDialog}
+            >
+              {canUpload && (
+                <Button>
+                  <IconPlus className="mr-2 size-4" />
+                  <span className="block md:hidden">Upload</span>
+                  <span className="hidden md:block">Upload Document</span>
+                </Button>
+              )}
+            </UploadDialog>
           )}
         </div>
       }
     >
       <div className="flex flex-col gap-4 p-4 md:gap-6 md:p-6">
-        <div className="space-y-2">
-          <p className="text-muted-foreground">
-            Manage and view project design files, drawings, and specifications.
-          </p>
-        </div>
-
         <DocumentList
           projectId={project.id}
           currentUserId={session?.user?.id ?? ""}
@@ -126,15 +129,6 @@ export function DocumentsClient({ projectSlug }: DocumentsClientProps) {
         />
       </div>
 
-      {project && (
-        <UploadDialog
-          projectId={project.id}
-          projectSlug={project.slug}
-          open={showUploadDialog}
-          onOpenChange={setShowUploadDialog}
-        />
-      )}
-
       <AlertDialog
         open={!!deleteDialogDoc}
         onOpenChange={(open) => !open && setDeleteDialogDoc(null)}
@@ -143,13 +137,17 @@ export function DocumentsClient({ projectSlug }: DocumentsClientProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Document</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{deleteDialogDoc?.fileName}"?
-              This action cannot be undone.
+              Are you sure you want to delete{" "}
+              <span className="inline-block max-w-[200px] align-bottom font-semibold truncate sm:max-w-[300px]">
+                {deleteDialogDoc?.fileName}
+              </span>
+              ? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
+              variant="destructive"
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >

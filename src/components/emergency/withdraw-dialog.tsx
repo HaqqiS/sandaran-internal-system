@@ -61,7 +61,7 @@ export function WithdrawDialog({
           <DrawerTitle>{title}</DrawerTitle>
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
-        <div className="px-4 pb-4">
+        <div className="px-4 pb-4 overflow-y-auto no-scrollbar flex-1">
           <RequestForm
             projectId={projectId}
             projectSlug={projectSlug}

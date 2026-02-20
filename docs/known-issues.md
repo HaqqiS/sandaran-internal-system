@@ -53,7 +53,7 @@ Avoid renaming project slugs if they already contain uploaded files. If renaming
 
 - close sidebar after klick menu (fixed)
 - select project broken if project's name to long (fixed)
-- sidebar header broken if many content link 2 button and project's name to long
+- sidebar header broken if many content link 2 button and project's name to long (fixed)
 
 2. admin dashboard
 
@@ -61,24 +61,24 @@ Avoid renaming project slugs if they already contain uploaded files. If renaming
 
 3. projects
 
-- sheet create/edit project
-- sheet create/edit project' report
+- sheet create/edit project (fixed)
+- sheet create/edit project' report (fixed)
 
 4. emergency
 
 - the data-table break through screen
-- add fund emergency still using modal change to sheet
+- add fund emergency still using modal change to sheet (fixed)
 - emergency page, set colors of chart
 
 5. logistics
 
-- create & edit still using modal
-- in and out stock still using modal
-- change detele modal look a like delete modal in documents but button confirm is red
+- create & edit still using modal (fixed)
+- in and out stock still using modal (fixed)
+- change detele modal look a like delete modal in documents but button confirm is red (fixed)
 
 6. documents
 
-- create still using modal
-- on the delete modal, the confirmation button is black. change to red
+- create still using modal (fixed)
+- on the delete modal, the confirmation button is black. change to red (fixed)
 
 ## 5. Make Gallerys UI for each project and recent gallery all projects

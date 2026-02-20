@@ -3,13 +3,6 @@
 import { IconBox, IconMinus, IconPlus, IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import {
   Table,
@@ -23,7 +16,7 @@ import { useLogisticStockSummary } from "~/hooks/useLogistic";
 import { useProjectMembers } from "~/hooks/useProject";
 import { useSession } from "~/stores/use-session-store";
 import { ItemActions } from "./item-actions";
-import { TransactionForm } from "./transaction-form";
+import { TransactionDialog } from "./transaction-dialog";
 
 interface ItemListProps {
   projectId: string;
@@ -183,34 +176,16 @@ export function ItemList({ projectId }: ItemListProps) {
         </Table>
       </div>
 
-      <Dialog
-        open={transactionDialog.isOpen}
+      <TransactionDialog
+        projectId={projectId}
+        isOpen={transactionDialog.isOpen}
         onOpenChange={(open) =>
           setTransactionDialog((prev) => ({ ...prev, isOpen: open }))
         }
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {transactionDialog.type === "IN" ? "Stock In" : "Stock Out"}
-            </DialogTitle>
-            <DialogDescription>
-              Record {transactionDialog.type === "IN" ? "incoming" : "outgoing"}{" "}
-              stock for <strong>{transactionDialog.item?.name}</strong>.
-            </DialogDescription>
-          </DialogHeader>
-          {transactionDialog.item && (
-            <TransactionForm
-              projectId={projectId}
-              itemId={transactionDialog.item.id}
-              itemName={transactionDialog.item.name}
-              unit={transactionDialog.item.unit}
-              defaultType={transactionDialog.type}
-              onSuccess={handleTransactionSuccess}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+        type={transactionDialog.type}
+        item={transactionDialog.item}
+        onSuccess={handleTransactionSuccess}
+      />
     </div>
   );
 }
