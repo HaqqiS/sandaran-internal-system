@@ -5,14 +5,9 @@ import Link from "next/link";
 import { PageLayout } from "~/components/layout";
 import { ReportCard } from "~/components/report/report-card";
 import { Button } from "~/components/ui/button";
-import { api } from "~/trpc/react";
-
+import { useRecentReportsByProject } from "~/hooks";
 export function RecentReportsClient() {
-  const {
-    data: projects,
-    isLoading,
-    error,
-  } = api.report.getRecentByProject.useQuery();
+  const { data: projects, isLoading, error } = useRecentReportsByProject();
 
   if (isLoading) {
     return (

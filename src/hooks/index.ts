@@ -74,6 +74,7 @@ export {
   useDeleteReport,
   useDeleteReportMedia,
   useDeleteReportTask,
+  useRecentReportsByProject,
   useReport,
   useReportBySlug,
   useReportsByProject,

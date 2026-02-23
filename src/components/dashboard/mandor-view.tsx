@@ -119,7 +119,7 @@ export function MandorView() {
                             {project._count.dailyReports} reports submitted
                           </p>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex lg:flex-row flex-col items-center gap-2">
                           <Button
                             size="sm"
                             variant="outline"

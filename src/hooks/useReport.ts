@@ -31,6 +31,10 @@ export function useReportBySlug(projectId: string, reportSlug: string) {
   );
 }
 
+export function useRecentReportsByProject() {
+  return api.report.getRecentByProject.useQuery();
+}
+
 export function useCreateReport() {
   const utils = api.useUtils();
   return api.report.create.useMutation({
