@@ -97,6 +97,7 @@ export function ReportForm({
   const [uploadedImageUrls, setUploadedImageUrls] = useState<
     { url: string; publicId: string }[]
   >([]);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
 
   const form = useForm({
@@ -407,6 +408,7 @@ export function ReportForm({
                   prev.filter((img) => img.url !== urlToRemove),
                 );
               }}
+              onUploadChange={setIsUploadingImage}
             />
             <FieldDescription>
               Pilih beberapa foto sekaligus atau ambil langsung dari kamera HP
@@ -418,7 +420,7 @@ export function ReportForm({
 
       {/* Submit Button */}
       <div className="flex justify-end gap-2 pt-4">
-        <Button type="submit" disabled={isSubmittingForm}>
+        <Button type="submit" disabled={isSubmittingForm || isUploadingImage}>
           {isSubmittingForm
             ? "Menyimpan..."
             : isEditMode

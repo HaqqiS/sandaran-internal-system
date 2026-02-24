@@ -57,8 +57,13 @@ export function generateUploadSignature(options: {
 /**
  * Delete asset by publicId
  */
-export async function deleteCloudinaryAsset(publicId: string) {
-  return cloudinary.uploader.destroy(publicId);
+export async function deleteCloudinaryAsset(
+  publicId: string,
+  options?: { type?: string },
+) {
+  return cloudinary.uploader.destroy(publicId, {
+    type: options?.type || "authenticated",
+  });
 }
 
 /**

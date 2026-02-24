@@ -2,7 +2,7 @@
 
 import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
 import NextImage from "next/image";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "~/components/ui/button";
 import { Progress } from "~/components/ui/progress";
@@ -24,6 +24,9 @@ interface ImageUploadProps {
   onChange?: (url: string, publicId: string) => void;
   /** Callback when multiple images change */
   onMultipleChange?: (files: UploadedFile[]) => void;
+
+  /** Callback when uploading status changes */
+  onUploadChange?: (isUploading: boolean) => void;
 
   /** Callback when image is removed */
   onRemove?: (urlToRemove?: string, publicIdToRemove?: string) => void;
@@ -52,10 +55,16 @@ export function ImageUpload({
   maxSizeMB = 5,
   accept = { "image/*": [".jpg", ".jpeg", ".png", ".webp"] },
   multiple = false,
+  onUploadChange,
 }: ImageUploadProps) {
   const [previews, setPreviews] = useState<string[]>([]);
   const { upload, remove, isLoading, isCompressing, progress, error, reset } =
     useCloudinaryUpload();
+
+  // Notify parent of upload status changes
+  useEffect(() => {
+    onUploadChange?.(isLoading);
+  }, [isLoading, onUploadChange]);
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
