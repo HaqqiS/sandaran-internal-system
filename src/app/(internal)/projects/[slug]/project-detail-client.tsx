@@ -256,6 +256,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
 
       <ReportDialog
         projectId={project.id}
+        projectSlug={project.slug}
         open={isCreateReportOpen}
         onOpenChange={setIsCreateReportOpen}
       />

@@ -3,8 +3,11 @@
 import { IconCalendar } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
 import { format } from "date-fns";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { ImageUpload } from "~/components/shared/image-upload";
 import { Button } from "~/components/ui/button";
 import { Calendar } from "~/components/ui/calendar";
 import {
@@ -28,7 +31,11 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
-import { useCreateReport, useUpdateReport } from "~/hooks";
+import {
+  useCreateReport,
+  useUpdateReport,
+  useUploadReportMedia,
+} from "~/hooks/useReport";
 import { cn } from "~/lib/utils";
 
 const WEATHER_OPTIONS = [
@@ -54,6 +61,7 @@ type ReportFormValues = z.infer<typeof reportSchema>;
 
 interface ReportFormProps {
   projectId: string;
+  projectSlug: string;
   report?: {
     id: string;
     reportDate: Date | string;
@@ -67,15 +75,29 @@ interface ReportFormProps {
   onSuccess?: () => void;
 }
 
-export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
+export function ReportForm({
+  projectId,
+  projectSlug,
+  report,
+  onSuccess,
+}: ReportFormProps) {
   const createReport = useCreateReport();
   const updateReport = useUpdateReport();
+  const uploadMedia = useUploadReportMedia();
+  const router = useRouter();
+
   const isEditMode = !!report;
 
   // Check if existing weather is a custom value
   const isCustomWeather =
     report?.weather &&
     !WEATHER_OPTIONS.slice(0, -1).some((opt) => opt.value === report.weather);
+
+  // Local state for images uploaded to cloudinary but not yet attached to a report in DB
+  const [uploadedImageUrls, setUploadedImageUrls] = useState<
+    { url: string; publicId: string }[]
+  >([]);
+  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -93,14 +115,17 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
     },
     onSubmit: async ({ value }) => {
       try {
+        setIsSubmittingForm(true);
         // Determine final weather value
         const weather =
           value.weather === "custom" ? value.customWeather : value.weather;
 
-        if (isEditMode && report) {
+        let currentReportId = report?.id;
+
+        if (isEditMode && currentReportId) {
           await updateReport.mutateAsync({
             projectId,
-            reportId: report.id,
+            reportId: currentReportId,
             taskDescription: value.taskDescription,
             progressPercent: value.progressPercent,
             issues: value.issues || undefined,
@@ -108,9 +133,9 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
             totalWorkers: value.totalWorkers,
             location: value.location || undefined,
           });
-          toast.success("Laporan berhasil diperbarui");
+          toast.success("Teks laporan berhasil diperbarui");
         } else {
-          await createReport.mutateAsync({
+          const newReport = await createReport.mutateAsync({
             projectId,
             reportDate: value.reportDate,
             taskDescription: value.taskDescription,
@@ -120,11 +145,37 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
             totalWorkers: value.totalWorkers,
             location: value.location || undefined,
           });
+          currentReportId = newReport.id;
           toast.success("Laporan berhasil dibuat");
         }
+
+        // Attach all uploaded images to the database
+        if (currentReportId && uploadedImageUrls.length > 0) {
+          toast.info(
+            `Menyimpan ${uploadedImageUrls.length} foto ke database...`,
+          );
+
+          for (const img of uploadedImageUrls) {
+            await uploadMedia.mutateAsync({
+              projectId,
+              reportId: currentReportId,
+              publicId: img.publicId, // Extract from URL if missing (usually returned by ImageUpload)
+              url: img.url,
+            });
+          }
+          toast.success("Semua foto berhasil disimpan!");
+        }
+
         onSuccess?.();
-      } catch {
-        // Error is handled by global mutation cache
+        if (!isEditMode) {
+          // Redirect or refresh to clear the form properly
+          router.refresh();
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Terjadi kesalahan saat menyimpan laporan");
+      } finally {
+        setIsSubmittingForm(false);
       }
     },
   });
@@ -252,7 +303,7 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
                   onValueChange={field.handleChange}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih cuaca" />
+                    <SelectValue placeholder="Pilih Cuaca" />
                   </SelectTrigger>
                   <SelectContent>
                     {WEATHER_OPTIONS.map((option) => (
@@ -331,19 +382,49 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
         )}
       </form.Field>
 
+      {/* Image Upload for Report WhatsApp Style */}
+      {!isEditMode && (
+        <FieldGroup>
+          <Field>
+            <FieldLabel>Dokumentasi Foto (Opsional)</FieldLabel>
+            <ImageUpload
+              projectSlug={projectSlug || "project"}
+              type="reports"
+              multiple={true}
+              value={uploadedImageUrls}
+              onMultipleChange={(files) => {
+                const newUploads = files.map((file) => {
+                  const existing = uploadedImageUrls.find(
+                    (u) => u.url === file.url,
+                  );
+                  return existing || file;
+                });
+
+                setUploadedImageUrls(newUploads);
+              }}
+              onRemove={(urlToRemove) => {
+                setUploadedImageUrls((prev) =>
+                  prev.filter((img) => img.url !== urlToRemove),
+                );
+              }}
+            />
+            <FieldDescription>
+              Pilih beberapa foto sekaligus atau ambil langsung dari kamera HP
+              Anda.
+            </FieldDescription>
+          </Field>
+        </FieldGroup>
+      )}
+
       {/* Submit Button */}
       <div className="flex justify-end gap-2 pt-4">
-        <form.Subscribe selector={(state) => state.isSubmitting}>
-          {(isSubmitting) => (
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting
-                ? "Menyimpan..."
-                : isEditMode
-                  ? "Simpan Perubahan"
-                  : "Buat Laporan"}
-            </Button>
-          )}
-        </form.Subscribe>
+        <Button type="submit" disabled={isSubmittingForm}>
+          {isSubmittingForm
+            ? "Menyimpan..."
+            : isEditMode
+              ? "Simpan Perubahan"
+              : "Kirim Laporan"}
+        </Button>
       </div>
     </form>
   );

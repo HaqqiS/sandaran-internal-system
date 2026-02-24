@@ -80,6 +80,7 @@ export function ReportsClient({ projectSlug }: ReportsClientProps) {
 
       <ReportDialog
         projectId={project.id}
+        projectSlug={projectSlug}
         open={isCreateOpen}
         onOpenChange={setIsCreateOpen}
       />

@@ -243,6 +243,7 @@ export function MandorView() {
       {selectedProject && (
         <ReportDialog
           projectId={selectedProject.id}
+          projectSlug={selectedProject.slug}
           open={isReportOpen}
           onOpenChange={(open) => {
             setIsReportOpen(open);

@@ -17,6 +17,7 @@ import { ReportForm } from "./report-form";
 
 interface ReportDialogProps {
   projectId: string;
+  projectSlug?: string;
   report?: {
     id: string;
     reportDate: Date | string;
@@ -33,6 +34,7 @@ interface ReportDialogProps {
 
 export function ReportDialog({
   projectId,
+  projectSlug,
   report,
   open,
   onOpenChange,
@@ -48,13 +50,14 @@ export function ReportDialog({
   if (!isMobile) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto no-scrollbar">
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
           <ReportForm
             projectId={projectId}
+            projectSlug={projectSlug || "project"}
             report={report}
             onSuccess={() => onOpenChange(false)}
           />
@@ -73,6 +76,7 @@ export function ReportDialog({
         <div className="px-4 pb-4 overflow-y-auto no-scrollbar flex-1">
           <ReportForm
             projectId={projectId}
+            projectSlug={projectSlug || "project"}
             report={report}
             onSuccess={() => onOpenChange(false)}
           />

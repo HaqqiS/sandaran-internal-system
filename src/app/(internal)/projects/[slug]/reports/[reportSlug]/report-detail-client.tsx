@@ -274,6 +274,7 @@ export function ReportDetailClient({
       {/* Edit Sheet */}
       <ReportDialog
         projectId={project.id}
+        projectSlug={projectSlug}
         report={report}
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
