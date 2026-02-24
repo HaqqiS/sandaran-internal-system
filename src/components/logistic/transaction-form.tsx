@@ -66,7 +66,7 @@ export function TransactionForm({
           quantity: value.quantity,
           notes: value.notes,
         });
-        toast.success(`Transaction recorded for ${itemName}`);
+        toast.success(`Transaksi berhasil dicatat untuk ${itemName}`);
         onSuccess?.();
       } catch {
         // Error handled by mutation
@@ -85,7 +85,7 @@ export function TransactionForm({
     >
       <div className="bg-muted/50 rounded-lg p-3 text-sm">
         <p>
-          Creating transaction for: <strong>{itemName}</strong>
+          Mencatat transaksi untuk: <strong>{itemName}</strong>
         </p>
       </div>
 
@@ -97,7 +97,7 @@ export function TransactionForm({
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel>Transaction Type</FieldLabel>
+                <FieldLabel>Tipe Transaksi *</FieldLabel>
                 <Select
                   value={field.state.value}
                   onValueChange={(value) =>
@@ -105,13 +105,11 @@ export function TransactionForm({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
+                    <SelectValue placeholder="Pilih tipe transaksi" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="IN">Stock IN (Barang Masuk)</SelectItem>
-                    <SelectItem value="OUT">
-                      Stock OUT (Barang Keluar)
-                    </SelectItem>
+                    <SelectItem value="IN">Stok Masuk (IN)</SelectItem>
+                    <SelectItem value="OUT">Stok Keluar (OUT)</SelectItem>
                   </SelectContent>
                 </Select>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -127,7 +125,7 @@ export function TransactionForm({
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Quantity ({unit})</FieldLabel>
+                <FieldLabel htmlFor={field.name}>Jumlah ({unit}) *</FieldLabel>
                 <Input
                   id={field.name}
                   name={field.name}
@@ -153,7 +151,7 @@ export function TransactionForm({
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Notes (Optional)</FieldLabel>
+                <FieldLabel htmlFor={field.name}>Catatan (Opsional)</FieldLabel>
                 <Textarea
                   id={field.name}
                   name={field.name}
@@ -161,7 +159,7 @@ export function TransactionForm({
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
                   aria-invalid={isInvalid}
-                  placeholder="Add notes about this transaction..."
+                  placeholder="Tambahkan catatan untuk transaksi ini..."
                   rows={3}
                 />
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -176,7 +174,7 @@ export function TransactionForm({
           selector={(state) => [state.canSubmit, state.isSubmitting]}
           children={([canSubmit, isSubmitting]) => (
             <Button type="submit" disabled={!canSubmit || isSubmitting}>
-              {isSubmitting ? "Saving..." : "Record Transaction"}
+              {isSubmitting ? "Menyimpan..." : "Catat Transaksi"}
             </Button>
           )}
         />

@@ -95,7 +95,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
             endDate: value.endDate,
             status: value.status,
           });
-          toast.success("Project updated successfully");
+          toast.success("Proyek berhasil diperbarui");
         } else {
           await createProject.mutateAsync({
             name: value.name,
@@ -106,7 +106,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
             endDate: value.endDate,
             status: value.status,
           });
-          toast.success("Project created successfully");
+          toast.success("Proyek berhasil dibuat");
         }
         onSuccess?.();
       } catch {
@@ -131,7 +131,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Project Name</FieldLabel>
+                <FieldLabel htmlFor={field.name}>Nama Proyek *</FieldLabel>
                 <Input
                   id={field.name}
                   name={field.name}
@@ -149,11 +149,11 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                     form.setFieldValue("slug", newSlug);
                   }}
                   aria-invalid={isInvalid}
-                  placeholder="My Construction Project"
+                  placeholder="Proyek Konstruksi Saya"
                   autoComplete="off"
                 />
                 <FieldDescription>
-                  The display name for your project.
+                  Nama yang akan ditampilkan untuk proyek Anda.
                 </FieldDescription>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
@@ -168,7 +168,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Slug</FieldLabel>
+                <FieldLabel htmlFor={field.name}>Slug *</FieldLabel>
                 <Input
                   id={field.name}
                   name={field.name}
@@ -180,7 +180,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                   className="bg-muted cursor-not-allowed"
                 />
                 <FieldDescription>
-                  Auto-generated from project name.
+                  Dibuat otomatis berdasarkan nama proyek.
                 </FieldDescription>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
@@ -195,7 +195,9 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Description</FieldLabel>
+                <FieldLabel htmlFor={field.name}>
+                  Deskripsi (Opsional)
+                </FieldLabel>
                 <Textarea
                   id={field.name}
                   name={field.name}
@@ -203,7 +205,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
                   aria-invalid={isInvalid}
-                  placeholder="Describe your project..."
+                  placeholder="Jelaskan secara singkat mengenai proyek Anda..."
                   rows={3}
                 />
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -219,7 +221,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Location</FieldLabel>
+                <FieldLabel htmlFor={field.name}>Lokasi (Opsional)</FieldLabel>
                 <Input
                   id={field.name}
                   name={field.name}
@@ -244,7 +246,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                 field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel>Start Date</FieldLabel>
+                  <FieldLabel>Tanggal Mulai (Opsional)</FieldLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -257,7 +259,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                         <IconCalendar className="mr-2 h-4 w-4" />
                         {field.state.value
                           ? format(field.state.value, "PPP")
-                          : "Pick a date"}
+                          : "Pilih tanggal"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -282,7 +284,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                 field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel>End Date</FieldLabel>
+                  <FieldLabel>Tanggal Selesai (Opsional)</FieldLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -295,7 +297,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                         <IconCalendar className="mr-2 h-4 w-4" />
                         {field.state.value
                           ? format(field.state.value, "PPP")
-                          : "Pick a date"}
+                          : "Pilih tanggal"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -321,7 +323,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel>Status</FieldLabel>
+                <FieldLabel>Status *</FieldLabel>
                 <Select
                   value={field.state.value}
                   onValueChange={(value) =>
@@ -329,12 +331,12 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
+                    <SelectValue placeholder="Pilih status proyek" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="ACTIVE">Active</SelectItem>
-                    <SelectItem value="PAUSED">Paused</SelectItem>
-                    <SelectItem value="DONE">Done</SelectItem>
+                    <SelectItem value="ACTIVE">Aktif</SelectItem>
+                    <SelectItem value="PAUSED">Ditunda</SelectItem>
+                    <SelectItem value="DONE">Selesai</SelectItem>
                   </SelectContent>
                 </Select>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -350,10 +352,10 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
           children={([canSubmit, isSubmitting]) => (
             <Button type="submit" disabled={!canSubmit || isSubmitting}>
               {isSubmitting
-                ? "Saving..."
+                ? "Menyimpan..."
                 : isEditMode
-                  ? "Update Project"
-                  : "Create Project"}
+                  ? "Simpan Perubahan"
+                  : "Buat Proyek"}
             </Button>
           )}
         />

@@ -11,7 +11,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { api } from "~/trpc/react";
 
 const commentSchema = z.object({
-  content: z.string().min(1, "Comment cannot be empty"),
+  content: z.string().min(1, "Komentar tidak boleh kosong"),
 });
 
 interface CommentFormProps {
@@ -28,7 +28,7 @@ export function CommentForm({
   const utils = api.useUtils();
   const createComment = api.comment.create.useMutation({
     onSuccess: () => {
-      toast.success("Comment posted");
+      toast.success("Komentar berhasil dikirim");
       utils.comment.getByReport.invalidate({ projectId, reportId });
       form.reset();
       onSuccess?.();
@@ -69,11 +69,11 @@ export function CommentForm({
         children={(field) => (
           <div className="space-y-2">
             <Label htmlFor={field.name} className="sr-only">
-              Comment
+              Komentar *
             </Label>
             <Textarea
               id={field.name}
-              placeholder="Write a comment..."
+              placeholder="Tulis komentar..."
               className="min-h-[80px] resize-none"
               value={field.state.value}
               onBlur={field.handleBlur}
@@ -104,11 +104,11 @@ export function CommentForm({
               disabled={!canSubmit || isSubmitting || createComment.isPending}
             >
               {createComment.isPending ? (
-                "Posting..."
+                "Mengirim..."
               ) : (
                 <>
                   <IconSend className="mr-2 h-4 w-4" />
-                  Post Comment
+                  Kirim Komentar
                 </>
               )}
             </Button>

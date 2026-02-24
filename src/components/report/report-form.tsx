@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/correctness/noChildrenProp: <children prop used by Field> */
 "use client";
 
 import { IconCalendar } from "@tabler/icons-react";
@@ -109,7 +108,7 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
             totalWorkers: value.totalWorkers,
             location: value.location || undefined,
           });
-          toast.success("Report updated successfully");
+          toast.success("Laporan berhasil diperbarui");
         } else {
           await createReport.mutateAsync({
             projectId,
@@ -121,7 +120,7 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
             totalWorkers: value.totalWorkers,
             location: value.location || undefined,
           });
-          toast.success("Report created successfully");
+          toast.success("Laporan berhasil dibuat");
         }
         onSuccess?.();
       } catch {
@@ -144,7 +143,7 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
         {(field) => (
           <FieldGroup>
             <Field>
-              <FieldLabel>Report Date</FieldLabel>
+              <FieldLabel>Tanggal Laporan *</FieldLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -157,7 +156,7 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
                     <IconCalendar className="mr-2 h-4 w-4" />
                     {field.state.value
                       ? format(field.state.value, "PPP")
-                      : "Select date"}
+                      : "Pilih tanggal"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -180,16 +179,16 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
         {(field) => (
           <FieldGroup>
             <Field>
-              <FieldLabel>Task Description *</FieldLabel>
+              <FieldLabel>Deskripsi Pekerjaan *</FieldLabel>
               <Textarea
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
-                placeholder="Describe the work done today..."
+                placeholder="Jelaskan pekerjaan yang diselesaikan hari ini..."
                 rows={4}
               />
               <FieldDescription>
-                Describe the main tasks completed today
+                Deskripsikan tugas-tugas utama yang diselesaikan hari ini
               </FieldDescription>
               <FieldError errors={field.state.meta.errors} />
             </Field>
@@ -203,7 +202,7 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
           {(field) => (
             <FieldGroup>
               <Field>
-                <FieldLabel>Progress (%)</FieldLabel>
+                <FieldLabel>Progres (%) *</FieldLabel>
                 <Input
                   type="number"
                   min={0}
@@ -224,7 +223,7 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
           {(field) => (
             <FieldGroup>
               <Field>
-                <FieldLabel>Total Workers</FieldLabel>
+                <FieldLabel>Jumlah Pekerja *</FieldLabel>
                 <Input
                   type="number"
                   min={0}
@@ -247,13 +246,13 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
           {(field) => (
             <FieldGroup>
               <Field>
-                <FieldLabel>Weather</FieldLabel>
+                <FieldLabel>Cuaca (Opsional)</FieldLabel>
                 <Select
                   value={field.state.value}
                   onValueChange={field.handleChange}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select weather" />
+                    <SelectValue placeholder="Pilih cuaca" />
                   </SelectTrigger>
                   <SelectContent>
                     {WEATHER_OPTIONS.map((option) => (
@@ -273,12 +272,12 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
           {(field) => (
             <FieldGroup>
               <Field>
-                <FieldLabel>Location</FieldLabel>
+                <FieldLabel>Lokasi (Opsional)</FieldLabel>
                 <Input
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
-                  placeholder="e.g., Villa A, Lantai 2"
+                  placeholder="cth: Villa A, Lantai 2"
                 />
                 <FieldError errors={field.state.meta.errors} />
               </Field>
@@ -295,12 +294,12 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
               {(field) => (
                 <FieldGroup>
                   <Field>
-                    <FieldLabel>Custom Weather</FieldLabel>
+                    <FieldLabel>Cuaca Lainnya *</FieldLabel>
                     <Input
                       value={field.state.value}
                       onChange={(e) => field.handleChange(e.target.value)}
                       onBlur={field.handleBlur}
-                      placeholder="Enter custom weather condition"
+                      placeholder="Masukkan kondisi cuaca lainnya"
                     />
                   </Field>
                 </FieldGroup>
@@ -315,16 +314,16 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
         {(field) => (
           <FieldGroup>
             <Field>
-              <FieldLabel>Issues / Problems</FieldLabel>
+              <FieldLabel>Kendala / Masalah (Opsional)</FieldLabel>
               <Textarea
                 value={field.state.value}
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
-                placeholder="Any issues or problems encountered..."
+                placeholder="Tuliskan kendala atau masalah yang dihadapi..."
                 rows={3}
               />
               <FieldDescription>
-                Optional: Note any issues or blockers
+                Opsional: Catat kendala atau hambatan pekerjaan di lapangan
               </FieldDescription>
               <FieldError errors={field.state.meta.errors} />
             </Field>
@@ -338,10 +337,10 @@ export function ReportForm({ projectId, report, onSuccess }: ReportFormProps) {
           {(isSubmitting) => (
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting
-                ? "Saving..."
+                ? "Menyimpan..."
                 : isEditMode
-                  ? "Update Report"
-                  : "Create Report"}
+                  ? "Simpan Perubahan"
+                  : "Buat Laporan"}
             </Button>
           )}
         </form.Subscribe>

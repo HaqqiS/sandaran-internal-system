@@ -71,7 +71,7 @@ export function UploadForm({
     },
     onSubmit: async ({ value }) => {
       if (!fileData) {
-        toast.error("Please upload a file");
+        toast.error("Harap unggah sebuah file");
         return;
       }
 
@@ -89,7 +89,7 @@ export function UploadForm({
           description: value.description || undefined,
           version: value.version || undefined,
         });
-        toast.success("Document uploaded successfully");
+        toast.success("Dokumen berhasil diunggah");
         onSuccess?.();
 
         // Reset file state
@@ -111,7 +111,7 @@ export function UploadForm({
     >
       {/* File Upload Section */}
       <div className="space-y-2">
-        <FieldLabel>File</FieldLabel>
+        <FieldLabel>File *</FieldLabel>
         <FileUpload
           projectSlug={projectSlug}
           type="documents"
@@ -136,14 +136,14 @@ export function UploadForm({
             name="title"
             children={(field) => (
               <Field>
-                <FieldLabel htmlFor={field.name}>Title (Optional)</FieldLabel>
+                <FieldLabel htmlFor={field.name}>Judul (Opsional)</FieldLabel>
                 <Input
                   id={field.name}
                   name={field.name}
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Display title"
+                  placeholder="Judul dokumen"
                 />
               </Field>
             )}
@@ -153,7 +153,7 @@ export function UploadForm({
             name="fileType"
             children={(field) => (
               <Field>
-                <FieldLabel>Document Type</FieldLabel>
+                <FieldLabel>Tipe Dokumen *</FieldLabel>
                 <Select
                   value={field.state.value}
                   onValueChange={(value) =>
@@ -161,14 +161,14 @@ export function UploadForm({
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
+                    <SelectValue placeholder="Pilih tipe dokumen" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="DESIGN">Design File</SelectItem>
-                    <SelectItem value="DRAWING">Technical Drawing</SelectItem>
-                    <SelectItem value="SPECIFICATION">Specification</SelectItem>
-                    <SelectItem value="REFERENCE">Reference</SelectItem>
-                    <SelectItem value="OTHER">Other</SelectItem>
+                    <SelectItem value="DESIGN">File Desain/Denah</SelectItem>
+                    <SelectItem value="DRAWING">Gambar Teknis</SelectItem>
+                    <SelectItem value="SPECIFICATION">Spesifikasi</SelectItem>
+                    <SelectItem value="REFERENCE">Referensi</SelectItem>
+                    <SelectItem value="OTHER">Lainnya</SelectItem>
                   </SelectContent>
                 </Select>
               </Field>
@@ -180,14 +180,14 @@ export function UploadForm({
           name="version"
           children={(field) => (
             <Field>
-              <FieldLabel htmlFor={field.name}>Version (Optional)</FieldLabel>
+              <FieldLabel htmlFor={field.name}>Versi (Opsional)</FieldLabel>
               <Input
                 id={field.name}
                 name={field.name}
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="e.g. v1.0, Rev A"
+                placeholder="cth: v1.0, Revisi A"
               />
             </Field>
           )}
@@ -197,14 +197,14 @@ export function UploadForm({
           name="description"
           children={(field) => (
             <Field>
-              <FieldLabel htmlFor={field.name}>Description</FieldLabel>
+              <FieldLabel htmlFor={field.name}>Deskripsi (Opsional)</FieldLabel>
               <Textarea
                 id={field.name}
                 name={field.name}
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="Brief description of the document content..."
+                placeholder="Deskripsi singkat mengenai isi dokumen..."
                 rows={3}
               />
             </Field>
@@ -214,7 +214,7 @@ export function UploadForm({
 
       <div className="flex justify-end gap-2 pt-2">
         <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
+          Batal
         </Button>
         <form.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}
@@ -223,7 +223,7 @@ export function UploadForm({
               type="submit"
               disabled={!canSubmit || isSubmitting || !fileData}
             >
-              {isSubmitting ? "Uploading..." : "Upload Document"}
+              {isSubmitting ? "Mengunggah..." : "Unggah Dokumen"}
             </Button>
           )}
         />
