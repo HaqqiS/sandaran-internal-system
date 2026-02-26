@@ -34,8 +34,8 @@ Avoid renaming project slugs if they already contain uploaded files. If renaming
 
 ## 2. Improving form
 
-- **logistics Form**: error unknown value, amount can caracter.
-- **Sheet Form**: broken in mobile view, cannot scroll to bottom.
+- **logistics Form**: error unknown value, amount can caracter. (fixed)
+- **Sheet Form**: broken in mobile view, when using keyboard its glitch
 
 ## 3. Improving UI/UX
 

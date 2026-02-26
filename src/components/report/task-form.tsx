@@ -16,7 +16,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { useAddReportTask, useUpdateReportTask } from "~/hooks";
 
 const taskSchema = z.object({
-  taskName: z.string().min(1, "Task name is required"),
+  taskName: z.string().min(1, "Nama pekerjaan wajib diisi"),
   workerCount: z.number().min(0),
   progress: z.number().min(0).max(100),
   notes: z.string().optional(),
@@ -64,7 +64,7 @@ export function TaskForm({
             progress: value.progress,
             notes: value.notes || undefined,
           });
-          toast.success("Task updated");
+          toast.success("Tugas berhasil diperbarui");
         } else {
           await addTask.mutateAsync({
             projectId,
@@ -74,11 +74,11 @@ export function TaskForm({
             progress: value.progress,
             notes: value.notes || undefined,
           });
-          toast.success("Task added");
+          toast.success("Tugas berhasil ditambahkan");
         }
         onSuccess();
       } catch {
-        toast.error("Failed to save task");
+        toast.error("Gagal menyimpan tugas");
       }
     },
   });
@@ -99,12 +99,12 @@ export function TaskForm({
             {(field) => (
               <FieldGroup>
                 <Field>
-                  <FieldLabel>Task Name</FieldLabel>
+                  <FieldLabel>Nama Pekerjaan</FieldLabel>
                   <Input
                     value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
-                    placeholder="e.g. Wall plastering"
+                    placeholder="Contoh: Plester dinding Lt. 1"
                     autoFocus
                   />
                   <FieldError errors={field.state.meta.errors} />
@@ -119,7 +119,7 @@ export function TaskForm({
           {(field) => (
             <FieldGroup>
               <Field>
-                <FieldLabel>Workers</FieldLabel>
+                <FieldLabel>Jml Pekerja Terlibat</FieldLabel>
                 <Input
                   type="number"
                   min={0}
@@ -140,7 +140,7 @@ export function TaskForm({
           {(field) => (
             <FieldGroup>
               <Field>
-                <FieldLabel>Progress (%)</FieldLabel>
+                <FieldLabel>Progres (%)</FieldLabel>
                 <Input
                   type="number"
                   min={0}
@@ -163,13 +163,13 @@ export function TaskForm({
             {(field) => (
               <FieldGroup>
                 <Field>
-                  <FieldLabel>Notes (Optional)</FieldLabel>
+                  <FieldLabel>Catatan Tambahan (Opsional)</FieldLabel>
                   <Textarea
                     value={field.state.value || ""}
                     onChange={(e) => field.handleChange(e.target.value)}
                     onBlur={field.handleBlur}
                     rows={2}
-                    placeholder="Additional details..."
+                    placeholder="Tulis kendala atau detail spesifik dari pekerjaan ini..."
                   />
                   <FieldError errors={field.state.meta.errors} />
                 </Field>
@@ -182,12 +182,16 @@ export function TaskForm({
       {/* Actions */}
       <div className="flex justify-end gap-2">
         <Button type="button" variant="ghost" onClick={onCancel}>
-          Cancel
+          Batal
         </Button>
         <form.Subscribe selector={(state) => state.isSubmitting}>
           {(isSubmitting) => (
             <Button type="submit" disabled={isSubmitting} size="sm">
-              {isSubmitting ? "Saving..." : isEditMode ? "Update" : "Add Task"}
+              {isSubmitting
+                ? "Menyimpan..."
+                : isEditMode
+                  ? "Simpan Perbaikan"
+                  : "Tambah Pekerjaan"}
             </Button>
           )}
         </form.Subscribe>

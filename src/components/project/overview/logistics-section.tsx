@@ -7,11 +7,15 @@ import {
   IconMinus,
   IconPlus,
 } from "@tabler/icons-react";
+import { useState } from "react";
 import Link from "next/link";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { useLogisticStockSummary } from "~/hooks/useLogistic";
+import { useProjectMembers } from "~/hooks/useProject";
+import { useSession } from "~/stores/use-session-store";
+import { TransactionDialog } from "~/components/logistic/transaction-dialog";
 
 interface LogisticsSectionProps {
   projectId: string;
@@ -23,9 +27,33 @@ export function LogisticsSection({
   projectSlug,
 }: LogisticsSectionProps) {
   const { data: items, isLoading } = useLogisticStockSummary(projectId);
+  const { data: members } = useProjectMembers(projectId);
+  const { session } = useSession();
+
+  const [transactionDialog, setTransactionDialog] = useState<{
+    isOpen: boolean;
+    type: "IN" | "OUT";
+    item: { id: string; name: string; unit: string } | null;
+  }>({
+    isOpen: false,
+    type: "OUT",
+    item: null,
+  });
 
   const lowStockItems = items?.filter((item) => item.currentStock < 10) ?? [];
   const totalItems = items?.length ?? 0;
+
+  // Find user's role
+  const projectMember = members?.find((m) => m.userId === session?.user?.id);
+  const role = projectMember?.role;
+  const canRecordTransaction =
+    role === "MANDOR" ||
+    role === "FINANCE" ||
+    session?.user?.roleGlobal === "ADMIN";
+
+  const handleTransactionSuccess = () => {
+    setTransactionDialog((prev) => ({ ...prev, isOpen: false }));
+  };
 
   return (
     <Card>
@@ -115,16 +143,53 @@ export function LogisticsSection({
                           {item.unit}
                         </p>
                       </div>
-                      <div className="flex items-center gap-3 text-xs">
-                        <div className="flex items-center gap-1 text-green-600">
-                          <IconPlus className="h-3 w-3" />
-                          <span>{item.totalIn}</span>
+                      <div className="flex flex-col items-end gap-2">
+                        <div className="flex items-center gap-3 text-xs">
+                          <div className="flex items-center gap-1 text-green-600">
+                            <IconPlus className="h-3 w-3" />
+                            <span>{item.totalIn}</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-red-600">
+                            <IconMinus className="h-3 w-3" />
+                            <span>{item.totalOut}</span>
+                          </div>
+                          <div className="font-bold">= {item.currentStock}</div>
                         </div>
-                        <div className="flex items-center gap-1 text-red-600">
-                          <IconMinus className="h-3 w-3" />
-                          <span>{item.totalOut}</span>
-                        </div>
-                        <div className="font-bold">= {item.currentStock}</div>
+
+                        {canRecordTransaction && (
+                          <div className="flex items-center gap-1 text-xs">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 text-green-600 hover:text-green-700"
+                              onClick={() =>
+                                setTransactionDialog({
+                                  isOpen: true,
+                                  type: "IN",
+                                  item,
+                                })
+                              }
+                            >
+                              <IconPlus className="mr-1 h-3 w-3" />
+                              IN
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 text-red-600 hover:text-red-700"
+                              onClick={() =>
+                                setTransactionDialog({
+                                  isOpen: true,
+                                  type: "OUT",
+                                  item,
+                                })
+                              }
+                            >
+                              <IconMinus className="mr-1 h-3 w-3" />
+                              OUT
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -141,6 +206,17 @@ export function LogisticsSection({
           </div>
         )}
       </CardContent>
+
+      <TransactionDialog
+        projectId={projectId}
+        isOpen={transactionDialog.isOpen}
+        onOpenChange={(open) =>
+          setTransactionDialog((prev) => ({ ...prev, isOpen: open }))
+        }
+        type={transactionDialog.type}
+        item={transactionDialog.item}
+        onSuccess={handleTransactionSuccess}
+      />
     </Card>
   );
 }

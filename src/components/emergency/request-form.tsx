@@ -15,9 +15,9 @@ const withdrawSchema = z.object({
   amount: z
     .string()
     .refine((val) => !Number.isNaN(Number(val)) && Number(val) > 0, {
-      message: "Amount must be a positive number",
+      message: "Nominal harus berupa angka lebih dari 0",
     }),
-  description: z.string().min(1, "Description is required"),
+  description: z.string().min(1, "Keterangan / Keperluan wajib diisi"),
 });
 
 interface RequestFormProps {
@@ -64,12 +64,12 @@ export function RequestForm({
           proofPublicId,
         });
 
-        toast.success("Withdrawal requested successfully");
+        toast.success("Pengajuan dana berhasil dikirim");
         form.reset();
         setProofFile(null);
         onSuccess?.();
       } catch (error) {
-        toast.error("Failed to request funds");
+        toast.error("Gagal mengajukan dana");
         console.error(error);
       }
     },
@@ -88,7 +88,7 @@ export function RequestForm({
         name="amount"
         children={(field) => (
           <div className="space-y-2">
-            <Label htmlFor={field.name}>Amount (Rp)</Label>
+            <Label htmlFor={field.name}>Nominal (Rp)</Label>
             <Input
               id={field.name}
               name={field.name}
@@ -96,7 +96,7 @@ export function RequestForm({
               value={field.state.value}
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="e.g. 50000"
+              placeholder="Contoh: 50000"
             />
             {field.state.meta.errors.length > 0 && (
               <p className="text-sm text-destructive">
@@ -111,14 +111,14 @@ export function RequestForm({
         name="description"
         children={(field) => (
           <div className="space-y-2">
-            <Label htmlFor={field.name}>Description</Label>
+            <Label htmlFor={field.name}>Keterangan / Keperluan</Label>
             <Textarea
               id={field.name}
               name={field.name}
               value={field.state.value}
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="e.g. Beli Paku, Makan Siang Tukang"
+              placeholder="Contoh: Beli paku tambahan pendukung, Makan siang tukang borongan"
             />
             {field.state.meta.errors.length > 0 && (
               <p className="text-sm text-destructive">
@@ -130,7 +130,7 @@ export function RequestForm({
       />
 
       <div className="space-y-2">
-        <Label>Proof (Optional)</Label>
+        <Label>Bukti Foto / Bon (Opsional)</Label>
         <div className="flex items-center gap-2">
           <Input
             type="file"
@@ -141,17 +141,19 @@ export function RequestForm({
         </div>
         {proofFile && (
           <p className="text-xs text-muted-foreground">
-            Selected: {proofFile.name}
+            Terpilih: {proofFile.name}
           </p>
         )}
       </div>
 
       <div className="flex justify-end gap-2 pt-2">
         <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
+          Batal
         </Button>
         <Button type="submit" disabled={requestFund.isPending || isUploading}>
-          {requestFund.isPending || isUploading ? "Submitting..." : "Request"}
+          {requestFund.isPending || isUploading
+            ? "Memproses..."
+            : "Ajukan Dana"}
         </Button>
       </div>
     </form>

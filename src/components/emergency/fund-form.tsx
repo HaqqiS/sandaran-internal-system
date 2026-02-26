@@ -13,9 +13,9 @@ const fundSchema = z.object({
   amount: z
     .string()
     .refine((val) => !Number.isNaN(Number(val)) && Number(val) > 0, {
-      message: "Amount must be a positive number",
+      message: "Nominal harus berupa angka lebih dari 0",
     }),
-  description: z.string().min(1, "Description is required"),
+  description: z.string().min(1, "Keterangan/sumber aliran harus diisi"),
 });
 
 interface FundFormProps {
@@ -42,11 +42,11 @@ export function FundForm({ projectId, onSuccess, onCancel }: FundFormProps) {
           amount: Number(value.amount),
           description: value.description,
         });
-        toast.success("Funds added successfully");
+        toast.success("Kas berhasil ditambahkan");
         form.reset();
         onSuccess?.();
       } catch (error) {
-        toast.error("Failed to add funds");
+        toast.error("Gagal menambahkan dana ke kas");
         console.error(error);
       }
     },
@@ -65,7 +65,7 @@ export function FundForm({ projectId, onSuccess, onCancel }: FundFormProps) {
         name="amount"
         children={(field) => (
           <div className="space-y-2">
-            <Label htmlFor={field.name}>Amount (Rp)</Label>
+            <Label htmlFor={field.name}>Nominal Masuk (Rp)</Label>
             <Input
               id={field.name}
               name={field.name}
@@ -73,7 +73,7 @@ export function FundForm({ projectId, onSuccess, onCancel }: FundFormProps) {
               value={field.state.value}
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="e.g. 1000000"
+              placeholder="Contoh: 1000000"
             />
             {field.state.meta.errors.length > 0 && (
               <p className="text-sm text-destructive">
@@ -88,14 +88,14 @@ export function FundForm({ projectId, onSuccess, onCancel }: FundFormProps) {
         name="description"
         children={(field) => (
           <div className="space-y-2">
-            <Label htmlFor={field.name}>Source / Description</Label>
+            <Label htmlFor={field.name}>Sumber Dana / Keterangan</Label>
             <Textarea
               id={field.name}
               name={field.name}
               value={field.state.value}
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="e.g. Top up from Finance"
+              placeholder="Contoh: Pencairan Bon dari Akuntan, Titipan Mandor"
             />
             {field.state.meta.errors.length > 0 && (
               <p className="text-sm text-destructive">
@@ -108,10 +108,10 @@ export function FundForm({ projectId, onSuccess, onCancel }: FundFormProps) {
 
       <div className="flex justify-end gap-2 pt-2">
         <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
+          Batal
         </Button>
         <Button type="submit" disabled={addBalance.isPending}>
-          {addBalance.isPending ? "Adding..." : "Add Funds"}
+          {addBalance.isPending ? "Memproses..." : "Tambah Kas Masuk"}
         </Button>
       </div>
     </form>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
+import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -13,13 +14,25 @@ import {
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import {
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+} from "~/components/ui/popover";
+import {
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "~/components/ui/command";
+import { IconCheck } from "@tabler/icons-react";
+import {
   useCreateLogisticItem,
   useUpdateLogisticItem,
 } from "~/hooks/useLogistic";
 
 const itemSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  unit: z.string().min(1, "Unit is required"),
+  name: z.string().min(1, "Nama barang wajib diisi"),
+  unit: z.string().min(1, "Satuan pengukuran wajib diisi"),
 });
 
 type ItemFormValues = z.infer<typeof itemSchema>;
@@ -37,7 +50,7 @@ interface ItemFormProps {
 const COMMON_UNITS = [
   "Pcs",
   "Box",
-  "Sack",
+  "Sak",
   "Kg",
   "Ton",
   "Meter",
@@ -58,6 +71,7 @@ export function LogisticItemForm({
   const createItem = useCreateLogisticItem();
   const updateItem = useUpdateLogisticItem();
   const isEditMode = !!item;
+  const [open, setOpen] = useState(false);
 
   const form = useForm({
     defaultValues: {
@@ -76,14 +90,14 @@ export function LogisticItemForm({
             name: value.name,
             unit: value.unit,
           });
-          toast.success("Item updated successfully");
+          toast.success("Data barang berhasil diperbarui");
         } else {
           await createItem.mutateAsync({
             projectId,
             name: value.name,
             unit: value.unit,
           });
-          toast.success("Item created successfully");
+          toast.success("Barang baru berhasil ditambahkan");
         }
         onSuccess?.();
       } catch {
@@ -109,7 +123,9 @@ export function LogisticItemForm({
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Item Name</FieldLabel>
+                <FieldLabel htmlFor={field.name}>
+                  Nama Barang Logistik
+                </FieldLabel>
                 <Input
                   id={field.name}
                   name={field.name}
@@ -117,7 +133,7 @@ export function LogisticItemForm({
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
                   aria-invalid={isInvalid}
-                  placeholder="e.g. Semen Tiga Roda"
+                  placeholder="Contoh: Semen Tiga Roda, Paku Payung 5cm"
                   autoComplete="off"
                 />
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -133,27 +149,82 @@ export function LogisticItemForm({
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Unit</FieldLabel>
-                <div className="relative">
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={isInvalid}
-                    placeholder="e.g. Sack"
-                    autoComplete="off"
-                    list="units-list"
-                  />
-                  <datalist id="units-list">
-                    {COMMON_UNITS.map((unit) => (
-                      <option key={unit} value={unit} />
-                    ))}
-                  </datalist>
-                </div>
+                <FieldLabel htmlFor={field.name}>Satuan</FieldLabel>
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverAnchor asChild>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                        if (!open) setOpen(true);
+                      }}
+                      onFocus={() => setOpen(true)}
+                      aria-invalid={isInvalid}
+                      placeholder="Contoh: Sak, Kg, Pcs"
+                      autoComplete="off"
+                    />
+                  </PopoverAnchor>
+                  <PopoverContent
+                    className="w-[--radix-popover-trigger-width] p-0"
+                    onOpenAutoFocus={(e) => e.preventDefault()}
+                    onInteractOutside={(e) => {
+                      if (
+                        e.target instanceof Element &&
+                        e.target.closest(`#${field.name}`)
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                    onWheel={(e) => e.stopPropagation()}
+                    onTouchMove={(e) => e.stopPropagation()}
+                  >
+                    <Command shouldFilter={false}>
+                      <CommandList>
+                        <CommandGroup>
+                          {COMMON_UNITS.filter((u) =>
+                            u
+                              .toLowerCase()
+                              .includes(
+                                (field.state.value || "").toLowerCase(),
+                              ),
+                          ).map((unit) => (
+                            <CommandItem
+                              key={unit}
+                              value={unit}
+                              onSelect={() => {
+                                field.handleChange(unit);
+                                setOpen(false);
+                              }}
+                            >
+                              {unit}
+                              {field.state.value === unit && (
+                                <IconCheck className="ml-auto flex size-4 text-primary" />
+                              )}
+                            </CommandItem>
+                          ))}
+                          {COMMON_UNITS.filter((u) =>
+                            u
+                              .toLowerCase()
+                              .includes(
+                                (field.state.value || "").toLowerCase(),
+                              ),
+                          ).length === 0 && (
+                            <div className="py-6 text-center text-sm text-muted-foreground p-4">
+                              "{field.state.value}" akan disimpan sebagai satuan
+                              baru.
+                            </div>
+                          )}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
                 <FieldDescription>
-                  Unit of measurement (e.g. Sack, Kg, Pcs)
+                  Pilih dari daftar atau ketik kepanjangan satuan untuk barang
+                  ini
                 </FieldDescription>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
@@ -168,10 +239,10 @@ export function LogisticItemForm({
           children={([canSubmit, isSubmitting]) => (
             <Button type="submit" disabled={!canSubmit || isSubmitting}>
               {isSubmitting
-                ? "Saving..."
+                ? "Menyimpan..."
                 : isEditMode
-                  ? "Update Item"
-                  : "Create Item"}
+                  ? "Simpan Perubahan"
+                  : "Tambah Barang"}
             </Button>
           )}
         />

@@ -21,6 +21,10 @@ export function useCreateComment() {
         projectId: variables.projectId,
         reportId: variables.reportId,
       });
+      void utils.report.getRecentByProject.invalidate();
+      void utils.report.getByProject.invalidate({
+        projectId: variables.projectId,
+      });
     },
   });
 }

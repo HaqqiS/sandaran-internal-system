@@ -57,6 +57,8 @@ export function ReportCard({ report, projectSlug }: ReportCardProps) {
     .toUpperCase()
     .slice(0, 2);
 
+  const url = `/projects/${projectSlug}/reports/${report.slug}`;
+
   // return (
   //   <Link href={`/projects/${projectSlug}/reports/${report.slug}`}>
   //     <Card className="transition-colors hover:bg-muted/50">
@@ -119,7 +121,7 @@ export function ReportCard({ report, projectSlug }: ReportCardProps) {
 
   return (
     <Link
-      href={`/projects/${projectSlug}/reports/${report.slug}`}
+      href={url}
       className="group relative block w-full outline-none transition-all"
     >
       {/* Back Layer: Media */}
@@ -153,7 +155,7 @@ export function ReportCard({ report, projectSlug }: ReportCardProps) {
       </div>
 
       {/* Front Layer: Info Card */}
-      <Card className="relative z-10 -mt-6 w-full shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:border-primary/20 group-hover:shadow-lg sm:-mt-8">
+      <Card className="relative z-10 -mt-6 flex w-full flex-col shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:border-primary/20 group-hover:shadow-lg sm:-mt-8">
         <CardHeader className="pb-2">
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -175,8 +177,8 @@ export function ReportCard({ report, projectSlug }: ReportCardProps) {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <p className="line-clamp-2 text-sm text-muted-foreground">
+        <CardContent className="space-y-3 pb-3">
+          <p className="line-clamp-2 text-sm ">
             {report.taskDescription || "No description provided."}
           </p>
 
