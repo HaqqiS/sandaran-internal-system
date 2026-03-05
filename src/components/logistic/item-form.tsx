@@ -2,7 +2,7 @@
 
 import { IconCheck } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
+import { useImperativeHandle, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -35,7 +35,8 @@ const itemSchema = z.object({
   unit: z.string().min(1, "Satuan pengukuran wajib diisi"),
 });
 
-type ItemFormValues = z.infer<typeof itemSchema>;
+export type ItemFormValues = z.infer<typeof itemSchema>;
+export type ItemFormDraft = Partial<ItemFormValues>;
 
 interface ItemFormProps {
   projectId: string;
@@ -44,6 +45,8 @@ interface ItemFormProps {
     name: string;
     unit: string;
   };
+  draftValues?: ItemFormDraft;
+  ref?: React.Ref<{ getValues: () => ItemFormValues }>;
   onSuccess?: () => void;
 }
 
@@ -66,6 +69,8 @@ const COMMON_UNITS = [
 export function LogisticItemForm({
   projectId,
   item,
+  draftValues,
+  ref,
   onSuccess,
 }: ItemFormProps) {
   const createItem = useCreateLogisticItem();
@@ -73,10 +78,12 @@ export function LogisticItemForm({
   const isEditMode = !!item;
   const [open, setOpen] = useState(false);
 
+  useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
+
   const form = useForm({
     defaultValues: {
-      name: item?.name ?? "",
-      unit: item?.unit ?? "",
+      name: item?.name ?? draftValues?.name ?? "",
+      unit: item?.unit ?? draftValues?.unit ?? "",
     } as ItemFormValues,
     validators: {
       onSubmit: itemSchema,

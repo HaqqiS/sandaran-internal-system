@@ -1,6 +1,7 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
+import { useImperativeHandle } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -27,7 +28,8 @@ const transactionSchema = z.object({
   notes: z.string().optional(),
 });
 
-type TransactionFormValues = z.infer<typeof transactionSchema>;
+export type TransactionFormValues = z.infer<typeof transactionSchema>;
+export type TransactionFormDraft = Partial<TransactionFormValues>;
 
 interface TransactionFormProps {
   projectId: string;
@@ -35,6 +37,8 @@ interface TransactionFormProps {
   itemName: string;
   unit: string;
   defaultType?: "IN" | "OUT";
+  draftValues?: TransactionFormDraft;
+  ref?: React.Ref<{ getValues: () => TransactionFormValues }>;
   onSuccess?: () => void;
 }
 
@@ -44,15 +48,19 @@ export function TransactionForm({
   itemName,
   unit,
   defaultType = "OUT",
+  draftValues,
+  ref,
   onSuccess,
 }: TransactionFormProps) {
   const recordTransaction = useRecordLogisticTransaction();
 
+  useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
+
   const form = useForm({
     defaultValues: {
-      type: defaultType,
-      quantity: 1,
-      notes: "",
+      type: draftValues?.type ?? defaultType,
+      quantity: draftValues?.quantity ?? 1,
+      notes: draftValues?.notes ?? "",
     } as TransactionFormValues,
     validators: {
       onSubmit: transactionSchema,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
+import { useImperativeHandle, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -20,9 +20,14 @@ const withdrawSchema = z.object({
   description: z.string().min(1, "Keterangan / Keperluan wajib diisi"),
 });
 
+export type WithdrawFormValues = z.infer<typeof withdrawSchema>;
+export type WithdrawFormDraft = Partial<WithdrawFormValues>;
+
 interface RequestFormProps {
   projectId: string;
   projectSlug: string;
+  draftValues?: WithdrawFormDraft;
+  ref?: React.Ref<{ getValues: () => WithdrawFormValues }>;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
@@ -30,6 +35,8 @@ interface RequestFormProps {
 export function RequestForm({
   projectId,
   projectSlug,
+  draftValues,
+  ref,
   onSuccess,
   onCancel,
 }: RequestFormProps) {
@@ -37,10 +44,12 @@ export function RequestForm({
   const { upload, isUploading } = useCloudinaryUpload();
   const [proofFile, setProofFile] = useState<File | null>(null);
 
+  useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
+
   const form = useForm({
     defaultValues: {
-      amount: "",
-      description: "",
+      amount: draftValues?.amount ?? "",
+      description: draftValues?.description ?? "",
     },
     validators: {
       onChange: withdrawSchema,

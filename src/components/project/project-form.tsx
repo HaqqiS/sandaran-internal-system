@@ -4,6 +4,7 @@
 import { IconCalendar } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
 import { format } from "date-fns";
+import { useImperativeHandle } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -48,7 +49,9 @@ const projectSchema = z.object({
   status: z.enum(["ACTIVE", "DONE", "PAUSED"]),
 });
 
-type ProjectFormValues = z.infer<typeof projectSchema>;
+export type ProjectFormValues = z.infer<typeof projectSchema>;
+
+export type ProjectFormDraft = Partial<ProjectFormValues>;
 
 interface ProjectFormProps {
   project?: {
@@ -61,23 +64,32 @@ interface ProjectFormProps {
     endDate?: Date | null;
     status: "ACTIVE" | "DONE" | "PAUSED";
   };
+  draftValues?: ProjectFormDraft;
+  ref?: React.Ref<{ getValues: () => ProjectFormValues }>;
   onSuccess?: () => void;
 }
 
-export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
+export function ProjectForm({
+  project,
+  draftValues,
+  ref,
+  onSuccess,
+}: ProjectFormProps) {
   const createProject = useCreateProject();
   const updateProject = useUpdateProject();
   const isEditMode = !!project;
 
+  useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
+
   const form = useForm({
     defaultValues: {
-      name: project?.name ?? "",
-      slug: project?.slug ?? "",
-      description: project?.description ?? "",
-      location: project?.location ?? "",
-      startDate: project?.startDate ?? undefined,
-      endDate: project?.endDate ?? undefined,
-      status: project?.status ?? "ACTIVE",
+      name: project?.name ?? draftValues?.name ?? "",
+      slug: project?.slug ?? draftValues?.slug ?? "",
+      description: project?.description ?? draftValues?.description ?? "",
+      location: project?.location ?? draftValues?.location ?? "",
+      startDate: project?.startDate ?? draftValues?.startDate ?? undefined,
+      endDate: project?.endDate ?? draftValues?.endDate ?? undefined,
+      status: project?.status ?? draftValues?.status ?? "ACTIVE",
     } as ProjectFormValues,
     validators: {
       onSubmit: projectSchema,

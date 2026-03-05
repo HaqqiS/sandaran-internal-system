@@ -1,6 +1,7 @@
 "use client";
 
 import type * as React from "react";
+import { useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +19,11 @@ import {
   DrawerTrigger,
 } from "~/components/ui/drawer";
 import { useIsMobile } from "~/hooks/use-mobile";
-import { ProjectForm } from "./project-form";
+import {
+  ProjectForm,
+  type ProjectFormDraft,
+  type ProjectFormValues,
+} from "./project-form";
 
 interface ProjectDialogProps {
   project?: {
@@ -44,6 +49,20 @@ export function ProjectDialog({
 }: ProjectDialogProps) {
   const isMobile = useIsMobile();
   const isEditMode = !!project;
+  const [draft, setDraft] = useState<ProjectFormDraft>({});
+  const formRef = useRef<{ getValues: () => ProjectFormValues }>(null);
+
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen && formRef.current) {
+      setDraft(formRef.current.getValues());
+    }
+    onOpenChange?.(isOpen);
+  };
+
+  const handleSuccess = () => {
+    setDraft({});
+    onOpenChange?.(false);
+  };
 
   const title = isEditMode ? "Edit Project" : "New Project";
   const description = isEditMode
@@ -52,7 +71,7 @@ export function ProjectDialog({
 
   if (!isMobile) {
     return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
         {children && <DialogTrigger asChild>{children}</DialogTrigger>}
         <DialogContent className="sm:max-w-[525px]">
           <DialogHeader>
@@ -60,8 +79,10 @@ export function ProjectDialog({
             <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
           <ProjectForm
+            ref={formRef}
             project={project}
-            onSuccess={() => onOpenChange?.(false)}
+            draftValues={draft}
+            onSuccess={handleSuccess}
           />
         </DialogContent>
       </Dialog>
@@ -69,7 +90,7 @@ export function ProjectDialog({
   }
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={open} onOpenChange={handleOpenChange}>
       {children && <DrawerTrigger asChild>{children}</DrawerTrigger>}
       <DrawerContent className="flex flex-col h-[85dvh]">
         <DrawerHeader className="text-left shrink-0">
@@ -78,8 +99,10 @@ export function ProjectDialog({
         </DrawerHeader>
         <div className="flex-1 overflow-y-auto px-4 pb-6">
           <ProjectForm
+            ref={formRef}
             project={project}
-            onSuccess={() => onOpenChange?.(false)}
+            draftValues={draft}
+            onSuccess={handleSuccess}
           />
         </div>
       </DrawerContent>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
+import { useImperativeHandle } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -18,19 +19,32 @@ const fundSchema = z.object({
   description: z.string().min(1, "Keterangan/sumber aliran harus diisi"),
 });
 
+export type FundFormValues = z.infer<typeof fundSchema>;
+export type FundFormDraft = Partial<FundFormValues>;
+
 interface FundFormProps {
   projectId: string;
+  draftValues?: FundFormDraft;
+  ref?: React.Ref<{ getValues: () => FundFormValues }>;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
 
-export function FundForm({ projectId, onSuccess, onCancel }: FundFormProps) {
+export function FundForm({
+  projectId,
+  draftValues,
+  ref,
+  onSuccess,
+  onCancel,
+}: FundFormProps) {
   const addBalance = useAddEmergencyBalance();
+
+  useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
 
   const form = useForm({
     defaultValues: {
-      amount: "",
-      description: "",
+      amount: draftValues?.amount ?? "",
+      description: draftValues?.description ?? "",
     },
     validators: {
       onChange: fundSchema,

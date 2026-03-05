@@ -1,6 +1,7 @@
 "use client";
 
 import type * as React from "react";
+import { useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +19,11 @@ import {
   DrawerTrigger,
 } from "~/components/ui/drawer";
 import { useIsMobile } from "~/hooks/use-mobile";
-import { UploadForm } from "./upload-form";
+import {
+  type DocumentFormDraft,
+  type DocumentFormValues,
+  UploadForm,
+} from "./upload-form";
 
 interface UploadDialogProps {
   projectId: string;
@@ -38,13 +43,27 @@ export function UploadDialog({
   children,
 }: UploadDialogProps) {
   const isMobile = useIsMobile();
-
   const title = "Upload Document";
   const descriptionText = "Upload design files, drawings, or specifications.";
+  const [draft, setDraft] = useState<DocumentFormDraft>({});
+  const formRef = useRef<{ getValues: () => DocumentFormValues }>(null);
+
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen && formRef.current) {
+      setDraft(formRef.current.getValues());
+    }
+    onOpenChange(isOpen);
+  };
+
+  const handleSuccess = () => {
+    setDraft({});
+    onOpenChange(false);
+    onSuccess?.();
+  };
 
   if (!isMobile) {
     return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
         {children && <DialogTrigger asChild>{children}</DialogTrigger>}
         <DialogContent className="sm:max-w-xl">
           <DialogHeader>
@@ -53,12 +72,11 @@ export function UploadDialog({
           </DialogHeader>
           <div className="overflow-y-auto no-scrollbar max-h-[80vh] px-1">
             <UploadForm
+              ref={formRef}
               projectId={projectId}
               projectSlug={projectSlug}
-              onSuccess={() => {
-                onOpenChange(false);
-                onSuccess?.();
-              }}
+              draftValues={draft}
+              onSuccess={handleSuccess}
               onCancel={() => onOpenChange(false)}
             />
           </div>
@@ -68,7 +86,7 @@ export function UploadDialog({
   }
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={open} onOpenChange={handleOpenChange}>
       {children && <DrawerTrigger asChild>{children}</DrawerTrigger>}
       <DrawerContent className="flex flex-col h-[85dvh]">
         <DrawerHeader className="text-left shrink-0">
@@ -77,12 +95,11 @@ export function UploadDialog({
         </DrawerHeader>
         <div className="flex-1 overflow-y-auto px-4 pb-6">
           <UploadForm
+            ref={formRef}
             projectId={projectId}
             projectSlug={projectSlug}
-            onSuccess={() => {
-              onOpenChange(false);
-              onSuccess?.();
-            }}
+            draftValues={draft}
+            onSuccess={handleSuccess}
             onCancel={() => onOpenChange(false)}
           />
         </div>

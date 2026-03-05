@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +16,11 @@ import {
   DrawerTitle,
 } from "~/components/ui/drawer";
 import { useIsMobile } from "~/hooks/use-mobile";
-import { TransactionForm } from "./transaction-form";
+import {
+  TransactionForm,
+  type TransactionFormDraft,
+  type TransactionFormValues,
+} from "./transaction-form";
 
 interface TransactionDialogProps {
   projectId: string;
@@ -42,10 +47,24 @@ export function TransactionDialog({
       Record {directionText} stock for <strong>{item?.name}</strong>.
     </>
   );
+  const [draft, setDraft] = useState<TransactionFormDraft>({});
+  const formRef = useRef<{ getValues: () => TransactionFormValues }>(null);
+
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen && formRef.current) {
+      setDraft(formRef.current.getValues());
+    }
+    onOpenChange(isOpen);
+  };
+
+  const handleSuccess = () => {
+    setDraft({});
+    onSuccess();
+  };
 
   if (!isMobile) {
     return (
-      <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
@@ -53,12 +72,14 @@ export function TransactionDialog({
           </DialogHeader>
           {item && (
             <TransactionForm
+              ref={formRef}
               projectId={projectId}
               itemId={item.id}
               itemName={item.name}
               unit={item.unit}
               defaultType={type}
-              onSuccess={onSuccess}
+              draftValues={draft}
+              onSuccess={handleSuccess}
             />
           )}
         </DialogContent>
@@ -67,7 +88,7 @@ export function TransactionDialog({
   }
 
   return (
-    <Drawer open={isOpen} onOpenChange={onOpenChange}>
+    <Drawer open={isOpen} onOpenChange={handleOpenChange}>
       <DrawerContent className="flex flex-col h-[85dvh]">
         <DrawerHeader className="text-left shrink-0">
           <DrawerTitle>{title}</DrawerTitle>
@@ -76,12 +97,14 @@ export function TransactionDialog({
         <div className="flex-1 overflow-y-auto px-4 pb-6">
           {item && (
             <TransactionForm
+              ref={formRef}
               projectId={projectId}
               itemId={item.id}
               itemName={item.name}
               unit={item.unit}
               defaultType={type}
-              onSuccess={onSuccess}
+              draftValues={draft}
+              onSuccess={handleSuccess}
             />
           )}
         </div>

@@ -4,7 +4,7 @@ import { IconCalendar } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useImperativeHandle, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ImageUpload } from "~/components/shared/image-upload";
@@ -57,7 +57,8 @@ const reportSchema = z.object({
   location: z.string().optional(),
 });
 
-type ReportFormValues = z.infer<typeof reportSchema>;
+export type ReportFormValues = z.infer<typeof reportSchema>;
+export type ReportFormDraft = Partial<ReportFormValues>;
 
 interface ReportFormProps {
   projectId: string;
@@ -72,6 +73,8 @@ interface ReportFormProps {
     totalWorkers: number;
     location?: string | null;
   };
+  draftValues?: ReportFormDraft;
+  ref?: React.Ref<{ getValues: () => ReportFormValues }>;
   onSuccess?: () => void;
 }
 
@@ -79,6 +82,8 @@ export function ReportForm({
   projectId,
   projectSlug,
   report,
+  draftValues,
+  ref,
   onSuccess,
 }: ReportFormProps) {
   const createReport = useCreateReport();
@@ -100,16 +105,26 @@ export function ReportForm({
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
 
+  useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
+
   const form = useForm({
     defaultValues: {
-      reportDate: report?.reportDate ? new Date(report.reportDate) : new Date(),
-      taskDescription: report?.taskDescription ?? "",
-      progressPercent: report?.progressPercent ?? 0,
-      issues: report?.issues ?? "",
-      weather: isCustomWeather ? "custom" : (report?.weather ?? ""),
-      customWeather: isCustomWeather ? (report?.weather ?? "") : "",
-      totalWorkers: report?.totalWorkers ?? 0,
-      location: report?.location ?? "",
+      reportDate: report?.reportDate
+        ? new Date(report.reportDate)
+        : (draftValues?.reportDate ?? new Date()),
+      taskDescription:
+        report?.taskDescription ?? draftValues?.taskDescription ?? "",
+      progressPercent:
+        report?.progressPercent ?? draftValues?.progressPercent ?? 0,
+      issues: report?.issues ?? draftValues?.issues ?? "",
+      weather: isCustomWeather
+        ? "custom"
+        : (report?.weather ?? draftValues?.weather ?? ""),
+      customWeather: isCustomWeather
+        ? (report?.weather ?? "")
+        : (draftValues?.customWeather ?? ""),
+      totalWorkers: report?.totalWorkers ?? draftValues?.totalWorkers ?? 0,
+      location: report?.location ?? draftValues?.location ?? "",
     } as ReportFormValues,
     validators: {
       onSubmit: reportSchema,

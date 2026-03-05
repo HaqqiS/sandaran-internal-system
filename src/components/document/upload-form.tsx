@@ -2,7 +2,7 @@
 
 import { useForm } from "@tanstack/react-form";
 import type { DocumentType } from "generated/prisma";
-import { useState } from "react";
+import { useImperativeHandle, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { FileUpload } from "~/components/shared/file-upload";
@@ -32,11 +32,14 @@ const documentSchema = z.object({
   version: z.string().optional(),
 });
 
-type DocumentFormValues = z.infer<typeof documentSchema>;
+export type DocumentFormValues = z.infer<typeof documentSchema>;
+export type DocumentFormDraft = Partial<DocumentFormValues>;
 
 interface UploadFormProps {
   projectId: string;
   projectSlug: string;
+  draftValues?: DocumentFormDraft;
+  ref?: React.Ref<{ getValues: () => DocumentFormValues }>;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
@@ -44,12 +47,13 @@ interface UploadFormProps {
 export function UploadForm({
   projectId,
   projectSlug,
+  draftValues,
+  ref,
   onSuccess,
   onCancel,
 }: UploadFormProps) {
   const uploadDocument = useUploadDocument();
 
-  // File state
   const [fileData, setFileData] = useState<{
     url: string;
     publicId: string;
@@ -59,12 +63,14 @@ export function UploadForm({
     resourceType: string;
   } | null>(null);
 
+  useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
+
   const form = useForm({
     defaultValues: {
-      title: "",
-      description: "",
-      fileType: "OTHER" as DocumentType,
-      version: "",
+      title: draftValues?.title ?? "",
+      description: draftValues?.description ?? "",
+      fileType: draftValues?.fileType ?? ("OTHER" as DocumentType),
+      version: draftValues?.version ?? "",
     } as DocumentFormValues,
     validators: {
       onSubmit: documentSchema,
