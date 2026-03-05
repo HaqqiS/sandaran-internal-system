@@ -70,26 +70,26 @@ function getSidebarConfig(
         navMain: [
           ...baseConfig.navMain,
           {
-            title: "Reports",
+            title: "Laporan",
             url: projectSlug ? `/projects/${projectSlug}/reports` : "/reports",
             icon: IconReport,
           },
           {
-            title: "Emergency Funds",
+            title: "Dana Darurat",
             url: projectSlug
               ? `/projects/${projectSlug}/emergency`
               : "/emergency",
             icon: IconCoin,
           },
           {
-            title: "Logistics",
+            title: "Logistik",
             url: projectSlug
               ? `/projects/${projectSlug}/logistics`
               : "/logistics",
             icon: IconPackage,
           },
           {
-            title: "Documents",
+            title: "Dokumen",
             url: projectSlug
               ? `/projects/${projectSlug}/documents`
               : "/documents",
@@ -104,12 +104,12 @@ function getSidebarConfig(
           ...baseConfig,
           navMain: [
             {
-              title: "Back to All Projects",
+              title: "Kembali ke Semua Proyek",
               url: "/projects",
               icon: IconArrowLeft,
             },
             {
-              title: "Project Reports",
+              title: "Laporan Proyek",
               url: `/projects/${projectSlug}/reports`,
               icon: IconNews,
             },
@@ -122,12 +122,12 @@ function getSidebarConfig(
         navMain: [
           ...baseConfig.navMain,
           {
-            title: "All Projects",
+            title: "Semua Proyek",
             url: "/projects",
             icon: IconFolder,
           },
           {
-            title: "Reports",
+            title: "Laporan",
             url: "/reports",
             icon: IconNews,
           },
@@ -140,17 +140,17 @@ function getSidebarConfig(
         navMain: [
           ...baseConfig.navMain,
           {
-            title: "Projects",
+            title: "Semua Proyek",
             url: "/projects",
             icon: IconFolder,
           },
           {
-            title: "Users",
+            title: "Pengguna",
             url: "/users",
             icon: IconUsers,
           },
           {
-            title: "Documents",
+            title: "Dokumen",
             url: "/documents",
             icon: IconFileText,
           },

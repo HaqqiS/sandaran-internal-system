@@ -1,5 +1,6 @@
 "use client";
 
+import { IconUsers } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { PageLayout } from "~/components/layout";
@@ -38,11 +39,11 @@ export function UsersClient() {
 
   const bulkApprove = useBulkApprove({
     onSuccess: (data) => {
-      toast.success(`Successfully approved ${data.count} user(s)`);
+      toast.success(`Berhasil menyetujui ${data.count} pengguna`);
       setRowSelection({});
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to approve users");
+      toast.error(error.message || "Gagal menyetujui pengguna");
     },
   });
 
@@ -98,11 +99,12 @@ export function UsersClient() {
     : undefined;
 
   return (
-    <PageLayout title="User Management">
+    <PageLayout title="Manajemen Pengguna">
       <div className="flex flex-col gap-4 p-4 md:gap-6 md:p-6">
-        <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <IconUsers className="h-5 w-5 text-muted-foreground" />
           <p className="text-muted-foreground">
-            Manage user approvals, roles, and permissions
+            Kelola persetujuan, peran, dan izin pengguna
           </p>
         </div>
 
@@ -138,22 +140,22 @@ export function UsersClient() {
             columns={columns}
             data={users}
             filterColumn="name"
-            filterPlaceholder="Search users by name or email..."
+            filterPlaceholder="Cari pengguna berdasarkan nama atau email..."
             state={{ rowSelection }}
             onRowSelectionChange={setRowSelection}
           />
         ) : (
           <div className="flex h-64 items-center justify-center rounded-md border border-dashed">
             <div className="text-center">
-              <p className="text-lg font-medium">No users found</p>
+              <p className="text-lg font-medium">Pengguna tidak ditemukan</p>
               <p className="text-sm text-muted-foreground">
                 {filter === "pending"
-                  ? "No pending users at the moment"
+                  ? "Tidak ada pengguna yang menunggu persetujuan"
                   : filter === "active"
-                    ? "No active users found"
+                    ? "Tidak ada pengguna aktif"
                     : filter === "rejected"
-                      ? "No rejected users found"
-                      : "No users in the system"}
+                      ? "Tidak ada pengguna yang ditolak"
+                      : "Belum ada pengguna di sistem"}
               </p>
             </div>
           </div>

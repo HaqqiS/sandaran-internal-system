@@ -1,6 +1,6 @@
 "use client";
 
-import { IconLoader2 } from "@tabler/icons-react";
+import { IconLoader2, IconReportAnalytics } from "@tabler/icons-react";
 import Link from "next/link";
 import { PageLayout } from "~/components/layout";
 import { ReportCard } from "~/components/report/report-card";
@@ -11,7 +11,7 @@ export function RecentReportsClient() {
 
   if (isLoading) {
     return (
-      <PageLayout title="Recent Reports">
+      <PageLayout title="Laporan Terbaru">
         <div className="flex h-full items-center justify-center">
           <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -21,10 +21,10 @@ export function RecentReportsClient() {
 
   if (error) {
     return (
-      <PageLayout title="Recent Reports">
+      <PageLayout title="Laporan Terbaru">
         <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
           <h2 className="text-xl font-semibold text-destructive">
-            Failed to load reports
+            Gagal memuat laporan
           </h2>
           <p className="text-muted-foreground">{error.message}</p>
         </div>
@@ -33,11 +33,15 @@ export function RecentReportsClient() {
   }
 
   return (
-    <PageLayout title="Recent Reports">
+    <PageLayout title="Laporan Terbaru">
       <div className="flex flex-col gap-8 p-4 md:p-6">
+        <div className="flex items-center gap-2">
+          <IconReportAnalytics className="h-5 w-5 text-muted-foreground" />
+          <p className="text-muted-foreground">Laporan terbaru per proyek</p>
+        </div>
         {projects?.length === 0 ? (
           <div className="rounded-lg border p-8 text-center">
-            <p className="text-muted-foreground">No projects found.</p>
+            <p className="text-muted-foreground">Belum ada proyek.</p>
           </div>
         ) : (
           projects?.map((project) => (
@@ -48,7 +52,7 @@ export function RecentReportsClient() {
                 </h2>
                 <Button variant="link" asChild>
                   <Link href={`/projects/${project.slug}/reports`}>
-                    View All
+                    Lihat Semua
                   </Link>
                 </Button>
               </div>
@@ -56,7 +60,7 @@ export function RecentReportsClient() {
               {project.reports.length === 0 ? (
                 <div className="rounded-lg border border-dashed p-8 text-center">
                   <p className="text-sm text-muted-foreground">
-                    No reports recently.
+                    Belum ada laporan terbaru.
                   </p>
                 </div>
               ) : (

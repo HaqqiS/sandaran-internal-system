@@ -4,9 +4,11 @@ import {
   IconChevronRight,
   IconFile,
   IconFileText,
+  IconFolder,
   IconLoader2,
 } from "@tabler/icons-react";
 import { format } from "date-fns";
+import { id } from "date-fns/locale";
 import type { DocumentType } from "generated/prisma";
 import Link from "next/link";
 import { Badge } from "~/components/ui/badge";
@@ -22,11 +24,11 @@ interface DocumentsSectionProps {
 // Helper to get document type label
 const getDocumentTypeLabel = (type: DocumentType) => {
   const labels: Record<DocumentType, string> = {
-    DESIGN: "Design",
-    DRAWING: "Drawing",
-    SPECIFICATION: "Specification",
-    REFERENCE: "Reference",
-    OTHER: "Other",
+    DESIGN: "Desain/Denah",
+    DRAWING: "Gambar Teknis",
+    SPECIFICATION: "Spesifikasi",
+    REFERENCE: "Referensi",
+    OTHER: "Lainnya",
   };
   return labels[type];
 };
@@ -69,14 +71,15 @@ export function DocumentsSection({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <div className="flex items-center gap-2">
-          <CardTitle>Documents</CardTitle>
+          <IconFolder className="h-4 w-4 text-foreground" />
+          <CardTitle className="text-base font-semibold">Dokumen</CardTitle>
           <span className="text-sm text-muted-foreground">
-            ({totalCount} files in {typeCount} categories)
+            ({totalCount} file dalam {typeCount} kategori)
           </span>
         </div>
         <Link href={`/projects/${projectSlug}/documents`}>
           <Button variant="ghost" size="sm" className="gap-1">
-            View All
+            Lihat Semua
             <IconChevronRight className="h-4 w-4" />
           </Button>
         </Link>
@@ -102,7 +105,7 @@ export function DocumentsSection({
 
             {/* Recent Documents */}
             <div className="space-y-2">
-              <p className="text-sm font-medium">Recent Uploads</p>
+              <p className="text-sm font-medium">Upload Terbaru</p>
               <div className="space-y-2">
                 {allDocuments?.slice(0, 4).map((doc) => (
                   <div
@@ -128,7 +131,9 @@ export function DocumentsSection({
                           {getDocumentTypeLabel(doc.fileType)}
                         </Badge>
                         <p className="text-xs text-muted-foreground">
-                          {format(new Date(doc.createdAt), "dd MMM yyyy")}
+                          {format(new Date(doc.createdAt), "dd MMM yyyy", {
+                            locale: id,
+                          })}
                         </p>
                       </div>
                     </div>
@@ -140,7 +145,7 @@ export function DocumentsSection({
         ) : (
           <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
             <IconFileText className="h-12 w-12 text-muted-foreground/50" />
-            <p className="text-sm text-muted-foreground">No documents yet</p>
+            <p className="text-sm text-muted-foreground">Belum ada dokumen</p>
           </div>
         )}
       </CardContent>

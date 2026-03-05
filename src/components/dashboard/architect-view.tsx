@@ -29,23 +29,23 @@ export function ArchitectView() {
 
   return (
     <DashboardLayout
-      title="Architect Dashboard"
-      description="Design document management and project oversight"
+      title="Dashboard Arsitek"
+      description="Manajemen dokumen desain dan pengawasan proyek"
     >
       {/* Top Stats */}
       <StatsGrid cols={{ mobile: 2, tablet: 2, desktop: 2 }}>
         <StatCard
-          title="My Projects"
+          title="Proyek Saya"
           value={stats?.projectCount ?? 0}
           icon={IconFileText}
-          description="Projects needing design docs"
+          description="Proyek yang butuh dokumen desain"
           isLoading={statsLoading}
         />
         <StatCard
-          title="Uploaded Documents"
+          title="Dokumen Diunggah"
           value={stats?.uploadedDocuments ?? 0}
           icon={IconCloudUpload}
-          trend={{ value: "+2", label: "this week", positive: true }}
+          trend={{ value: "+2", label: "minggu ini", positive: true }}
           isLoading={statsLoading}
         />
       </StatsGrid>
@@ -53,22 +53,20 @@ export function ArchitectView() {
       {/* Documents by Project */}
       <Card>
         <CardHeader>
-          <CardTitle>My Documents</CardTitle>
+          <CardTitle>Dokumen Saya</CardTitle>
           <CardDescription>
-            Design documents organized by project
+            Dokumen desain disusun berdasarkan proyek
           </CardDescription>
         </CardHeader>
         <CardContent>
           {dashboardLoading ? (
             <div className="flex items-center justify-center p-8">
-              <p className="text-sm text-muted-foreground">
-                Loading documents...
-              </p>
+              <p className="text-sm text-muted-foreground">Memuat dokumen...</p>
             </div>
           ) : !dashboard?.documentsByProject.length ? (
             <div className="flex items-center justify-center p-8">
               <p className="text-sm text-muted-foreground">
-                No documents uploaded yet
+                Belum ada dokumen yang diunggah
               </p>
             </div>
           ) : (
@@ -79,7 +77,7 @@ export function ArchitectView() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{project.name}</p>
                       <p className="mt-1 text-sm text-muted-foreground">
-                        {project.documentCount} documents
+                        {project.documentCount} dokumen
                       </p>
                     </div>
                     <IconFileText className="h-5 w-5 text-muted-foreground" />
@@ -92,7 +90,7 @@ export function ArchitectView() {
                       asChild
                     >
                       <Link href={`/projects/${project.slug}/documents`}>
-                        View All
+                        Lihat Semua
                       </Link>
                     </Button>
                     <Button
@@ -105,7 +103,7 @@ export function ArchitectView() {
                         })
                       }
                     >
-                      Upload
+                      Unggah
                     </Button>
                   </div>
                 </div>

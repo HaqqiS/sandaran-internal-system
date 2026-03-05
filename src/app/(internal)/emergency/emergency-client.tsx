@@ -20,11 +20,11 @@ import { useEmergencyAnalytics } from "~/hooks";
 
 const chartConfig = {
   deposit: {
-    label: "Funding",
+    label: "Dana Masuk",
     color: "var(--foreground)",
   },
   withdrawal: {
-    label: "Withdrawal",
+    label: "Penarikan",
     color: "var(--foreground)",
   },
 } satisfies ChartConfig;
@@ -34,7 +34,7 @@ export function EmergencyClient() {
 
   if (isLoading) {
     return (
-      <PageLayout title="Emergency Fund">
+      <PageLayout title="Dana Darurat">
         <div className="flex h-full items-center justify-center">
           <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -44,16 +44,16 @@ export function EmergencyClient() {
 
   if (!data?.projects.length) {
     return (
-      <PageLayout title="Emergency Fund">
+      <PageLayout title="Dana Darurat">
         <div className="flex h-64 items-center justify-center">
-          <p className="text-muted-foreground">No projects found.</p>
+          <p className="text-muted-foreground">Belum ada proyek.</p>
         </div>
       </PageLayout>
     );
   }
 
   return (
-    <PageLayout title="Emergency Fund">
+    <PageLayout title="Dana Darurat">
       <div className="grid gap-6 p-4 md:grid-cols-2 lg:grid-cols-3 md:p-6">
         {data.projects.map((project) => (
           <Card key={project.id} className="flex flex-col">
@@ -62,7 +62,7 @@ export function EmergencyClient() {
                 {project.name}
               </CardTitle>
               <CardDescription>
-                Balance:{" "}
+                Saldo:{" "}
                 <span className="font-bold text-foreground">
                   Rp {Number(project.balance).toLocaleString("id-ID")}
                 </span>
@@ -85,13 +85,13 @@ export function EmergencyClient() {
                       dataKey="deposit"
                       fill="var(--color-deposit)"
                       radius={[4, 4, 0, 0]}
-                      name="Funding"
+                      name="Dana Masuk"
                     />
                     <Bar
                       dataKey="withdrawal"
                       fill="var(--color-withdrawal)"
                       radius={[4, 4, 0, 0]}
-                      name="Withdrawal"
+                      name="Penarikan"
                     />
                   </BarChart>
                 </ChartContainer>

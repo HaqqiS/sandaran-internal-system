@@ -24,7 +24,7 @@ export function DocumentsClient() {
 
   if (isLoading) {
     return (
-      <PageLayout title="Documents Overview">
+      <PageLayout title="Ringkasan Dokumen">
         <div className="flex h-[50vh] items-center justify-center">
           <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
@@ -34,12 +34,12 @@ export function DocumentsClient() {
 
   if (!projects?.length) {
     return (
-      <PageLayout title="Documents Overview">
+      <PageLayout title="Ringkasan Dokumen">
         <div className="flex h-[50vh] flex-col items-center justify-center gap-2 text-center">
           <IconFolder className="h-12 w-12 text-muted-foreground/50" />
-          <h3 className="text-lg font-semibold">No Projects Found</h3>
+          <h3 className="text-lg font-semibold">Belum Ada Proyek</h3>
           <p className="text-sm text-muted-foreground">
-            You don't have access to any active projects with documents.
+            Anda belum memiliki akses ke proyek aktif yang memiliki dokumen.
           </p>
         </div>
       </PageLayout>
@@ -47,13 +47,13 @@ export function DocumentsClient() {
   }
 
   return (
-    <PageLayout title="Documents Overview">
+    <PageLayout title="Ringkasan Dokumen">
       <div className="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3 md:p-6">
         {projects.map((project) => (
           <Card key={project.id} className="flex flex-col">
             <CardHeader>
               <CardTitle className="line-clamp-1">{project.name}</CardTitle>
-              <CardDescription>Documents Overview</CardDescription>
+              <CardDescription>Ringkasan Dokumen</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
               <div className="flex items-center gap-4 rounded-lg border p-3">
@@ -62,7 +62,7 @@ export function DocumentsClient() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
-                    Total Documents
+                    Total Dokumen
                   </p>
                   <p className="text-2xl font-bold">{project.totalDocuments}</p>
                 </div>
@@ -73,7 +73,7 @@ export function DocumentsClient() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
-                    Recent Uploads (30d)
+                    Upload Terbaru (30h)
                   </p>
                   <p className="text-2xl font-bold">
                     {project.recentUploadsCount}
@@ -84,7 +84,7 @@ export function DocumentsClient() {
             <CardFooter className="mt-auto pt-2">
               <Button asChild className="w-full" variant="outline">
                 <Link href={`/projects/${project.slug}/documents`}>
-                  View Documents
+                  Lihat Dokumen
                 </Link>
               </Button>
             </CardFooter>

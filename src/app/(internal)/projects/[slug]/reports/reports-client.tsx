@@ -40,16 +40,16 @@ export function ReportsClient({ projectSlug }: ReportsClientProps) {
 
   if (error || !project) {
     return (
-      <PageLayout title="Reports">
+      <PageLayout title="Laporan">
         <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-          <h2 className="text-xl font-semibold">Project not found</h2>
+          <h2 className="text-xl font-semibold">Proyek tidak ditemukan</h2>
           <p className="text-muted-foreground">
-            The project you are looking for does not exist.
+            Proyek yang Anda cari tidak ada.
           </p>
           <Button asChild variant="outline">
             <Link href="/projects">
               <IconArrowLeft className="mr-2 h-4 w-4" />
-              Back to Projects
+              Kembali ke Proyek
             </Link>
           </Button>
         </div>
@@ -59,12 +59,12 @@ export function ReportsClient({ projectSlug }: ReportsClientProps) {
 
   return (
     <PageLayout
-      title={`${project.name} - Reports`}
+      title={`${project.name} — Laporan`}
       actions={
         <Button asChild variant="outline" size="sm">
           <Link href={`/projects/${projectSlug}`}>
             <IconArrowLeft className="mr-2 h-4 w-4" />
-            Back to Project
+            Kembali ke Proyek
           </Link>
         </Button>
       }

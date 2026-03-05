@@ -5,9 +5,12 @@ import {
   IconCalendar,
   IconCloud,
   IconCloudRain,
+  IconFileDescription,
+  IconListCheck,
   IconLoader2,
   IconMapPin,
   IconPencil,
+  IconPhoto,
   IconSun,
   IconUsers,
 } from "@tabler/icons-react";
@@ -76,9 +79,9 @@ export function ReportDetailClient({
         projectId: project.id,
         mediaId,
       });
-      toast.success("Image deleted");
+      toast.success("Foto berhasil dihapus");
     } catch {
-      toast.error("Failed to delete image");
+      toast.error("Gagal menghapus foto");
     }
   };
 
@@ -92,16 +95,16 @@ export function ReportDetailClient({
 
   if (error || !project || !report) {
     return (
-      <PageLayout title="Report Not Found">
+      <PageLayout title="Laporan Tidak Ditemukan">
         <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-          <h2 className="text-xl font-semibold">Report not found</h2>
+          <h2 className="text-xl font-semibold">Laporan tidak ditemukan</h2>
           <p className="text-muted-foreground">
-            The report you are looking for does not exist.
+            Laporan yang Anda cari tidak ada.
           </p>
           <Button asChild variant="outline">
             <Link href={`/projects/${projectSlug}/reports`}>
               <IconArrowLeft className="mr-2 h-4 w-4" />
-              Back to Reports
+              Kembali ke Laporan
             </Link>
           </Button>
         </div>
@@ -119,13 +122,13 @@ export function ReportDetailClient({
 
   return (
     <PageLayout
-      title={`Report - ${format(reportDate, "dd MMM yyyy")}`}
+      title={`Laporan - ${format(reportDate, "dd MMM yyyy")}`}
       actions={
         <div className="flex items-center gap-2">
           <Button asChild variant="outline" size="sm">
             <Link href={`/projects/${projectSlug}/reports`}>
               <IconArrowLeft className="mr-2 h-4 w-4" />
-              Back
+              Kembali
             </Link>
           </Button>
           {canEdit && (
@@ -195,7 +198,7 @@ export function ReportDetailClient({
                         {report.totalWorkers}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Total Workers
+                        Total Pekerja
                       </p>
                     </div>
                   </div>
@@ -205,7 +208,10 @@ export function ReportDetailClient({
               {/* Right Column: Task & Issues */}
               <div className="space-y-4 md:col-span-2">
                 <div className="rounded-lg border p-4">
-                  <h4 className="mb-2 font-semibold">Task Description</h4>
+                  <h4 className="mb-2 font-semibold flex items-center gap-2">
+                    <IconFileDescription className="h-4 w-4 text-foreground" />
+                    Deskripsi Pekerjaan
+                  </h4>
                   <p className="whitespace-pre-wrap text-sm">
                     {report.taskDescription}
                   </p>
@@ -213,7 +219,7 @@ export function ReportDetailClient({
 
                 {report.issues && (
                   <div className="rounded-lg border p-4">
-                    <h4 className="mb-2 font-semibold">Issues / Problems</h4>
+                    <h4 className="mb-2 font-semibold">Kendala / Masalah</h4>
                     <p className="whitespace-pre-wrap text-sm text-muted-foreground">
                       {report.issues}
                     </p>
@@ -227,7 +233,12 @@ export function ReportDetailClient({
         {/* Task Breakdown Card */}
         <Card>
           <CardHeader>
-            <CardTitle>Task Breakdown</CardTitle>
+            <div className="flex items-center gap-2">
+              <IconListCheck className="h-4 w-4 text-foreground" />
+              <CardTitle className="text-base font-semibold">
+                Rincian Tugas
+              </CardTitle>
+            </div>
           </CardHeader>
           <CardContent>
             <TaskList
@@ -242,7 +253,12 @@ export function ReportDetailClient({
         {/* Media Card (Bottom) */}
         <Card>
           <CardHeader>
-            <CardTitle>Photos ({report.media.length})</CardTitle>
+            <div className="flex items-center gap-2">
+              <IconPhoto className="h-4 w-4 text-foreground" />
+              <CardTitle className="text-base font-semibold">
+                Foto ({report.media.length})
+              </CardTitle>
+            </div>
           </CardHeader>
           <CardContent>
             {canEdit ? (

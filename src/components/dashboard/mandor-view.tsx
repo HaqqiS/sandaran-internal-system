@@ -51,22 +51,22 @@ export function MandorView() {
 
   return (
     <DashboardLayout
-      title="Mandor Dashboard"
-      description="Field operations and daily report management"
+      title="Dashboard Mandor"
+      description="Operasi lapangan dan manajemen laporan harian"
     >
       {/* Top Stats */}
       <StatsGrid cols={{ mobile: 2, tablet: 2, desktop: 2 }}>
         <StatCard
-          title="Assigned Projects"
+          title="Proyek Ditugaskan"
           value={stats?.projectCount ?? 0}
           icon={IconListCheck}
           isLoading={statsLoading}
         />
         <StatCard
-          title="Reports Due Today"
+          title="Laporan Jatuh Tempo Hari Ini"
           value={stats?.reportsDue ?? 0}
           icon={IconClipboardCheck}
-          description="Make sure to submit before 5 PM"
+          description="Pastikan mengumpulkan sebelum jam 5 sore"
           variant={
             stats?.reportsDue && stats.reportsDue > 0 ? "warning" : "default"
           }
@@ -74,10 +74,14 @@ export function MandorView() {
             (stats?.reportsDue ?? 0) > 0
               ? {
                   value: stats?.reportsDue ?? 0,
-                  label: "Pending",
+                  label: "Menunggu",
                   positive: false,
                 }
-              : { value: "All Done", label: "Good job!", positive: true }
+              : {
+                  value: "Semua Selesai",
+                  label: "Kerja bagus!",
+                  positive: true,
+                }
           }
           isLoading={statsLoading}
         />
@@ -88,22 +92,22 @@ export function MandorView() {
         <div className="col-span-4">
           <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+              <CardTitle>Aksi Cepat</CardTitle>
               <CardDescription>
-                Submit daily reports for your projects
+                Kumpulkan laporan harian untuk proyek Anda
               </CardDescription>
             </CardHeader>
             <CardContent>
               {statsLoading ? (
                 <div className="flex items-center justify-center p-8">
                   <p className="text-sm text-muted-foreground">
-                    Loading projects...
+                    Memuat proyek...
                   </p>
                 </div>
               ) : !stats?.projects.length ? (
                 <div className="flex items-center justify-center p-8">
                   <p className="text-sm text-muted-foreground">
-                    No active projects assigned.
+                    Belum ada proyek aktif yang ditugaskan.
                   </p>
                 </div>
               ) : (
@@ -116,7 +120,7 @@ export function MandorView() {
                             {project.name}
                           </h4>
                           <p className="text-sm text-muted-foreground">
-                            {project._count.dailyReports} reports submitted
+                            {project._count.dailyReports} laporan dikumpulkan
                           </p>
                         </div>
                         <div className="flex lg:flex-row flex-col items-center gap-2">
@@ -131,7 +135,7 @@ export function MandorView() {
                             }
                           >
                             <IconWallet className="mr-2 h-4 w-4" />
-                            Withdraw
+                            Tarik Dana
                           </Button>
                           <Button
                             size="sm"
@@ -142,7 +146,7 @@ export function MandorView() {
                               })
                             }
                           >
-                            Create Report
+                            Buat Laporan
                           </Button>
                         </div>
                       </div>
@@ -160,16 +164,16 @@ export function MandorView() {
         {/* Recent Reports */}
         <div className="lg:col-span-3 col-span-4 space-y-4">
           <QuickActionCard
-            title="Navigation"
-            description="Quick access"
+            title="Navigasi"
+            description="Akses cepat"
             actions={[
               {
-                label: "View All Projects",
+                label: "Lihat Semua Proyek",
                 icon: <IconListCheck className="h-4 w-4" />,
                 href: "/projects",
               },
               {
-                label: "View Recent Reports",
+                label: "Lihat Laporan Terbaru",
                 icon: <IconClipboardCheck className="h-4 w-4" />,
                 href: "/reports",
               },
@@ -179,20 +183,20 @@ export function MandorView() {
           {/* Recent Reports Preview */}
           <Card>
             <CardHeader>
-              <CardTitle>Recent Reports</CardTitle>
-              <CardDescription>Your latest submissions</CardDescription>
+              <CardTitle>Laporan Terbaru</CardTitle>
+              <CardDescription>Kumpulan laporan terbaru Anda</CardDescription>
             </CardHeader>
             <CardContent>
               {reportsLoading ? (
                 <div className="flex items-center justify-center p-4">
                   <p className="text-xs text-muted-foreground">
-                    Loading reports...
+                    Memuat laporan...
                   </p>
                 </div>
               ) : !recentReports?.length ? (
                 <div className="flex items-center justify-center p-4">
                   <p className="text-xs text-muted-foreground">
-                    No recent reports
+                    Tidak ada laporan terbaru
                   </p>
                 </div>
               ) : (

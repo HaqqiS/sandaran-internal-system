@@ -9,6 +9,7 @@ import {
   IconWallet,
 } from "@tabler/icons-react";
 import { formatDistanceToNow } from "date-fns";
+import { id } from "date-fns/locale";
 import type { GlobalRole, ProjectRole } from "generated/prisma";
 import { useState } from "react";
 import { FundDialog } from "~/components/emergency/fund-dialog";
@@ -73,12 +74,11 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
 
   if (error || !project) {
     return (
-      <PageLayout title="Project Not Found">
+      <PageLayout title="Proyek Tidak Ditemukan">
         <div className="flex h-[50vh] flex-col items-center justify-center gap-4 text-center">
-          <h2 className="text-xl font-semibold">Project not found</h2>
+          <h2 className="text-xl font-semibold">Proyek tidak ditemukan</h2>
           <p className="text-muted-foreground">
-            The project you are looking for does not exist or you don't have
-            access.
+            Proyek yang Anda cari tidak ada atau Anda tidak memiliki akses.
           </p>
         </div>
       </PageLayout>
@@ -97,8 +97,8 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
               onClick={() => setIsTeamOpen(true)}
             >
               <IconUsers className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Manage Team</span>
-              <span className="inline sm:hidden">Team</span>
+              <span className="hidden sm:inline">Kelola Tim</span>
+              <span className="inline sm:hidden">Tim</span>
             </Button>
             <Button
               variant="outline"
@@ -106,8 +106,8 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
               onClick={() => setIsEditOpen(true)}
             >
               <IconPencil className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Edit Project</span>
-              <span className="inline sm:hidden">Project</span>
+              <span className="hidden sm:inline">Edit Proyek</span>
+              <span className="inline sm:hidden">Edit</span>
             </Button>
           </div>
         )
@@ -120,7 +120,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Overall Progress
+                Progres Keseluruhan
               </CardTitle>
               <IconTrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -137,7 +137,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
                 %
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Based on {project._count.dailyReports} reports
+                Berdasarkan {project._count.dailyReports} laporan
               </p>
             </CardContent>
           </Card>
@@ -145,9 +145,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
           {/* Team Members */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Team Members
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Anggota Tim</CardTitle>
               <IconUsers className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -156,16 +154,19 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
                 {[
                   {
                     role: "MANDOR",
+                    label: "Mandor",
                     count: project.members.filter((m) => m.role === "MANDOR")
                       .length,
                   },
                   {
                     role: "ARCHITECT",
+                    label: "Arsitek",
                     count: project.members.filter((m) => m.role === "ARCHITECT")
                       .length,
                   },
                   {
                     role: "FINANCE",
+                    label: "Keuangan",
                     count: project.members.filter((m) => m.role === "FINANCE")
                       .length,
                   },
@@ -173,7 +174,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
                   .filter((r) => r.count > 0)
                   .map((r) => (
                     <Badge key={r.role} variant="outline" className="text-xs">
-                      {r.role}: {r.count}
+                      {r.label}: {r.count}
                     </Badge>
                   ))}
               </div>
@@ -184,7 +185,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Recent Activity
+                Aktivitas Terbaru
               </CardTitle>
               <IconActivity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -193,12 +194,12 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
                 {reportsData?.reports && reportsData.reports.length > 0
                   ? formatDistanceToNow(
                       new Date(reportsData?.reports[0]?.reportDate ?? ""),
-                      { addSuffix: true },
+                      { addSuffix: true, locale: id },
                     )
-                  : "No activity"}
+                  : "Belum ada aktivitas"}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Last report submitted
+                Laporan terakhir dikirim
               </p>
             </CardContent>
           </Card>
@@ -206,9 +207,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
           {/* Budget Status */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Budget Status
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">Kas Darurat</CardTitle>
               <IconWallet className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -220,7 +219,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
                 )}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Emergency Fund Balance
+                Saldo Dana Darurat
               </p>
             </CardContent>
           </Card>

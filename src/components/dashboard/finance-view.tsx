@@ -47,7 +47,7 @@ export function FinanceView() {
       setReviewingIds((prev) => new Set(prev).add(variables.transactionId));
     },
     onSuccess: () => {
-      toast.success("Transaction marked as reviewed");
+      toast.success("Transaksi ditandai sebagai telah ditinjau");
       void utils.emergency.getRecentTransactions.invalidate();
     },
     onError: (error) => {
@@ -72,16 +72,16 @@ export function FinanceView() {
 
   return (
     <DashboardLayout
-      title="Finance Dashboard"
-      description="Emergency fund management and transaction oversight"
+      title="Dashboard Keuangan"
+      description="Manajemen dana darurat dan pengawasan transaksi"
     >
       {/* Top Stats */}
       <StatsGrid cols={{ mobile: 2, tablet: 2, desktop: 2 }}>
         <StatCard
-          title="Pending Reviews"
+          title="Tinjauan Menunggu"
           value={stats?.pendingApprovals ?? 0}
           icon={IconGavel}
-          description="Emergency fund requests"
+          description="Permintaan dana darurat"
           variant={
             stats?.pendingApprovals && stats.pendingApprovals > 0
               ? "warning"
@@ -89,18 +89,18 @@ export function FinanceView() {
           }
           trend={
             (stats?.pendingApprovals ?? 0) > 0
-              ? { value: "Action Required", label: "Urgent", positive: false }
-              : { value: "All Clear", label: "", positive: true }
+              ? { value: "Butuh Tindakan", label: "Mendesak", positive: false }
+              : { value: "Semua Selesai", label: "", positive: true }
           }
           isLoading={statsLoading}
         />
         <StatCard
-          title="Monthly Withdrawals"
+          title="Penarikan Bulanan"
           value={`Rp ${Number(stats?.monthlyWithdrawals ?? 0).toLocaleString(
             "id-ID",
           )}`}
           icon={IconWallet}
-          description="Total approved this month"
+          description="Total disetujui bulan ini"
           isLoading={statsLoading}
         />
       </StatsGrid>
@@ -108,22 +108,22 @@ export function FinanceView() {
       {/* Emergency Fund Breakdown */}
       <Card>
         <CardHeader>
-          <CardTitle>Emergency Fund by Project</CardTitle>
+          <CardTitle>Dana Darurat per Proyek</CardTitle>
           <CardDescription>
-            Current balance across all managed projects
+            Saldo saat ini di seluruh proyek yang dikelola
           </CardDescription>
         </CardHeader>
         <CardContent>
           {fundsLoading ? (
             <div className="flex items-center justify-center p-8">
               <p className="text-sm text-muted-foreground">
-                Loading fund breakdown...
+                Memuat rincian dana...
               </p>
             </div>
           ) : !fundBreakdown?.length ? (
             <div className="flex items-center justify-center p-8">
               <p className="text-sm text-muted-foreground">
-                No emergency funds available
+                Tidak ada dana darurat tersedia
               </p>
             </div>
           ) : (
@@ -151,7 +151,7 @@ export function FinanceView() {
                     asChild
                   >
                     <Link href={`/projects/${fund.projectSlug}`}>
-                      View Project
+                      Lihat Proyek
                     </Link>
                   </Button>
                 </div>
@@ -166,13 +166,13 @@ export function FinanceView() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Recent Transactions</CardTitle>
+              <CardTitle>Transaksi Terbaru</CardTitle>
               <CardDescription>
-                Latest emergency fund activities across all projects
+                Aktivitas dana darurat terbaru di seluruh proyek
               </CardDescription>
             </div>
             <Button variant="outline" size="sm" asChild>
-              <Link href="/emergency">View All</Link>
+              <Link href="/emergency">Lihat Semua</Link>
             </Button>
           </div>
         </CardHeader>
@@ -180,13 +180,13 @@ export function FinanceView() {
           {txLoading ? (
             <div className="flex items-center justify-center p-8">
               <p className="text-sm text-muted-foreground">
-                Loading transactions...
+                Memuat transaksi...
               </p>
             </div>
           ) : !transactions?.length ? (
             <div className="flex items-center justify-center p-8">
               <p className="text-sm text-muted-foreground">
-                No transactions found
+                Tidak ada transaksi ditemukan
               </p>
             </div>
           ) : (
@@ -194,13 +194,13 @@ export function FinanceView() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Project</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead className="text-right">Amount</TableHead>
-                    <TableHead>Requester</TableHead>
+                    <TableHead>Tanggal</TableHead>
+                    <TableHead>Proyek</TableHead>
+                    <TableHead>Tipe</TableHead>
+                    <TableHead className="text-right">Jumlah</TableHead>
+                    <TableHead>Pemohon</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
+                    <TableHead className="text-right">Aksi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -246,8 +246,8 @@ export function FinanceView() {
                             disabled={reviewingIds.has(tx.id)}
                           >
                             {reviewingIds.has(tx.id)
-                              ? "Reviewing..."
-                              : "Mark Reviewed"}
+                              ? "Meninjau..."
+                              : "Tandai Ditinjau"}
                           </Button>
                         )}
                       </TableCell>

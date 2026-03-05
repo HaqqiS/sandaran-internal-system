@@ -32,23 +32,23 @@ export function AdminView() {
 
   return (
     <DashboardLayout
-      title="Admin Dashboard"
-      description="System management and oversight"
+      title="Dashboard Admin"
+      description="Manajemen sistem dan pengawasan"
     >
       {/* Top Stats */}
       <StatsGrid cols={{ mobile: 2, tablet: 2, desktop: 5 }}>
         <StatCard
-          title="Active Projects"
+          title="Proyek Aktif"
           value={stats?.activeProjects ?? 0}
           icon={IconBuildingSkyscraper}
-          description="Currently in progress"
+          description="Sedang berlangsung"
           isLoading={statsLoading}
         />
         <StatCard
-          title="Users"
+          title="Pengguna"
           value={stats?.totalUsers ?? 0}
           icon={IconUsers}
-          description={`${stats?.activeUsers ?? 0} Active · ${stats?.pendingUsers ?? 0} Pending · ${stats?.rejectedUsers ?? 0} Rejected`}
+          description={`${stats?.activeUsers ?? 0} Aktif · ${stats?.pendingUsers ?? 0} Menunggu · ${stats?.rejectedUsers ?? 0} Ditolak`}
           variant={
             stats?.pendingUsers && stats.pendingUsers > 0
               ? "warning"
@@ -57,18 +57,18 @@ export function AdminView() {
           isLoading={statsLoading}
         />
         <StatCard
-          title="Logistics Alerts"
+          title="Peringatan Logistik"
           value={stats?.lowStockItems ?? 0}
           icon={IconAlertTriangle}
-          description="Items needing attention"
+          description="Barang butuh perhatian"
           isLoading={statsLoading}
         />
         <StatCard
-          title="Storage Used"
+          title="Penyimpanan"
           value="2.4 GB"
           icon={IconCloud}
-          description="Cloudinary storage"
-          trend={{ value: "+12%", label: "this month", positive: false }}
+          description="Kapasitas Cloudinary"
+          trend={{ value: "+12%", label: "bulan ini", positive: false }}
           isLoading={statsLoading}
         />
       </StatsGrid>
@@ -79,13 +79,13 @@ export function AdminView() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Pending User Approvals</CardTitle>
+                <CardTitle>Persetujuan Pengguna</CardTitle>
                 <CardDescription>
-                  Recent users awaiting activation
+                  Pengguna terbaru yang menunggu aktivasi
                 </CardDescription>
               </div>
               <Button variant="outline" size="sm" asChild>
-                <Link href="/users?tab=pending">View All</Link>
+                <Link href="/users?tab=pending">Lihat Semua</Link>
               </Button>
             </div>
           </CardHeader>
@@ -93,13 +93,13 @@ export function AdminView() {
             {usersLoading ? (
               <div className="flex items-center justify-center p-8">
                 <p className="text-sm text-muted-foreground">
-                  Loading pending users...
+                  Memuat pengguna...
                 </p>
               </div>
             ) : !pendingUsers?.length ? (
               <div className="flex items-center justify-center p-8">
                 <p className="text-sm text-muted-foreground">
-                  No pending users at this time
+                  Tidak ada pengguna yang menunggu
                 </p>
               </div>
             ) : (
@@ -114,7 +114,7 @@ export function AdminView() {
                         </p>
                       </div>
                       <Button size="sm" asChild>
-                        <Link href={`/users?highlight=${user.id}`}>Review</Link>
+                        <Link href={`/users?highlight=${user.id}`}>Tinjau</Link>
                       </Button>
                     </div>
                     {index < pendingUsers.length - 1 && (
@@ -130,23 +130,23 @@ export function AdminView() {
         {/* Quick Actions */}
         <div className="col-span-4 lg:col-span-3">
           <QuickActionCard
-            title="Quick Actions"
-            description="Common administrative tasks"
+            title="Aksi Cepat"
+            description="Tugas administratif umum"
             actions={[
               {
-                label: "Review Pending Users",
+                label: "Tinjau Pengguna",
                 icon: <IconUserCheck className="h-4 w-4" />,
                 href: "/users?tab=pending",
                 variant: "outline",
               },
               {
-                label: "Create New Project",
+                label: "Buat Proyek Baru",
                 icon: <IconPlus className="h-4 w-4" />,
                 href: "/projects/new",
                 variant: "outline",
               },
               {
-                label: "Check Low Stock",
+                label: "Cek Stok Menipis",
                 icon: <IconAlertTriangle className="h-4 w-4" />,
                 href: "/logistics",
                 variant: "outline",
@@ -159,18 +159,20 @@ export function AdminView() {
       {/* System Overview Placeholder */}
       <Card className="opacity-60">
         <CardHeader>
-          <CardTitle>System Overview</CardTitle>
-          <CardDescription>Activity metrics and system health</CardDescription>
+          <CardTitle>Ringkasan Sistem</CardTitle>
+          <CardDescription>
+            Metrik aktivitas dan kesehatan sistem
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
             <IconBuildingSkyscraper className="h-12 w-12 text-muted-foreground/50" />
             <p className="text-sm text-muted-foreground">
-              System activity chart coming soon...
+              Grafik aktivitas sistem segera hadir...
             </p>
             <p className="text-xs text-muted-foreground">
-              Real-time monitoring and analytics will be added in a future
-              update
+              Pemantauan dan analitik real-time akan ditambahkan pada pembaruan
+              mendatang
             </p>
           </div>
         </CardContent>

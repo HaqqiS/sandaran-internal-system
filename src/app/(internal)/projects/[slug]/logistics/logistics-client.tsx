@@ -38,16 +38,16 @@ export function LogisticsClient({ projectSlug }: LogisticsClientProps) {
 
   if (error || !project) {
     return (
-      <PageLayout title="Logistics & Inventory">
+      <PageLayout title="Logistik & Inventaris">
         <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-          <h2 className="text-xl font-semibold">Project not found</h2>
+          <h2 className="text-xl font-semibold">Proyek tidak ditemukan</h2>
           <p className="text-muted-foreground">
-            The project you are looking for does not exist.
+            Proyek yang Anda cari tidak ada.
           </p>
           <Button asChild variant="outline">
             <Link href="/projects">
               <IconArrowLeft className="mr-2 h-4 w-4" />
-              Back to Projects
+              Kembali ke Proyek
             </Link>
           </Button>
         </div>
@@ -57,13 +57,13 @@ export function LogisticsClient({ projectSlug }: LogisticsClientProps) {
 
   return (
     <PageLayout
-      title={`${project.name} - Logistics & Inventory`}
+      title={`${project.name} — Logistik & Inventaris`}
       actions={
         <div className="flex items-center gap-2">
           <Button asChild variant="outline" size="sm">
             <Link href={`/projects/${projectSlug}`}>
               <IconArrowLeft className="mr-2 h-4 w-4" />
-              Back
+              Kembali
             </Link>
           </Button>
           {canManage && (
@@ -75,7 +75,7 @@ export function LogisticsClient({ projectSlug }: LogisticsClientProps) {
             >
               <Button>
                 <IconPlus className="mr-2 size-4" />
-                Add Item
+                Tambah Barang
               </Button>
             </LogisticItemDialog>
           )}
@@ -85,7 +85,7 @@ export function LogisticsClient({ projectSlug }: LogisticsClientProps) {
       <div className="flex flex-col gap-4 p-4 md:gap-6 md:p-6">
         <div className="space-y-2">
           <p className="text-muted-foreground">
-            Manage material stock and track usage.
+            Kelola stok material dan lacak penggunaan.
           </p>
         </div>
 

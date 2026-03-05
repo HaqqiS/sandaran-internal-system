@@ -43,17 +43,17 @@ export default function DashboardPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome back, {user?.name ?? "User"}.
+          Selamat datang kembali, {user?.name ?? "Pengguna"}.
         </p>
       </div>
 
       <div className="rounded-lg border border-dashed bg-muted/30 p-8 text-center">
-        <h3 className="text-lg font-medium">Hello, {user?.name}!</h3>
+        <h3 className="text-lg font-medium">Halo, {user?.name}!</h3>
         <p className="mt-2 text-sm text-muted-foreground">
-          You are logged in, but you don't have any active project roles
-          assigned yet.
+          Anda sudah berhasil masuk, tetapi belum ada peran proyek yang
+          ditugaskan kepada Anda.
           <br />
-          Please contact an administrator to be assigned to a project.
+          Silakan hubungi administrator untuk ditugaskan ke sebuah proyek.
         </p>
       </div>
     </div>

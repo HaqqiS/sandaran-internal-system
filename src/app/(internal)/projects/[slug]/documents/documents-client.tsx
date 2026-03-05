@@ -53,7 +53,7 @@ export function DocumentsClient({ projectSlug }: DocumentsClientProps) {
         projectId: project.id,
         documentId: deleteDialogDoc.id,
       });
-      toast.success("Document deleted successfully");
+      toast.success("Dokumen berhasil dihapus");
       setDeleteDialogDoc(null);
     } catch {
       // Error handled by mutation
@@ -70,16 +70,16 @@ export function DocumentsClient({ projectSlug }: DocumentsClientProps) {
 
   if (error || !project) {
     return (
-      <PageLayout title="Project Documents">
+      <PageLayout title="Dokumen Proyek">
         <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-          <h2 className="text-xl font-semibold">Project not found</h2>
+          <h2 className="text-xl font-semibold">Proyek tidak ditemukan</h2>
           <p className="text-muted-foreground">
-            The project you are looking for does not exist.
+            Proyek yang Anda cari tidak ada.
           </p>
           <Button asChild variant="outline">
             <Link href="/projects">
               <IconArrowLeft className="mr-2 h-4 w-4" />
-              Back to Projects
+              Kembali ke Proyek
             </Link>
           </Button>
         </div>
@@ -89,13 +89,13 @@ export function DocumentsClient({ projectSlug }: DocumentsClientProps) {
 
   return (
     <PageLayout
-      title={`${project.name} - Documents`}
+      title={`${project.name} — Dokumen`}
       actions={
         <div className="flex items-center gap-2">
           <Button asChild variant="outline" size="sm">
             <Link href={`/projects/${projectSlug}`}>
               <IconArrowLeft className="mr-2 h-4 w-4" />
-              Back
+              Kembali
             </Link>
           </Button>
           {project && (
@@ -109,7 +109,7 @@ export function DocumentsClient({ projectSlug }: DocumentsClientProps) {
                 <Button>
                   <IconPlus className="mr-2 size-4" />
                   <span className="block md:hidden">Upload</span>
-                  <span className="hidden md:block">Upload Document</span>
+                  <span className="hidden md:block">Upload Dokumen</span>
                 </Button>
               )}
             </UploadDialog>
@@ -122,8 +122,7 @@ export function DocumentsClient({ projectSlug }: DocumentsClientProps) {
           projectId={project.id}
           currentUserId={session?.user?.id ?? ""}
           onEdit={(_doc) => {
-            // TODO: Implement Edit
-            toast.info("Edit functionality coming soon");
+            toast.info("Fitur edit segera hadir");
           }}
           onDelete={(doc) => setDeleteDialogDoc(doc)}
         />
@@ -135,23 +134,23 @@ export function DocumentsClient({ projectSlug }: DocumentsClientProps) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Document</AlertDialogTitle>
+            <AlertDialogTitle>Hapus Dokumen</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete{" "}
+              Apakah Anda yakin ingin menghapus{" "}
               <span className="inline-block max-w-[200px] align-bottom font-semibold truncate sm:max-w-[300px]">
                 {deleteDialogDoc?.fileName}
               </span>
-              ? This action cannot be undone.
+              ? Tindakan ini tidak dapat dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleteDocument.isPending ? "Deleting..." : "Delete"}
+              {deleteDocument.isPending ? "Menghapus..." : "Hapus"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -7,6 +7,7 @@ import {
   IconWallet,
 } from "@tabler/icons-react";
 import { format } from "date-fns";
+import { id } from "date-fns/locale";
 import Link from "next/link";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -44,11 +45,14 @@ export function EmergencyFundSection({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <div className="flex items-center gap-2">
-          <CardTitle>Emergency Fund</CardTitle>
+          <IconWallet className="h-4 w-4 text-foreground" />
+          <CardTitle className="text-base font-semibold">
+            Dana Darurat
+          </CardTitle>
         </div>
         <Link href={`/projects/${projectSlug}/emergency`}>
           <Button variant="ghost" size="sm" className="gap-1">
-            View All
+            Lihat Semua
             <IconChevronRight className="h-4 w-4" />
           </Button>
         </Link>
@@ -63,12 +67,12 @@ export function EmergencyFundSection({
             {/* Balance Section */}
             <div className="flex items-center justify-between rounded-lg bg-muted/50 p-4">
               <div>
-                <p className="text-sm text-muted-foreground">Current Balance</p>
+                <p className="text-sm text-muted-foreground">Saldo Saat Ini</p>
                 <p className="text-2xl font-bold mt-1">
                   Rp {Number(fund?.currentBalance || 0).toLocaleString("id-ID")}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {fund?.transactions?.length || 0} total transactions
+                  {fund?.transactions?.length || 0} total transaksi
                 </p>
               </div>
               <IconWallet className="h-10 w-10 text-muted-foreground/50" />
@@ -79,13 +83,13 @@ export function EmergencyFundSection({
               <div className="flex gap-2">
                 {canWithdraw && onWithdraw && (
                   <Button variant="outline" size="sm" onClick={onWithdraw}>
-                    Withdraw
+                    Tarik Dana
                   </Button>
                 )}
                 {canAddFund && onAddFund && (
                   <Button size="sm" onClick={onAddFund}>
                     <IconPlus className="mr-2 h-4 w-4" />
-                    Add Funds
+                    Tambah Dana
                   </Button>
                 )}
               </div>
@@ -94,7 +98,7 @@ export function EmergencyFundSection({
             {/* Recent Transactions */}
             {recentTransactions.length > 0 && (
               <div className="space-y-2">
-                <p className="text-sm font-medium">Recent Activity</p>
+                <p className="text-sm font-medium">Transaksi Terbaru</p>
                 <div className="space-y-2">
                   {recentTransactions.map((transaction) => (
                     <div
@@ -109,18 +113,20 @@ export function EmergencyFundSection({
                           {format(
                             new Date(transaction.createdAt),
                             "dd MMM yyyy, HH:mm",
+                            { locale: id },
                           )}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge
-                          variant={
+                          className={
                             transaction.type === "DEPOSIT"
-                              ? "default"
-                              : "secondary"
+                              ? "bg-green-100 text-green-700 border-green-200"
+                              : "bg-red-100 text-red-700 border-red-200"
                           }
+                          variant="outline"
                         >
-                          {transaction.type}
+                          {transaction.type === "DEPOSIT" ? "Masuk" : "Keluar"}
                         </Badge>
                         <p
                           className={`font-medium ${

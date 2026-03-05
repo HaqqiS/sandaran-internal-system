@@ -38,16 +38,16 @@ export function EmergencyClient({ projectSlug }: EmergencyClientProps) {
 
   if (error || !project) {
     return (
-      <PageLayout title="Emergency Fund">
+      <PageLayout title="Dana Darurat">
         <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-          <h2 className="text-xl font-semibold">Project not found</h2>
+          <h2 className="text-xl font-semibold">Proyek tidak ditemukan</h2>
           <p className="text-muted-foreground">
-            The project you are looking for does not exist.
+            Proyek yang Anda cari tidak ada.
           </p>
           <Button asChild variant="outline">
             <Link href="/projects">
               <IconArrowLeft className="mr-2 h-4 w-4" />
-              Back to Projects
+              Kembali ke Proyek
             </Link>
           </Button>
         </div>
@@ -65,24 +65,24 @@ export function EmergencyClient({ projectSlug }: EmergencyClientProps) {
 
   return (
     <PageLayout
-      title={`${project.name} - Emergency Fund`}
+      title={`${project.name} — Dana Darurat`}
       actions={
         <div className="flex items-center gap-2">
           <Button asChild variant="outline" size="sm">
             <Link href={`/projects/${projectSlug}`}>
               <IconArrowLeft className="mr-2 h-4 w-4" />
-              Back
+              Kembali
             </Link>
           </Button>
           {canWithdraw && (
             <Button variant="outline" onClick={() => setIsWithdrawOpen(true)}>
-              Withdraw
+              Tarik Dana
             </Button>
           )}
           {canAddFund && (
             <Button onClick={() => setIsFundOpen(true)}>
               <IconPlus className="mr-2 h-4 w-4" />
-              Add Funds
+              Tambah Dana
             </Button>
           )}
         </div>
@@ -90,10 +90,10 @@ export function EmergencyClient({ projectSlug }: EmergencyClientProps) {
     >
       <div className="flex flex-col gap-6 p-4 md:p-6">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Emergency Fund</h2>
+          <h2 className="text-2xl font-bold tracking-tight">Dana Darurat</h2>
           <p className="text-muted-foreground">
-            Manage emergency funds and view transaction history for{" "}
-            {project.name}.
+            Kelola dana darurat dan lihat riwayat transaksi untuk {project.name}
+            .
           </p>
         </div>
 
@@ -101,7 +101,7 @@ export function EmergencyClient({ projectSlug }: EmergencyClientProps) {
           <FundOverview projectId={project.id} />
 
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Transaction History</h3>
+            <h3 className="text-lg font-medium">Riwayat Transaksi</h3>
             <TransactionList projectId={project.id} canReview={canReview} />
           </div>
         </div>

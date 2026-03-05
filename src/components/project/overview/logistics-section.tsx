@@ -59,14 +59,15 @@ export function LogisticsSection({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
         <div className="flex items-center gap-2">
-          <CardTitle>Logistics</CardTitle>
+          <IconBox className="h-4 w-4 text-foreground" />
+          <CardTitle className="text-base font-semibold">Logistik</CardTitle>
           <span className="text-sm text-muted-foreground">
-            ({totalItems} items)
+            ({totalItems} barang)
           </span>
         </div>
         <Link href={`/projects/${projectSlug}/logistics`}>
           <Button variant="ghost" size="sm" className="gap-1">
-            View All
+            Lihat Semua
             <IconChevronRight className="h-4 w-4" />
           </Button>
         </Link>
@@ -81,11 +82,11 @@ export function LogisticsSection({
             {/* Stock Summary */}
             <div className="grid grid-cols-2 gap-4">
               <div className="rounded-lg border p-3">
-                <p className="text-sm text-muted-foreground">Total Items</p>
+                <p className="text-sm text-muted-foreground">Total Barang</p>
                 <p className="text-2xl font-bold mt-1">{totalItems}</p>
               </div>
               <div className="rounded-lg border p-3">
-                <p className="text-sm text-muted-foreground">Low Stock</p>
+                <p className="text-sm text-muted-foreground">Stok Rendah</p>
                 <p className="text-2xl font-bold mt-1 text-amber-600">
                   {lowStockItems.length}
                 </p>
@@ -96,9 +97,9 @@ export function LogisticsSection({
             {lowStockItems.length > 0 && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium">Low Stock Items</p>
+                  <p className="text-sm font-medium">Stok Menipis</p>
                   <Badge variant="destructive" className="text-xs">
-                    Alert
+                    Perhatian!
                   </Badge>
                 </div>
                 <div className="space-y-2">
@@ -110,16 +111,14 @@ export function LogisticsSection({
                       <div className="flex-1">
                         <p className="font-medium">{item.name}</p>
                         <p className="text-xs text-muted-foreground">
-                          Unit: {item.unit}
+                          Satuan: {item.unit}
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-amber-600">
                           {item.currentStock}
                         </p>
-                        <p className="text-xs text-muted-foreground">
-                          remaining
-                        </p>
+                        <p className="text-xs text-muted-foreground">tersisa</p>
                       </div>
                     </div>
                   ))}
@@ -130,7 +129,7 @@ export function LogisticsSection({
             {/* Recent Activity - Top 3 items with recent changes */}
             {items.length > 0 && (
               <div className="space-y-2">
-                <p className="text-sm font-medium">Stock Overview</p>
+                <p className="text-sm font-medium">Ringkasan Stok</p>
                 <div className="space-y-2">
                   {items.slice(0, 3).map((item) => (
                     <div
@@ -171,7 +170,7 @@ export function LogisticsSection({
                               }
                             >
                               <IconPlus className="mr-1 h-3 w-3" />
-                              IN
+                              Masuk
                             </Button>
                             <Button
                               variant="outline"
@@ -186,7 +185,7 @@ export function LogisticsSection({
                               }
                             >
                               <IconMinus className="mr-1 h-3 w-3" />
-                              OUT
+                              Keluar
                             </Button>
                           </div>
                         )}
@@ -201,7 +200,7 @@ export function LogisticsSection({
           <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
             <IconBox className="h-12 w-12 text-muted-foreground/50" />
             <p className="text-sm text-muted-foreground">
-              No logistics items yet
+              Belum ada barang logistik
             </p>
           </div>
         )}
