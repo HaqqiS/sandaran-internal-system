@@ -48,7 +48,7 @@ const WEATHER_OPTIONS = [
 
 const reportSchema = z.object({
   reportDate: z.date(),
-  taskDescription: z.string().min(1, "Task description is required"),
+  taskDescription: z.string().min(1, "Deskripsi pekerjaan wajib diisi"),
   progressPercent: z.number().min(0).max(100),
   issues: z.string().optional(),
   weather: z.string().optional(),

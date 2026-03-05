@@ -33,13 +33,13 @@ import { useCreateProject, useUpdateProject } from "~/hooks";
 import { cn } from "~/lib/utils";
 
 const projectSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().min(1, "Nama proyek wajib diisi"),
   slug: z
     .string()
-    .min(1, "Slug is required")
+    .min(1, "Slug wajib diisi")
     .regex(
       /^[a-z0-9-]+$/,
-      "Slug must contain only lowercase letters, numbers, and hyphens",
+      "Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung",
     ),
   description: z.string().optional(),
   location: z.string().optional(),

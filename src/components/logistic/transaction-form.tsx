@@ -23,7 +23,7 @@ import { useRecordLogisticTransaction } from "~/hooks/useLogistic";
 
 const transactionSchema = z.object({
   type: z.enum(["IN", "OUT"]),
-  quantity: z.number().positive("Quantity must be greater than 0"),
+  quantity: z.number().positive("Jumlah harus lebih dari 0"),
   notes: z.string().optional(),
 });
 
