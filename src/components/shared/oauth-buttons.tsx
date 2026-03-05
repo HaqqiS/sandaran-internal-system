@@ -7,6 +7,7 @@ export function OAuthButtons() {
     await authClient.signIn.social({
       provider: "google",
       callbackURL: "/",
+      errorCallbackURL: "/",
     });
   };
 

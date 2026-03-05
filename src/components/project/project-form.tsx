@@ -247,7 +247,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel>Tanggal Mulai (Opsional)</FieldLabel>
-                  <Popover>
+                  <Popover modal={true}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
@@ -285,7 +285,7 @@ export function ProjectForm({ project, onSuccess }: ProjectFormProps) {
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel>Tanggal Selesai (Opsional)</FieldLabel>
-                  <Popover>
+                  <Popover modal={true}>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"

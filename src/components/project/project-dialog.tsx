@@ -71,12 +71,12 @@ export function ProjectDialog({
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       {children && <DrawerTrigger asChild>{children}</DrawerTrigger>}
-      <DrawerContent>
-        <DrawerHeader className="text-left">
+      <DrawerContent className="flex flex-col h-[85dvh]">
+        <DrawerHeader className="text-left shrink-0">
           <DrawerTitle>{title}</DrawerTitle>
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
-        <div className="px-4 pb-4 overflow-y-auto no-scrollbar flex-1">
+        <div className="flex-1 overflow-y-auto px-4 pb-6">
           <ProjectForm
             project={project}
             onSuccess={() => onOpenChange?.(false)}
