@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "~/server/better-auth";
+import { WaitingApprovalPoller } from "./waiting-approval-client";
 
 export default async function WaitingApprovalPage() {
   const session = await auth.api.getSession({
@@ -62,9 +63,12 @@ export default async function WaitingApprovalPage() {
 
           {/* Status Badge */}
           <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-yellow-50 px-4 py-2 text-sm font-medium text-yellow-800">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-yellow-600"></span>
+            <span className="h-2 w-2 animate-pulse rounded-full bg-yellow-600" />
             Status: Pending Approval
           </div>
+
+          {/* Auto-detect polling — redirect otomatis saat admin approve */}
+          <WaitingApprovalPoller />
 
           {/* Actions */}
           <div className="mt-8 space-y-3">

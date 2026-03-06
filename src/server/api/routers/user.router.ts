@@ -292,7 +292,7 @@ export const userRouter = createTRPCRouter({
         });
       }
 
-      return ctx.db.user.updateMany({
+      await ctx.db.user.updateMany({
         where: {
           id: { in: validUserIds },
         },
@@ -303,6 +303,8 @@ export const userRouter = createTRPCRouter({
           reviewedById: approverId,
         },
       });
+
+      return { count: validUserIds.length };
     }),
 
   /**

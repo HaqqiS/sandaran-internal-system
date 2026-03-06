@@ -15,8 +15,7 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24 * 7, // 7 days in seconds
     updateAge: 60 * 60 * 24, // Update session every 24 hours
     cookieCache: {
-      enabled: true,
-      maxAge: 5 * 60, // Cache for 5 minutes
+      enabled: false, // Disabled: polling di /waiting-approval butuh fresh data dari DB
     },
   },
   plugins: [nextCookies()],
