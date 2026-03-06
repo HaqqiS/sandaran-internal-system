@@ -72,7 +72,7 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
 
   const handleAddMember = async () => {
     if (!selectedUserId) {
-      toast.error("Please select a user");
+      toast.error("Silakan pilih pengguna");
       return;
     }
 
@@ -82,7 +82,7 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
         userId: selectedUserId,
         role: selectedRole,
       });
-      toast.success("Member added successfully");
+      toast.success("Anggota berhasil ditambahkan");
       setSelectedUserId("");
       setSelectedRole("MANDOR");
     } catch {
@@ -96,7 +96,7 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
         memberId,
         role: newRole,
       });
-      toast.success("Role updated successfully");
+      toast.success("Peran berhasil diperbarui");
     } catch {
       // Error handled by global mutation cache
     }
@@ -106,7 +106,7 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
     if (!memberToRemove) return;
     try {
       await removeMember.mutateAsync({ memberId: memberToRemove.id });
-      toast.success("Member removed successfully");
+      toast.success("Anggota berhasil dihapus dari proyek");
       setMemberToRemove(null);
     } catch {
       // Error handled by global mutation cache
@@ -116,7 +116,7 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <div className="text-muted-foreground">Loading members...</div>
+        <div className="text-muted-foreground">Memuat anggota...</div>
       </div>
     );
   }
@@ -127,14 +127,14 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
       {canManage && (
         <div className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-end">
           <div className="flex-1 space-y-2">
-            <Label>Select User</Label>
+            <Label>Pilih Pengguna</Label>
             <UserSelect
               onSelect={(userId) => setSelectedUserId(userId)}
               disabled={addMember.isPending}
             />
           </div>
           <div className="w-full space-y-2 sm:w-40">
-            <Label>Role</Label>
+            <Label>Peran</Label>
             <Select
               value={selectedRole}
               onValueChange={(value) => setSelectedRole(value as ProjectRole)}
@@ -157,7 +157,7 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
             disabled={!selectedUserId || addMember.isPending}
           >
             <IconPlus className="mr-2 h-4 w-4" />
-            {addMember.isPending ? "Adding..." : "Add Member"}
+            {addMember.isPending ? "Menambahkan..." : "Tambah Anggota"}
           </Button>
         </div>
       )}
@@ -168,11 +168,9 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Member</TableHead>
-                <TableHead>Role</TableHead>
-                {canManage && (
-                  <TableHead className="w-[80px]">Actions</TableHead>
-                )}
+                <TableHead>Anggota</TableHead>
+                <TableHead>Peran</TableHead>
+                {canManage && <TableHead className="w-[80px]">Aksi</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -188,7 +186,7 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
                       </Avatar>
                       <div className="flex flex-col">
                         <span className="font-medium">
-                          {member.user.name || "Unknown"}
+                          {member.user.name || "Tidak Diketahui"}
                         </span>
                         <span className="text-xs text-muted-foreground">
                           {member.user.email}
@@ -247,10 +245,10 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
         </div>
       ) : (
         <div className="rounded-lg border p-8 text-center">
-          <p className="text-muted-foreground">No members yet.</p>
+          <p className="text-muted-foreground">Belum ada anggota.</p>
           {canManage && (
             <p className="mt-2 text-sm text-muted-foreground">
-              Add team members using the form above.
+              Tambah anggota tim menggunakan form di atas.
             </p>
           )}
         </div>
@@ -263,19 +261,19 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove Member</AlertDialogTitle>
+            <AlertDialogTitle>Hapus Anggota</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to remove "{memberToRemove?.name}" from this
-              project?
+              Apakah Anda yakin ingin menghapus "{memberToRemove?.name}" dari
+              proyek ini?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleRemoveMember}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {removeMember.isPending ? "Removing..." : "Remove"}
+              {removeMember.isPending ? "Menghapus..." : "Hapus"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

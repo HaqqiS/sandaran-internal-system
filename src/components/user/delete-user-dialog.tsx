@@ -36,11 +36,11 @@ export function DeleteUserDialog({
       { userId: user.id },
       {
         onSuccess: () => {
-          toast.success(`${user.name} has been deleted`);
+          toast.success(`${user.name} telah dihapus`);
           onOpenChange(false);
         },
         onError: (error) => {
-          toast.error(error.message || "Failed to delete user");
+          toast.error(error.message || "Gagal menghapus pengguna");
         },
       },
     );
@@ -52,9 +52,9 @@ export function DeleteUserDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Delete User</DialogTitle>
+          <DialogTitle>Hapus Pengguna</DialogTitle>
           <DialogDescription>
-            Are you sure you want to permanently delete this user?
+            Apakah Anda yakin ingin menghapus pengguna ini secara permanen?
           </DialogDescription>
         </DialogHeader>
 
@@ -65,17 +65,17 @@ export function DeleteUserDialog({
             <div className="mt-1 text-xs">
               Status:{" "}
               <span className="font-medium">
-                {user.isActive ? "Active" : "Inactive"}
+                {user.isActive ? "Aktif" : "Tidak Aktif"}
               </span>
             </div>
           </div>
           <div className="mt-4 rounded-md border border-destructive/50 bg-destructive/10 p-3">
             <p className="text-sm font-medium text-destructive">
-              ⚠️ Warning: This action cannot be undone
+              ⚠️ Peringatan: Tindakan ini tidak dapat dibatalkan
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              The user and all associated data will be permanently removed from
-              the system.
+              Pengguna dan semua data terkait akan dihapus secara permanen dari
+              sistem.
             </p>
           </div>
         </div>
@@ -86,14 +86,14 @@ export function DeleteUserDialog({
             onClick={() => onOpenChange(false)}
             disabled={deleteUser.isPending}
           >
-            Cancel
+            Batal
           </Button>
           <Button
             variant="destructive"
             onClick={handleDelete}
             disabled={deleteUser.isPending}
           >
-            {deleteUser.isPending ? "Deleting..." : "Delete User"}
+            {deleteUser.isPending ? "Menghapus..." : "Hapus Pengguna"}
           </Button>
         </DialogFooter>
       </DialogContent>

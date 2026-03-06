@@ -135,7 +135,7 @@ export function FileUpload({
               <p className="text-sm font-medium truncate max-w-[200px]">
                 {fileName || "Uploaded File"}
               </p>
-              <p className="text-xs text-muted-foreground">Ready</p>
+              <p className="text-xs text-muted-foreground">Siap</p>
             </div>
           </div>
 
@@ -148,7 +148,7 @@ export function FileUpload({
               onClick={handleRemove}
             >
               <IconX className="h-4 w-4" />
-              <span className="sr-only">Remove file</span>
+              <span className="sr-only">Hapus berkas</span>
             </Button>
           )}
         </div>
@@ -171,11 +171,11 @@ export function FileUpload({
             )}
             <p className="text-sm text-muted-foreground">
               {isDragActive
-                ? "Drop the file here"
-                : "Drag & drop or click to upload"}
+                ? "Lepaskan berkas di sini"
+                : "Seret & lepas atau klik untuk mengunggah"}
             </p>
             <p className="text-xs text-muted-foreground">
-              PDF, Excel, Images up to {maxSizeMB}MB
+              PDF, Excel, Gambar hingga {maxSizeMB}MB
             </p>
           </div>
         </div>
@@ -184,7 +184,7 @@ export function FileUpload({
       {isLoading && (
         <div className="space-y-1">
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Uploading...</span>
+            <span>Mengunggah...</span>
             <span>{progress}%</span>
           </div>
           <Progress value={progress} className="h-2" />
@@ -192,7 +192,7 @@ export function FileUpload({
       )}
 
       {error && (
-        <p className="text-sm text-destructive">Upload failed: {error}</p>
+        <p className="text-sm text-destructive">Gagal mengunggah: {error}</p>
       )}
     </div>
   );

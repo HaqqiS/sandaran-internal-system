@@ -2,6 +2,7 @@
 
 import { IconTrash } from "@tabler/icons-react";
 import { formatDistanceToNow } from "date-fns";
+import { id } from "date-fns/locale";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -33,7 +34,7 @@ export function CommentItem({ comment, projectId }: CommentItemProps) {
 
   const deleteComment = api.comment.delete.useMutation({
     onSuccess: () => {
-      toast.success("Comment deleted");
+      toast.success("Komentar dihapus");
       utils.comment.getByReport.invalidate({
         projectId,
         reportId: comment.reportId,
@@ -69,6 +70,7 @@ export function CommentItem({ comment, projectId }: CommentItemProps) {
             <span className="text-xs text-muted-foreground">
               {formatDistanceToNow(new Date(comment.createdAt), {
                 addSuffix: true,
+                locale: id,
               })}
             </span>
           </div>
@@ -81,18 +83,18 @@ export function CommentItem({ comment, projectId }: CommentItemProps) {
                   className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
                 >
                   <IconTrash className="h-4 w-4 text-destructive" />
-                  <span className="sr-only">Delete comment</span>
+                  <span className="sr-only">Hapus komentar</span>
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete Comment?</AlertDialogTitle>
+                  <AlertDialogTitle>Hapus Komentar?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone.
+                    Tindakan ini tidak dapat dibatalkan.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogCancel>Batal</AlertDialogCancel>
                   <AlertDialogAction
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     onClick={() =>
@@ -103,7 +105,7 @@ export function CommentItem({ comment, projectId }: CommentItemProps) {
                     }
                     disabled={deleteComment.isPending}
                   >
-                    {deleteComment.isPending ? "Deleting..." : "Delete"}
+                    {deleteComment.isPending ? "Menghapus..." : "Hapus"}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>

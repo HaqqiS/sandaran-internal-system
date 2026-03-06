@@ -51,11 +51,11 @@ export function EditRoleDialog({
       },
       {
         onSuccess: () => {
-          toast.success(`Role updated successfully for ${user.name}`);
+          toast.success(`Peran berhasil diperbarui untuk ${user.name}`);
           onOpenChange(false);
         },
         onError: (error) => {
-          toast.error(error.message || "Failed to update role");
+          toast.error(error.message || "Gagal memperbarui peran");
         },
       },
     );
@@ -69,27 +69,27 @@ export function EditRoleDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit User Role</DialogTitle>
+          <DialogTitle>Edit Peran Pengguna</DialogTitle>
           <DialogDescription>
-            Change the global role for {user.name}
+            Ubah peran global untuk {user.name}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label>User Information</Label>
+            <Label>Informasi Pengguna</Label>
             <div className="rounded-md bg-muted p-3 text-sm">
               <div className="font-medium">{user.name}</div>
               <div className="text-muted-foreground">{user.email}</div>
               <div className="mt-1 text-xs">
-                Current Role:{" "}
+                Peran Saat Ini:{" "}
                 <span className="font-medium">{user.roleGlobal}</span>
               </div>
             </div>
           </div>
 
           <div className="space-y-3">
-            <Label>Select New Role</Label>
+            <Label>Pilih Peran Baru</Label>
             <RadioGroup
               value={role}
               onValueChange={(v) => setRole(v as GlobalRole)}
@@ -97,28 +97,28 @@ export function EditRoleDialog({
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="NONE" id="none" />
                 <Label htmlFor="none" className="font-normal">
-                  <span className="font-medium">NONE</span> - No access
+                  <span className="font-medium">NONE</span> - Tanpa akses
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="USER" id="user" />
                 <Label htmlFor="user" className="font-normal">
-                  <span className="font-medium">USER</span> - Regular access to
-                  assigned projects
+                  <span className="font-medium">USER</span> - Akses reguler ke
+                  proyek yang ditugaskan
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="CEO" id="ceo" />
                 <Label htmlFor="ceo" className="font-normal">
-                  <span className="font-medium">CEO</span> - Read-only access to
-                  all projects
+                  <span className="font-medium">CEO</span> - Akses baca seluruh
+                  proyek
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="ADMIN" id="admin" />
                 <Label htmlFor="admin" className="font-normal">
-                  <span className="font-medium">ADMIN</span> - Full system
-                  access
+                  <span className="font-medium">ADMIN</span> - Akses penuh
+                  sistem
                 </Label>
               </div>
             </RadioGroup>
@@ -131,13 +131,13 @@ export function EditRoleDialog({
             onClick={() => onOpenChange(false)}
             disabled={updateRole.isPending}
           >
-            Cancel
+            Batal
           </Button>
           <Button
             onClick={handleUpdateRole}
             disabled={updateRole.isPending || !hasRoleChanged}
           >
-            {updateRole.isPending ? "Updating..." : "Update Role"}
+            {updateRole.isPending ? "Memperbarui..." : "Perbarui Peran"}
           </Button>
         </DialogFooter>
       </DialogContent>

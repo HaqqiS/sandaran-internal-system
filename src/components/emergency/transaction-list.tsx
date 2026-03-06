@@ -41,12 +41,12 @@ export function TransactionList({
   const columns: ColumnDef<EmergencyTransaction>[] = [
     {
       accessorKey: "createdAt",
-      header: "Date",
+      header: "Tanggal",
       cell: ({ row }) => format(new Date(row.getValue("createdAt")), "PP p"),
     },
     {
       accessorKey: "description",
-      header: "Description",
+      header: "Keterangan",
       cell: ({ row }) => (
         <div
           className="max-w-[300px] truncate"
@@ -58,7 +58,7 @@ export function TransactionList({
     },
     {
       accessorKey: "type",
-      header: "Type",
+      header: "Tipe",
       cell: ({ row }) => {
         const type = row.getValue("type") as string;
         return (
@@ -70,7 +70,7 @@ export function TransactionList({
     },
     {
       accessorKey: "amount",
-      header: "Amount",
+      header: "Jumlah",
       cell: ({ row }) => {
         const amount = Number(row.getValue("amount"));
         const type = row.getValue("type") as string;
@@ -97,7 +97,7 @@ export function TransactionList({
     },
     {
       accessorKey: "proofPublicId",
-      header: "Proof",
+      header: "Bukti",
       cell: ({ row }) => {
         const proofId = row.getValue("proofPublicId") as string | null;
         if (!proofId) return <span className="text-muted-foreground">-</span>;
@@ -127,7 +127,7 @@ export function TransactionList({
               size="sm"
               onClick={() => setVerifyId(row.original.id)}
             >
-              Review
+              Tinjau
             </Button>
           );
         }
@@ -149,7 +149,7 @@ export function TransactionList({
   });
 
   if (isLoading) {
-    return <div className="p-4 text-center">Loading transactions...</div>;
+    return <div className="p-4 text-center">Memuat transaksi...</div>;
   }
 
   return (
@@ -195,7 +195,7 @@ export function TransactionList({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No transactions found.
+                  Tidak ada transaksi ditemukan.
                 </TableCell>
               </TableRow>
             )}

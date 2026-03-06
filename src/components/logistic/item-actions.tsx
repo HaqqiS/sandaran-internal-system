@@ -70,7 +70,7 @@ export function ItemActions({ projectId, item }: ItemActionsProps) {
         projectId,
         itemId: item.id,
       });
-      toast.success("Item deleted successfully");
+      toast.success("Barang berhasil dihapus");
       setShowDeleteDialog(false);
     } catch {
       // Error handled by mutation
@@ -87,24 +87,24 @@ export function ItemActions({ projectId, item }: ItemActionsProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuLabel>Aksi</DropdownMenuLabel>
           <DropdownMenuItem onClick={() => setShowHistoryDialog(true)}>
             <IconHistory className="mr-2 h-4 w-4" />
-            View History
+            Lihat Riwayat
           </DropdownMenuItem>
           {canManage && (
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
                 <IconEdit className="mr-2 h-4 w-4" />
-                Edit Item
+                Edit Barang
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => setShowDeleteDialog(true)}
                 className="text-destructive focus:text-destructive"
               >
                 <IconTrash className="mr-2 h-4 w-4" />
-                Delete Item
+                Hapus Barang
               </DropdownMenuItem>
             </>
           )}
@@ -115,9 +115,9 @@ export function ItemActions({ projectId, item }: ItemActionsProps) {
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Item</DialogTitle>
+            <DialogTitle>Edit Barang</DialogTitle>
             <DialogDescription>
-              Update the name or unit for this item.
+              Perbarui nama atau satuan untuk barang ini.
             </DialogDescription>
           </DialogHeader>
           <LogisticItemForm
@@ -132,9 +132,9 @@ export function ItemActions({ projectId, item }: ItemActionsProps) {
       <Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
         <DialogContent className="sm:max-w-5xl">
           <DialogHeader>
-            <DialogTitle>Transaction History</DialogTitle>
+            <DialogTitle>Riwayat Transaksi</DialogTitle>
             <DialogDescription>
-              History for {item.name} ({item.unit})
+              Riwayat untuk {item.name} ({item.unit})
             </DialogDescription>
           </DialogHeader>
           <TransactionHistory projectId={projectId} itemId={item.id} />
@@ -145,23 +145,23 @@ export function ItemActions({ projectId, item }: ItemActionsProps) {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Item</AlertDialogTitle>
+            <AlertDialogTitle>Hapus Barang</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete <strong>{item.name}</strong>? This
-              action cannot be undone and will delete all associated
-              transactions.
+              Apakah Anda yakin ingin menghapus <strong>{item.name}</strong>?
+              Tindakan ini tidak dapat dibatalkan dan akan menghapus semua
+              transaksi terkait.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={deleteItem.isPending}>
-              Cancel
+              Batal
             </AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={handleDelete}
               disabled={deleteItem.isPending}
             >
-              {deleteItem.isPending ? "Deleting..." : "Delete"}
+              {deleteItem.isPending ? "Menghapus..." : "Hapus"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

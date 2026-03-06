@@ -37,7 +37,7 @@ type UserItem = {
 export function UserSelect({
   onSelect,
   disabled = false,
-  placeholder = "Select a user...",
+  placeholder = "Pilih pengguna...",
 }: UserSelectProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -84,7 +84,7 @@ export function UserSelect({
       <PopoverContent className="w-[300px] p-0" align="start">
         <Command shouldFilter={false}>
           <CommandInput
-            placeholder="Search users..."
+            placeholder="Cari pengguna..."
             value={search}
             onValueChange={setSearch}
           />
@@ -93,11 +93,11 @@ export function UserSelect({
               <CommandEmpty>
                 <div className="flex items-center justify-center py-2">
                   <IconUserSearch className="mr-2 h-4 w-4 animate-pulse" />
-                  Searching...
+                  Mencari...
                 </div>
               </CommandEmpty>
             ) : !users?.length ? (
-              <CommandEmpty>No users found.</CommandEmpty>
+              <CommandEmpty>Pengguna tidak ditemukan.</CommandEmpty>
             ) : (
               <CommandGroup>
                 {users?.map((user) => (
@@ -115,7 +115,7 @@ export function UserSelect({
                     </Avatar>
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">
-                        {user.name || "Unknown"}
+                        {user.name || "Tidak Diketahui"}
                       </span>
                       <span className="text-xs text-muted-foreground">
                         {user.email}

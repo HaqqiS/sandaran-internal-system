@@ -21,7 +21,7 @@ export function MediaGallery({
   if (media.length === 0) {
     return (
       <div className="flex h-32 items-center justify-center rounded-lg border border-dashed">
-        <p className="text-sm text-muted-foreground">No images</p>
+        <p className="text-sm text-muted-foreground">Belum ada gambar</p>
       </div>
     );
   }

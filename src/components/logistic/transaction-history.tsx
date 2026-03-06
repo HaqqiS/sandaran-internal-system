@@ -31,7 +31,7 @@ export function TransactionHistory({
   if (isLoading) {
     return (
       <div className="p-4 text-center text-muted-foreground">
-        Loading history...
+        Memuat riwayat...
       </div>
     );
   }
@@ -39,7 +39,7 @@ export function TransactionHistory({
   if (!transactions || transactions.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-muted-foreground">
-        <p>No transactions found for this item.</p>
+        <p>Belum ada transaksi untuk barang ini.</p>
       </div>
     );
   }
@@ -49,11 +49,11 @@ export function TransactionHistory({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Date</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Quantity</TableHead>
-            <TableHead>User</TableHead>
-            <TableHead>Notes</TableHead>
+            <TableHead>Tanggal</TableHead>
+            <TableHead>Tipe</TableHead>
+            <TableHead>Jumlah</TableHead>
+            <TableHead>Pengguna</TableHead>
+            <TableHead>Catatan</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -70,7 +70,7 @@ export function TransactionHistory({
                       className="bg-green-100 text-green-700 hover:bg-green-200 border-green-200"
                     >
                       <IconArrowDownLeft className="mr-1 h-3 w-3" />
-                      IN
+                      MASUK
                     </Badge>
                   ) : (
                     <Badge
@@ -78,7 +78,7 @@ export function TransactionHistory({
                       className="bg-red-100 text-red-700 hover:bg-red-200 border-red-200"
                     >
                       <IconArrowUpRight className="mr-1 h-3 w-3" />
-                      OUT
+                      KELUAR
                     </Badge>
                   )}
                 </div>

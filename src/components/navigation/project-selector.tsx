@@ -128,21 +128,21 @@ export function ProjectSelector() {
                   {selectedProject.name}
                 </span>
                 <span className="truncate text-xs text-muted-foreground mt-1">
-                  {selectedProject.location || "No location"}
+                  {selectedProject.location || "Lokasi tidak tersedia"}
                 </span>
               </div>
             </div>
           ) : (
-            <span className="text-muted-foreground">Select project...</span>
+            <span className="text-muted-foreground">Pilih proyek...</span>
           )}
           <IconChevronDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-sm lg:w-lg p-0" align="start">
         <Command defaultValue={selectedProject?.name}>
-          <CommandInput placeholder="Search project..." />
+          <CommandInput placeholder="Cari proyek..." />
           <CommandList>
-            <CommandEmpty>No project found.</CommandEmpty>
+            <CommandEmpty>Proyek tidak ditemukan.</CommandEmpty>
             {groupedProjects &&
               Object.entries(groupedProjects).map(([status, groupProjects]) => (
                 <CommandGroup key={status} heading={status}>

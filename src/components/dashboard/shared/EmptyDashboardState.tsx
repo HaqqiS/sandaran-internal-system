@@ -19,7 +19,7 @@ export function EmptyDashboardState({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>No Data</CardTitle>
+        <CardTitle>Tidak Ada Data</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col items-center justify-center gap-4 py-8 text-center">

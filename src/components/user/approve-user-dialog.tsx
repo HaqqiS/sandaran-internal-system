@@ -53,7 +53,7 @@ export function ApproveUserDialog({
 
   const handleApprove = () => {
     if (assignProject && !projectId) {
-      toast.error("Please select a project");
+      toast.error("Silakan pilih proyek");
       return;
     }
 
@@ -73,7 +73,7 @@ export function ApproveUserDialog({
       },
       {
         onSuccess: () => {
-          toast.success(`${user.name} has been approved successfully`);
+          toast.success(`${user.name} berhasil disetujui`);
           onOpenChange(false);
           // Reset state
           setRole("USER");
@@ -82,7 +82,7 @@ export function ApproveUserDialog({
           setProjectRole("MANDOR");
         },
         onError: (error) => {
-          toast.error(error.message || "Failed to approve user");
+          toast.error(error.message || "Gagal menyetujui pengguna");
         },
       },
     );
@@ -92,15 +92,15 @@ export function ApproveUserDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Approve User</DialogTitle>
+          <DialogTitle>Setujui Pengguna</DialogTitle>
           <DialogDescription>
-            Approve {user?.name} and assign a global role
+            Setujui {user?.name} dan tetapkan peran global
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label>User Information</Label>
+            <Label>Informasi Pengguna</Label>
             <div className="rounded-md bg-muted p-3 text-sm">
               <div className="font-medium">{user?.name}</div>
               <div className="text-muted-foreground">{user?.email}</div>
@@ -108,7 +108,7 @@ export function ApproveUserDialog({
           </div>
 
           <div className="space-y-3">
-            <Label>Select Global Role</Label>
+            <Label>Pilih Peran Global</Label>
             <RadioGroup
               value={role}
               onValueChange={(v) => {
@@ -119,22 +119,22 @@ export function ApproveUserDialog({
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="USER" id="user" />
                 <Label htmlFor="user" className="font-normal">
-                  <span className="font-medium">USER</span> - Regular access to
-                  assigned projects
+                  <span className="font-medium">USER</span> - Akses reguler ke
+                  proyek yang ditugaskan
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="CEO" id="ceo" />
                 <Label htmlFor="ceo" className="font-normal">
-                  <span className="font-medium">CEO</span> - Read-only access to
-                  all projects
+                  <span className="font-medium">CEO</span> - Akses baca seluruh
+                  proyek
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="ADMIN" id="admin" />
                 <Label htmlFor="admin" className="font-normal">
-                  <span className="font-medium">ADMIN</span> - Full system
-                  access
+                  <span className="font-medium">ADMIN</span> - Akses penuh
+                  sistem
                 </Label>
               </div>
             </RadioGroup>
@@ -149,17 +149,17 @@ export function ApproveUserDialog({
                   onCheckedChange={(checked) => setAssignProject(!!checked)}
                 />
                 <Label htmlFor="assignProject">
-                  Assign to Project (Optional)
+                  Tambahkan ke Proyek (Opsional)
                 </Label>
               </div>
 
               {assignProject && (
                 <div className="grid gap-4 pl-6">
                   <div className="grid gap-2">
-                    <Label>Project</Label>
+                    <Label>Proyek</Label>
                     <Select value={projectId} onValueChange={setProjectId}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select project" />
+                        <SelectValue placeholder="Pilih proyek" />
                       </SelectTrigger>
                       <SelectContent>
                         {projects?.map((project) => (
@@ -171,7 +171,7 @@ export function ApproveUserDialog({
                     </Select>
                   </div>
                   <div className="grid gap-2">
-                    <Label>Project Role</Label>
+                    <Label>Peran Proyek</Label>
                     <Select
                       value={projectRole}
                       onValueChange={(v) =>
@@ -183,8 +183,8 @@ export function ApproveUserDialog({
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="MANDOR">Mandor</SelectItem>
-                        <SelectItem value="ARCHITECT">Architect</SelectItem>
-                        <SelectItem value="FINANCE">Finance</SelectItem>
+                        <SelectItem value="ARCHITECT">Arsitek</SelectItem>
+                        <SelectItem value="FINANCE">Keuangan</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -200,10 +200,10 @@ export function ApproveUserDialog({
             onClick={() => onOpenChange(false)}
             disabled={approve.isPending}
           >
-            Cancel
+            Batal
           </Button>
           <Button onClick={handleApprove} disabled={approve.isPending}>
-            {approve.isPending ? "Approving..." : "Approve User"}
+            {approve.isPending ? "Menyetujui..." : "Setujui Pengguna"}
           </Button>
         </DialogFooter>
       </DialogContent>

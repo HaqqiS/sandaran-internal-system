@@ -31,7 +31,7 @@ export function ReportList({
   if (error) {
     return (
       <div className="flex h-48 flex-col items-center justify-center gap-2 text-center">
-        <p className="text-sm text-muted-foreground">Failed to load reports</p>
+        <p className="text-sm text-muted-foreground">Gagal memuat laporan</p>
       </div>
     );
   }
@@ -41,11 +41,11 @@ export function ReportList({
   if (reports.length === 0) {
     return (
       <div className="flex h-48 flex-col items-center justify-center gap-4 text-center">
-        <p className="text-sm text-muted-foreground">No reports yet</p>
+        <p className="text-sm text-muted-foreground">Belum ada laporan</p>
         {canCreate && onCreateClick && (
           <Button onClick={onCreateClick}>
             <IconPlus className="mr-2 h-4 w-4" />
-            Create First Report
+            Buat Laporan Pertama
           </Button>
         )}
       </div>
@@ -59,7 +59,7 @@ export function ReportList({
         <div className="flex items-center justify-end">
           <Button onClick={onCreateClick}>
             <IconPlus className="mr-2 h-4 w-4" />
-            New Report
+            Laporan Baru
           </Button>
         </div>
       )}
@@ -79,7 +79,7 @@ export function ReportList({
       {data?.nextCursor && (
         <div className="flex justify-center pt-4">
           <Button variant="outline" disabled>
-            Load More
+            Muat Lebih Banyak
           </Button>
         </div>
       )}

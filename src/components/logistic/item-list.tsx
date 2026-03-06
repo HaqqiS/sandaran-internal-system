@@ -60,7 +60,7 @@ export function ItemList({ projectId }: ItemListProps) {
   if (isLoading) {
     return (
       <div className="p-4 text-center text-muted-foreground">
-        Loading items...
+        Memuat barang...
       </div>
     );
   }
@@ -71,9 +71,9 @@ export function ItemList({ projectId }: ItemListProps) {
         <div className="bg-muted mx-auto flex h-12 w-12 items-center justify-center rounded-full">
           <IconBox className="h-6 w-6 text-muted-foreground" />
         </div>
-        <h3 className="mt-4 text-lg font-semibold">No items found</h3>
+        <h3 className="mt-4 text-lg font-semibold">Belum ada barang</h3>
         <p className="mb-4 text-sm text-muted-foreground">
-          There are no logistic items in this project yet.
+          Belum ada barang logistik di proyek ini.
         </p>
       </div>
     );
@@ -85,7 +85,7 @@ export function ItemList({ projectId }: ItemListProps) {
         <div className="relative flex-1">
           <IconSearch className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search items..."
+            placeholder="Cari barang..."
             className="pl-8"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -97,18 +97,18 @@ export function ItemList({ projectId }: ItemListProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[40%]">Item Name</TableHead>
-              <TableHead className="text-right">In</TableHead>
-              <TableHead className="text-right">Out</TableHead>
-              <TableHead className="text-right">Stock</TableHead>
-              <TableHead className="w-[100px] text-right">Actions</TableHead>
+              <TableHead className="w-[40%]">Nama Barang</TableHead>
+              <TableHead className="text-right">Masuk</TableHead>
+              <TableHead className="text-right">Keluar</TableHead>
+              <TableHead className="text-right">Stok</TableHead>
+              <TableHead className="w-[100px] text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredItems?.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="h-24 text-center">
-                  No results found.
+                  Tidak ada hasil ditemukan.
                 </TableCell>
               </TableRow>
             ) : (
@@ -117,7 +117,7 @@ export function ItemList({ projectId }: ItemListProps) {
                   <TableCell>
                     <div className="font-medium">{item.name}</div>
                     <div className="text-xs text-muted-foreground">
-                      Unit: {item.unit}
+                      Satuan: {item.unit}
                     </div>
                   </TableCell>
                   <TableCell className="text-right text-green-600">

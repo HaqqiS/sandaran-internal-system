@@ -35,11 +35,11 @@ export function RejectUserDialog({
       { userId: user.id },
       {
         onSuccess: () => {
-          toast.success(`${user.name} has been rejected`);
+          toast.success(`${user.name} telah ditolak`);
           onOpenChange(false);
         },
         onError: (error) => {
-          toast.error(error.message || "Failed to reject user");
+          toast.error(error.message || "Gagal menolak pengguna");
         },
       },
     );
@@ -51,9 +51,9 @@ export function RejectUserDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Reject User</DialogTitle>
+          <DialogTitle>Tolak Pengguna</DialogTitle>
           <DialogDescription>
-            Are you sure you want to reject this user registration?
+            Apakah Anda yakin ingin menolak pendaftaran pengguna ini?
           </DialogDescription>
         </DialogHeader>
 
@@ -63,8 +63,8 @@ export function RejectUserDialog({
             <div className="text-muted-foreground">{user.email}</div>
           </div>
           <p className="mt-3 text-sm text-muted-foreground">
-            This user will be marked as rejected and won't be able to access the
-            system.
+            Pengguna ini akan ditandai sebagai ditolak dan tidak dapat mengakses
+            sistem.
           </p>
         </div>
 
@@ -74,14 +74,14 @@ export function RejectUserDialog({
             onClick={() => onOpenChange(false)}
             disabled={reject.isPending}
           >
-            Cancel
+            Batal
           </Button>
           <Button
             variant="destructive"
             onClick={handleReject}
             disabled={reject.isPending}
           >
-            {reject.isPending ? "Rejecting..." : "Reject User"}
+            {reject.isPending ? "Menolak..." : "Tolak Pengguna"}
           </Button>
         </DialogFooter>
       </DialogContent>
