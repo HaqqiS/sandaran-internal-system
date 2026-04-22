@@ -82,13 +82,33 @@ export const documentRouter = createTRPCRouter({
       recentCounts.set(doc.projectId, doc._count.id);
     });
 
-    return projects.map((project) => ({
-      id: project.id,
-      name: project.name,
-      slug: project.slug,
-      totalDocuments: project._count.documents,
-      recentUploadsCount: recentCounts.get(project.id) || 0,
-    }));
+    const result = await Promise.all(
+      projects.map(async (project) => {
+        const recentDocuments = await ctx.db.projectDocument.findMany({
+          where: { projectId: project.id },
+          orderBy: { createdAt: "desc" },
+          take: 3,
+          select: {
+            id: true,
+            title: true,
+            fileName: true,
+            fileType: true,
+            createdAt: true,
+          },
+        });
+
+        return {
+          id: project.id,
+          name: project.name,
+          slug: project.slug,
+          totalDocuments: project._count.documents,
+          recentUploadsCount: recentCounts.get(project.id) || 0,
+          recentDocuments,
+        };
+      }),
+    );
+
+    return result;
   }),
 
   /**
@@ -228,7 +248,9 @@ export const documentRouter = createTRPCRouter({
    * Get signed download URL for a specific document
    * This generates a fresh link with expiry
    */
-  getDownloadUrl: projectMemberProcedure
+  getDownloadUrl: projectProcedure(["MANDOR", "ARCHITECT", "FINANCE"], {
+    allowCEO: true,
+  })
     .input(
       z.object({
         projectId: z.string(),

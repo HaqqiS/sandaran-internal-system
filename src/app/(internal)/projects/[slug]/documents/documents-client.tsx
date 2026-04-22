@@ -90,31 +90,30 @@ export function DocumentsClient({ projectSlug }: DocumentsClientProps) {
   return (
     <PageLayout
       title={`${project.name} — Dokumen`}
+      navActions={
+        <Button asChild variant="outline" size="sm">
+          <Link href={`/projects/${projectSlug}`}>
+            <IconArrowLeft className="mr-2 h-4 w-4" />
+            Kembali
+          </Link>
+        </Button>
+      }
       actions={
-        <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/projects/${projectSlug}`}>
-              <IconArrowLeft className="mr-2 h-4 w-4" />
-              Kembali
-            </Link>
-          </Button>
-          {project && (
-            <UploadDialog
-              projectId={project.id}
-              projectSlug={project.slug}
-              open={showUploadDialog}
-              onOpenChange={setShowUploadDialog}
-            >
-              {canUpload && (
-                <Button>
-                  <IconPlus className="mr-2 size-4" />
-                  <span className="block md:hidden">Upload</span>
-                  <span className="hidden md:block">Upload Dokumen</span>
-                </Button>
-              )}
-            </UploadDialog>
-          )}
-        </div>
+        project &&
+        canUpload && (
+          <UploadDialog
+            projectId={project.id}
+            projectSlug={project.slug}
+            open={showUploadDialog}
+            onOpenChange={setShowUploadDialog}
+          >
+            <Button size="sm">
+              <IconPlus className="mr-2 size-4" />
+              <span className="block md:hidden">Upload</span>
+              <span className="hidden md:block">Upload Dokumen</span>
+            </Button>
+          </UploadDialog>
+        )
       }
     >
       <div className="flex flex-col gap-4 p-4 md:gap-6 md:p-6">

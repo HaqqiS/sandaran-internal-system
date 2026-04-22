@@ -66,39 +66,39 @@ export function EmergencyClient({ projectSlug }: EmergencyClientProps) {
   return (
     <PageLayout
       title={`${project.name} — Dana Darurat`}
-      actions={
-        <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/projects/${projectSlug}`}>
-              <IconArrowLeft className="mr-2 h-4 w-4" />
-              Kembali
-            </Link>
-          </Button>
-          {canWithdraw && (
-            <Button variant="outline" onClick={() => setIsWithdrawOpen(true)}>
-              Tarik Dana
-            </Button>
-          )}
-          {canAddFund && (
-            <Button onClick={() => setIsFundOpen(true)}>
-              <IconPlus className="mr-2 h-4 w-4" />
-              Tambah Dana
-            </Button>
-          )}
-        </div>
+      navActions={
+        <Button asChild variant="outline" size="sm">
+          <Link href={`/projects/${projectSlug}`}>
+            <IconArrowLeft className="mr-2 h-4 w-4" />
+            Kembali
+          </Link>
+        </Button>
       }
     >
       <div className="flex flex-col gap-6 p-4 md:p-6">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Dana Darurat</h2>
-          <p className="text-muted-foreground">
-            Kelola dana darurat dan lihat riwayat transaksi untuk {project.name}
-            .
-          </p>
-        </div>
-
         <div className="grid gap-6">
-          <FundOverview projectId={project.id} />
+          <FundOverview
+            projectId={project.id}
+            actions={
+              <div className="flex gap-2">
+                {canWithdraw && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsWithdrawOpen(true)}
+                  >
+                    Tarik Dana
+                  </Button>
+                )}
+                {canAddFund && (
+                  <Button size="sm" onClick={() => setIsFundOpen(true)}>
+                    <IconPlus className="mr-2 h-4 w-4" />
+                    Tambah Dana
+                  </Button>
+                )}
+              </div>
+            }
+          />
 
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Riwayat Transaksi</h3>

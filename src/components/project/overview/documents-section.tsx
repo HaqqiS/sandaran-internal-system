@@ -2,6 +2,7 @@
 
 import {
   IconChevronRight,
+  IconDownload,
   IconFile,
   IconFileText,
   IconFolder,
@@ -11,10 +12,11 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import type { DocumentType } from "generated/prisma";
 import Link from "next/link";
+import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { useDocumentsByProject } from "~/hooks/useDocument";
+import { useDocumentsByProject, useGetDownloadUrl } from "~/hooks/useDocument";
 
 interface DocumentsSectionProps {
   projectId: string;
@@ -50,6 +52,22 @@ export function DocumentsSection({
   projectSlug,
 }: DocumentsSectionProps) {
   const { data: allDocuments, isLoading } = useDocumentsByProject(projectId);
+  const getDownloadUrl = useGetDownloadUrl();
+
+  const handleDownload = async (projectId: string, documentId: string) => {
+    toast.promise(getDownloadUrl.mutateAsync({ projectId, documentId }), {
+      loading: "Menyiapkan unduhan...",
+      success: (data) => {
+        if (data.url) {
+          window.open(data.url, "_blank");
+        }
+        return "Dokumen siap diunduh";
+      },
+      error: (err: unknown) => {
+        return err instanceof Error ? err.message : "Gagal mengunduh dokumen";
+      },
+    });
+  };
 
   // Group documents by type and get recent ones
   const documentsByType: Partial<Record<DocumentType, typeof allDocuments>> =
@@ -110,7 +128,7 @@ export function DocumentsSection({
                 {allDocuments?.slice(0, 4).map((doc) => (
                   <div
                     key={doc.id}
-                    className="flex items-center gap-3 rounded-md border p-3 text-sm"
+                    className="group flex items-center gap-3 rounded-md border p-3 text-sm transition-colors hover:bg-muted/50"
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted">
                       {doc.resourceType === "image" ? (
@@ -137,6 +155,21 @@ export function DocumentsSection({
                         </p>
                       </div>
                     </div>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="h-10 w-10 shrink-0 transition-opacity md:opacity-0 md:group-hover:opacity-100"
+                      onClick={() => handleDownload(projectId, doc.id)}
+                      disabled={getDownloadUrl.isPending}
+                      title="Unduh Dokumen"
+                    >
+                      {getDownloadUrl.isPending &&
+                      getDownloadUrl.variables?.documentId === doc.id ? (
+                        <IconLoader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                      ) : (
+                        <IconDownload className="h-5 w-5 text-muted-foreground" />
+                      )}
+                    </Button>
                   </div>
                 ))}
               </div>

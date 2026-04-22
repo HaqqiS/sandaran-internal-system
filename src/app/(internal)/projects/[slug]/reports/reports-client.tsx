@@ -1,6 +1,6 @@
 "use client";
 
-import { IconArrowLeft, IconLoader2 } from "@tabler/icons-react";
+import { IconArrowLeft, IconLoader2, IconPlus } from "@tabler/icons-react";
 import type { GlobalRole, ProjectRole } from "generated/prisma";
 import Link from "next/link";
 import { useState } from "react";
@@ -60,13 +60,21 @@ export function ReportsClient({ projectSlug }: ReportsClientProps) {
   return (
     <PageLayout
       title={`${project.name} — Laporan`}
-      actions={
+      navActions={
         <Button asChild variant="outline" size="sm">
           <Link href={`/projects/${projectSlug}`}>
             <IconArrowLeft className="mr-2 h-4 w-4" />
             Kembali ke Proyek
           </Link>
         </Button>
+      }
+      actions={
+        canCreate && (
+          <Button size="sm" onClick={() => setIsCreateOpen(true)}>
+            <IconPlus className="mr-2 h-4 w-4" />
+            Laporan Baru
+          </Button>
+        )
       }
     >
       <div className="p-4 md:p-6">

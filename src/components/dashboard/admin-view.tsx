@@ -3,7 +3,6 @@
 import {
   IconAlertTriangle,
   IconBuildingSkyscraper,
-  IconCloud,
   IconPlus,
   IconUserCheck,
   IconUsers,
@@ -60,14 +59,6 @@ export function AdminView() {
           description="Barang butuh perhatian"
           isLoading={statsLoading}
         />
-        <StatCard
-          title="Penyimpanan"
-          value="2.4 GB"
-          icon={IconCloud}
-          description="Kapasitas Cloudinary"
-          trend={{ value: "+12%", label: "bulan ini", positive: false }}
-          isLoading={statsLoading}
-        />
       </StatsGrid>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
@@ -82,7 +73,7 @@ export function AdminView() {
                 </CardDescription>
               </div>
               <Button variant="outline" size="sm" asChild>
-                <Link href="/users?tab=pending">Lihat Semua</Link>
+                <Link href="/users">Lihat Semua</Link>
               </Button>
             </div>
           </CardHeader>
@@ -111,7 +102,7 @@ export function AdminView() {
                         </p>
                       </div>
                       <Button size="sm" asChild>
-                        <Link href={`/users?highlight=${user.id}`}>Tinjau</Link>
+                        <Link href="/users">Tinjau</Link>
                       </Button>
                     </div>
                     {index < pendingUsers.length - 1 && (
@@ -133,7 +124,7 @@ export function AdminView() {
               {
                 label: "Tinjau Pengguna",
                 icon: <IconUserCheck className="h-4 w-4" />,
-                href: "/users?tab=pending",
+                href: "/users",
                 variant: "outline",
               },
               {
@@ -152,28 +143,6 @@ export function AdminView() {
           />
         </div>
       </div>
-
-      {/* System Overview Placeholder */}
-      <Card className="opacity-60">
-        <CardHeader>
-          <CardTitle>Ringkasan Sistem</CardTitle>
-          <CardDescription>
-            Metrik aktivitas dan kesehatan sistem
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
-            <IconBuildingSkyscraper className="h-12 w-12 text-muted-foreground/50" />
-            <p className="text-sm text-muted-foreground">
-              Grafik aktivitas sistem segera hadir...
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Pemantauan dan analitik real-time akan ditambahkan pada pembaruan
-              mendatang
-            </p>
-          </div>
-        </CardContent>
-      </Card>
     </DashboardLayout>
   );
 }

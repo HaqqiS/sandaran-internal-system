@@ -6,6 +6,7 @@ import { useLayout } from "~/components/providers/layout-provider";
 interface PageLayoutProps {
   title: string;
   actions?: ReactNode;
+  navActions?: ReactNode;
   children: ReactNode;
 }
 
@@ -21,7 +22,11 @@ interface PageLayoutProps {
  *
  * export default function MyPage() {
  *   return (
- *     <PageLayout title="My Page" actions={<Button>Action</Button>}>
+ *     <PageLayout
+ *       title="My Page"
+ *       actions={<Button>Title Action</Button>}
+ *       navActions={<Button>Nav Action</Button>}
+ *     >
  *       <div>Page content</div>
  *     </PageLayout>
  *   )
@@ -30,19 +35,23 @@ interface PageLayoutProps {
  */
 import { PageHeader } from "~/components/layout/page-header";
 
-export function PageLayout({ title, actions, children }: PageLayoutProps) {
+export function PageLayout({
+  title,
+  actions,
+  navActions,
+  children,
+}: PageLayoutProps) {
   const { updateConfig } = useLayout();
 
   useEffect(() => {
     updateConfig({
-      // headerTitle: title, // Title is now handled locally by PageLayout
-      headerActions: actions,
+      headerActions: navActions,
     });
-  }, [actions, updateConfig]);
+  }, [navActions, updateConfig]);
 
   return (
     <>
-      <PageHeader title={title} />
+      <PageHeader title={title} actions={actions} />
       {children}
     </>
   );

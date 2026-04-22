@@ -58,37 +58,31 @@ export function LogisticsClient({ projectSlug }: LogisticsClientProps) {
   return (
     <PageLayout
       title={`${project.name} — Logistik & Inventaris`}
+      navActions={
+        <Button asChild variant="outline" size="sm">
+          <Link href={`/projects/${projectSlug}`}>
+            <IconArrowLeft className="mr-2 h-4 w-4" />
+            Kembali
+          </Link>
+        </Button>
+      }
       actions={
-        <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/projects/${projectSlug}`}>
-              <IconArrowLeft className="mr-2 h-4 w-4" />
-              Kembali
-            </Link>
-          </Button>
-          {canManage && (
-            <LogisticItemDialog
-              projectId={project.id}
-              open={showAddDialog}
-              onOpenChange={setShowAddDialog}
-              onSuccess={() => setShowAddDialog(false)}
-            >
-              <Button>
-                <IconPlus className="mr-2 size-4" />
-                Tambah Barang
-              </Button>
-            </LogisticItemDialog>
-          )}
-        </div>
+        canManage && (
+          <LogisticItemDialog
+            projectId={project.id}
+            open={showAddDialog}
+            onOpenChange={setShowAddDialog}
+            onSuccess={() => setShowAddDialog(false)}
+          >
+            <Button size="sm">
+              <IconPlus className="mr-2 size-4" />
+              Tambah Barang
+            </Button>
+          </LogisticItemDialog>
+        )
       }
     >
       <div className="flex flex-col gap-4 p-4 md:gap-6 md:p-6">
-        <div className="space-y-2">
-          <p className="text-muted-foreground">
-            Kelola stok material dan lacak penggunaan.
-          </p>
-        </div>
-
         <ItemList projectId={project.id} />
       </div>
     </PageLayout>

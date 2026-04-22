@@ -32,10 +32,7 @@ export function CEOView() {
   const { data: stats, isLoading } = useCEOStats();
 
   return (
-    <DashboardLayout
-      title="Ringkasan Eksekutif"
-      description="Analisis tingkat tinggi dan status seluruh proyek"
-    >
+    <DashboardLayout title="Ringkasan Eksekutif">
       {/* Top Stats */}
       <StatsGrid cols={{ mobile: 2, tablet: 2, desktop: 4 }}>
         <StatCard

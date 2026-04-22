@@ -71,10 +71,7 @@ export function FinanceView() {
   };
 
   return (
-    <DashboardLayout
-      title="Dashboard Keuangan"
-      description="Manajemen dana darurat dan pengawasan transaksi"
-    >
+    <DashboardLayout title="Dashboard Keuangan">
       {/* Top Stats */}
       <StatsGrid cols={{ mobile: 2, tablet: 2, desktop: 2 }}>
         <StatCard

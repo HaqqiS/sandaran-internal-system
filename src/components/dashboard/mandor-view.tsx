@@ -50,10 +50,7 @@ export function MandorView() {
   };
 
   return (
-    <DashboardLayout
-      title="Dashboard Mandor"
-      description="Operasi lapangan dan manajemen laporan harian"
-    >
+    <DashboardLayout title="Dashboard Mandor">
       {/* Top Stats */}
       <StatsGrid cols={{ mobile: 2, tablet: 2, desktop: 2 }}>
         <StatCard

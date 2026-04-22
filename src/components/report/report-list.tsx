@@ -54,16 +54,6 @@ export function ReportList({
 
   return (
     <div className="space-y-4">
-      {/* Header with Create button */}
-      {canCreate && onCreateClick && (
-        <div className="flex items-center justify-end">
-          <Button onClick={onCreateClick}>
-            <IconPlus className="mr-2 h-4 w-4" />
-            Laporan Baru
-          </Button>
-        </div>
-      )}
-
       {/* Reports Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {reports.map((report) => (

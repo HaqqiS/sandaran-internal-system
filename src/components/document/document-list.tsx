@@ -1,6 +1,6 @@
 "use client";
 
-import { IconLoader2 } from "@tabler/icons-react";
+import { IconFileText, IconLoader2 } from "@tabler/icons-react";
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useDocumentsByProject } from "~/hooks/useDocument";
@@ -26,33 +26,45 @@ export function DocumentList({
     activeTab === "ALL" ? undefined : (activeTab as DocumentType),
   );
 
-  if (isLoading) {
-    return (
-      <div className="flex h-40 items-center justify-center">
-        <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
   const hasDocuments = documents && documents.length > 0;
 
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full justify-start overflow-x-auto">
-          <TabsTrigger value="ALL">All Files</TabsTrigger>
-          <TabsTrigger value="DESIGN">Designs</TabsTrigger>
-          <TabsTrigger value="DRAWING">Drawings</TabsTrigger>
-          <TabsTrigger value="SPECIFICATION">Specs</TabsTrigger>
-          <TabsTrigger value="REFERENCE">References</TabsTrigger>
-          <TabsTrigger value="OTHER">Other</TabsTrigger>
+        <TabsList className="w-full justify-start overflow-x-auto h-auto p-1 bg-muted/50">
+          <TabsTrigger value="ALL" className="py-2">
+            Semua File
+          </TabsTrigger>
+          <TabsTrigger value="DESIGN" className="py-2">
+            Desain/Denah
+          </TabsTrigger>
+          <TabsTrigger value="DRAWING" className="py-2">
+            Gambar Teknis
+          </TabsTrigger>
+          <TabsTrigger value="SPECIFICATION" className="py-2">
+            Spesifikasi
+          </TabsTrigger>
+          <TabsTrigger value="REFERENCE" className="py-2">
+            Referensi
+          </TabsTrigger>
+          <TabsTrigger value="OTHER" className="py-2">
+            Lainnya
+          </TabsTrigger>
         </TabsList>
 
-        <div className="mt-6">
-          {!hasDocuments ? (
-            <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">
-              <p className="text-muted-foreground">
-                No documents found in this category.
+        <div className="mt-6 min-h-[200px]">
+          {isLoading ? (
+            <div className="flex h-40 items-center justify-center">
+              <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : !hasDocuments ? (
+            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed p-12 text-center bg-muted/20">
+              <IconFileText className="h-12 w-12 text-muted-foreground/50 mb-4" />
+              <p className="text-muted-foreground font-medium">
+                Tidak ada dokumen ditemukan di kategori ini.
+              </p>
+              <p className="text-sm text-muted-foreground/60 mt-1">
+                Silakan pilih kategori lain atau tambahkan dokumen baru.
               </p>
             </div>
           ) : (

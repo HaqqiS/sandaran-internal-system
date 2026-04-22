@@ -28,10 +28,7 @@ export function ArchitectView() {
   } | null>(null);
 
   return (
-    <DashboardLayout
-      title="Dashboard Arsitek"
-      description="Manajemen dokumen desain dan pengawasan proyek"
-    >
+    <DashboardLayout title="Dashboard Arsitek">
       {/* Top Stats */}
       <StatsGrid cols={{ mobile: 2, tablet: 2, desktop: 2 }}>
         <StatCard
