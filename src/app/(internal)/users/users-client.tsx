@@ -1,6 +1,5 @@
 "use client";
 
-import { IconUsers } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { PageLayout } from "~/components/layout";
@@ -101,13 +100,6 @@ export function UsersClient() {
   return (
     <PageLayout title="Manajemen Pengguna">
       <div className="flex flex-col gap-4 p-4 md:gap-6 md:p-6">
-        <div className="flex items-center gap-2">
-          <IconUsers className="h-5 w-5 text-muted-foreground" />
-          <p className="text-muted-foreground">
-            Kelola persetujuan, peran, dan izin pengguna
-          </p>
-        </div>
-
         {/* Filter Controls - Responsive */}
         <div className="flex items-center gap-4">
           {isMobile ? (

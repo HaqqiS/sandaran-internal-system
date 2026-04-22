@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  IconBuildingCommunity,
-  IconLoader2,
-  IconPlus,
-} from "@tabler/icons-react";
+import { IconLoader2, IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { PageLayout } from "~/components/layout";
@@ -80,11 +76,6 @@ export function ProjectsClient() {
       }
     >
       <div className="flex flex-col gap-4 p-4 md:gap-6 md:p-6">
-        <div className="flex items-center gap-3">
-          <IconBuildingCommunity className="h-5 w-5 text-muted-foreground" />
-          <p className="text-muted-foreground">Kelola proyek konstruksi Anda</p>
-        </div>
-
         {isLoading ? (
           <div className="flex h-64 items-center justify-center">
             <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />

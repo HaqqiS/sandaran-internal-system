@@ -31,10 +31,7 @@ export function AdminView() {
   );
 
   return (
-    <DashboardLayout
-      title="Dashboard Admin"
-      description="Manajemen sistem dan pengawasan"
-    >
+    <DashboardLayout title="Dashboard Admin">
       {/* Top Stats */}
       <StatsGrid cols={{ mobile: 2, tablet: 2, desktop: 5 }}>
         <StatCard

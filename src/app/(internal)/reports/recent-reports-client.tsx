@@ -1,6 +1,6 @@
 "use client";
 
-import { IconLoader2, IconReportAnalytics } from "@tabler/icons-react";
+import { IconLoader2 } from "@tabler/icons-react";
 import Link from "next/link";
 import { PageLayout } from "~/components/layout";
 import { ReportCard } from "~/components/report/report-card";
@@ -35,10 +35,6 @@ export function RecentReportsClient() {
   return (
     <PageLayout title="Laporan Terbaru">
       <div className="flex flex-col gap-8 p-4 md:p-6">
-        <div className="flex items-center gap-2">
-          <IconReportAnalytics className="h-5 w-5 text-muted-foreground" />
-          <p className="text-muted-foreground">Laporan terbaru per proyek</p>
-        </div>
         {projects?.length === 0 ? (
           <div className="rounded-lg border p-8 text-center">
             <p className="text-muted-foreground">Belum ada proyek.</p>
