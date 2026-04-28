@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import type { Metadata } from "next";
 import { Geist, Inter } from "next/font/google";
 import { Toaster } from "sonner";
+import { SmoothScrollProvider } from "~/components/providers/smooth-scroll-provider";
 import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
@@ -14,6 +15,8 @@ export const metadata: Metadata = {
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
+  weight: ["400", "500", "600", "700", "800", "900"],
+  display: "swap",
 });
 
 const geist = Geist({
@@ -28,8 +31,10 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${geist.variable}`}>
       <body>
         <TRPCReactProvider>
-          <Toaster richColors position="top-center" duration={5000} />
-          {children}
+          <SmoothScrollProvider>
+            <Toaster richColors position="top-center" duration={5000} />
+            {children}
+          </SmoothScrollProvider>
         </TRPCReactProvider>
       </body>
     </html>

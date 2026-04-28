@@ -9,6 +9,17 @@
     var(--font-sans), var(--font-geist-sans), ui-sans-serif, system-ui,
     sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
     "Noto Color Emoji";
+
+  /* Homepage display sizes — clamp() untuk responsive tanpa breakpoint */
+  --text-display-2xl: clamp(3.5rem, 8vw, 9rem);
+  --text-display-xl: clamp(2.5rem, 5vw, 6rem);
+  --text-display-lg: clamp(2rem, 4vw, 4rem);
+  --text-display-md: clamp(1.5rem, 3vw, 3rem);
+  --text-display-sm: clamp(1rem, 2vw, 1.5rem);
+
+  /* Homepage letter-spacing untuk heading besar */
+  --tracking-display: -0.04em;
+  --tracking-display-loose: 0.1em;
 }
 
 :root {
@@ -69,6 +80,29 @@
   --shadow-2xl: 0px 8px 20px 0px hsl(0 0% 0% / 0.13);
   --tracking-normal: -0.01em;
   --spacing: 0.25rem;
+
+  /* ─── Homepage / Landing Page Tokens ─────────────────────────────────── */
+  /* Background dark ala yurdaermimarlik — deep navy-black */
+  --hp-bg: #000a12;
+  --hp-bg-surface: #080f17;
+  --hp-bg-elevated: #0d1a25;
+
+  /* Foreground */
+  --hp-fg: #ffffff;
+  --hp-fg-muted: rgba(255, 255, 255, 0.5);
+  --hp-fg-subtle: rgba(255, 255, 255, 0.25);
+
+  /* Accent teal */
+  --hp-accent: #7ec8e3;
+  --hp-accent-dim: rgba(126, 200, 227, 0.15);
+
+  /* Borders */
+  --hp-border: rgba(255, 255, 255, 0.08);
+  --hp-border-strong: rgba(255, 255, 255, 0.16);
+
+  /* Overlay untuk glassmorphism navbar */
+  --hp-glass-bg: rgba(0, 10, 18, 0.75);
+  --hp-glass-blur: 16px;
 }
 
 .dark {
@@ -127,6 +161,21 @@
   --shadow-xl:
     0px 10px 25px 0px hsl(0 0% 0% / 0.4), 0px 8px 10px -1px hsl(0 0% 0% / 0.4);
   --shadow-2xl: 0px 10px 25px 0px hsl(0 0% 0% / 1);
+
+  /* ─── Homepage dark overrides (berlaku di dalam .dark) ───────────────── */
+  /* Tokens ini sudah sama dengan :root karena homepage selalu dark,        */
+  /* tapi didefinisikan ulang agar konsisten jika tema berubah.             */
+  --hp-bg: #000a12;
+  --hp-bg-surface: #080f17;
+  --hp-bg-elevated: #0d1a25;
+  --hp-fg: #ffffff;
+  --hp-fg-muted: rgba(255, 255, 255, 0.5);
+  --hp-fg-subtle: rgba(255, 255, 255, 0.25);
+  --hp-accent: #7ec8e3;
+  --hp-accent-dim: rgba(126, 200, 227, 0.15);
+  --hp-border: rgba(255, 255, 255, 0.08);
+  --hp-border-strong: rgba(255, 255, 255, 0.16);
+  --hp-glass-bg: rgba(0, 10, 18, 0.75);
 }
 
 @theme inline {
@@ -200,4 +249,124 @@
     @apply bg-background text-foreground;
     letter-spacing: var(--tracking-normal);
   }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Homepage Utilities — gunakan class ini di dalam section homepage saja.
+   Diletakkan di luar @layer base agar tidak di-purge oleh Tailwind.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Background utilities */
+.hp-bg {
+  background-color: var(--hp-bg);
+}
+.hp-bg-surface {
+  background-color: var(--hp-bg-surface);
+}
+.hp-bg-elevated {
+  background-color: var(--hp-bg-elevated);
+}
+
+/* Text utilities */
+.hp-text {
+  color: var(--hp-fg);
+}
+.hp-text-muted {
+  color: var(--hp-fg-muted);
+}
+.hp-text-subtle {
+  color: var(--hp-fg-subtle);
+}
+.hp-text-accent {
+  color: var(--hp-accent);
+}
+
+/* Border utilities */
+.hp-border {
+  border-color: var(--hp-border);
+}
+.hp-border-strong {
+  border-color: var(--hp-border-strong);
+}
+
+/* Glass navbar */
+.hp-glass {
+  background-color: var(--hp-glass-bg);
+  backdrop-filter: blur(var(--hp-glass-blur));
+  -webkit-backdrop-filter: blur(var(--hp-glass-blur));
+}
+
+/* Display text sizes — pakai style attribute atau extend di @theme */
+.text-display-2xl {
+  font-size: var(--text-display-2xl);
+}
+.text-display-xl {
+  font-size: var(--text-display-xl);
+}
+.text-display-lg {
+  font-size: var(--text-display-lg);
+}
+.text-display-md {
+  font-size: var(--text-display-md);
+}
+.text-display-sm {
+  font-size: var(--text-display-sm);
+}
+
+/* Letter spacing untuk heading homepage */
+.tracking-display {
+  letter-spacing: var(--tracking-display);
+}
+.tracking-display-loose {
+  letter-spacing: var(--tracking-display-loose);
+}
+
+/* Smooth scroll untuk Lenis — ini WAJIB */
+/* Official CSS reset dari Lenis (https://github.com/darkroomengineering/lenis).
+   scroll-behavior: auto HARUS diforce karena Lenis menggantikan native smooth
+   scroll browser sepenuhnya. Tanpa !important, browser bisa override dengan
+   scroll-behavior: smooth dan menyebabkan konflik / double-smoothing. */
+html.lenis {
+  height: auto;
+}
+html.lenis,
+html.lenis body {
+  /* biome-ignore lint/complexity/noImportantStyles: Required by Lenis — overrides browser scroll-behavior to prevent conflict with RAF-based smooth scroll */
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth {
+  /* biome-ignore lint/complexity/noImportantStyles: Required by Lenis — overrides browser scroll-behavior to prevent conflict with RAF-based smooth scroll */
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Marquee animation */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+  will-change: transform;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Cursor custom (opsional) */
+.cursor-none * {
+  /* biome-ignore lint/complexity/noImportantStyles: Required by Lenis — overrides browser scroll-behavior to prevent conflict with RAF-based smooth scroll */
+  cursor: none !important;
 }
