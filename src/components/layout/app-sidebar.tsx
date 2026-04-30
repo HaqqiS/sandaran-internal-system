@@ -30,7 +30,7 @@ export function AppSidebar({ config, ...props }: AppSidebarProps) {
     navMain,
     navDocuments = [],
     navSecondary = [],
-    companyName = "Sandaran Home Living",
+    companyName = "Astaloka",
     companyIcon: CompanyIcon,
   } = config;
 

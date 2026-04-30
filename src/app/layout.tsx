@@ -7,8 +7,8 @@ import { SmoothScrollProvider } from "~/components/providers/smooth-scroll-provi
 import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
-  title: "Sandaran Home Living",
-  description: "Sandaran Home Living Interior Design",
+  title: "Astaloka",
+  description: "Astaloka Interior Design",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

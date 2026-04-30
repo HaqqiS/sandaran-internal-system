@@ -11,6 +11,11 @@
     "Noto Color Emoji";
 
   /* Homepage display sizes — clamp() untuk responsive tanpa breakpoint */
+  --text-hero-display: clamp(
+    5.5rem,
+    17vw,
+    17rem
+  ); /* Hero: CRAFTED/SPACES raksasa */
   --text-display-2xl: clamp(3.5rem, 8vw, 9rem);
   --text-display-xl: clamp(2.5rem, 5vw, 6rem);
   --text-display-lg: clamp(2rem, 4vw, 4rem);

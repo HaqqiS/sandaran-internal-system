@@ -25,7 +25,7 @@ import { useEffect, useState } from "react";
  */
 
 interface IntroScreenProps {
-  /** Brand name yang ditampilkan — default: "SANDARAN" */
+  /** Brand name yang ditampilkan — default: "ASTALOKA" */
   brandName?: string;
   /** Tagline kecil di pojok kanan bawah */
   tagline?: string;
@@ -34,8 +34,8 @@ interface IntroScreenProps {
 }
 
 export function IntroScreen({
-  brandName = "SANDARAN",
-  tagline = "HOME LIVING",
+  brandName = "ASTALOKA",
+  tagline = "INTERIOR DESIGN",
   duration = 1800,
 }: IntroScreenProps) {
   const [done, setDone] = useState(false);

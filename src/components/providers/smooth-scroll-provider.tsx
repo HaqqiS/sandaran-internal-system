@@ -1,62 +1,56 @@
 "use client";
 
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import { useEffect, useRef } from "react";
+
+// Register ScrollTrigger once at module level
+gsap.registerPlugin(ScrollTrigger);
 
 interface SmoothScrollProviderProps {
   children: React.ReactNode;
 }
 
 /**
- * SmoothScrollProvider — wraps the app dengan Lenis smooth scroll.
+ * SmoothScrollProvider — Lenis smooth scroll + GSAP ScrollTrigger sync.
  *
- * Lenis akan menambahkan class `lenis` dan `lenis-smooth` ke <html>,
- * yang di-handle oleh CSS reset di globals.css (html.lenis { height: auto }).
+ * Integrasi:
+ *   1. Lenis.on('scroll') → ScrollTrigger.update()
+ *   2. gsap.ticker → lenis.raf() (mengganti manual RAF loop)
+ *   3. lagSmoothing(0) agar tidak ada frame skipping
  *
- * Untuk integrasi GSAP ScrollTrigger, gunakan:
- *   ScrollTrigger.normalizeScroll(true)
- *   lenis.on('scroll', ScrollTrigger.update)
- *   gsap.ticker.add((time) => lenis.raf(time * 1000))
- *   gsap.ticker.lagSmoothing(0)
- *
- * Catatan: komponen ini hanya aktif di halaman yang menggunakan layout
- * dengan SmoothScrollProvider. Halaman internal/dashboard tidak terpengaruh
- * karena mereka punya layout sendiri.
+ * Ini memastikan semua animasi scroll-driven (pin, scrub, parallax)
+ * berjalan sync dengan Lenis smooth scroll.
  */
 export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
     const lenis = new Lenis({
-      // Durasi scroll — 1.2 terasa natural, naikkan ke 1.5 untuk lebih smooth
       duration: 1.2,
-      // Easing exponential ala web portfolio premium
       easing: (t: number) => Math.min(1, 1.001 - 2 ** (-10 * t)),
-      // Orientasi scroll
       orientation: "vertical",
-      // Gesture orientation (untuk touchpad horizontal)
       gestureOrientation: "vertical",
-      // Smooth wheel
       smoothWheel: true,
-      // Touch multiplier untuk mobile feel
       touchMultiplier: 2,
     });
 
     lenisRef.current = lenis;
 
-    // RAF loop — Lenis perlu dipanggil setiap frame
-    let animationFrameId: number;
+    // Sync Lenis scroll events → GSAP ScrollTrigger
+    lenis.on("scroll", ScrollTrigger.update);
 
-    function raf(time: number) {
-      lenis.raf(time);
-      animationFrameId = requestAnimationFrame(raf);
-    }
+    // Gunakan GSAP ticker sebagai RAF loop (bukan manual requestAnimationFrame)
+    // Ini memastikan Lenis dan GSAP selalu di frame yang sama.
+    const tickerCallback = (time: number) => {
+      lenis.raf(time * 1000); // gsap ticker time dalam detik, lenis perlu ms
+    };
+    gsap.ticker.add(tickerCallback);
+    gsap.ticker.lagSmoothing(0);
 
-    animationFrameId = requestAnimationFrame(raf);
-
-    // Cleanup saat unmount / route change
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      gsap.ticker.remove(tickerCallback);
       lenis.destroy();
       lenisRef.current = null;
     };

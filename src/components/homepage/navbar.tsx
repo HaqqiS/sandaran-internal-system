@@ -362,7 +362,7 @@ export function HomepageNavbar() {
         <Link
           href="/"
           className="flex items-center gap-3"
-          aria-label="Sandaran Home Living — Beranda"
+          aria-label="Astaloka — Beranda"
           onClick={() => setMenuOpen(false)}
         >
           <LogoMark />
@@ -371,13 +371,13 @@ export function HomepageNavbar() {
               className="text-sm font-black uppercase tracking-[0.08em]"
               style={{ color: "var(--hp-fg)" }}
             >
-              Sandaran
+              Astaloka
             </span>
             <span
               className="text-[10px] font-medium uppercase tracking-[0.2em]"
               style={{ color: "var(--hp-fg-muted)" }}
             >
-              Home Living
+              Interior Design
             </span>
           </div>
         </Link>
@@ -406,7 +406,7 @@ export function HomepageNavbar() {
 
 // ─── LogoMark SVG ─────────────────────────────────────────────────────────────
 // Geometric columns ala arsitektur — mirip logo referensi dari screenshot.
-// Ganti dengan SVG logo asli Sandaran.
+// Ganti dengan SVG logo asli Astaloka.
 
 function LogoMark() {
   return (

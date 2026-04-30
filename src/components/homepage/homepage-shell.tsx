@@ -1,5 +1,6 @@
 "use client";
 
+import { HeroSection } from "~/components/homepage/hero-section";
 import { IntroScreen } from "~/components/homepage/intro-screen";
 import { HomepageNavbar } from "~/components/homepage/navbar";
 
@@ -21,12 +22,19 @@ export function HomepageShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       {/* Loading animation — muncul sekali saat halaman pertama dibuka */}
-      <IntroScreen brandName="SANDARAN" tagline="HOME LIVING" duration={1800} />
+      <IntroScreen
+        brandName="ASTALOKA"
+        tagline="INTERIOR DESIGN"
+        duration={1800}
+      />
 
       {/* Fixed navbar — transparan di hero, glass saat scroll */}
       <HomepageNavbar />
 
-      {/* Konten halaman utama */}
+      {/* Hero section — full viewport, parallax background */}
+      <HeroSection />
+
+      {/* Konten halaman utama — sections di bawah hero */}
       {children}
     </>
   );

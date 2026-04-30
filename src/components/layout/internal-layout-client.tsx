@@ -58,7 +58,7 @@ function getSidebarConfig(
       },
     ],
     navDocuments: [],
-    companyName: "Sandaran Home Living",
+    companyName: "Astaloka",
     companyIcon: IconInnerShadowTop,
   };
 

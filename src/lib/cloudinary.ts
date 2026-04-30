@@ -19,7 +19,7 @@ interface SignatureParams {
 
 /**
  * Generate signed upload params for client-side upload
- * Folder structure: sandaran/{project-slug}/{type}/{filename}
+ * Folder structure: astaloka/{project-slug}/{type}/{filename}
  * Types: reports, documents, emergency
  */
 export function generateUploadSignature(options: {
@@ -27,7 +27,7 @@ export function generateUploadSignature(options: {
   type: "reports" | "documents" | "emergency";
 }) {
   const timestamp = Math.round(Date.now() / 1000);
-  const folder = `sandaran/${options.projectSlug}/${options.type}`;
+  const folder = `astaloka/${options.projectSlug}/${options.type}`;
 
   const params: SignatureParams = {
     folder,
@@ -71,8 +71,8 @@ export async function deleteCloudinaryAsset(
  * NOTE: This uses the Admin API which might have rate limits.
  */
 export async function renameCloudinaryFolder(oldSlug: string, newSlug: string) {
-  const oldPath = `sandaran/${oldSlug}`;
-  const newPath = `sandaran/${newSlug}`;
+  const oldPath = `astaloka/${oldSlug}`;
+  const newPath = `astaloka/${newSlug}`;
 
   try {
     await cloudinary.api.rename_folder(oldPath, newPath);
