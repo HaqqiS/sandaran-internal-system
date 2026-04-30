@@ -375,3 +375,31 @@ html.lenis body {
   /* biome-ignore lint/complexity/noImportantStyles: Required by Lenis — overrides browser scroll-behavior to prevent conflict with RAF-based smooth scroll */
   cursor: none !important;
 }
+
+/* ─── Motion Utilities (motion-design-rules.md) ──────────────────────────── */
+
+/* Parallax section — overflow hidden wajib agar foto tidak keluar bounds */
+.parallax-section {
+  overflow: hidden;
+}
+
+/* Pin wrapper — prevent layout shift saat ScrollTrigger pin aktif */
+.pin-wrapper {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* ─── Accessibility: Reduced Motion ──────────────────────────────────────── */
+/* Referensi: motion-design-rules.md § RULES PERFORMA & AKSESIBILITAS       */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: Required for accessibility — disables all animations when user prefers reduced motion */
+    animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: Required for accessibility — disables all animations when user prefers reduced motion */
+    animation-iteration-count: 1 !important;
+    /* biome-ignore lint/complexity/noImportantStyles: Required for accessibility — disables all transitions when user prefers reduced motion */
+    transition-duration: 0.01ms !important;
+  }
+}

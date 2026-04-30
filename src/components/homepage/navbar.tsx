@@ -9,6 +9,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -182,7 +183,12 @@ function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
     };
   }, [isOpen]);
 
-  return (
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <motion.div
@@ -195,7 +201,7 @@ function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
           transition={{ duration: 0.65, ease: EASE_CUBIC }}
         >
           {/* Decorative architectural grid — kanan layar, desktop only */}
-          <ArchitecturalGrid isVisible={isOpen} />
+          <ArchitecturalGrid isVisible={true} />
 
           {/* Konten overlay — full height flex column */}
           <div className="relative z-10 flex flex-1 flex-col px-8 pb-10 pt-28 md:px-16 lg:px-20">
@@ -308,7 +314,8 @@ function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
           </div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
 

@@ -1,5 +1,7 @@
 "use client";
 
+import { AnimatePresence } from "motion/react";
+import { useState } from "react";
 import { HeroSection } from "~/components/homepage/hero-section";
 import { IntroScreen } from "~/components/homepage/intro-screen";
 import { HomepageNavbar } from "~/components/homepage/navbar";
@@ -19,14 +21,21 @@ import { HomepageNavbar } from "~/components/homepage/navbar";
  *  9997 → HomepageNavbar bar
  */
 export function HomepageShell({ children }: { children: React.ReactNode }) {
+  const [introDone, setIntroDone] = useState(false);
+
   return (
     <>
       {/* Loading animation — muncul sekali saat halaman pertama dibuka */}
-      <IntroScreen
-        brandName="ASTALOKA"
-        tagline="INTERIOR DESIGN"
-        duration={1800}
-      />
+      <AnimatePresence mode="wait">
+        {!introDone && (
+          <IntroScreen
+            brandName="ASTALOKA"
+            tagline="INTERIOR DESIGN"
+            duration={1800}
+            onDone={() => setIntroDone(true)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Fixed navbar — transparan di hero, glass saat scroll */}
       <HomepageNavbar />

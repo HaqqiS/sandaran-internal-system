@@ -1,12 +1,10 @@
 "use client";
 
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
 import { useRef } from "react";
-
-gsap.registerPlugin(ScrollTrigger);
+import { gsap, useGSAP } from "~/hooks/use-gsap-safe";
+import { useReducedMotion } from "~/hooks/use-reduced-motion";
+import { MOTION } from "~/lib/motion-tokens";
 
 // ─── HeroSection ───────────────────────────────────────────────────────────────
 
@@ -14,42 +12,45 @@ gsap.registerPlugin(ScrollTrigger);
  * HeroSection — Scrollytelling dengan GSAP ScrollTrigger.
  *
  * Arsitektur:
- *   Container ini memiliki height 100dvh dan di-pin selama 300vh tambahan.
- *   Total scroll = 400vh. Viewport tetap diam di layar,
- *   animasi di dalam berputar mengikuti scroll progress.
+ *   Container 100dvh di-pin selama 300vh tambahan (total 400vh scroll).
+ *   Viewport tetap diam di layar, animasi di dalam berjalan mengikuti
+ *   scroll progress (0 → 1).
  *
  * 3 Scene (masing-masing ~33% scroll):
  *   Scene 1: Foto full-bleed + "CRAFTED SPACES" kanan bawah → keluar ke atas
- *   Scene 2: Foto menyusut jadi kartu + "WE DESIGN" muncul dari bawah → keluar
- *   Scene 3: "WE BUILD" muncul dari bawah dengan stagger
+ *   Scene 2: Foto menyusut jadi kartu + "WE DESIGN" muncul → keluar
+ *   Scene 3: "WE BUILD" muncul dengan stagger
  *
- * Teknik:
+ * Teknik (sesuai motion-design-rules.md):
  *   1. Scrollytelling — scroll memajukan narasi visual
  *   2. Kinetic Typography — teks masuk/keluar dramatis per-baris
  *   3. Multi-layer Parallax — foto/teks bergerak kecepatan berbeda
  *   4. Pin Scrolling — viewport terkunci selama 400vh
+ *
+ * Tokens: Semua angka animasi dari MOTION (src/lib/motion-tokens.ts).
+ * A11y: Skip GSAP setup jika user prefers reduced motion.
  */
 export function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const reducedMotion = useReducedMotion();
 
   useGSAP(
     () => {
+      // A11y: jika user minta reduced motion, skip semua animasi scroll-driven
+      if (reducedMotion) return;
+
       // ── Initial States ────────────────────────────────────────────────
-      // Scene 2 & 3 text mulai tersembunyi (y:110% di dalam overflow-hidden)
-      gsap.set(".design-line", { y: "110%" });
-      gsap.set(".build-line", { y: "110%" });
+      gsap.set(".design-line", { y: MOTION.offset.textYPercent });
+      gsap.set(".build-line", { y: MOTION.offset.textYPercent });
 
       // ── Master Timeline ───────────────────────────────────────────────
-      // scrub: 1 → 1 detik smoothing delay
-      // pin: true → containerRef di-pin selama scroll
-      // end: "+=300%" → 300vh tambahan = total 400vh
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top top",
           end: "+=300%",
           pin: true,
-          scrub: 1,
+          scrub: MOTION.trigger.scrubSmooth,
           anticipatePin: 1,
         },
       });
@@ -60,40 +61,39 @@ export function HeroSection() {
       tl.addLabel("scene3", 2);
 
       // ══════════════════════════════════════════════════════════════════
-      //  SCENE 1 (position 0 → 1): CRAFTED SPACES exit + Photo shrink
+      //  SCENE 1 (0 → 1): CRAFTED SPACES exit + Photo shrink
       // ══════════════════════════════════════════════════════════════════
 
-      // Scroll indicator hilang cepat
+      // Scroll indicator + meta fade out cepat
       tl.to(
         ".hero-scroll-indicator",
         { autoAlpha: 0, duration: 0.08 },
         "scene1",
       );
-
-      // Meta info kiri bawah fade out
       tl.to(".hero-meta", { autoAlpha: 0, duration: 0.12 }, "scene1");
 
-      // "CRAFTED" dan "SPACES" bergerak keluar ke atas (layer cepat)
+      // "CRAFTED" dan "SPACES" bergerak keluar ke atas
       tl.to(
         ".crafted-line",
         {
-          y: "-120%",
-          stagger: 0.04,
-          duration: 0.35,
-          ease: "power3.in",
+          y: MOTION.offset.textExitY,
+          stagger: MOTION.stagger.word,
+          duration: MOTION.duration.base,
+          ease: MOTION.ease.cubicIn,
         },
         "scene1",
       );
 
-      // Foto: parallax lambat ke atas + scale down + border radius
+      // Foto: parallax lambat + scale down + border radius (menjadi kartu)
       tl.to(
         ".hero-photo",
         {
           y: "-5%",
           scale: 0.65,
           borderRadius: "16px",
-          duration: 0.7,
-          ease: "power2.inOut",
+          duration: MOTION.duration.slow,
+          ease: MOTION.ease.inOut,
+          force3D: true,
         },
         "scene1+=0.1",
       );
@@ -101,25 +101,22 @@ export function HeroSection() {
       // Overlay jadi lebih gelap saat foto menyusut
       tl.to(
         ".hero-overlay",
-        {
-          opacity: 0.92,
-          duration: 0.5,
-        },
+        { opacity: 0.92, duration: MOTION.duration.base },
         "scene1+=0.2",
       );
 
       // ══════════════════════════════════════════════════════════════════
-      //  SCENE 2 (position 1 → 2): WE DESIGN enter/exit + Photo exit
+      //  SCENE 2 (1 → 2): WE DESIGN enter/exit + Photo exit
       // ══════════════════════════════════════════════════════════════════
 
-      // "WE DESIGN" teks masuk dari bawah
+      // "WE DESIGN" masuk dari bawah
       tl.to(
         ".design-line",
         {
           y: "0%",
-          stagger: 0.05,
-          duration: 0.2,
-          ease: "power3.out",
+          stagger: MOTION.stagger.word,
+          duration: MOTION.duration.fast,
+          ease: MOTION.ease.cubicOut,
         },
         "scene2",
       );
@@ -129,36 +126,37 @@ export function HeroSection() {
         ".hero-photo",
         {
           y: "-140%",
-          duration: 0.5,
-          ease: "power2.in",
+          duration: MOTION.duration.base,
+          ease: MOTION.ease.in,
+          force3D: true,
         },
         "scene2",
       );
 
-      // "WE DESIGN" teks keluar ke atas
+      // "WE DESIGN" keluar ke atas
       tl.to(
         ".design-line",
         {
-          y: "-120%",
-          stagger: 0.04,
-          duration: 0.2,
-          ease: "power3.in",
+          y: MOTION.offset.textExitY,
+          stagger: MOTION.stagger.word,
+          duration: MOTION.duration.fast,
+          ease: MOTION.ease.cubicIn,
         },
         "scene2+=0.6",
       );
 
       // ══════════════════════════════════════════════════════════════════
-      //  SCENE 3 (position 2 → 3): WE BUILD enter + hold
+      //  SCENE 3 (2 → 3): WE BUILD enter + hold
       // ══════════════════════════════════════════════════════════════════
 
-      // "WE BUILD" teks masuk dari bawah, stagger lebih lambat (dramatis)
+      // "WE BUILD" masuk dari bawah, stagger lebih lambat (dramatis)
       tl.to(
         ".build-line",
         {
           y: "0%",
-          stagger: 0.06,
-          duration: 0.25,
-          ease: "power3.out",
+          stagger: MOTION.stagger.item,
+          duration: MOTION.duration.base,
+          ease: MOTION.ease.cubicOut,
         },
         "scene3",
       );
@@ -169,13 +167,13 @@ export function HeroSection() {
         {
           y: "-30%",
           opacity: 0.2,
-          stagger: 0.03,
-          duration: 0.15,
+          stagger: MOTION.stagger.char,
+          duration: MOTION.duration.fast,
         },
         "scene3+=0.75",
       );
     },
-    { scope: containerRef },
+    { scope: containerRef, dependencies: [reducedMotion] },
   );
 
   return (
@@ -190,11 +188,16 @@ export function HeroSection() {
 
       {/* ── Layer 1: Photo + Overlay (hero-photo) ─────────────────────────
           Wrapper ini yang di-animate: scale, borderRadius, y.
-          Di dalamnya: next/image + gradient overlay.
+          Foto height 130% + top -15% untuk ruang gerak parallax.
+          GSAP handles will-change via force3D: true (bukan CSS permanen).
       */}
       <div
-        className="hero-photo absolute inset-0 overflow-hidden will-change-transform"
-        style={{ transformOrigin: "center center" }}
+        className="hero-photo absolute inset-x-0 overflow-hidden"
+        style={{
+          height: "130%",
+          top: "-15%",
+          transformOrigin: "center center",
+        }}
       >
         <Image
           src="/Sadara Bouteique Resort 1.jpg"
@@ -204,7 +207,7 @@ export function HeroSection() {
           sizes="100vw"
           className="object-cover object-center"
         />
-        {/* Dark gradient overlay — heavy, terutama di bottom untuk teks */}
+        {/* Dark gradient overlay */}
         <div
           className="hero-overlay absolute inset-0"
           style={{
@@ -222,12 +225,12 @@ export function HeroSection() {
 
       {/* ── Layer 2: Scene 1 — "CRAFTED / SPACES" ────────────────────────
           Posisi: kanan bawah, ukuran raksasa.
-          Tiap baris di-wrap overflow-hidden, inner div di-animate y.
+          overflow-hidden wrapper = clip mask (motion-design-rules rule #5).
       */}
       <div className="absolute bottom-0 right-0 w-full pb-12 pr-6 text-right md:pr-14 lg:pr-20">
         <div className="overflow-hidden">
           <div
-            className="crafted-line will-change-transform font-black uppercase"
+            className="crafted-line font-black uppercase"
             style={{
               fontSize: "var(--text-hero-display)",
               lineHeight: "0.88",
@@ -240,7 +243,7 @@ export function HeroSection() {
         </div>
         <div className="overflow-hidden">
           <div
-            className="crafted-line will-change-transform font-black uppercase"
+            className="crafted-line font-black uppercase"
             style={{
               fontSize: "var(--text-hero-display)",
               lineHeight: "0.88",
@@ -254,12 +257,12 @@ export function HeroSection() {
       </div>
 
       {/* ── Layer 3: Scene 2 — "WE DESIGN" ───────────────────────────────
-          Posisi: center viewport. Mulai hidden (y: 110%).
+          Posisi: center viewport. Initial hidden (y: 110% via gsap.set).
       */}
       <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
         <div className="overflow-hidden">
           <div
-            className="design-line will-change-transform font-black uppercase"
+            className="design-line font-black uppercase"
             style={{
               fontSize: "var(--text-hero-display)",
               lineHeight: "0.88",
@@ -273,12 +276,12 @@ export function HeroSection() {
       </div>
 
       {/* ── Layer 4: Scene 3 — "WE BUILD" ────────────────────────────────
-          Posisi: center viewport. Mulai hidden (y: 110%).
+          Posisi: center viewport. Initial hidden (y: 110% via gsap.set).
       */}
       <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
         <div className="overflow-hidden">
           <div
-            className="build-line will-change-transform font-black uppercase"
+            className="build-line font-black uppercase"
             style={{
               fontSize: "var(--text-hero-display)",
               lineHeight: "0.88",
