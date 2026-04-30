@@ -114,6 +114,12 @@ export const projectRouter = createTRPCRouter({
             select: {
               dailyReports: true,
               documents: true,
+              logistics: true,
+            },
+          },
+          emergencyFund: {
+            select: {
+              currentBalance: true,
             },
           },
         },
@@ -151,6 +157,12 @@ export const projectRouter = createTRPCRouter({
           select: {
             dailyReports: true,
             documents: true,
+            logistics: true,
+          },
+        },
+        emergencyFund: {
+          select: {
+            currentBalance: true,
           },
         },
       },
