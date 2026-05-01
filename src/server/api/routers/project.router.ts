@@ -117,9 +117,45 @@ export const projectRouter = createTRPCRouter({
               logistics: true,
             },
           },
+          dailyReports: {
+            take: 1,
+            orderBy: { reportDate: "desc" },
+            select: {
+              id: true,
+              reportDate: true,
+              progressPercent: true,
+              taskDescription: true,
+            },
+          },
+          documents: {
+            take: 2,
+            orderBy: { createdAt: "desc" },
+            select: {
+              id: true,
+              fileName: true,
+              createdAt: true,
+              fileType: true,
+            },
+          },
+          logistics: {
+            take: 2,
+            orderBy: { createdAt: "desc" },
+            select: { id: true, name: true, unit: true },
+          },
           emergencyFund: {
             select: {
               currentBalance: true,
+              transactions: {
+                take: 1,
+                orderBy: { createdAt: "desc" },
+                select: {
+                  id: true,
+                  amount: true,
+                  type: true,
+                  status: true,
+                  createdAt: true,
+                },
+              },
             },
           },
         },
@@ -160,9 +196,40 @@ export const projectRouter = createTRPCRouter({
             logistics: true,
           },
         },
+        dailyReports: {
+          take: 1,
+          orderBy: { reportDate: "desc" },
+          select: {
+            id: true,
+            reportDate: true,
+            progressPercent: true,
+            taskDescription: true,
+          },
+        },
+        documents: {
+          take: 2,
+          orderBy: { createdAt: "desc" },
+          select: { id: true, fileName: true, createdAt: true, fileType: true },
+        },
+        logistics: {
+          take: 2,
+          orderBy: { createdAt: "desc" },
+          select: { id: true, name: true, unit: true },
+        },
         emergencyFund: {
           select: {
             currentBalance: true,
+            transactions: {
+              take: 1,
+              orderBy: { createdAt: "desc" },
+              select: {
+                id: true,
+                amount: true,
+                type: true,
+                status: true,
+                createdAt: true,
+              },
+            },
           },
         },
       },
