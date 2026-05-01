@@ -9,7 +9,6 @@ import { SiteHeader } from "./site-header";
 interface DashboardLayoutProps {
   children: React.ReactNode;
   sidebarConfig: SidebarConfig;
-  // headerTitle?: string; // Unused
   headerActions?: React.ReactNode;
   sidebarVariant?: "sidebar" | "floating" | "inset";
 }
@@ -17,7 +16,6 @@ interface DashboardLayoutProps {
 export function DashboardLayout({
   children,
   sidebarConfig,
-  // headerTitle, // Unused
   headerActions,
   sidebarVariant = "inset",
 }: DashboardLayoutProps) {

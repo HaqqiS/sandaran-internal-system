@@ -2,14 +2,14 @@
 
 import {
   IconArrowLeft,
-  IconCoin,
+  // IconCoin,
   IconDashboard,
-  IconFileText,
+  // IconFileText,
   IconFolder,
   IconInnerShadowTop,
   IconNews,
-  IconPackage,
-  IconReport,
+  // IconPackage,
+  // IconReport,
   IconUsers,
 } from "@tabler/icons-react";
 import type { GlobalRole } from "generated/prisma";
@@ -70,31 +70,36 @@ function getSidebarConfig(
         navMain: [
           ...baseConfig.navMain,
           {
-            title: "Laporan",
-            url: projectSlug ? `/projects/${projectSlug}/reports` : "/reports",
-            icon: IconReport,
+            title: "Semua Proyek",
+            url: "/projects",
+            icon: IconFolder,
           },
-          {
-            title: "Dana Darurat",
-            url: projectSlug
-              ? `/projects/${projectSlug}/emergency`
-              : "/emergency",
-            icon: IconCoin,
-          },
-          {
-            title: "Logistik",
-            url: projectSlug
-              ? `/projects/${projectSlug}/logistics`
-              : "/logistics",
-            icon: IconPackage,
-          },
-          {
-            title: "Dokumen",
-            url: projectSlug
-              ? `/projects/${projectSlug}/documents`
-              : "/documents",
-            icon: IconFileText,
-          },
+          // {
+          //   title: "Laporan",
+          //   url: projectSlug ? `/projects/${projectSlug}/reports` : "/reports",
+          //   icon: IconReport,
+          // },
+          // {
+          //   title: "Dana Darurat",
+          //   url: projectSlug
+          //     ? `/projects/${projectSlug}/emergency`
+          //     : "/emergency",
+          //   icon: IconCoin,
+          // },
+          // {
+          //   title: "Logistik",
+          //   url: projectSlug
+          //     ? `/projects/${projectSlug}/logistics`
+          //     : "/logistics",
+          //   icon: IconPackage,
+          // },
+          // {
+          //   title: "Dokumen",
+          //   url: projectSlug
+          //     ? `/projects/${projectSlug}/documents`
+          //     : "/documents",
+          //   icon: IconFileText,
+          // },
         ],
       };
 
@@ -149,11 +154,11 @@ function getSidebarConfig(
             url: "/users",
             icon: IconUsers,
           },
-          {
-            title: "Dokumen",
-            url: "/documents",
-            icon: IconFileText,
-          },
+          // {
+          //   title: "Dokumen",
+          //   url: "/documents",
+          //   icon: IconFileText,
+          // },
         ],
       };
 

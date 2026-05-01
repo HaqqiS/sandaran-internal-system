@@ -141,7 +141,10 @@ export function ProjectSelector() {
       <PopoverContent className="w-sm lg:w-lg p-0" align="start">
         <Command defaultValue={selectedProject?.name}>
           <CommandInput placeholder="Cari proyek..." />
-          <CommandList>
+          <CommandList
+            className="max-h-[300px] overflow-y-scroll"
+            onWheel={(e) => e.stopPropagation()}
+          >
             <CommandEmpty>Proyek tidak ditemukan.</CommandEmpty>
             {groupedProjects &&
               Object.entries(groupedProjects).map(([status, groupProjects]) => (
