@@ -99,11 +99,10 @@ export function TransactionList({
       },
     },
     {
-      accessorKey: "proofPublicId",
+      accessorKey: "publicId",
       header: "Bukti",
       cell: ({ row }) => {
-        const proofUrl = (row.original as { proofUrl?: string | null })
-          .proofUrl;
+        const proofUrl = row.original.url;
         if (!proofUrl) return <span className="text-muted-foreground">-</span>;
         return (
           <button

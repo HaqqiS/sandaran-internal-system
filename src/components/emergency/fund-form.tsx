@@ -1,14 +1,23 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { useImperativeHandle } from "react";
+import { useImperativeHandle, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { ImageUpload } from "~/components/shared/image-upload";
 import { Button } from "~/components/ui/button";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { useAddEmergencyBalance } from "~/hooks/useEmergency";
+import { formatNumberIDR } from "~/lib/utils";
 
 const fundSchema = z.object({
   amount: z
@@ -17,6 +26,8 @@ const fundSchema = z.object({
       message: "Nominal harus berupa angka lebih dari 0",
     }),
   description: z.string().min(1, "Keterangan/sumber aliran harus diisi"),
+  proofPublicId: z.string(),
+  proofUrl: z.string(),
 });
 
 export type FundFormValues = z.infer<typeof fundSchema>;
@@ -38,6 +49,7 @@ export function FundForm({
   onCancel,
 }: FundFormProps) {
   const addBalance = useAddEmergencyBalance();
+  const [isUploading, setIsUploading] = useState(false);
 
   useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
 
@@ -45,7 +57,9 @@ export function FundForm({
     defaultValues: {
       amount: draftValues?.amount ?? "",
       description: draftValues?.description ?? "",
-    },
+      proofPublicId: draftValues?.proofPublicId ?? "",
+      proofUrl: draftValues?.proofUrl ?? "",
+    } as FundFormValues,
     validators: {
       onChange: fundSchema,
     },
@@ -55,6 +69,8 @@ export function FundForm({
           projectId,
           amount: Number(value.amount),
           description: value.description,
+          proofPublicId: value.proofPublicId || undefined,
+          proofUrl: value.proofUrl || undefined,
         });
         toast.success("Kas berhasil ditambahkan");
         form.reset();
@@ -75,57 +91,100 @@ export function FundForm({
       }}
       className="space-y-4"
     >
-      <form.Field
-        name="amount"
-        children={(field) => (
-          <div className="space-y-2">
-            <Label htmlFor={field.name}>Nominal Masuk (Rp)</Label>
-            <Input
-              id={field.name}
-              name={field.name}
-              type="number"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="Contoh: 1000000"
-            />
-            {field.state.meta.errors.length > 0 && (
-              <p className="text-sm text-destructive">
-                {field.state.meta.errors.join(", ")}
-              </p>
-            )}
-          </div>
+      <form.Field name="amount">
+        {(field) => (
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor={field.name}>Nominal Masuk (Rp) *</FieldLabel>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
+                  Rp
+                </span>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  type="text"
+                  inputMode="numeric"
+                  value={formatNumberIDR(field.state.value)}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => {
+                    const raw = e.target.value.replace(/\D/g, "");
+                    field.handleChange(raw);
+                  }}
+                  className="pl-10 font-semibold text-lg"
+                  placeholder="0"
+                />
+              </div>
+              <FieldDescription>
+                Masukkan jumlah dana yang masuk ke kas. Format akan otomatis muncul.
+              </FieldDescription>
+              <FieldError errors={field.state.meta.errors} />
+            </Field>
+          </FieldGroup>
         )}
-      />
+      </form.Field>
 
-      <form.Field
-        name="description"
-        children={(field) => (
-          <div className="space-y-2">
-            <Label htmlFor={field.name}>Sumber Dana / Keterangan</Label>
-            <Textarea
-              id={field.name}
-              name={field.name}
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={(e) => field.handleChange(e.target.value)}
-              placeholder="Contoh: Pencairan Bon dari Akuntan, Titipan Mandor"
-            />
-            {field.state.meta.errors.length > 0 && (
-              <p className="text-sm text-destructive">
-                {field.state.meta.errors.join(", ")}
-              </p>
-            )}
-          </div>
+      <form.Field name="description">
+        {(field) => (
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor={field.name}>Sumber Dana / Keterangan *</FieldLabel>
+              <Textarea
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="Contoh: Pencairan Bon dari Akuntan, Titipan Mandor"
+                rows={3}
+              />
+              <FieldDescription>
+                Jelaskan asal atau sumber aliran dana masuk ini.
+              </FieldDescription>
+              <FieldError errors={field.state.meta.errors} />
+            </Field>
+          </FieldGroup>
         )}
-      />
+      </form.Field>
+
+      <form.Field name="proofUrl">
+        {(field) => (
+          <form.Field name="proofPublicId">
+            {(publicIdField) => (
+              <FieldGroup>
+                <Field>
+                  <FieldLabel>Bukti Transfer (Opsional)</FieldLabel>
+                  <ImageUpload
+                    projectSlug="emergency"
+                    type="emergency"
+                    value={field.state.value}
+                    onChange={(url, publicId) => {
+                      field.handleChange(url);
+                      publicIdField.handleChange(publicId);
+                    }}
+                    onRemove={() => {
+                      field.handleChange("");
+                      publicIdField.handleChange("");
+                    }}
+                    onUploadChange={setIsUploading}
+                  />
+                  <FieldDescription>
+                    Lampirkan bukti transfer atau mutasi sebagai bukti aliran
+                    dana masuk.
+                  </FieldDescription>
+                </Field>
+              </FieldGroup>
+            )}
+          </form.Field>
+        )}
+      </form.Field>
 
       <div className="flex justify-end gap-2 pt-2">
         <Button type="button" variant="outline" onClick={onCancel}>
           Batal
         </Button>
-        <Button type="submit" disabled={addBalance.isPending}>
-          {addBalance.isPending ? "Memproses..." : "Tambah Kas Masuk"}
+        <Button type="submit" disabled={addBalance.isPending || isUploading}>
+          {addBalance.isPending || isUploading ? "Memproses..." : "Tambah Kas Masuk"}
         </Button>
       </div>
     </form>

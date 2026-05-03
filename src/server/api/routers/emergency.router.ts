@@ -201,6 +201,8 @@ export const emergencyRouter = createTRPCRouter({
         projectId: z.string(),
         amount: z.number().positive(),
         description: z.string(),
+        proofPublicId: z.string().optional(),
+        proofUrl: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -225,6 +227,8 @@ export const emergencyRouter = createTRPCRouter({
           requestedById: ctx.session.user.id,
           amount: input.amount,
           description: input.description,
+          publicId: input.proofPublicId,
+          url: input.proofUrl,
           type: "DEPOSIT",
           status: "REVIEWED", // Auto-approved for balance additions
           verifiedById: ctx.session.user.id,
