@@ -1,6 +1,11 @@
 "use client";
 
-import { IconArrowLeft, IconLoader2, IconPlus } from "@tabler/icons-react";
+import {
+  IconArrowLeft,
+  IconLoader2,
+  IconMinus,
+  IconPlus,
+} from "@tabler/icons-react";
 import Link from "next/link";
 import { useState } from "react";
 import { FundDialog } from "~/components/emergency/fund-dialog";
@@ -75,23 +80,27 @@ export function EmergencyClient({ projectSlug }: EmergencyClientProps) {
         </Button>
       }
     >
-      <div className="flex flex-col gap-6 p-4 md:p-6">
-        <div className="grid gap-6">
+      <div className="flex flex-col gap-6 p-4 md:p-6 min-w-0 w-full overflow-hidden">
+        <div className="flex flex-col gap-6 min-w-0 w-full">
           <FundOverview
             projectId={project.id}
             actions={
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 {canWithdraw && (
                   <Button
                     variant="outline"
-                    size="sm"
+                    className="w-full sm:w-auto"
                     onClick={() => setIsWithdrawOpen(true)}
                   >
+                    <IconMinus className="mr-2 h-4 w-4" />
                     Tarik Dana
                   </Button>
                 )}
                 {canAddFund && (
-                  <Button size="sm" onClick={() => setIsFundOpen(true)}>
+                  <Button
+                    className="w-full sm:w-auto"
+                    onClick={() => setIsFundOpen(true)}
+                  >
                     <IconPlus className="mr-2 h-4 w-4" />
                     Tambah Dana
                   </Button>

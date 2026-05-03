@@ -343,6 +343,7 @@ export async function createEmergencyTransaction(
   amount: number,
   status: "UNREVIEWED" | "REVIEWED" = "UNREVIEWED",
   type: "WITHDRAWAL" | "DEPOSIT" = "WITHDRAWAL",
+  url: string,
 ) {
   return await db.emergencyTransaction.create({
     data: {
@@ -352,6 +353,7 @@ export async function createEmergencyTransaction(
       description: "Test emergency request",
       status,
       type,
+      url,
     },
     include: {
       requester: true,

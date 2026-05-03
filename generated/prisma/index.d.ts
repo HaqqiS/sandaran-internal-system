@@ -16441,7 +16441,8 @@ export namespace Prisma {
     requestedById: string | null
     amount: Decimal | null
     description: string | null
-    proofPublicId: string | null
+    publicId: string | null
+    url: string | null
     type: $Enums.TransactionType | null
     status: $Enums.TransactionStatus | null
     verifiedById: string | null
@@ -16455,7 +16456,8 @@ export namespace Prisma {
     requestedById: string | null
     amount: Decimal | null
     description: string | null
-    proofPublicId: string | null
+    publicId: string | null
+    url: string | null
     type: $Enums.TransactionType | null
     status: $Enums.TransactionStatus | null
     verifiedById: string | null
@@ -16469,7 +16471,8 @@ export namespace Prisma {
     requestedById: number
     amount: number
     description: number
-    proofPublicId: number
+    publicId: number
+    url: number
     type: number
     status: number
     verifiedById: number
@@ -16493,7 +16496,8 @@ export namespace Prisma {
     requestedById?: true
     amount?: true
     description?: true
-    proofPublicId?: true
+    publicId?: true
+    url?: true
     type?: true
     status?: true
     verifiedById?: true
@@ -16507,7 +16511,8 @@ export namespace Prisma {
     requestedById?: true
     amount?: true
     description?: true
-    proofPublicId?: true
+    publicId?: true
+    url?: true
     type?: true
     status?: true
     verifiedById?: true
@@ -16521,7 +16526,8 @@ export namespace Prisma {
     requestedById?: true
     amount?: true
     description?: true
-    proofPublicId?: true
+    publicId?: true
+    url?: true
     type?: true
     status?: true
     verifiedById?: true
@@ -16622,7 +16628,8 @@ export namespace Prisma {
     requestedById: string
     amount: Decimal
     description: string
-    proofPublicId: string | null
+    publicId: string | null
+    url: string | null
     type: $Enums.TransactionType
     status: $Enums.TransactionStatus
     verifiedById: string | null
@@ -16655,7 +16662,8 @@ export namespace Prisma {
     requestedById?: boolean
     amount?: boolean
     description?: boolean
-    proofPublicId?: boolean
+    publicId?: boolean
+    url?: boolean
     type?: boolean
     status?: boolean
     verifiedById?: boolean
@@ -16672,7 +16680,8 @@ export namespace Prisma {
     requestedById?: boolean
     amount?: boolean
     description?: boolean
-    proofPublicId?: boolean
+    publicId?: boolean
+    url?: boolean
     type?: boolean
     status?: boolean
     verifiedById?: boolean
@@ -16689,7 +16698,8 @@ export namespace Prisma {
     requestedById?: boolean
     amount?: boolean
     description?: boolean
-    proofPublicId?: boolean
+    publicId?: boolean
+    url?: boolean
     type?: boolean
     status?: boolean
     verifiedById?: boolean
@@ -16706,7 +16716,8 @@ export namespace Prisma {
     requestedById?: boolean
     amount?: boolean
     description?: boolean
-    proofPublicId?: boolean
+    publicId?: boolean
+    url?: boolean
     type?: boolean
     status?: boolean
     verifiedById?: boolean
@@ -16714,7 +16725,7 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type EmergencyTransactionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "fundId" | "requestedById" | "amount" | "description" | "proofPublicId" | "type" | "status" | "verifiedById" | "verifiedAt" | "createdAt", ExtArgs["result"]["emergencyTransaction"]>
+  export type EmergencyTransactionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "fundId" | "requestedById" | "amount" | "description" | "publicId" | "url" | "type" | "status" | "verifiedById" | "verifiedAt" | "createdAt", ExtArgs["result"]["emergencyTransaction"]>
   export type EmergencyTransactionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     fund?: boolean | EmergencyFundDefaultArgs<ExtArgs>
     requester?: boolean | UserDefaultArgs<ExtArgs>
@@ -16744,7 +16755,8 @@ export namespace Prisma {
       requestedById: string
       amount: Prisma.Decimal
       description: string
-      proofPublicId: string | null
+      publicId: string | null
+      url: string | null
       type: $Enums.TransactionType
       status: $Enums.TransactionStatus
       verifiedById: string | null
@@ -17181,7 +17193,8 @@ export namespace Prisma {
     readonly requestedById: FieldRef<"EmergencyTransaction", 'String'>
     readonly amount: FieldRef<"EmergencyTransaction", 'Decimal'>
     readonly description: FieldRef<"EmergencyTransaction", 'String'>
-    readonly proofPublicId: FieldRef<"EmergencyTransaction", 'String'>
+    readonly publicId: FieldRef<"EmergencyTransaction", 'String'>
+    readonly url: FieldRef<"EmergencyTransaction", 'String'>
     readonly type: FieldRef<"EmergencyTransaction", 'TransactionType'>
     readonly status: FieldRef<"EmergencyTransaction", 'TransactionStatus'>
     readonly verifiedById: FieldRef<"EmergencyTransaction", 'String'>
@@ -20042,7 +20055,8 @@ export namespace Prisma {
     requestedById: 'requestedById',
     amount: 'amount',
     description: 'description',
-    proofPublicId: 'proofPublicId',
+    publicId: 'publicId',
+    url: 'url',
     type: 'type',
     status: 'status',
     verifiedById: 'verifiedById',
@@ -21242,7 +21256,8 @@ export namespace Prisma {
     requestedById?: StringFilter<"EmergencyTransaction"> | string
     amount?: DecimalFilter<"EmergencyTransaction"> | Decimal | DecimalJsLike | number | string
     description?: StringFilter<"EmergencyTransaction"> | string
-    proofPublicId?: StringNullableFilter<"EmergencyTransaction"> | string | null
+    publicId?: StringNullableFilter<"EmergencyTransaction"> | string | null
+    url?: StringNullableFilter<"EmergencyTransaction"> | string | null
     type?: EnumTransactionTypeFilter<"EmergencyTransaction"> | $Enums.TransactionType
     status?: EnumTransactionStatusFilter<"EmergencyTransaction"> | $Enums.TransactionStatus
     verifiedById?: StringNullableFilter<"EmergencyTransaction"> | string | null
@@ -21259,7 +21274,8 @@ export namespace Prisma {
     requestedById?: SortOrder
     amount?: SortOrder
     description?: SortOrder
-    proofPublicId?: SortOrderInput | SortOrder
+    publicId?: SortOrderInput | SortOrder
+    url?: SortOrderInput | SortOrder
     type?: SortOrder
     status?: SortOrder
     verifiedById?: SortOrderInput | SortOrder
@@ -21279,7 +21295,8 @@ export namespace Prisma {
     requestedById?: StringFilter<"EmergencyTransaction"> | string
     amount?: DecimalFilter<"EmergencyTransaction"> | Decimal | DecimalJsLike | number | string
     description?: StringFilter<"EmergencyTransaction"> | string
-    proofPublicId?: StringNullableFilter<"EmergencyTransaction"> | string | null
+    publicId?: StringNullableFilter<"EmergencyTransaction"> | string | null
+    url?: StringNullableFilter<"EmergencyTransaction"> | string | null
     type?: EnumTransactionTypeFilter<"EmergencyTransaction"> | $Enums.TransactionType
     status?: EnumTransactionStatusFilter<"EmergencyTransaction"> | $Enums.TransactionStatus
     verifiedById?: StringNullableFilter<"EmergencyTransaction"> | string | null
@@ -21296,7 +21313,8 @@ export namespace Prisma {
     requestedById?: SortOrder
     amount?: SortOrder
     description?: SortOrder
-    proofPublicId?: SortOrderInput | SortOrder
+    publicId?: SortOrderInput | SortOrder
+    url?: SortOrderInput | SortOrder
     type?: SortOrder
     status?: SortOrder
     verifiedById?: SortOrderInput | SortOrder
@@ -21318,7 +21336,8 @@ export namespace Prisma {
     requestedById?: StringWithAggregatesFilter<"EmergencyTransaction"> | string
     amount?: DecimalWithAggregatesFilter<"EmergencyTransaction"> | Decimal | DecimalJsLike | number | string
     description?: StringWithAggregatesFilter<"EmergencyTransaction"> | string
-    proofPublicId?: StringNullableWithAggregatesFilter<"EmergencyTransaction"> | string | null
+    publicId?: StringNullableWithAggregatesFilter<"EmergencyTransaction"> | string | null
+    url?: StringNullableWithAggregatesFilter<"EmergencyTransaction"> | string | null
     type?: EnumTransactionTypeWithAggregatesFilter<"EmergencyTransaction"> | $Enums.TransactionType
     status?: EnumTransactionStatusWithAggregatesFilter<"EmergencyTransaction"> | $Enums.TransactionStatus
     verifiedById?: StringNullableWithAggregatesFilter<"EmergencyTransaction"> | string | null
@@ -22499,7 +22518,8 @@ export namespace Prisma {
     id?: string
     amount: Decimal | DecimalJsLike | number | string
     description: string
-    proofPublicId?: string | null
+    publicId?: string | null
+    url?: string | null
     type?: $Enums.TransactionType
     status?: $Enums.TransactionStatus
     verifiedAt?: Date | string | null
@@ -22515,7 +22535,8 @@ export namespace Prisma {
     requestedById: string
     amount: Decimal | DecimalJsLike | number | string
     description: string
-    proofPublicId?: string | null
+    publicId?: string | null
+    url?: string | null
     type?: $Enums.TransactionType
     status?: $Enums.TransactionStatus
     verifiedById?: string | null
@@ -22527,7 +22548,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: StringFieldUpdateOperationsInput | string
-    proofPublicId?: NullableStringFieldUpdateOperationsInput | string | null
+    publicId?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -22543,7 +22565,8 @@ export namespace Prisma {
     requestedById?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: StringFieldUpdateOperationsInput | string
-    proofPublicId?: NullableStringFieldUpdateOperationsInput | string | null
+    publicId?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
     verifiedById?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22557,7 +22580,8 @@ export namespace Prisma {
     requestedById: string
     amount: Decimal | DecimalJsLike | number | string
     description: string
-    proofPublicId?: string | null
+    publicId?: string | null
+    url?: string | null
     type?: $Enums.TransactionType
     status?: $Enums.TransactionStatus
     verifiedById?: string | null
@@ -22569,7 +22593,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: StringFieldUpdateOperationsInput | string
-    proofPublicId?: NullableStringFieldUpdateOperationsInput | string | null
+    publicId?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -22582,7 +22607,8 @@ export namespace Prisma {
     requestedById?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: StringFieldUpdateOperationsInput | string
-    proofPublicId?: NullableStringFieldUpdateOperationsInput | string | null
+    publicId?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
     verifiedById?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23640,7 +23666,8 @@ export namespace Prisma {
     requestedById?: SortOrder
     amount?: SortOrder
     description?: SortOrder
-    proofPublicId?: SortOrder
+    publicId?: SortOrder
+    url?: SortOrder
     type?: SortOrder
     status?: SortOrder
     verifiedById?: SortOrder
@@ -23658,7 +23685,8 @@ export namespace Prisma {
     requestedById?: SortOrder
     amount?: SortOrder
     description?: SortOrder
-    proofPublicId?: SortOrder
+    publicId?: SortOrder
+    url?: SortOrder
     type?: SortOrder
     status?: SortOrder
     verifiedById?: SortOrder
@@ -23672,7 +23700,8 @@ export namespace Prisma {
     requestedById?: SortOrder
     amount?: SortOrder
     description?: SortOrder
-    proofPublicId?: SortOrder
+    publicId?: SortOrder
+    url?: SortOrder
     type?: SortOrder
     status?: SortOrder
     verifiedById?: SortOrder
@@ -25629,7 +25658,8 @@ export namespace Prisma {
     id?: string
     amount: Decimal | DecimalJsLike | number | string
     description: string
-    proofPublicId?: string | null
+    publicId?: string | null
+    url?: string | null
     type?: $Enums.TransactionType
     status?: $Enums.TransactionStatus
     verifiedAt?: Date | string | null
@@ -25643,7 +25673,8 @@ export namespace Prisma {
     fundId: string
     amount: Decimal | DecimalJsLike | number | string
     description: string
-    proofPublicId?: string | null
+    publicId?: string | null
+    url?: string | null
     type?: $Enums.TransactionType
     status?: $Enums.TransactionStatus
     verifiedById?: string | null
@@ -25665,7 +25696,8 @@ export namespace Prisma {
     id?: string
     amount: Decimal | DecimalJsLike | number | string
     description: string
-    proofPublicId?: string | null
+    publicId?: string | null
+    url?: string | null
     type?: $Enums.TransactionType
     status?: $Enums.TransactionStatus
     verifiedAt?: Date | string | null
@@ -25680,7 +25712,8 @@ export namespace Prisma {
     requestedById: string
     amount: Decimal | DecimalJsLike | number | string
     description: string
-    proofPublicId?: string | null
+    publicId?: string | null
+    url?: string | null
     type?: $Enums.TransactionType
     status?: $Enums.TransactionStatus
     verifiedAt?: Date | string | null
@@ -26036,7 +26069,8 @@ export namespace Prisma {
     requestedById?: StringFilter<"EmergencyTransaction"> | string
     amount?: DecimalFilter<"EmergencyTransaction"> | Decimal | DecimalJsLike | number | string
     description?: StringFilter<"EmergencyTransaction"> | string
-    proofPublicId?: StringNullableFilter<"EmergencyTransaction"> | string | null
+    publicId?: StringNullableFilter<"EmergencyTransaction"> | string | null
+    url?: StringNullableFilter<"EmergencyTransaction"> | string | null
     type?: EnumTransactionTypeFilter<"EmergencyTransaction"> | $Enums.TransactionType
     status?: EnumTransactionStatusFilter<"EmergencyTransaction"> | $Enums.TransactionStatus
     verifiedById?: StringNullableFilter<"EmergencyTransaction"> | string | null
@@ -27762,7 +27796,8 @@ export namespace Prisma {
     id?: string
     amount: Decimal | DecimalJsLike | number | string
     description: string
-    proofPublicId?: string | null
+    publicId?: string | null
+    url?: string | null
     type?: $Enums.TransactionType
     status?: $Enums.TransactionStatus
     verifiedAt?: Date | string | null
@@ -27776,7 +27811,8 @@ export namespace Prisma {
     requestedById: string
     amount: Decimal | DecimalJsLike | number | string
     description: string
-    proofPublicId?: string | null
+    publicId?: string | null
+    url?: string | null
     type?: $Enums.TransactionType
     status?: $Enums.TransactionStatus
     verifiedById?: string | null
@@ -28467,7 +28503,8 @@ export namespace Prisma {
     fundId: string
     amount: Decimal | DecimalJsLike | number | string
     description: string
-    proofPublicId?: string | null
+    publicId?: string | null
+    url?: string | null
     type?: $Enums.TransactionType
     status?: $Enums.TransactionStatus
     verifiedById?: string | null
@@ -28481,7 +28518,8 @@ export namespace Prisma {
     requestedById: string
     amount: Decimal | DecimalJsLike | number | string
     description: string
-    proofPublicId?: string | null
+    publicId?: string | null
+    url?: string | null
     type?: $Enums.TransactionType
     status?: $Enums.TransactionStatus
     verifiedAt?: Date | string | null
@@ -28729,7 +28767,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: StringFieldUpdateOperationsInput | string
-    proofPublicId?: NullableStringFieldUpdateOperationsInput | string | null
+    publicId?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -28743,7 +28782,8 @@ export namespace Prisma {
     fundId?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: StringFieldUpdateOperationsInput | string
-    proofPublicId?: NullableStringFieldUpdateOperationsInput | string | null
+    publicId?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
     verifiedById?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28756,7 +28796,8 @@ export namespace Prisma {
     fundId?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: StringFieldUpdateOperationsInput | string
-    proofPublicId?: NullableStringFieldUpdateOperationsInput | string | null
+    publicId?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
     verifiedById?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28768,7 +28809,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: StringFieldUpdateOperationsInput | string
-    proofPublicId?: NullableStringFieldUpdateOperationsInput | string | null
+    publicId?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -28783,7 +28825,8 @@ export namespace Prisma {
     requestedById?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: StringFieldUpdateOperationsInput | string
-    proofPublicId?: NullableStringFieldUpdateOperationsInput | string | null
+    publicId?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -28796,7 +28839,8 @@ export namespace Prisma {
     requestedById?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: StringFieldUpdateOperationsInput | string
-    proofPublicId?: NullableStringFieldUpdateOperationsInput | string | null
+    publicId?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -29202,7 +29246,8 @@ export namespace Prisma {
     requestedById: string
     amount: Decimal | DecimalJsLike | number | string
     description: string
-    proofPublicId?: string | null
+    publicId?: string | null
+    url?: string | null
     type?: $Enums.TransactionType
     status?: $Enums.TransactionStatus
     verifiedById?: string | null
@@ -29214,7 +29259,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: StringFieldUpdateOperationsInput | string
-    proofPublicId?: NullableStringFieldUpdateOperationsInput | string | null
+    publicId?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
     verifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -29228,7 +29274,8 @@ export namespace Prisma {
     requestedById?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: StringFieldUpdateOperationsInput | string
-    proofPublicId?: NullableStringFieldUpdateOperationsInput | string | null
+    publicId?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
     verifiedById?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29241,7 +29288,8 @@ export namespace Prisma {
     requestedById?: StringFieldUpdateOperationsInput | string
     amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     description?: StringFieldUpdateOperationsInput | string
-    proofPublicId?: NullableStringFieldUpdateOperationsInput | string | null
+    publicId?: NullableStringFieldUpdateOperationsInput | string | null
+    url?: NullableStringFieldUpdateOperationsInput | string | null
     type?: EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
     status?: EnumTransactionStatusFieldUpdateOperationsInput | $Enums.TransactionStatus
     verifiedById?: NullableStringFieldUpdateOperationsInput | string | null

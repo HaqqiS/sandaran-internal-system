@@ -21,13 +21,13 @@ export function FundOverview({ projectId, actions }: FundOverviewProps) {
         <IconWallet className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="flex items-end justify-between">
-          <div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
+          <div className="min-w-0 max-w-full">
             {isLoading ? (
               <div className="h-8 w-32 animate-pulse rounded bg-muted" />
             ) : (
               <>
-                <div className="text-2xl font-bold">
+                <div className="text-2xl font-bold truncate max-w-full">
                   Rp {Number(fund?.currentBalance || 0).toLocaleString("id-ID")}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -37,7 +37,7 @@ export function FundOverview({ projectId, actions }: FundOverviewProps) {
             )}
           </div>
 
-          <div className="flex gap-2">{actions}</div>
+          {actions && <div className="w-full sm:w-auto">{actions}</div>}
         </div>
       </CardContent>
     </Card>

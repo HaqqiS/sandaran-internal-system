@@ -292,7 +292,8 @@ model EmergencyTransaction {
   requestedById String
   amount        Decimal           @db.Decimal(15, 2)
   description   String            @db.Text
-  proofPublicId String?           // Bukti nota di Cloudinary
+  publicId      String?           // Cloudinary Public ID
+  url           String?           // Cloudinary Secure URL
   type          TransactionType   @default(WITHDRAWAL)
   status        TransactionStatus @default(UNREVIEWED)
   

@@ -1,5 +1,6 @@
 "use client";
 
+import { IconZoomIn } from "@tabler/icons-react";
 import {
   type ColumnDef,
   flexRender,
@@ -12,6 +13,7 @@ import {
 import { format } from "date-fns";
 import type { EmergencyTransaction } from "generated/prisma";
 import { useState } from "react";
+import { MediaPreview } from "~/components/shared/media-preview";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -37,6 +39,7 @@ export function TransactionList({
   const { data: transactions, isLoading } = useEmergencyTransactions(projectId);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [verifyId, setVerifyId] = useState<string | null>(null);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
   const columns: ColumnDef<EmergencyTransaction>[] = [
     {
@@ -99,18 +102,26 @@ export function TransactionList({
       accessorKey: "proofPublicId",
       header: "Bukti",
       cell: ({ row }) => {
-        const proofId = row.getValue("proofPublicId") as string | null;
-        if (!proofId) return <span className="text-muted-foreground">-</span>;
-        // Construct basic Cloudinary URL or use a helper if available
-        // Assuming typical cloudinary url structure or using CldImage if installed
-        // For link, simple href is safer if we don't have CldImage handy
-        // But we need the cloud name. Let's assume standard delivery URL.
-        // Actually better to just show "View" button if we can't construct URL easily without env.
-        // Or if we have a helper.
-        // Let's use a generic generic link for now if we can't construct it.
-        // Wait, I can't construct URL without cloud name effectively unless hardcoded or passed.
-        // Let's just show "Has Proof" text for now, or link if I can find a way.
-        return <span className="text-xs">Attached</span>;
+        const proofUrl = (row.original as { proofUrl?: string | null })
+          .proofUrl;
+        if (!proofUrl) return <span className="text-muted-foreground">-</span>;
+        return (
+          <button
+            type="button"
+            className="group relative h-10 w-10 overflow-hidden rounded border bg-muted flex items-center justify-center cursor-pointer"
+            onClick={() => setLightboxImage(proofUrl)}
+          >
+            {/* biome-ignore lint: using img for Cloudinary external URLs */}
+            <img
+              src={proofUrl}
+              alt="Proof"
+              className="h-full w-full object-cover transition-transform group-hover:scale-110"
+            />
+            <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/20">
+              <IconZoomIn className="h-4 w-4 text-white opacity-0 transition-opacity group-hover:opacity-100" />
+            </div>
+          </button>
+        );
       },
     },
     {
@@ -208,6 +219,12 @@ export function TransactionList({
         transactionId={verifyId}
         open={!!verifyId}
         onOpenChange={(open) => !open && setVerifyId(null)}
+      />
+
+      <MediaPreview
+        url={lightboxImage}
+        open={!!lightboxImage}
+        onOpenChange={(open) => !open && setLightboxImage(null)}
       />
     </div>
   );
