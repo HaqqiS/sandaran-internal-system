@@ -6,7 +6,8 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatIDR(amount: number | string) {
-  const numericValue = typeof amount === "string" ? Number(amount.replace(/\D/g, "")) : amount;
+  const numericValue =
+    typeof amount === "string" ? Number(amount.replace(/\D/g, "")) : amount;
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",

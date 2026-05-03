@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { useImperativeHandle, useState } from "react";
+import { useImperativeHandle } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ImageUpload } from "~/components/shared/image-upload";
@@ -14,8 +14,8 @@ import {
   FieldLabel,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
+import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload";
 import { useRequestEmergencyFund } from "~/hooks/useEmergency";
 import { formatNumberIDR } from "~/lib/utils";
 
@@ -26,8 +26,8 @@ const withdrawSchema = z.object({
       message: "Nominal harus berupa angka lebih dari 0",
     }),
   description: z.string().min(1, "Keterangan / Keperluan wajib diisi"),
-  proofPublicId: z.string(),
-  proofUrl: z.string(),
+  proofPublicId: z.string().optional(),
+  proofUrl: z.union([z.string(), z.instanceof(File)]).optional(),
 });
 
 export type WithdrawFormValues = z.infer<typeof withdrawSchema>;
@@ -51,7 +51,7 @@ export function RequestForm({
   onCancel,
 }: RequestFormProps) {
   const requestFund = useRequestEmergencyFund();
-  const [isUploading, setIsUploading] = useState(false);
+  const { upload, isLoading: isUploading } = useCloudinaryUpload();
 
   useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
 
@@ -67,12 +67,25 @@ export function RequestForm({
     },
     onSubmit: async ({ value }) => {
       try {
+        let finalUrl = typeof value.proofUrl === "string" ? value.proofUrl : "";
+        let finalPublicId = value.proofPublicId || "";
+
+        // Atomic Upload: Perform upload only if it's a File
+        if (value.proofUrl instanceof File) {
+          const result = await upload(value.proofUrl, {
+            projectSlug,
+            type: "emergency",
+          });
+          finalUrl = result.secureUrl;
+          finalPublicId = result.publicId;
+        }
+
         await requestFund.mutateAsync({
           projectId,
           amount: Number(value.amount),
           description: value.description,
-          proofPublicId: value.proofPublicId || undefined,
-          proofUrl: value.proofUrl || undefined,
+          proofPublicId: finalPublicId || undefined,
+          proofUrl: finalUrl || undefined,
         });
 
         toast.success("Pengajuan dana berhasil dikirim");
@@ -131,7 +144,9 @@ export function RequestForm({
         {(field) => (
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor={field.name}>Keterangan / Keperluan *</FieldLabel>
+              <FieldLabel htmlFor={field.name}>
+                Keterangan / Keperluan *
+              </FieldLabel>
               <Textarea
                 id={field.name}
                 name={field.name}
@@ -161,15 +176,14 @@ export function RequestForm({
                     projectSlug={projectSlug}
                     type="emergency"
                     value={field.state.value}
-                    onChange={(url, publicId) => {
-                      field.handleChange(url);
-                      publicIdField.handleChange(publicId);
+                    onFileChange={(files) => {
+                      field.handleChange(files[0] ?? "");
+                      publicIdField.handleChange("");
                     }}
                     onRemove={() => {
                       field.handleChange("");
                       publicIdField.handleChange("");
                     }}
-                    onUploadChange={setIsUploading}
                   />
                   <FieldDescription>
                     Ambil foto bon atau bukti pembayaran sebagai lampiran

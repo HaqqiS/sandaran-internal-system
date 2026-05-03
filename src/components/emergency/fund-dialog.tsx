@@ -24,11 +24,17 @@ import { useIsMobile } from "~/hooks/use-mobile";
 
 interface FundDialogProps {
   projectId: string;
+  projectSlug: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function FundDialog({ projectId, open, onOpenChange }: FundDialogProps) {
+export function FundDialog({
+  projectId,
+  projectSlug,
+  open,
+  onOpenChange,
+}: FundDialogProps) {
   const isMobile = useIsMobile();
   const title = "Add Emergency Fund";
   const description =
@@ -59,6 +65,7 @@ export function FundDialog({ projectId, open, onOpenChange }: FundDialogProps) {
           <FundForm
             ref={formRef}
             projectId={projectId}
+            projectSlug={projectSlug}
             draftValues={draft}
             onSuccess={handleSuccess}
             onCancel={() => onOpenChange(false)}
@@ -79,6 +86,7 @@ export function FundDialog({ projectId, open, onOpenChange }: FundDialogProps) {
           <FundForm
             ref={formRef}
             projectId={projectId}
+            projectSlug={projectSlug}
             draftValues={draft}
             onSuccess={handleSuccess}
             onCancel={() => onOpenChange(false)}

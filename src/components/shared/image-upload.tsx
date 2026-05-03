@@ -17,8 +17,8 @@ interface ImageUploadProps {
   /** Upload type: reports, documents, or emergency */
   type: "reports" | "documents" | "emergency";
 
-  /** Current image URL(s) */
-  value?: string | UploadedFile[];
+  /** Current image URL(s) or File object(s) */
+  value?: string | File | (string | File | UploadedFile)[];
 
   /** Callback when single image is uploaded */
   onChange?: (url: string, publicId: string) => void;
@@ -29,7 +29,7 @@ interface ImageUploadProps {
   onUploadChange?: (isUploading: boolean) => void;
 
   /** Callback when image is removed */
-  onRemove?: (urlToRemove?: string, publicIdToRemove?: string) => void;
+  onRemove?: (fileOrUrl?: string | File, publicIdToRemove?: string) => void;
 
   /** Optional className */
   className?: string;
@@ -41,6 +41,8 @@ interface ImageUploadProps {
   accept?: Record<string, string[]>;
   /** Enable multiple file upload */
   multiple?: boolean;
+  /** Callback when file selection changes (Atomic Mode) */
+  onFileChange?: (files: File[]) => void;
 }
 
 export function ImageUpload({
@@ -56,10 +58,63 @@ export function ImageUpload({
   accept = { "image/*": [".jpg", ".jpeg", ".png", ".webp"] },
   multiple = false,
   onUploadChange,
+  onFileChange,
 }: ImageUploadProps) {
   const [previews, setPreviews] = useState<string[]>([]);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [multiplePreviews, setMultiplePreviews] = useState<Map<File, string>>(
+    new Map(),
+  );
   const { upload, remove, isLoading, isCompressing, progress, error, reset } =
     useCloudinaryUpload();
+
+  // Handle local file preview for Atomic Mode (Single)
+  useEffect(() => {
+    if (!multiple && value instanceof File) {
+      const url = URL.createObjectURL(value);
+      setFilePreview(url);
+      return () => URL.revokeObjectURL(url);
+    }
+    setFilePreview(null);
+  }, [value, multiple]);
+
+  // Handle local file previews for Atomic Mode (Multiple)
+  useEffect(() => {
+    if (multiple && Array.isArray(value)) {
+      const newMap = new Map(multiplePreviews);
+      let changed = false;
+
+      // Add new files
+      for (const item of value) {
+        if (item instanceof File && !newMap.has(item)) {
+          newMap.set(item, URL.createObjectURL(item));
+          changed = true;
+        }
+      }
+
+      // Remove old files
+      for (const [file, url] of newMap.entries()) {
+        if (!value.includes(file)) {
+          URL.revokeObjectURL(url);
+          newMap.delete(file);
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        setMultiplePreviews(newMap);
+      }
+    }
+  }, [value, multiple, multiplePreviews]);
+
+  // Cleanup all on unmount
+  useEffect(() => {
+    return () => {
+      for (const url of multiplePreviews.values()) {
+        URL.revokeObjectURL(url);
+      }
+    };
+  }, [multiplePreviews]);
 
   // Notify parent of upload status changes
   useEffect(() => {
@@ -70,13 +125,20 @@ export function ImageUpload({
     async (acceptedFiles: File[]) => {
       if (!acceptedFiles || acceptedFiles.length === 0) return;
 
-      const filesToUpload = multiple
+      const selectedFiles = multiple
         ? acceptedFiles
         : acceptedFiles[0]
           ? [acceptedFiles[0]]
           : [];
 
-      const newPreviews = filesToUpload.map((f) => URL.createObjectURL(f));
+      // Atomic Mode: If onFileChange is provided, don't upload immediately
+      if (onFileChange) {
+        onFileChange(selectedFiles);
+        return;
+      }
+
+      // Legacy Mode: Immediate Upload
+      const newPreviews = selectedFiles.map((f) => URL.createObjectURL(f));
       setPreviews((prev) =>
         multiple ? [...prev, ...newPreviews] : newPreviews,
       );
@@ -84,7 +146,7 @@ export function ImageUpload({
       try {
         const uploadedFiles: UploadedFile[] = [];
 
-        for (const file of filesToUpload) {
+        for (const file of selectedFiles) {
           const result = await upload(file, {
             projectSlug,
             type,
@@ -97,7 +159,12 @@ export function ImageUpload({
         }
 
         if (multiple && onMultipleChange) {
-          const existing = Array.isArray(value) ? value : [];
+          const existing = Array.isArray(value)
+            ? (value as (string | File | UploadedFile)[]).filter(
+                (item): item is UploadedFile =>
+                  typeof item === "object" && item !== null && "url" in item,
+              )
+            : [];
           onMultipleChange([...existing, ...uploadedFiles]);
         } else if (!multiple && onChange && uploadedFiles[0]) {
           onChange(uploadedFiles[0].url, uploadedFiles[0].publicId);
@@ -120,6 +187,7 @@ export function ImageUpload({
       upload,
       multiple,
       value,
+      onFileChange,
     ],
   );
 
@@ -130,11 +198,18 @@ export function ImageUpload({
     disabled: disabled || isLoading,
   });
 
-  const handleRemove = async (fileToRemove?: UploadedFile) => {
-    // If it has a publicId, try to delete it from cloudinary first
-    if (fileToRemove?.publicId) {
+  const handleRemove = async (fileToRemove?: File | UploadedFile | string) => {
+    const publicId =
+      typeof fileToRemove === "object" &&
+      fileToRemove !== null &&
+      "publicId" in fileToRemove
+        ? (fileToRemove as UploadedFile).publicId
+        : undefined;
+
+    // Legacy Mode: If it has a publicId, try to delete it from cloudinary first
+    if (publicId) {
       try {
-        await remove(fileToRemove.publicId);
+        await remove(publicId);
       } catch (err) {
         console.error("Failed to delete asset from Cloudinary", err);
       }
@@ -145,18 +220,69 @@ export function ImageUpload({
       reset();
       onRemove?.();
     } else {
-      onRemove?.(fileToRemove?.url, fileToRemove?.publicId);
+      // For Atomic Mode, we pass the original File or URL/UploadedFile
+      const identifier =
+        fileToRemove instanceof File
+          ? fileToRemove
+          : typeof fileToRemove === "object"
+            ? fileToRemove.url
+            : fileToRemove;
+
+      const publicIdToRemove =
+        typeof fileToRemove === "object" && "publicId" in fileToRemove
+          ? fileToRemove.publicId
+          : undefined;
+
+      onRemove?.(identifier, publicIdToRemove);
     }
   };
 
-  const displayFiles: UploadedFile[] = [];
-  if (multiple) {
-    if (Array.isArray(value)) {
-      displayFiles.push(...value);
+  const displayFiles: {
+    url: string;
+    publicId: string;
+    file?: File;
+    key: string;
+  }[] = [];
+
+  if (multiple && Array.isArray(value)) {
+    for (const item of value) {
+      if (item instanceof File) {
+        const url = multiplePreviews.get(item);
+        if (url) {
+          displayFiles.push({
+            url,
+            publicId: "",
+            file: item,
+            key: `file-${item.name}-${item.size}`,
+          });
+        }
+      } else if (typeof item === "object" && item !== null && "url" in item) {
+        displayFiles.push({
+          ...(item as UploadedFile),
+          key: (item as UploadedFile).publicId || (item as UploadedFile).url,
+        });
+      } else if (typeof item === "string") {
+        displayFiles.push({
+          url: item,
+          publicId: "",
+          key: item,
+        });
+      }
     }
-  } else {
-    if (typeof value === "string" && value) {
-      displayFiles.push({ url: value, publicId: "" });
+  } else if (!multiple) {
+    if (value instanceof File && filePreview) {
+      displayFiles.push({
+        url: filePreview,
+        publicId: "",
+        file: value,
+        key: "single-file",
+      });
+    } else if (typeof value === "string" && value) {
+      displayFiles.push({
+        url: value,
+        publicId: "",
+        key: "single-url",
+      });
     }
   }
 
@@ -175,7 +301,7 @@ export function ImageUpload({
           {multiple &&
             displayFiles.map((file) => (
               <div
-                key={file.url}
+                key={file.key}
                 className="relative aspect-video overflow-hidden rounded-lg border bg-muted"
               >
                 <NextImage
@@ -191,7 +317,9 @@ export function ImageUpload({
                     variant="destructive"
                     size="icon"
                     className="absolute right-2 top-2 h-8 w-8"
-                    onClick={() => handleRemove(file)}
+                    onClick={() =>
+                      handleRemove(file.file || { url: file.url, publicId: "" })
+                    }
                   >
                     <IconX className="h-4 w-4" />
                   </Button>
@@ -199,28 +327,31 @@ export function ImageUpload({
               </div>
             ))}
 
-          {!multiple && typeof value === "string" && value && (
-            <div className="relative aspect-video overflow-hidden rounded-lg border bg-muted">
-              <NextImage
-                src={value}
-                alt="Upload preview"
-                fill
-                className="object-cover"
-                unoptimized={value.startsWith("blob:")}
-              />
-              {onRemove && !isLoading && (
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="icon"
-                  className="absolute right-2 top-2 h-8 w-8"
-                  onClick={() => handleRemove()}
-                >
-                  <IconX className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          )}
+          {!multiple &&
+            (filePreview || (typeof value === "string" && value)) && (
+              <div className="relative aspect-video overflow-hidden rounded-lg border bg-muted">
+                <NextImage
+                  src={filePreview || (value as string)}
+                  alt="Upload preview"
+                  fill
+                  className="object-cover"
+                  unoptimized={(filePreview || (value as string)).startsWith(
+                    "blob:",
+                  )}
+                />
+                {onRemove && !isLoading && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute right-2 top-2 h-8 w-8"
+                    onClick={() => handleRemove()}
+                  >
+                    <IconX className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            )}
 
           {previews.map((previewUrl) => (
             <div

@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
+import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload";
 import {
   useCreateReport,
   useUpdateReport,
@@ -55,6 +56,7 @@ const reportSchema = z.object({
   customWeather: z.string().optional(),
   totalWorkers: z.number().min(0),
   location: z.string().optional(),
+  images: z.array(z.union([z.string(), z.instanceof(File)])).optional(),
 });
 
 export type ReportFormValues = z.infer<typeof reportSchema>;
@@ -98,11 +100,7 @@ export function ReportForm({
     report?.weather &&
     !WEATHER_OPTIONS.slice(0, -1).some((opt) => opt.value === report.weather);
 
-  // Local state for images uploaded to cloudinary but not yet attached to a report in DB
-  const [uploadedImageUrls, setUploadedImageUrls] = useState<
-    { url: string; publicId: string }[]
-  >([]);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const { upload, isLoading: isUploadingMedia } = useCloudinaryUpload();
   const [isSubmittingForm, setIsSubmittingForm] = useState(false);
 
   useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
@@ -125,6 +123,7 @@ export function ReportForm({
         : (draftValues?.customWeather ?? ""),
       totalWorkers: report?.totalWorkers ?? draftValues?.totalWorkers ?? 0,
       location: report?.location ?? draftValues?.location ?? "",
+      images: draftValues?.images ?? [],
     } as ReportFormValues,
     validators: {
       onSubmit: reportSchema,
@@ -165,17 +164,32 @@ export function ReportForm({
           toast.success("Laporan berhasil dibuat");
         }
 
-        // Attach all uploaded images to the database
-        if (currentReportId && uploadedImageUrls.length > 0) {
-          toast.info(
-            `Menyimpan ${uploadedImageUrls.length} foto ke database...`,
-          );
+        // Handle Atomic Upload for multiple images
+        const imagesToUpload = (value.images || []).filter(
+          (img): img is File => img instanceof File,
+        );
 
-          for (const img of uploadedImageUrls) {
+        const uploadedMedia: { url: string; publicId: string }[] = [];
+
+        if (imagesToUpload.length > 0) {
+          toast.info(`Mengunggah ${imagesToUpload.length} foto...`);
+          for (const file of imagesToUpload) {
+            const res = await upload(file, {
+              projectSlug,
+              type: "reports",
+            });
+            uploadedMedia.push({ url: res.secureUrl, publicId: res.publicId });
+          }
+        }
+
+        // Attach all newly uploaded images to the database
+        if (currentReportId && uploadedMedia.length > 0) {
+          toast.info(`Menyimpan foto ke database...`);
+          for (const img of uploadedMedia) {
             await uploadMedia.mutateAsync({
               projectId,
               reportId: currentReportId,
-              publicId: img.publicId, // Extract from URL if missing (usually returned by ImageUpload)
+              publicId: img.publicId,
               url: img.url,
             });
           }
@@ -400,43 +414,44 @@ export function ReportForm({
 
       {/* Image Upload for Report WhatsApp Style */}
       {!isEditMode && (
-        <FieldGroup>
-          <Field>
-            <FieldLabel>Dokumentasi Foto (Opsional)</FieldLabel>
-            <ImageUpload
-              projectSlug={projectSlug || "project"}
-              type="reports"
-              multiple={true}
-              value={uploadedImageUrls}
-              onMultipleChange={(files) => {
-                const newUploads = files.map((file) => {
-                  const existing = uploadedImageUrls.find(
-                    (u) => u.url === file.url,
-                  );
-                  return existing || file;
-                });
-
-                setUploadedImageUrls(newUploads);
-              }}
-              onRemove={(urlToRemove) => {
-                setUploadedImageUrls((prev) =>
-                  prev.filter((img) => img.url !== urlToRemove),
-                );
-              }}
-              onUploadChange={setIsUploadingImage}
-            />
-            <FieldDescription>
-              Pilih beberapa foto sekaligus atau ambil langsung dari kamera HP
-              Anda.
-            </FieldDescription>
-          </Field>
-        </FieldGroup>
+        <form.Field name="images">
+          {(field) => (
+            <FieldGroup>
+              <Field>
+                <FieldLabel>Dokumentasi Foto (Opsional)</FieldLabel>
+                <ImageUpload
+                  projectSlug={projectSlug || "project"}
+                  type="reports"
+                  multiple={true}
+                  value={field.state.value}
+                  onFileChange={(files) => {
+                    field.handleChange([
+                      ...(field.state.value || []),
+                      ...files,
+                    ]);
+                  }}
+                  onRemove={(fileOrUrl) => {
+                    field.handleChange(
+                      (field.state.value || []).filter(
+                        (img) => img !== fileOrUrl,
+                      ),
+                    );
+                  }}
+                />
+                <FieldDescription>
+                  Pilih beberapa foto sekaligus atau ambil langsung dari kamera
+                  HP Anda.
+                </FieldDescription>
+              </Field>
+            </FieldGroup>
+          )}
+        </form.Field>
       )}
 
       {/* Submit Button */}
       <div className="flex justify-end gap-2 pt-4">
-        <Button type="submit" disabled={isSubmittingForm || isUploadingImage}>
-          {isSubmittingForm
+        <Button type="submit" disabled={isSubmittingForm || isUploadingMedia}>
+          {isSubmittingForm || isUploadingMedia
             ? "Menyimpan..."
             : isEditMode
               ? "Simpan Perubahan"

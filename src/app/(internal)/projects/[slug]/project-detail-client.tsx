@@ -262,6 +262,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
 
       <FundDialog
         projectId={project.id}
+        projectSlug={project.slug}
         open={isFundOpen}
         onOpenChange={setIsFundOpen}
       />

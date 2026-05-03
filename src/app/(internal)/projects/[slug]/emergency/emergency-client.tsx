@@ -118,6 +118,7 @@ export function EmergencyClient({ projectSlug }: EmergencyClientProps) {
 
       <FundDialog
         projectId={project.id}
+        projectSlug={project.slug}
         open={isFundOpen}
         onOpenChange={setIsFundOpen}
       />

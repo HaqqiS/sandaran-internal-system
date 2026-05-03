@@ -1,7 +1,7 @@
 "use client";
 
 import { IconFile, IconUpload, IconX } from "@tabler/icons-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
@@ -14,8 +14,8 @@ interface FileUploadProps {
   projectSlug: string;
   /** Upload type: documents */
   type: "documents";
-  /** Current file URL */
-  value?: string;
+  /** Current file URL or File object */
+  value?: string | File;
   /** Callback when file is uploaded */
   onChange: (
     url: string,
@@ -35,6 +35,8 @@ interface FileUploadProps {
   maxSizeMB?: number;
   /** Accepted file types */
   accept?: Record<string, string[]>;
+  /** Callback when file selection changes (Atomic Mode) */
+  onFileChange?: (file: File | null) => void;
 }
 
 export function FileUpload({
@@ -54,9 +56,17 @@ export function FileUpload({
     "application/vnd.ms-excel": [".xls"],
     "image/*": [".jpg", ".jpeg", ".png", ".webp"],
   },
+  onFileChange,
 }: FileUploadProps) {
   const [fileName, setFileName] = useState<string | null>(null);
   const { upload, isLoading, progress, error, reset } = useCloudinaryUpload();
+
+  // Handle local file preview for Atomic Mode
+  useEffect(() => {
+    if (value instanceof File) {
+      setFileName(value.name);
+    }
+  }, [value]);
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
@@ -65,6 +75,13 @@ export function FileUpload({
 
       setFileName(file.name);
 
+      // Atomic Mode: If onFileChange is provided, don't upload immediately
+      if (onFileChange) {
+        onFileChange(file);
+        return;
+      }
+
+      // Legacy Mode: Immediate Upload
       try {
         const isImage = file.type.startsWith("image/");
         const resourceType = isImage ? "image" : "raw";
@@ -107,7 +124,7 @@ export function FileUpload({
         setFileName(null);
       }
     },
-    [projectSlug, type, maxSizeMB, onChange, upload],
+    [projectSlug, type, maxSizeMB, onChange, upload, onFileChange],
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({

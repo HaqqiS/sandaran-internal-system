@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { useImperativeHandle, useState } from "react";
+import { useImperativeHandle } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ImageUpload } from "~/components/shared/image-upload";
@@ -14,8 +14,8 @@ import {
   FieldLabel,
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
+import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload";
 import { useAddEmergencyBalance } from "~/hooks/useEmergency";
 import { formatNumberIDR } from "~/lib/utils";
 
@@ -26,8 +26,8 @@ const fundSchema = z.object({
       message: "Nominal harus berupa angka lebih dari 0",
     }),
   description: z.string().min(1, "Keterangan/sumber aliran harus diisi"),
-  proofPublicId: z.string(),
-  proofUrl: z.string(),
+  proofPublicId: z.string().optional(),
+  proofUrl: z.union([z.string(), z.instanceof(File)]).optional(),
 });
 
 export type FundFormValues = z.infer<typeof fundSchema>;
@@ -35,6 +35,7 @@ export type FundFormDraft = Partial<FundFormValues>;
 
 interface FundFormProps {
   projectId: string;
+  projectSlug: string;
   draftValues?: FundFormDraft;
   ref?: React.Ref<{ getValues: () => FundFormValues }>;
   onSuccess?: () => void;
@@ -43,13 +44,14 @@ interface FundFormProps {
 
 export function FundForm({
   projectId,
+  projectSlug,
   draftValues,
   ref,
   onSuccess,
   onCancel,
 }: FundFormProps) {
   const addBalance = useAddEmergencyBalance();
-  const [isUploading, setIsUploading] = useState(false);
+  const { upload, isLoading: isUploading } = useCloudinaryUpload();
 
   useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
 
@@ -65,12 +67,25 @@ export function FundForm({
     },
     onSubmit: async ({ value }) => {
       try {
+        let finalUrl = typeof value.proofUrl === "string" ? value.proofUrl : "";
+        let finalPublicId = value.proofPublicId || "";
+
+        // Atomic Upload: Perform upload only if it's a File
+        if (value.proofUrl instanceof File) {
+          const result = await upload(value.proofUrl, {
+            projectSlug,
+            type: "emergency",
+          });
+          finalUrl = result.secureUrl;
+          finalPublicId = result.publicId;
+        }
+
         await addBalance.mutateAsync({
           projectId,
           amount: Number(value.amount),
           description: value.description,
-          proofPublicId: value.proofPublicId || undefined,
-          proofUrl: value.proofUrl || undefined,
+          proofPublicId: finalPublicId || undefined,
+          proofUrl: finalUrl || undefined,
         });
         toast.success("Kas berhasil ditambahkan");
         form.reset();
@@ -116,7 +131,8 @@ export function FundForm({
                 />
               </div>
               <FieldDescription>
-                Masukkan jumlah dana yang masuk ke kas. Format akan otomatis muncul.
+                Masukkan jumlah dana yang masuk ke kas. Format akan otomatis
+                muncul.
               </FieldDescription>
               <FieldError errors={field.state.meta.errors} />
             </Field>
@@ -128,7 +144,9 @@ export function FundForm({
         {(field) => (
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor={field.name}>Sumber Dana / Keterangan *</FieldLabel>
+              <FieldLabel htmlFor={field.name}>
+                Sumber Dana / Keterangan *
+              </FieldLabel>
               <Textarea
                 id={field.name}
                 name={field.name}
@@ -155,18 +173,17 @@ export function FundForm({
                 <Field>
                   <FieldLabel>Bukti Transfer (Opsional)</FieldLabel>
                   <ImageUpload
-                    projectSlug="emergency"
+                    projectSlug={projectSlug}
                     type="emergency"
                     value={field.state.value}
-                    onChange={(url, publicId) => {
-                      field.handleChange(url);
-                      publicIdField.handleChange(publicId);
+                    onFileChange={(files) => {
+                      field.handleChange(files[0] ?? "");
+                      publicIdField.handleChange("");
                     }}
                     onRemove={() => {
                       field.handleChange("");
                       publicIdField.handleChange("");
                     }}
-                    onUploadChange={setIsUploading}
                   />
                   <FieldDescription>
                     Lampirkan bukti transfer atau mutasi sebagai bukti aliran
@@ -184,7 +201,9 @@ export function FundForm({
           Batal
         </Button>
         <Button type="submit" disabled={addBalance.isPending || isUploading}>
-          {addBalance.isPending || isUploading ? "Memproses..." : "Tambah Kas Masuk"}
+          {addBalance.isPending || isUploading
+            ? "Memproses..."
+            : "Tambah Kas Masuk"}
         </Button>
       </div>
     </form>
