@@ -256,6 +256,7 @@ export function ProjectForm({
             children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
+              const currentYear = new Date().getFullYear();
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel>Tanggal Mulai (Opsional)</FieldLabel>
@@ -274,11 +275,19 @@ export function ProjectForm({
                           : "Pilih tanggal"}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent
+                      className="w-auto p-0"
+                      align="start"
+                      sideOffset={4}
+                    >
                       <Calendar
                         mode="single"
+                        captionLayout="dropdown"
+                        startMonth={new Date(currentYear - 10, 0)}
+                        endMonth={new Date(currentYear + 10, 11)}
                         selected={field.state.value}
                         onSelect={(date) => field.handleChange(date)}
+                        defaultMonth={field.state.value ?? new Date()}
                         initialFocus
                       />
                     </PopoverContent>
@@ -294,6 +303,7 @@ export function ProjectForm({
             children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
+              const currentYear = new Date().getFullYear();
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel>Tanggal Selesai (Opsional)</FieldLabel>
@@ -312,11 +322,19 @@ export function ProjectForm({
                           : "Pilih tanggal"}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent
+                      className="w-auto p-0"
+                      align="start"
+                      sideOffset={4}
+                    >
                       <Calendar
                         mode="single"
+                        captionLayout="dropdown"
+                        startMonth={new Date(currentYear - 10, 0)}
+                        endMonth={new Date(currentYear + 10, 11)}
                         selected={field.state.value}
                         onSelect={(date) => field.handleChange(date)}
+                        defaultMonth={field.state.value ?? new Date()}
                         initialFocus
                       />
                     </PopoverContent>

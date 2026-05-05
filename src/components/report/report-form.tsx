@@ -4,7 +4,7 @@ import { IconCalendar } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
-import { useImperativeHandle, useState } from "react";
+import { useImperativeHandle } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ImageUpload } from "~/components/shared/image-upload";
@@ -76,7 +76,7 @@ interface ReportFormProps {
     location?: string | null;
   };
   draftValues?: ReportFormDraft;
-  ref?: React.Ref<{ getValues: () => ReportFormValues }>;
+  ref?: React.Ref<{ getValues: () => ReportFormValues; submit: () => void }>;
   onSuccess?: () => void;
 }
 
@@ -100,10 +100,12 @@ export function ReportForm({
     report?.weather &&
     !WEATHER_OPTIONS.slice(0, -1).some((opt) => opt.value === report.weather);
 
-  const { upload, isLoading: isUploadingMedia } = useCloudinaryUpload();
-  const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+  const { upload } = useCloudinaryUpload();
 
-  useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
+  useImperativeHandle(ref, () => ({
+    getValues: () => form.state.values,
+    submit: () => void form.handleSubmit(),
+  }));
 
   const form = useForm({
     defaultValues: {
@@ -130,7 +132,6 @@ export function ReportForm({
     },
     onSubmit: async ({ value }) => {
       try {
-        setIsSubmittingForm(true);
         // Determine final weather value
         const weather =
           value.weather === "custom" ? value.customWeather : value.weather;
@@ -204,8 +205,6 @@ export function ReportForm({
       } catch (err) {
         console.error(err);
         toast.error("Terjadi kesalahan saat menyimpan laporan");
-      } finally {
-        setIsSubmittingForm(false);
       }
     },
   });
@@ -447,17 +446,6 @@ export function ReportForm({
           )}
         </form.Field>
       )}
-
-      {/* Submit Button */}
-      <div className="flex justify-end gap-2 pt-4">
-        <Button type="submit" disabled={isSubmittingForm || isUploadingMedia}>
-          {isSubmittingForm || isUploadingMedia
-            ? "Menyimpan..."
-            : isEditMode
-              ? "Simpan Perubahan"
-              : "Kirim Laporan"}
-        </Button>
-      </div>
     </form>
   );
 }

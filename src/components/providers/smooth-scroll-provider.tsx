@@ -3,13 +3,27 @@
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import { useEffect, useRef } from "react";
+import { createContext, useContext, useEffect, useRef } from "react";
 
 // Register ScrollTrigger once at module level
 gsap.registerPlugin(ScrollTrigger);
 
 interface SmoothScrollProviderProps {
   children: React.ReactNode;
+}
+
+interface LenisContextValue {
+  stop: () => void;
+  start: () => void;
+}
+
+const LenisContext = createContext<LenisContextValue>({
+  stop: () => {},
+  start: () => {},
+});
+
+export function useLenis() {
+  return useContext(LenisContext);
 }
 
 /**
@@ -22,6 +36,9 @@ interface SmoothScrollProviderProps {
  *
  * Ini memastikan semua animasi scroll-driven (pin, scrub, parallax)
  * berjalan sync dengan Lenis smooth scroll.
+ *
+ * Expose stop()/start() via useLenis() hook agar Dialog/Drawer dapat
+ * menonaktifkan Lenis saat terbuka (mencegah halaman ikut ter-scroll).
  */
 export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
   const lenisRef = useRef<Lenis | null>(null);
@@ -56,5 +73,14 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
     };
   }, []);
 
-  return <>{children}</>;
+  const contextValue: LenisContextValue = {
+    stop: () => lenisRef.current?.stop(),
+    start: () => lenisRef.current?.start(),
+  };
+
+  return (
+    <LenisContext.Provider value={contextValue}>
+      {children}
+    </LenisContext.Provider>
+  );
 }

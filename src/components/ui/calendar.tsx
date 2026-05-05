@@ -43,7 +43,7 @@ function Calendar({
       locale={locale}
       formatters={{
         formatMonthDropdown: (date) =>
-          date.toLocaleString(locale?.code, { month: "short" }),
+          date.toLocaleString(locale?.code, { month: "long" }),
         ...formatters,
       }}
       classNames={{
@@ -76,11 +76,11 @@ function Calendar({
           defaultClassNames.dropdowns,
         ),
         dropdown_root: cn(
-          "relative rounded-(--cell-radius)",
+          "relative overflow-hidden rounded-(--cell-radius)",
           defaultClassNames.dropdown_root,
         ),
         dropdown: cn(
-          "absolute bg-popover inset-0 opacity-0",
+          "absolute inset-0 cursor-pointer opacity-0 font-[inherit] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
           defaultClassNames.dropdown,
         ),
         caption_label: cn(
