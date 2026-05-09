@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRef } from "react";
 import { gsap, useGSAP } from "~/hooks/use-gsap-safe";
 import { useReducedMotion } from "~/hooks/use-reduced-motion";
-import { useSlidePresentation } from "~/hooks/use-slide-presentation";
+import { MOTION } from "~/lib/motion-tokens";
 
 /**
  * HeroSection — Scrollytelling dengan GSAP ScrollTrigger.
@@ -24,183 +24,184 @@ export function HeroSection() {
     ));
   };
 
-  const { currentSlide } = useSlidePresentation(3, containerRef, {
-    outDuration: 0.6,
-    inDuration: 0.8,
-    holdDelay: 0.5,
-  });
-
-  const tl = useRef<gsap.core.Timeline | null>(null);
-
   useGSAP(
     () => {
-      if (reducedMotion) return;
+      if (reducedMotion || !containerRef.current) return;
 
       // ── Initial States ────────────────────────────────────────────────
       gsap.set(".design-line-top .char, .build-line-top .char", {
-        y: "-110%",
+        y: MOTION.offset.textExitY,
         opacity: 0,
       });
       gsap.set(".design-line-bottom .char, .build-line-bottom .char", {
-        y: "110%",
+        y: MOTION.offset.textYPercent,
         opacity: 0,
       });
       gsap.set(".hero-blob", { opacity: 0, scale: 0.8 });
 
-      // ── Master Timeline (Discrete Transitions) ────────────────────────
-      tl.current = gsap.timeline({ paused: true });
+      // ── Master Timeline (Scrubbed Transitions) ────────────────────────
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top top",
+          end: "+=5000", // Diperpanjang agar scroll sangat mulus dan lega
+          pin: true,
+          scrub: MOTION.trigger.scrubSmooth,
+          markers: process.env.NODE_ENV === "development",
+          snap: {
+            snapTo: "labelsDirectional",
+            duration: { min: 0.3, max: 0.8 },
+            delay: 0.1, // Tunggu user benar-benar berhenti scroll
+            ease: MOTION.ease.out,
+          },
+        },
+      });
 
-      tl.current.addLabel("scene0", 0);
+      // Label scene0 (posisi awal)
+      tl.addLabel("scene0", 0.0);
 
       // ══════════════════════════════════════════════════════════════════
       //  TRANSITION: Scene 0 → Scene 1
       // ══════════════════════════════════════════════════════════════════
-      tl.current.to(
+      const t1 = 0.5; // Beri ruang scroll 0.5s sebelum animasi mulai
+
+      tl.to(
         ".hero-scroll-indicator",
-        { autoAlpha: 0, duration: 0.4 },
-        "scene0",
+        { autoAlpha: 0, duration: MOTION.duration.fast },
+        t1,
       );
-      tl.current.to(".hero-meta", { autoAlpha: 0, duration: 0.4 }, "scene0");
+      tl.to(".hero-meta", { autoAlpha: 0, duration: MOTION.duration.fast }, t1);
 
       // Crafted Spaces exit DOWN
-      tl.current.to(
+      tl.to(
         ".crafted-line .char",
         {
           y: "120%",
           opacity: 0,
-          stagger: 0.05,
-          duration: 0.8,
-          ease: "power2.inOut",
+          stagger: { each: 0.04, from: "start" },
+          duration: MOTION.duration.base,
+          ease: MOTION.ease.cubicIn,
         },
-        "scene0+=0.2",
+        t1,
       );
 
-      // Foto: shrink ke tengah
-      tl.current.to(
+      // Foto & Background
+      tl.to(
         ".hero-photo",
         {
           scale: 0.55,
           borderRadius: "40% 60% 70% 30% / 50% 40% 60% 50%",
-          duration: 1.2,
-          ease: "power3.inOut",
-          force3D: true, // force3D is valid string or boolean. using boolean here.
+          duration: MOTION.duration.verySlow,
+          ease: MOTION.ease.inOut,
+          force3D: true,
         },
-        "scene0",
+        t1,
       );
-
-      tl.current.to(
+      tl.to(
         ".hero-overlay",
-        { opacity: 0.9, duration: 0.8 },
-        "scene0+=0.2",
+        { opacity: 0.9, duration: MOTION.duration.slow },
+        t1 + 0.2,
       );
-
-      tl.current.to(
+      tl.to(
         ".hero-blob",
         {
           opacity: 0.08,
           scale: 1,
-          duration: 1.2,
-          ease: "power2.out",
+          duration: MOTION.duration.verySlow,
+          ease: MOTION.ease.out,
         },
-        "scene0",
+        t1,
       );
 
-      // 1. Text Top Enter (We Design)
-      tl.current.to(
+      // We Design Enter (Mulai terlihat penuh sekitar ~2.6s)
+      tl.to(
         ".design-line-top .char",
         {
           y: "0%",
           opacity: 1,
-          stagger: 0.05,
-          duration: 0.8,
-          ease: "power2.out",
+          stagger: { each: 0.05, from: "start" },
+          duration: MOTION.duration.base,
+          ease: MOTION.ease.expo,
         },
-        "scene0+=0.8",
+        t1 + 0.6,
       );
-
-      // 2. Text Bottom Enter
-      tl.current.to(
+      tl.to(
         ".design-line-bottom .char",
         {
           y: "0%",
           opacity: 1,
-          stagger: 0.05,
-          duration: 0.8,
-          ease: "power2.out",
+          stagger: { each: 0.05, from: "start" },
+          duration: MOTION.duration.base,
+          ease: MOTION.ease.expo,
         },
-        "scene0+=1.0",
+        t1 + 0.8,
       );
 
-      tl.current.addLabel("scene1");
+      // Label scene1 diletakkan di TENGAH area statis (antara 2.6s - 3.8s)
+      // sehingga saat user disnap, mereka punya ruang scroll aman tanpa langsung memicu animasi
+      tl.addLabel("scene1", 3.2);
 
       // ══════════════════════════════════════════════════════════════════
       //  TRANSITION: Scene 1 → Scene 2
       // ══════════════════════════════════════════════════════════════════
+      const t2 = 3.8; // Animasi keluar We Design dimulai
 
       // We Design Exit
-      tl.current.to(
+      tl.to(
         ".design-line-top .char",
         {
-          y: "-120%",
+          y: MOTION.offset.textExitY,
           opacity: 0,
-          stagger: 0.04,
-          duration: 0.6,
-          ease: "power2.in",
+          stagger: { each: 0.04, from: "start" },
+          duration: MOTION.duration.fast,
+          ease: MOTION.ease.cubicIn,
         },
-        "scene1",
+        t2,
       );
-      tl.current.to(
+      tl.to(
         ".design-line-bottom .char",
         {
           y: "120%",
           opacity: 0,
-          stagger: 0.04,
-          duration: 0.6,
-          ease: "power2.in",
+          stagger: { each: 0.04, from: "start" },
+          duration: MOTION.duration.fast,
+          ease: MOTION.ease.cubicIn,
         },
-        "scene1+=0.2",
+        t2 + 0.2,
       );
 
-      // We Build Enter
-      tl.current.to(
+      // We Build Enter (Mulai terlihat penuh sekitar ~5.8s)
+      tl.to(
         ".build-line-top .char",
         {
           y: "0%",
           opacity: 1,
-          stagger: 0.06,
-          duration: 0.8,
-          ease: "power2.out",
+          stagger: { each: 0.05, from: "start" },
+          duration: MOTION.duration.base,
+          ease: MOTION.ease.expo,
         },
-        "scene1+=0.6",
+        t2 + 0.6,
       );
-      tl.current.to(
+      tl.to(
         ".build-line-bottom .char",
         {
           y: "0%",
           opacity: 1,
-          stagger: 0.06,
-          duration: 0.8,
-          ease: "power2.out",
+          stagger: { each: 0.05, from: "start" },
+          duration: MOTION.duration.base,
+          ease: MOTION.ease.expo,
         },
-        "scene1+=0.8",
+        t2 + 0.8,
       );
 
-      tl.current.addLabel("scene2");
+      // Label scene2 diletakkan di TENGAH area statis (antara 5.8s - 7.5s)
+      tl.addLabel("scene2", 6.6);
+
+      // Paksa timeline memiliki durasi ekstra di ujung (padding) sebesar hampir 1 detik
+      // Ini mencegah Portfolio langsung tertarik naik jika user tidak sengaja scroll sedikit
+      tl.to({}, { duration: 0.9 });
     },
     { scope: containerRef, dependencies: [reducedMotion] },
-  );
-
-  // Jalankan animasi transisi setiap kali currentSlide berubah
-  useGSAP(
-    () => {
-      if (!tl.current || reducedMotion) return;
-
-      tl.current.tweenTo(`scene${currentSlide}`, {
-        duration: 1.2, // durasi total perpindahan disesuaikan dengan in/out duration hook
-        ease: "power2.inOut",
-      });
-    },
-    { dependencies: [currentSlide, reducedMotion] },
   );
 
   return (

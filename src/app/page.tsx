@@ -10,10 +10,11 @@ export default async function Home() {
   return (
     <HydrateClient>
       <HomepageShell session={session}>
-        <HeroSection />
-        <PortfolioSection />
-
-        <div className="min-h-screen bg-[var(--hp-bg)]" />
+        <div className="bg-[var(--hp-bg)]">
+          <HeroSection />
+          <PortfolioSection />
+          <div className="min-h-screen" />
+        </div>
       </HomepageShell>
     </HydrateClient>
   );
