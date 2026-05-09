@@ -2,29 +2,36 @@
 
 import { AnimatePresence } from "motion/react";
 import { useState } from "react";
-import { HeroSection } from "~/components/homepage/hero-section";
+import { CustomCursor } from "~/components/homepage/custom-cursor";
 import { IntroScreen } from "~/components/homepage/intro-screen";
 import { HomepageNavbar } from "~/components/homepage/navbar";
+import { NoiseOverlay } from "~/components/homepage/noise-overlay";
+import type { Session } from "~/server/better-auth/client";
 
 /**
  * HomepageShell — client wrapper untuk homepage.
  *
- * Alasannya: page.tsx adalah server component (ada getSession),
- * sementara IntroScreen & HomepageNavbar butuh useState/useEffect (client only).
- *
- * Dengan memisahkan shell ini, server component tetap bisa
- * fetch data di level atas, lalu shell menangani animasi client-side.
- *
  * Z-index layer:
- *  9999 → IntroScreen (paling atas, hanya saat loading)
- *  9998 → MenuOverlay (full-screen nav)
- *  9997 → HomepageNavbar bar
+ *  9999 → CustomCursor (paling atas)
+ *  9998 → IntroScreen (hanya saat loading)
+ *  9997 → NoiseOverlay (dibawah kursor, diatas konten)
+ *  9996 → MenuOverlay (full-screen nav)
+ *  9995 → HomepageNavbar bar
  */
-export function HomepageShell({ children }: { children: React.ReactNode }) {
+export function HomepageShell({
+  children,
+  session,
+}: {
+  children: React.ReactNode;
+  session: Session | null;
+}) {
   const [introDone, setIntroDone] = useState(false);
 
   return (
-    <>
+    <div className="cursor-none selection:bg-[var(--hp-clay)] selection:text-[var(--hp-ink)]">
+      <CustomCursor />
+      <NoiseOverlay />
+
       {/* Loading animation — muncul sekali saat halaman pertama dibuka */}
       <AnimatePresence mode="wait">
         {!introDone && (
@@ -38,13 +45,10 @@ export function HomepageShell({ children }: { children: React.ReactNode }) {
       </AnimatePresence>
 
       {/* Fixed navbar — transparan di hero, glass saat scroll */}
-      <HomepageNavbar />
+      <HomepageNavbar session={session} />
 
-      {/* Hero section — full viewport, parallax background */}
-      <HeroSection />
-
-      {/* Konten halaman utama — sections di bawah hero */}
-      {children}
-    </>
+      {/* Konten halaman utama */}
+      <main className="relative z-10">{children}</main>
+    </div>
   );
 }

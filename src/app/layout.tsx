@@ -1,7 +1,13 @@
 import "~/styles/globals.css";
 
 import type { Metadata } from "next";
-import { Geist, Inter } from "next/font/google";
+import {
+  Geist,
+  Inter,
+  Playfair_Display,
+  Space_Mono,
+  Syne,
+} from "next/font/google";
 import { Toaster } from "sonner";
 import { SmoothScrollProvider } from "~/components/providers/smooth-scroll-provider";
 import { TRPCReactProvider } from "~/trpc/react";
@@ -24,11 +30,36 @@ const geist = Geist({
   variable: "--font-geist-sans",
 });
 
+const syne = Syne({
+  subsets: ["latin"],
+  variable: "--font-syne",
+  weight: ["400", "700", "800"],
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
+  weight: ["400", "900"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+const spaceMono = Space_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  weight: ["400", "700"],
+  display: "swap",
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${geist.variable}`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${geist.variable} ${syne.variable} ${playfair.variable} ${spaceMono.variable}`}
+    >
       <body>
         <TRPCReactProvider>
           <SmoothScrollProvider>

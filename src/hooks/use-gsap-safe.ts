@@ -2,6 +2,7 @@
 
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
+import { Observer } from "gsap/Observer";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 /**
@@ -16,7 +17,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 // Register plugins once
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(Observer, ScrollTrigger);
 }
 
-export { gsap, ScrollTrigger, useGSAP };
+export { gsap, Observer, ScrollTrigger, useGSAP };

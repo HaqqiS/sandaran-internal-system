@@ -10,6 +10,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { OAuthButtons } from "~/components/shared/oauth-buttons";
+import { Button } from "~/components/ui/button";
+import type { Session } from "~/server/better-auth/client";
+import { authClient } from "~/server/better-auth/client";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -170,9 +174,10 @@ const menuItemVariants = {
 interface MenuOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  session: Session | null;
 }
 
-function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
+function MenuOverlay({ isOpen, onClose, session }: MenuOverlayProps) {
   const pathname = usePathname();
 
   // Lock body scroll saat overlay terbuka
@@ -248,22 +253,20 @@ function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
 
                             {/*
                               Underline accent yang grow dari kiri saat hover.
-                              Lebih elegan daripada opacity-50 saja.
+                              Diposisikan absolute di bawah teks.
                             */}
                             <span
-                              className="absolute bottom-0 left-0 h-[1.5px] w-0 transition-all duration-500 ease-out group-hover:w-full"
-                              style={{ backgroundColor: "var(--hp-accent)" }}
+                              className="absolute bottom-0 left-0 h-[2px] w-0 bg-[var(--hp-accent)] transition-all duration-300 group-hover:w-full"
                               aria-hidden="true"
                             />
                           </span>
 
-                          {/* Arrow muncul dari kiri saat hover */}
+                          {/* Desktop only index number: 01, 02, ... */}
                           <span
-                            className="ml-4 text-lg opacity-0 translate-x-[-8px] transition-all duration-300 ease-out group-hover:opacity-100 group-hover:translate-x-0"
-                            style={{ color: "var(--hp-accent)" }}
-                            aria-hidden="true"
+                            className="ml-auto hidden font-mono text-[10px] uppercase tracking-widest md:block"
+                            style={{ color: "var(--hp-fg-muted)" }}
                           >
-                            →
+                            0{NAV_LINKS.indexOf(link) + 1}
                           </span>
                         </Link>
                       </motion.div>
@@ -271,6 +274,48 @@ function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
                   );
                 })}
               </ul>
+
+              {/* Auth section — sementara dipindah ke sini */}
+              <motion.div
+                variants={menuItemVariants}
+                className="mt-12 flex flex-col items-start gap-6 border-t pt-10"
+                style={{ borderColor: "var(--hp-border)" }}
+              >
+                {session ? (
+                  <div className="flex flex-col gap-6 w-full">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">
+                        Authenticated as
+                      </span>
+                      <span className="text-lg font-bold">
+                        {session.user?.name}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-4">
+                      <Link href="/dashboard" onClick={onClose}>
+                        <Button className="rounded-full px-8">Dashboard</Button>
+                      </Link>
+                      <Button
+                        variant="outline"
+                        className="rounded-full px-8"
+                        onClick={async () => {
+                          await authClient.signOut();
+                          onClose();
+                        }}
+                      >
+                        Sign Out
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-4">
+                    <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">
+                      Login to access dashboard
+                    </span>
+                    <OAuthButtons />
+                  </div>
+                )}
+              </motion.div>
             </motion.nav>
 
             {/* Footer — social links di bawah */}
@@ -330,7 +375,7 @@ function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
  * - Klik MENU → full-screen overlay dengan stagger nav links
  * - Scroll lock saat overlay terbuka
  */
-export function HomepageNavbar() {
+export function HomepageNavbar({ session }: { session: Session | null }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -406,7 +451,11 @@ export function HomepageNavbar() {
       </motion.header>
 
       {/* Full-screen menu overlay */}
-      <MenuOverlay isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MenuOverlay
+        isOpen={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        session={session}
+      />
     </>
   );
 }
