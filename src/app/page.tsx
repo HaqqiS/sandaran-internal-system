@@ -1,5 +1,6 @@
 import { HeroSection } from "~/components/homepage/hero-section";
 import { HomepageShell } from "~/components/homepage/homepage-shell";
+import { PhilosophySection } from "~/components/homepage/philosophy-section";
 import { PortfolioSection } from "~/components/homepage/portfolio-section";
 import { getSession } from "~/server/better-auth/server";
 import { HydrateClient } from "~/trpc/server";
@@ -13,6 +14,7 @@ export default async function Home() {
         <div className="bg-[var(--hp-bg)]">
           <HeroSection />
           <PortfolioSection />
+          <PhilosophySection />
           <div className="min-h-screen" />
         </div>
       </HomepageShell>
