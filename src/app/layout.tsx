@@ -15,7 +15,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 export const metadata: Metadata = {
   title: "Astaloka",
   description: "Astaloka Interior Design",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  icons: [{ rel: "icon", url: "/icon.webp" }],
 };
 
 const inter = Inter({

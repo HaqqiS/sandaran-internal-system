@@ -11,6 +11,7 @@ const PHILOSOPHY_TEXT =
 export function PhilosophySection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLHeadingElement>(null);
+  const watermarkRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
 
   useGSAP(
@@ -19,19 +20,37 @@ export function PhilosophySection() {
 
       const words = textRef.current.querySelectorAll(".word");
 
-      // Animasikan opacity kata-per-kata yang di-scrub oleh scroll
+      // 1. Animasi Teks Reveal (Scrub)
       gsap.to(words, {
-        opacity: 1,
-        stagger: 0.1,
-        ease: "none", // Harus "none" agar pergerakan scrub linear dengan scroll
+        opacity: 0.9,
+        stagger: 0.4,
+        ease: "none",
         scrollTrigger: {
           trigger: containerRef.current,
           start: "top top",
-          end: "+=1500", // Panjang jarak scroll untuk membaca teks ini
+          end: "+=1500",
           pin: true,
           scrub: MOTION.trigger.scrubSmooth,
         },
       });
+
+      // 2. Animasi Parallax Watermark (Horizontal)
+      if (watermarkRef.current) {
+        gsap.fromTo(
+          watermarkRef.current,
+          { x: "25vw" }, // Posisi awal: tergeser ke kanan (menampilkan ASTALOK)
+          {
+            x: "-25vw", // Posisi akhir: tergeser ke kiri (menampilkan STALOKA)
+            ease: "none",
+            scrollTrigger: {
+              trigger: containerRef.current,
+              start: "top top", // Sinkron dengan awal reveal teks
+              end: "+=1500", // Sinkron dengan durasi reveal teks
+              scrub: true,
+            },
+          },
+        );
+      }
     },
     { scope: containerRef, dependencies: [reducedMotion] },
   );
@@ -42,9 +61,7 @@ export function PhilosophySection() {
       <span
         // biome-ignore lint/suspicious/noArrayIndexKey: Static text array, index is safe for keys
         key={`${word}-${i}`}
-        // Kita gunakan whitespace-pre-wrap dan tidak perlu margin-right manual
-        // asalkan kita pisah dengan spasi (lihat return di bawah)
-        className="word inline-block opacity-15 will-change-opacity"
+        className="word inline-block opacity-20 will-change-opacity"
       >
         {word}&nbsp;
       </span>
@@ -56,8 +73,40 @@ export function PhilosophySection() {
       ref={containerRef}
       className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-[var(--hp-bg)] px-[5vw]"
     >
+      {/* --- Lapisan Dekorasi --- */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        {/* Architectural Grid (Background Dasar) */}
+        <div
+          className="absolute inset-0 opacity-[0.15]" // Dinaikkan signifikan agar terlihat jelas
+          style={{
+            backgroundImage: `radial-gradient(var(--hp-fg) 1.5px, transparent 1.5px)`,
+            backgroundSize: "60px 60px",
+          }}
+        />
+
+        {/* Large Watermark Typography (Parallax) */}
+        <div
+          ref={watermarkRef}
+          className="absolute inset-0 flex items-center justify-center"
+        >
+          <span
+            className="select-none text-[25vw] font-black leading-none opacity-[0.08] will-change-transform" // Dinaikkan signifikan
+            style={{
+              fontFamily: "var(--font-playfair)",
+              color: "var(--hp-fg)",
+            }}
+          >
+            ASTALOKA
+          </span>
+        </div>
+
+        {/* Efek Tirai (Fading Edges) */}
+        <div className="absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-[var(--hp-bg)] to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-[var(--hp-bg)] to-transparent" />
+      </div>
+
       {/* Container teks agar memiliki batas lebar yang estetik */}
-      <div className="max-w-[85vw] md:max-w-[70vw] lg:max-w-[60vw]">
+      <div className="relative z-10 max-w-[85vw] md:max-w-[70vw] lg:max-w-[60vw]">
         {/* Label kecil di atas teks utama */}
         <div
           className="mb-8 flex items-center gap-4 text-xs font-bold uppercase tracking-widest opacity-50"

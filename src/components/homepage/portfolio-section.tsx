@@ -61,19 +61,25 @@ export function PortfolioSection() {
       });
 
       // Animasi Parallax pada gambar di dalam slider
-      const images = track.querySelectorAll(".portfolio-image-inner");
-      images.forEach((img) => {
-        gsap.to(img, {
-          x: "20%", // gambar bergerak sedikit ke kanan di dalam framenya (parallax)
-          ease: "none",
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top top",
-            end: () => `+=${getScrollAmount() * -1}`,
-            scrub: 1,
-            invalidateOnRefresh: true,
+      // Membutuhkan `containerAnimation` agar tersinkronisasi dengan scroll horizontal
+      const projectCards = track.querySelectorAll(".project-card");
+      projectCards.forEach((card) => {
+        const img = card.querySelector(".portfolio-image-inner");
+        gsap.fromTo(
+          img,
+          { xPercent: -8 }, // Mulai digeser ke kiri (batas aman overflow gambar)
+          {
+            xPercent: 8, // Bergeser ke kanan
+            ease: "none",
+            scrollTrigger: {
+              trigger: card, // Trigger parallax adalah card proyeknya, BUKAN containernya
+              start: "left right", // Mulai saat card masuk dari kanan layar
+              end: "right left", // Selesai saat card keluar di kiri layar
+              containerAnimation: tween, // KUNCI: hubungkan dengan timeline horizontal
+              scrub: true,
+            },
           },
-        });
+        );
       });
     },
     { scope: containerRef, dependencies: [reducedMotion] },
@@ -116,7 +122,7 @@ export function PortfolioSection() {
         {PROJECTS.map((project, index) => (
           <div
             key={project.id}
-            className="relative flex h-[70vh] w-[85vw] flex-col justify-center px-[4vw] md:w-[60vw]"
+            className="project-card relative flex h-[70vh] w-[85vw] flex-col justify-center px-[4vw] md:w-[60vw]"
           >
             {/* Image Wrapper */}
             <div className="relative h-full w-full overflow-hidden rounded-sm">

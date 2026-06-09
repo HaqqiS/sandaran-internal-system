@@ -6,6 +6,7 @@ import {
   useMotionValueEvent,
   useScroll,
 } from "motion/react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -171,6 +172,25 @@ const menuItemVariants = {
   },
 };
 
+// Overlay container variants — handles clipPath and propagates to children
+const overlayVariants = {
+  closed: {
+    clipPath: "inset(0 0 100% 0)",
+    transition: {
+      duration: 0.6,
+      ease: EASE_CUBIC,
+      when: "afterChildren", // Tunggu anak-anak selesai exit sebelum overlay menutup (opsional, tapi lebih rapi)
+    },
+  },
+  open: {
+    clipPath: "inset(0 0 0% 0)",
+    transition: {
+      duration: 0.65,
+      ease: EASE_CUBIC,
+    },
+  },
+};
+
 interface MenuOverlayProps {
   isOpen: boolean;
   onClose: () => void;
@@ -180,11 +200,14 @@ interface MenuOverlayProps {
 function MenuOverlay({ isOpen, onClose, session }: MenuOverlayProps) {
   const pathname = usePathname();
 
-  // Lock body scroll saat overlay terbuka
   useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = "unset";
     };
   }, [isOpen]);
 
@@ -198,15 +221,15 @@ function MenuOverlay({ isOpen, onClose, session }: MenuOverlayProps) {
       {isOpen && (
         <motion.div
           key="menu-overlay"
-          className="fixed inset-0 z-9998 flex flex-col overflow-hidden"
+          className="fixed inset-0 z-[9990] flex flex-col overflow-hidden"
           style={{ backgroundColor: "var(--hp-bg-surface)" }}
-          initial={{ clipPath: "inset(0 0 100% 0)" }}
-          animate={{ clipPath: "inset(0 0 0% 0)" }}
-          exit={{ clipPath: "inset(0 0 100% 0)" }}
-          transition={{ duration: 0.65, ease: EASE_CUBIC }}
+          variants={overlayVariants}
+          initial="closed"
+          animate="open"
+          exit="closed"
         >
-          {/* Decorative architectural grid — kanan layar, desktop only */}
-          <ArchitecturalGrid isVisible={true} />
+          {/* Decorative architectural grid — menggunakan isOpen untuk sinkronisasi */}
+          <ArchitecturalGrid isVisible={isOpen} />
 
           {/* Konten overlay — full height flex column */}
           <div className="relative z-10 flex flex-1 flex-col px-8 pb-10 pt-28 md:px-16 lg:px-20">
@@ -214,9 +237,6 @@ function MenuOverlay({ isOpen, onClose, session }: MenuOverlayProps) {
             <motion.nav
               className="flex flex-1 flex-col justify-center"
               variants={menuContainerVariants}
-              initial="closed"
-              animate="open"
-              exit="closed"
               aria-label="Menu utama"
             >
               <ul className="flex flex-col gap-0">
@@ -225,7 +245,7 @@ function MenuOverlay({ isOpen, onClose, session }: MenuOverlayProps) {
                   return (
                     <li
                       key={link.href}
-                      className="overflow-hidden border-b"
+                      className="group relative overflow-hidden border-b"
                       style={{ borderColor: "var(--hp-border)" }}
                     >
                       {/*
@@ -237,7 +257,7 @@ function MenuOverlay({ isOpen, onClose, session }: MenuOverlayProps) {
                         <Link
                           href={link.href}
                           onClick={onClose}
-                          className="group relative flex items-center py-4 lg:py-6"
+                          className="relative flex items-center py-4 lg:py-6"
                           aria-current={isActive ? "page" : undefined}
                         >
                           <span
@@ -245,20 +265,11 @@ function MenuOverlay({ isOpen, onClose, session }: MenuOverlayProps) {
                             style={{
                               fontSize: "var(--text-display-lg)",
                               color: isActive
-                                ? "var(--hp-accent)"
+                                ? "var(--hp-clay)"
                                 : "var(--hp-fg)",
                             }}
                           >
                             {link.label}
-
-                            {/*
-                              Underline accent yang grow dari kiri saat hover.
-                              Diposisikan absolute di bawah teks.
-                            */}
-                            <span
-                              className="absolute bottom-0 left-0 h-[2px] w-0 bg-[var(--hp-accent)] transition-all duration-300 group-hover:w-full"
-                              aria-hidden="true"
-                            />
                           </span>
 
                           {/* Desktop only index number: 01, 02, ... */}
@@ -270,6 +281,15 @@ function MenuOverlay({ isOpen, onClose, session }: MenuOverlayProps) {
                           </span>
                         </Link>
                       </motion.div>
+
+                      {/* Underline accent yang grow dari kiri saat hover, sejajar dengan border-b */}
+                      <div
+                        className="absolute bottom-0 left-0 h-[3px] w-0 bg-[var(--hp-clay)] transition-all duration-500 group-hover:w-full"
+                        style={{
+                          transitionTimingFunction:
+                            "cubic-bezier(0.76, 0, 0.24, 1)",
+                        }}
+                      />
                     </li>
                   );
                 })}
@@ -278,7 +298,7 @@ function MenuOverlay({ isOpen, onClose, session }: MenuOverlayProps) {
               {/* Auth section — sementara dipindah ke sini */}
               <motion.div
                 variants={menuItemVariants}
-                className="mt-12 flex flex-col items-start gap-6 border-t pt-10"
+                className="mt-12 flex flex-col items-start gap-6 pt-10"
                 style={{ borderColor: "var(--hp-border)" }}
               >
                 {session ? (
@@ -396,7 +416,7 @@ export function HomepageNavbar({ session }: { session: Session | null }) {
         className="fixed top-0 left-0 right-0 flex items-center justify-between px-8 md:px-16 lg:px-20"
         style={{
           height: "72px",
-          zIndex: menuOpen ? 9999 : 9997,
+          zIndex: 9999, // Selalu di atas overlay agar tombol CLOSE bisa diklik kapan saja
         }}
         animate={{
           backgroundColor:
@@ -466,42 +486,13 @@ export function HomepageNavbar({ session }: { session: Session | null }) {
 
 function LogoMark() {
   return (
-    <svg
-      width="36"
-      height="36"
-      viewBox="0 0 36 36"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      {/* 3 kolom vertikal — ala kolom arsitektur */}
-      <rect
-        x="2"
-        y="4"
-        width="8"
-        height="28"
-        rx="0"
-        fill="var(--hp-accent)"
-        opacity="0.9"
-      />
-      <rect
-        x="14"
-        y="10"
-        width="8"
-        height="22"
-        rx="0"
-        fill="var(--hp-accent)"
-        opacity="0.7"
-      />
-      <rect
-        x="26"
-        y="2"
-        width="8"
-        height="32"
-        rx="0"
-        fill="var(--hp-accent)"
-        opacity="0.5"
-      />
-    </svg>
+    <Image
+      src="/icon.webp"
+      alt="Logo Astaloka"
+      width={36}
+      height={36}
+      className="object-contain"
+      priority
+    />
   );
 }
