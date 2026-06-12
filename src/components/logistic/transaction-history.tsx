@@ -4,6 +4,7 @@ import { IconArrowDownLeft, IconArrowUpRight } from "@tabler/icons-react";
 import { format } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import {
   Table,
   TableBody,
@@ -23,10 +24,10 @@ export function TransactionHistory({
   projectId,
   itemId,
 }: TransactionHistoryProps) {
-  const { data: transactions, isLoading } = useLogisticTransactions(
-    projectId,
-    itemId,
-  );
+  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useLogisticTransactions(projectId, itemId);
+
+  const transactions = data?.pages.flatMap((page) => page.items) ?? [];
 
   if (isLoading) {
     return (
@@ -108,6 +109,17 @@ export function TransactionHistory({
           ))}
         </TableBody>
       </Table>
+      {hasNextPage && (
+        <div className="flex justify-center p-4 border-t">
+          <Button
+            variant="outline"
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
+          >
+            {isFetchingNextPage ? "Memuat..." : "Muat Lebih Banyak"}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

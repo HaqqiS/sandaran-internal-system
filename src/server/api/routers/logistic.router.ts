@@ -250,6 +250,9 @@ export const logisticRouter = createTRPCRouter({
           id: input.itemId,
           projectId: ctx.projectId,
         },
+        include: {
+          transactions: true,
+        },
       });
 
       if (!item) {
@@ -257,6 +260,23 @@ export const logisticRouter = createTRPCRouter({
           code: "NOT_FOUND",
           message: "Logistic item not found in this project",
         });
+      }
+
+      if (input.type === "OUT") {
+        const totalIn = item.transactions
+          .filter((t) => t.type === "IN")
+          .reduce((sum, t) => sum + Number(t.quantity), 0);
+        const totalOut = item.transactions
+          .filter((t) => t.type === "OUT")
+          .reduce((sum, t) => sum + Number(t.quantity), 0);
+        const currentStock = totalIn - totalOut;
+
+        if (input.quantity > currentStock) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `Stok tidak mencukupi. Stok saat ini: ${currentStock} ${item.unit}`,
+          });
+        }
       }
 
       const transaction = await ctx.db.logisticTransaction.create({
@@ -292,9 +312,12 @@ export const logisticRouter = createTRPCRouter({
         projectId: z.string(),
         itemId: z.string().optional(),
         type: z.enum(["IN", "OUT"]).optional(),
+        limit: z.number().min(1).max(100).default(20),
+        cursor: z.string().nullish(),
       }),
     )
     .query(async ({ ctx, input }) => {
+      const { limit, cursor } = input;
       // If itemId provided, verify it belongs to this project
       if (input.itemId) {
         const item = await ctx.db.logisticItem.findFirst({
@@ -321,6 +344,8 @@ export const logisticRouter = createTRPCRouter({
       const projectItemIds = projectItems.map((item) => item.id);
 
       const transactions = await ctx.db.logisticTransaction.findMany({
+        take: limit + 1,
+        cursor: cursor ? { id: cursor } : undefined,
         where: {
           itemId: {
             in: input.itemId ? [input.itemId] : projectItemIds,
@@ -335,14 +360,29 @@ export const logisticRouter = createTRPCRouter({
               image: true,
             },
           },
-          item: true,
+          item: {
+            select: {
+              id: true,
+              name: true,
+              unit: true,
+            },
+          },
         },
         orderBy: {
           createdAt: "desc",
         },
       });
 
-      return transactions;
+      let nextCursor: typeof cursor | undefined;
+      if (transactions.length > limit) {
+        const nextItem = transactions.pop();
+        nextCursor = nextItem?.id;
+      }
+
+      return {
+        items: transactions,
+        nextCursor,
+      };
     }),
 
   /**

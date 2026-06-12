@@ -131,67 +131,75 @@ export function LogisticsSection({
               <div className="space-y-2">
                 <p className="text-sm font-medium">Ringkasan Stok</p>
                 <div className="space-y-2">
-                  {items.slice(0, 3).map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center justify-between rounded-md border p-3 text-sm"
-                    >
-                      <div className="flex-1">
-                        <p className="font-medium">{item.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {item.unit}
-                        </p>
-                      </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <div className="flex items-center gap-3 text-xs">
-                          <div className="flex items-center gap-1 text-green-600">
-                            <IconPlus className="h-3 w-3" />
-                            <span>{item.totalIn}</span>
-                          </div>
-                          <div className="flex items-center gap-1 text-red-600">
-                            <IconMinus className="h-3 w-3" />
-                            <span>{item.totalOut}</span>
-                          </div>
-                          <div className="font-bold">= {item.currentStock}</div>
+                  {[...items]
+                    .sort(
+                      (a, b) =>
+                        b.totalIn + b.totalOut - (a.totalIn + a.totalOut),
+                    )
+                    .slice(0, 3)
+                    .map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between rounded-md border p-3 text-sm"
+                      >
+                        <div className="flex-1">
+                          <p className="font-medium">{item.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {item.unit}
+                          </p>
                         </div>
-
-                        {canRecordTransaction && (
-                          <div className="flex items-center gap-1 text-xs">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-7 text-green-600 hover:text-green-700"
-                              onClick={() =>
-                                setTransactionDialog({
-                                  isOpen: true,
-                                  type: "IN",
-                                  item,
-                                })
-                              }
-                            >
-                              <IconPlus className="mr-1 h-3 w-3" />
-                              Masuk
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-7 text-red-600 hover:text-red-700"
-                              onClick={() =>
-                                setTransactionDialog({
-                                  isOpen: true,
-                                  type: "OUT",
-                                  item,
-                                })
-                              }
-                            >
-                              <IconMinus className="mr-1 h-3 w-3" />
-                              Keluar
-                            </Button>
+                        <div className="flex flex-col items-end gap-2">
+                          <div className="flex items-center gap-3 text-xs">
+                            <div className="flex items-center gap-1 text-green-600">
+                              <IconPlus className="h-3 w-3" />
+                              <span>{item.totalIn}</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-red-600">
+                              <IconMinus className="h-3 w-3" />
+                              <span>{item.totalOut}</span>
+                            </div>
+                            <div className="font-bold">
+                              = {item.currentStock}
+                            </div>
                           </div>
-                        )}
+
+                          {canRecordTransaction && (
+                            <div className="flex items-center gap-1 text-xs">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-7 text-green-600 hover:text-green-700"
+                                onClick={() =>
+                                  setTransactionDialog({
+                                    isOpen: true,
+                                    type: "IN",
+                                    item,
+                                  })
+                                }
+                              >
+                                <IconPlus className="mr-1 h-3 w-3" />
+                                Masuk
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-7 text-red-600 hover:text-red-700"
+                                onClick={() =>
+                                  setTransactionDialog({
+                                    isOpen: true,
+                                    type: "OUT",
+                                    item,
+                                  })
+                                }
+                              >
+                                <IconMinus className="mr-1 h-3 w-3" />
+                                Keluar
+                              </Button>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
             )}

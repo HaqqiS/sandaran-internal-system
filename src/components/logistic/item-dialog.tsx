@@ -41,8 +41,9 @@ export function LogisticItemDialog({
   children,
 }: LogisticItemDialogProps) {
   const isMobile = useIsMobile();
-  const title = "Add New Item";
-  const description = "Create a new logistic item to track in this project.";
+  const title = "Tambah Barang Baru";
+  const description =
+    "Buat barang logistik baru untuk dilacak pada proyek ini.";
   const [draft, setDraft] = useState<ItemFormDraft>({});
   const formRef = useRef<{ getValues: () => ItemFormValues }>(null);
 

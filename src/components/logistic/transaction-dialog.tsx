@@ -40,13 +40,11 @@ export function TransactionDialog({
   onSuccess,
 }: TransactionDialogProps) {
   const isMobile = useIsMobile();
-  const title = type === "IN" ? "Stock In" : "Stock Out";
-  const directionText = type === "IN" ? "incoming" : "outgoing";
-  const description = (
-    <>
-      Record {directionText} stock for <strong>{item?.name}</strong>.
-    </>
-  );
+  const title = type === "IN" ? "Barang Masuk" : "Barang Keluar";
+  const description =
+    type === "IN"
+      ? `Catat penambahan stok untuk ${item?.name}`
+      : `Catat pengeluaran stok untuk ${item?.name}`;
   const [draft, setDraft] = useState<TransactionFormDraft>({});
   const formRef = useRef<{ getValues: () => TransactionFormValues }>(null);
 

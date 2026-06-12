@@ -86,7 +86,7 @@ export function LogisticItemForm({
       unit: item?.unit ?? draftValues?.unit ?? "",
     } as ItemFormValues,
     validators: {
-      onSubmit: itemSchema,
+      onChange: itemSchema,
     },
     onSubmit: async ({ value }) => {
       try {

@@ -63,7 +63,7 @@ export function TransactionForm({
       notes: draftValues?.notes ?? "",
     } as TransactionFormValues,
     validators: {
-      onSubmit: transactionSchema,
+      onChange: transactionSchema,
     },
     onSubmit: async ({ value }) => {
       try {
@@ -138,6 +138,8 @@ export function TransactionForm({
                   id={field.name}
                   name={field.name}
                   type="number"
+                  inputMode="decimal"
+                  autoComplete="off"
                   step="0.01"
                   min="0"
                   value={field.state.value}
