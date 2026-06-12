@@ -16,7 +16,10 @@ import {
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload";
-import { useAddEmergencyBalance } from "~/hooks/useEmergency";
+import {
+  useAddEmergencyBalance,
+  useEditEmergencyTransaction,
+} from "~/hooks/useEmergency";
 import { formatNumberIDR } from "~/lib/utils";
 
 const fundSchema = z.object({
@@ -36,6 +39,8 @@ export type FundFormDraft = Partial<FundFormValues>;
 interface FundFormProps {
   projectId: string;
   projectSlug: string;
+  mode?: "create" | "edit";
+  transactionId?: string;
   draftValues?: FundFormDraft;
   ref?: React.Ref<{ getValues: () => FundFormValues }>;
   onSuccess?: () => void;
@@ -45,13 +50,20 @@ interface FundFormProps {
 export function FundForm({
   projectId,
   projectSlug,
+  mode = "create",
+  transactionId,
   draftValues,
   ref,
   onSuccess,
   onCancel,
 }: FundFormProps) {
   const addBalance = useAddEmergencyBalance();
+  const editTransaction = useEditEmergencyTransaction();
   const { upload, isLoading: isUploading } = useCloudinaryUpload();
+
+  const isEdit = mode === "edit";
+  const isPending =
+    addBalance.isPending || editTransaction.isPending || isUploading;
 
   useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
 
@@ -80,18 +92,35 @@ export function FundForm({
           finalPublicId = result.publicId;
         }
 
-        await addBalance.mutateAsync({
-          projectId,
-          amount: Number(value.amount),
-          description: value.description,
-          proofPublicId: finalPublicId || undefined,
-          proofUrl: finalUrl || undefined,
-        });
-        toast.success("Kas berhasil ditambahkan");
+        if (isEdit && transactionId) {
+          await editTransaction.mutateAsync({
+            projectId,
+            transactionId,
+            amount: Number(value.amount),
+            description: value.description,
+            proofPublicId: finalPublicId || undefined,
+            proofUrl: finalUrl || undefined,
+          });
+          toast.success("Transaksi berhasil diperbarui");
+        } else {
+          await addBalance.mutateAsync({
+            projectId,
+            amount: Number(value.amount),
+            description: value.description,
+            proofPublicId: finalPublicId || undefined,
+            proofUrl: finalUrl || undefined,
+          });
+          toast.success("Kas berhasil ditambahkan");
+        }
+
         form.reset();
         onSuccess?.();
       } catch (error) {
-        toast.error("Gagal menambahkan dana ke kas");
+        toast.error(
+          isEdit
+            ? "Gagal memperbarui transaksi"
+            : "Gagal menambahkan dana ke kas",
+        );
         console.error(error);
       }
     },
@@ -200,10 +229,12 @@ export function FundForm({
         <Button type="button" variant="outline" onClick={onCancel}>
           Batal
         </Button>
-        <Button type="submit" disabled={addBalance.isPending || isUploading}>
-          {addBalance.isPending || isUploading
+        <Button type="submit" disabled={isPending}>
+          {isPending
             ? "Memproses..."
-            : "Tambah Kas Masuk"}
+            : isEdit
+              ? "Simpan Perubahan"
+              : "Tambah Kas Masuk"}
         </Button>
       </div>
     </form>

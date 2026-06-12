@@ -395,6 +395,213 @@ export const emergencyRouter = createTRPCRouter({
     }),
 
   /**
+   * Edit an emergency transaction
+   * Owner can edit their own transactions:
+   * - MANDOR can edit their own UNREVIEWED WITHDRAWALs
+   * - FINANCE can edit their own DEPOSITs
+   * - ADMIN can edit any transaction (with balance safety)
+   */
+  edit: projectProcedure(["MANDOR", "FINANCE"])
+    .input(
+      z.object({
+        projectId: z.string(),
+        transactionId: z.string(),
+        amount: z.number().positive(),
+        description: z.string().min(1),
+        proofPublicId: z.string().optional(),
+        proofUrl: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id: userId, roleGlobal } = ctx.session.user;
+      const isAdminUser = roleGlobal === "ADMIN";
+
+      // Get the existing transaction
+      const transaction = await ctx.db.emergencyTransaction.findUnique({
+        where: { id: input.transactionId },
+        include: { fund: true },
+      });
+
+      if (!transaction) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Transaction not found",
+        });
+      }
+
+      // Verify transaction belongs to this project
+      if (transaction.fund.projectId !== ctx.projectId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Transaction does not belong to this project",
+        });
+      }
+
+      // Ownership check: only the creator or ADMIN can edit
+      if (!isAdminUser && transaction.requestedById !== userId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Anda hanya bisa mengedit transaksi milik sendiri",
+        });
+      }
+
+      // Status check: WITHDRAWAL can only be edited if UNREVIEWED
+      if (
+        transaction.type === "WITHDRAWAL" &&
+        transaction.status !== "UNREVIEWED"
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Penarikan yang sudah ditinjau tidak dapat diedit",
+        });
+      }
+
+      // Calculate balance adjustment
+      const oldAmount = Number(transaction.amount);
+      const newAmount = input.amount;
+      const currentBalance = Number(transaction.fund.currentBalance);
+
+      let newBalance: number;
+      if (transaction.type === "DEPOSIT") {
+        // For deposits: remove old amount, add new amount
+        newBalance = currentBalance - oldAmount + newAmount;
+      } else {
+        // For withdrawals: restore old reservation, apply new reservation
+        newBalance = currentBalance + oldAmount - newAmount;
+      }
+
+      // Safety: balance must not go negative
+      if (newBalance < 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "Perubahan ini akan menyebabkan saldo menjadi negatif. Operasi dibatalkan.",
+        });
+      }
+
+      // Atomic update: transaction + balance
+      const [updated] = await ctx.db.$transaction([
+        ctx.db.emergencyTransaction.update({
+          where: { id: input.transactionId },
+          data: {
+            amount: newAmount,
+            description: input.description,
+            publicId: input.proofPublicId ?? transaction.publicId,
+            url: input.proofUrl ?? transaction.url,
+          },
+          include: {
+            requester: {
+              select: { id: true, name: true, image: true },
+            },
+            verifier: {
+              select: { id: true, name: true, image: true },
+            },
+          },
+        }),
+        ctx.db.emergencyFund.update({
+          where: { id: transaction.fundId },
+          data: { currentBalance: newBalance },
+        }),
+      ]);
+
+      return updated;
+    }),
+
+  /**
+   * Delete an emergency transaction
+   * Owner can delete their own transactions:
+   * - MANDOR can delete their own UNREVIEWED WITHDRAWALs
+   * - FINANCE can delete their own DEPOSITs
+   * - ADMIN can delete any transaction (with balance safety)
+   */
+  delete: projectProcedure(["MANDOR", "FINANCE"])
+    .input(
+      z.object({
+        projectId: z.string(),
+        transactionId: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id: userId, roleGlobal } = ctx.session.user;
+      const isAdminUser = roleGlobal === "ADMIN";
+
+      // Get the existing transaction
+      const transaction = await ctx.db.emergencyTransaction.findUnique({
+        where: { id: input.transactionId },
+        include: { fund: true },
+      });
+
+      if (!transaction) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Transaction not found",
+        });
+      }
+
+      // Verify transaction belongs to this project
+      if (transaction.fund.projectId !== ctx.projectId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Transaction does not belong to this project",
+        });
+      }
+
+      // Ownership check: only the creator or ADMIN can delete
+      if (!isAdminUser && transaction.requestedById !== userId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Anda hanya bisa menghapus transaksi milik sendiri",
+        });
+      }
+
+      // Status check: WITHDRAWAL can only be deleted if UNREVIEWED
+      if (
+        transaction.type === "WITHDRAWAL" &&
+        transaction.status !== "UNREVIEWED"
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Penarikan yang sudah ditinjau tidak dapat dihapus",
+        });
+      }
+
+      // Calculate new balance after deletion
+      const currentBalance = Number(transaction.fund.currentBalance);
+      const amount = Number(transaction.amount);
+
+      let newBalance: number;
+      if (transaction.type === "DEPOSIT") {
+        // Removing a deposit decreases balance
+        newBalance = currentBalance - amount;
+      } else {
+        // Removing a withdrawal restores the reserved amount
+        newBalance = currentBalance + amount;
+      }
+
+      // Safety: balance must not go negative
+      if (newBalance < 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "Menghapus transaksi ini akan menyebabkan saldo menjadi negatif. Operasi dibatalkan.",
+        });
+      }
+
+      // Atomic delete + balance update
+      await ctx.db.$transaction([
+        ctx.db.emergencyTransaction.delete({
+          where: { id: input.transactionId },
+        }),
+        ctx.db.emergencyFund.update({
+          where: { id: transaction.fundId },
+          data: { currentBalance: newBalance },
+        }),
+      ]);
+
+      return { success: true };
+    }),
+
+  /**
    * Get all transactions for a project
    * All project members can view
    */

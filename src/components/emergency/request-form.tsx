@@ -16,7 +16,10 @@ import {
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload";
-import { useRequestEmergencyFund } from "~/hooks/useEmergency";
+import {
+  useEditEmergencyTransaction,
+  useRequestEmergencyFund,
+} from "~/hooks/useEmergency";
 import { formatNumberIDR } from "~/lib/utils";
 
 const withdrawSchema = z.object({
@@ -36,6 +39,8 @@ export type WithdrawFormDraft = Partial<WithdrawFormValues>;
 interface RequestFormProps {
   projectId: string;
   projectSlug: string;
+  mode?: "create" | "edit";
+  transactionId?: string;
   draftValues?: WithdrawFormDraft;
   ref?: React.Ref<{ getValues: () => WithdrawFormValues }>;
   onSuccess?: () => void;
@@ -45,13 +50,20 @@ interface RequestFormProps {
 export function RequestForm({
   projectId,
   projectSlug,
+  mode = "create",
+  transactionId,
   draftValues,
   ref,
   onSuccess,
   onCancel,
 }: RequestFormProps) {
   const requestFund = useRequestEmergencyFund();
+  const editTransaction = useEditEmergencyTransaction();
   const { upload, isLoading: isUploading } = useCloudinaryUpload();
+
+  const isEdit = mode === "edit";
+  const isPending =
+    requestFund.isPending || editTransaction.isPending || isUploading;
 
   useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
 
@@ -80,19 +92,33 @@ export function RequestForm({
           finalPublicId = result.publicId;
         }
 
-        await requestFund.mutateAsync({
-          projectId,
-          amount: Number(value.amount),
-          description: value.description,
-          proofPublicId: finalPublicId || undefined,
-          proofUrl: finalUrl || undefined,
-        });
+        if (isEdit && transactionId) {
+          await editTransaction.mutateAsync({
+            projectId,
+            transactionId,
+            amount: Number(value.amount),
+            description: value.description,
+            proofPublicId: finalPublicId || undefined,
+            proofUrl: finalUrl || undefined,
+          });
+          toast.success("Transaksi berhasil diperbarui");
+        } else {
+          await requestFund.mutateAsync({
+            projectId,
+            amount: Number(value.amount),
+            description: value.description,
+            proofPublicId: finalPublicId || undefined,
+            proofUrl: finalUrl || undefined,
+          });
+          toast.success("Pengajuan dana berhasil dikirim");
+        }
 
-        toast.success("Pengajuan dana berhasil dikirim");
         form.reset();
         onSuccess?.();
       } catch (error) {
-        toast.error("Gagal mengajukan dana");
+        toast.error(
+          isEdit ? "Gagal memperbarui transaksi" : "Gagal mengajukan dana",
+        );
         console.error(error);
       }
     },
@@ -200,10 +226,12 @@ export function RequestForm({
         <Button type="button" variant="outline" onClick={onCancel}>
           Batal
         </Button>
-        <Button type="submit" disabled={requestFund.isPending || isUploading}>
-          {requestFund.isPending || isUploading
+        <Button type="submit" disabled={isPending}>
+          {isPending
             ? "Memproses..."
-            : "Ajukan Dana"}
+            : isEdit
+              ? "Simpan Perubahan"
+              : "Ajukan Dana"}
         </Button>
       </div>
     </form>

@@ -70,3 +70,31 @@ export function useVerifyEmergencyRequest() {
     },
   });
 }
+
+export function useEditEmergencyTransaction() {
+  const utils = api.useUtils();
+  return api.emergency.edit.useMutation({
+    onSuccess: (_data, variables) => {
+      void utils.emergency.getByProject.invalidate({
+        projectId: variables.projectId,
+      });
+      void utils.emergency.getTransactions.invalidate({
+        projectId: variables.projectId,
+      });
+    },
+  });
+}
+
+export function useDeleteEmergencyTransaction() {
+  const utils = api.useUtils();
+  return api.emergency.delete.useMutation({
+    onSuccess: (_data, variables) => {
+      void utils.emergency.getByProject.invalidate({
+        projectId: variables.projectId,
+      });
+      void utils.emergency.getTransactions.invalidate({
+        projectId: variables.projectId,
+      });
+    },
+  });
+}

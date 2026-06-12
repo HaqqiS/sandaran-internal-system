@@ -111,7 +111,13 @@ export function EmergencyClient({ projectSlug }: EmergencyClientProps) {
 
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Riwayat Transaksi</h3>
-            <TransactionList projectId={project.id} canReview={canReview} />
+            <TransactionList
+              projectId={project.id}
+              projectSlug={project.slug}
+              canReview={canReview}
+              currentUserId={user?.id}
+              isAdmin={isAdmin}
+            />
           </div>
         </div>
       </div>

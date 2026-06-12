@@ -27,6 +27,9 @@ interface WithdrawDialogProps {
   projectSlug: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  mode?: "create" | "edit";
+  transactionId?: string;
+  initialValues?: WithdrawFormDraft;
 }
 
 export function WithdrawDialog({
@@ -34,16 +37,24 @@ export function WithdrawDialog({
   projectSlug,
   open,
   onOpenChange,
+  mode = "create",
+  transactionId,
+  initialValues,
 }: WithdrawDialogProps) {
   const isMobile = useIsMobile();
-  const title = "Request Withdrawal";
-  const description =
-    "Request funds from the project budget. Please attach proof if available.";
+  const isEdit = mode === "edit";
+  const title = isEdit ? "Edit Penarikan Dana" : "Ajukan Penarikan Dana";
+  const description = isEdit
+    ? "Ubah detail penarikan dana darurat ini."
+    : "Ajukan penarikan dana darurat untuk project ini.Lampirkan bukti jika ada.";
   const [draft, setDraft] = useState<WithdrawFormDraft>({});
   const formRef = useRef<{ getValues: () => WithdrawFormValues }>(null);
 
+  // Use initialValues when available (edit mode), otherwise fall back to draft
+  const formDraftValues = isEdit ? initialValues : draft;
+
   const handleOpenChange = (isOpen: boolean) => {
-    if (!isOpen && formRef.current) {
+    if (!isOpen && formRef.current && !isEdit) {
       setDraft(formRef.current.getValues());
     }
     onOpenChange(isOpen);
@@ -66,7 +77,9 @@ export function WithdrawDialog({
             ref={formRef}
             projectId={projectId}
             projectSlug={projectSlug}
-            draftValues={draft}
+            mode={mode}
+            transactionId={transactionId}
+            draftValues={formDraftValues}
             onSuccess={handleSuccess}
             onCancel={() => onOpenChange(false)}
           />
@@ -87,7 +100,9 @@ export function WithdrawDialog({
             ref={formRef}
             projectId={projectId}
             projectSlug={projectSlug}
-            draftValues={draft}
+            mode={mode}
+            transactionId={transactionId}
+            draftValues={formDraftValues}
             onSuccess={handleSuccess}
             onCancel={() => onOpenChange(false)}
           />

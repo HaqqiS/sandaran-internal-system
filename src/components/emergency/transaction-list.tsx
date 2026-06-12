@@ -1,6 +1,11 @@
 "use client";
 
-import { IconZoomIn } from "@tabler/icons-react";
+import {
+  IconDotsVertical,
+  IconEdit,
+  IconTrash,
+  IconZoomIn,
+} from "@tabler/icons-react";
 import {
   type ColumnDef,
   flexRender,
@@ -13,9 +18,26 @@ import {
 import { format } from "date-fns";
 import type { EmergencyTransaction } from "generated/prisma";
 import { useState } from "react";
+import { toast } from "sonner";
 import { MediaPreview } from "~/components/shared/media-preview";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -24,24 +46,122 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { useEmergencyTransactions } from "~/hooks/useEmergency";
+import {
+  useDeleteEmergencyTransaction,
+  useEmergencyTransactions,
+} from "~/hooks/useEmergency";
+import { FundDialog } from "./fund-dialog";
 import { VerifyDialog } from "./verify-dialog";
+import { WithdrawDialog } from "./withdraw-dialog";
+
+// Extended transaction type that includes requester relation
+type TransactionWithRelations = EmergencyTransaction & {
+  requester?: { id: string; name: string; image: string | null } | null;
+  verifier?: { id: string; name: string; image: string | null } | null;
+};
 
 interface TransactionListProps {
   projectId: string;
+  projectSlug: string;
   canReview: boolean;
+  currentUserId?: string;
+  isAdmin: boolean;
 }
 
 export function TransactionList({
   projectId,
+  projectSlug,
   canReview,
+  currentUserId,
+  isAdmin,
 }: TransactionListProps) {
   const { data: transactions, isLoading } = useEmergencyTransactions(projectId);
+  const deleteTransaction = useDeleteEmergencyTransaction();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [verifyId, setVerifyId] = useState<string | null>(null);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
-  const columns: ColumnDef<EmergencyTransaction>[] = [
+  // Delete confirmation state
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string;
+    description: string;
+  } | null>(null);
+
+  // Edit state for DEPOSIT
+  const [editFund, setEditFund] = useState<{
+    transactionId: string;
+    amount: string;
+    description: string;
+    proofPublicId?: string;
+    proofUrl?: string;
+  } | null>(null);
+
+  // Edit state for WITHDRAWAL
+  const [editWithdraw, setEditWithdraw] = useState<{
+    transactionId: string;
+    amount: string;
+    description: string;
+    proofPublicId?: string;
+    proofUrl?: string;
+  } | null>(null);
+
+  /**
+   * Determine if the current user can edit/delete a given transaction
+   */
+  function canEditDelete(row: TransactionWithRelations): boolean {
+    // ADMIN can always edit/delete
+    if (isAdmin) return true;
+
+    // Owner check
+    const isOwner = row.requestedById === currentUserId;
+    if (!isOwner) return false;
+
+    // WITHDRAWAL must be UNREVIEWED
+    if (row.type === "WITHDRAWAL" && row.status !== "UNREVIEWED") return false;
+
+    return true;
+  }
+
+  function handleEditClick(row: TransactionWithRelations) {
+    const initialValues = {
+      amount: String(Number(row.amount)),
+      description: row.description,
+      proofPublicId: row.publicId ?? undefined,
+      proofUrl: row.url ?? undefined,
+    };
+
+    if (row.type === "DEPOSIT") {
+      setEditFund({
+        transactionId: row.id,
+        ...initialValues,
+      });
+    } else {
+      setEditWithdraw({
+        transactionId: row.id,
+        ...initialValues,
+      });
+    }
+  }
+
+  async function handleDeleteConfirm() {
+    if (!deleteTarget) return;
+    try {
+      await deleteTransaction.mutateAsync({
+        projectId,
+        transactionId: deleteTarget.id,
+      });
+      toast.success("Transaksi berhasil dihapus");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Gagal menghapus transaksi";
+      toast.error(message);
+      console.error(error);
+    } finally {
+      setDeleteTarget(null);
+    }
+  }
+
+  const columns: ColumnDef<TransactionWithRelations>[] = [
     {
       accessorKey: "createdAt",
       header: "Tanggal",
@@ -128,26 +248,65 @@ export function TransactionList({
       cell: ({ row }) => {
         const status = row.getValue("status") as string;
         const type = row.getValue("type") as string;
+        const showReview =
+          canReview && status === "UNREVIEWED" && type === "WITHDRAWAL";
+        const showEditDelete = canEditDelete(row.original);
 
-        // Only show Review button for UNREVIEWED WITHDRAWALs and if user has permission
-        if (canReview && status === "UNREVIEWED" && type === "WITHDRAWAL") {
-          return (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setVerifyId(row.original.id)}
-            >
-              Tinjau
-            </Button>
-          );
-        }
-        return null;
+        if (!showReview && !showEditDelete) return null;
+
+        return (
+          <div className="flex items-center gap-1">
+            {showReview && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setVerifyId(row.original.id)}
+              >
+                Tinjau
+              </Button>
+            )}
+            {showEditDelete && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    aria-label="Aksi lainnya"
+                  >
+                    <IconDotsVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => handleEditClick(row.original)}
+                  >
+                    <IconEdit className="mr-2 h-4 w-4" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-destructive focus:text-destructive"
+                    onClick={() =>
+                      setDeleteTarget({
+                        id: row.original.id,
+                        description: row.original.description,
+                      })
+                    }
+                  >
+                    <IconTrash className="mr-2 h-4 w-4" />
+                    Hapus
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
+        );
       },
     },
   ];
 
   const table = useReactTable({
-    data: transactions || [],
+    data: (transactions as TransactionWithRelations[]) || [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -213,6 +372,7 @@ export function TransactionList({
         </Table>
       </div>
 
+      {/* Review Dialog */}
       <VerifyDialog
         projectId={projectId}
         transactionId={verifyId}
@@ -220,10 +380,78 @@ export function TransactionList({
         onOpenChange={(open) => !open && setVerifyId(null)}
       />
 
+      {/* Lightbox */}
       <MediaPreview
         url={lightboxImage}
         open={!!lightboxImage}
         onOpenChange={(open) => !open && setLightboxImage(null)}
+      />
+
+      {/* Delete Confirmation AlertDialog */}
+      <AlertDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Transaksi?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus transaksi &quot;
+              {deleteTarget?.description}&quot;? Tindakan ini tidak dapat
+              dibatalkan dan saldo akan disesuaikan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={deleteTransaction.isPending}
+            >
+              {deleteTransaction.isPending ? "Menghapus..." : "Hapus"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Edit Deposit Dialog */}
+      <FundDialog
+        projectId={projectId}
+        projectSlug={projectSlug}
+        open={!!editFund}
+        onOpenChange={(open) => !open && setEditFund(null)}
+        mode="edit"
+        transactionId={editFund?.transactionId}
+        initialValues={
+          editFund
+            ? {
+                amount: editFund.amount,
+                description: editFund.description,
+                proofPublicId: editFund.proofPublicId,
+                proofUrl: editFund.proofUrl,
+              }
+            : undefined
+        }
+      />
+
+      {/* Edit Withdrawal Dialog */}
+      <WithdrawDialog
+        projectId={projectId}
+        projectSlug={projectSlug}
+        open={!!editWithdraw}
+        onOpenChange={(open) => !open && setEditWithdraw(null)}
+        mode="edit"
+        transactionId={editWithdraw?.transactionId}
+        initialValues={
+          editWithdraw
+            ? {
+                amount: editWithdraw.amount,
+                description: editWithdraw.description,
+                proofPublicId: editWithdraw.proofPublicId,
+                proofUrl: editWithdraw.proofUrl,
+              }
+            : undefined
+        }
       />
     </div>
   );
