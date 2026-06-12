@@ -2,6 +2,7 @@
 
 import {
   IconActivity,
+  IconFileSpreadsheet,
   IconLoader2,
   IconPencil,
   IconTrendingUp,
@@ -15,7 +16,7 @@ import { useState } from "react";
 import { FundDialog } from "~/components/emergency/fund-dialog";
 import { WithdrawDialog } from "~/components/emergency/withdraw-dialog";
 import { PageLayout } from "~/components/layout";
-
+import { ExportReportDialog } from "~/components/project/export-report-dialog";
 import {
   DocumentsSection,
   EmergencyFundSection,
@@ -47,6 +48,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
   const [isFundOpen, setIsFundOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [isTeamOpen, setIsTeamOpen] = useState(false);
+  const [isExportOpen, setIsExportOpen] = useState(false);
   const session = useSessionStore((state) => state.session);
   const canManage = isAdmin(
     session?.user?.roleGlobal as GlobalRole | null | undefined,
@@ -91,6 +93,15 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
       actions={
         canManage && (
           <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsExportOpen(true)}
+            >
+              <IconFileSpreadsheet className="mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Ekspor Laporan</span>
+              <span className="inline sm:hidden">Ekspor</span>
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -279,6 +290,14 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
         open={isTeamOpen}
         onOpenChange={setIsTeamOpen}
       />
+
+      {canManage && (
+        <ExportReportDialog
+          projectId={project.id}
+          open={isExportOpen}
+          onOpenChange={setIsExportOpen}
+        />
+      )}
     </PageLayout>
   );
 }

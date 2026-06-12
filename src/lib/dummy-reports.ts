@@ -11,9 +11,11 @@ export const DUMMY_REPORTS: DummyDailyReport[] = [
     userId: "user_mandor_1",
     slug: "laporan-harian-2026-06-08",
     reportDate: new Date("2026-06-08T00:00:00.000Z"),
-    taskDescription: "Pekerjaan plesteran dinding lobi utama lantai 1 dan instalasi perkabelan ceiling.",
+    taskDescription:
+      "Pekerjaan plesteran dinding lobi utama lantai 1 dan instalasi perkabelan ceiling.",
     progressPercent: 45,
-    issues: "Pengiriman semen sempat terlambat 2 jam, namun pekerjaan tetap dapat diselesaikan sesuai target harian.",
+    issues:
+      "Pengiriman semen sempat terlambat 2 jam, namun pekerjaan tetap dapat diselesaikan sesuai target harian.",
     weather: "Cerah",
     totalWorkers: 8,
     location: "Lobi Utama Lantai 1",
@@ -38,9 +40,11 @@ export const DUMMY_REPORTS: DummyDailyReport[] = [
     userId: "user_mandor_1",
     slug: "laporan-harian-2026-06-09",
     reportDate: new Date("2026-06-09T00:00:00.000Z"),
-    taskDescription: "Melanjutkan plesteran dinding lobi utama dan memulai pemasangan rangka hollow untuk plafon lobi.",
+    taskDescription:
+      "Melanjutkan plesteran dinding lobi utama dan memulai pemasangan rangka hollow untuk plafon lobi.",
     progressPercent: 55,
-    issues: "Hujan deras di siang hari, pengerjaan area luar (paving pintu masuk) ditunda.",
+    issues:
+      "Hujan deras di siang hari, pengerjaan area luar (paving pintu masuk) ditunda.",
     weather: "Hujan",
     totalWorkers: 10,
     location: "Lobi Utama & Drop Off",
@@ -71,7 +75,8 @@ export const DUMMY_REPORTS: DummyDailyReport[] = [
     userId: "user_mandor_2",
     slug: "laporan-harian-ba-house-2026-04-10",
     reportDate: new Date("2026-04-10T00:00:00.000Z"),
-    taskDescription: "Pembersihan akhir (final clean up) seluruh ruangan, pengecatan finishing dinding interior, dan pemasangan saklar lampu.",
+    taskDescription:
+      "Pembersihan akhir (final clean up) seluruh ruangan, pengecatan finishing dinding interior, dan pemasangan saklar lampu.",
     progressPercent: 100,
     issues: "Tidak ada masalah, semua pekerjaan selesai tepat waktu.",
     weather: "Cerah",
