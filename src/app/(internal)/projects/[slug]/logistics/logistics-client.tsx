@@ -16,7 +16,6 @@ interface LogisticsClientProps {
 
 export function LogisticsClient({ projectSlug }: LogisticsClientProps) {
   const { data: project, isLoading, error } = useProjectBySlug(projectSlug);
-  // useProjectBySlug might not return error based on previous view, but we can handle !project as error if not loading
   const { data: members } = useProjectMembers(project?.id ?? "");
 
   const { session } = useSession();
@@ -25,7 +24,6 @@ export function LogisticsClient({ projectSlug }: LogisticsClientProps) {
   // Find user's role
   const projectMember = members?.find((m) => m.userId === session?.user?.id);
   const role = projectMember?.role;
-
   const canManage = role === "FINANCE" || session?.user?.roleGlobal === "ADMIN";
 
   if (isLoading) {

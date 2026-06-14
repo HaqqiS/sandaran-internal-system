@@ -27,6 +27,13 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "~/components/ui/drawer";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -34,6 +41,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { useIsMobile } from "~/hooks/use-mobile";
 import { useDeleteLogisticItem } from "~/hooks/useLogistic";
 import { useProjectMembers } from "~/hooks/useProject";
 import { useSession } from "~/stores/use-session-store";
@@ -52,6 +60,7 @@ interface ItemActionsProps {
 export function ItemActions({ projectId, item }: ItemActionsProps) {
   const { session } = useSession();
   const { data: members } = useProjectMembers(projectId);
+  const isMobile = useIsMobile();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -81,9 +90,13 @@ export function ItemActions({ projectId, item }: ItemActionsProps) {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9"
+            aria-label="Buka menu aksi"
+          >
             <IconDotsVertical className="h-4 w-4" />
-            <span className="sr-only">Open menu</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
@@ -111,7 +124,7 @@ export function ItemActions({ projectId, item }: ItemActionsProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Edit Dialog */}
+      {/* ── Edit Dialog (same for all viewports) ──────────── */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent>
           <DialogHeader>
@@ -128,20 +141,38 @@ export function ItemActions({ projectId, item }: ItemActionsProps) {
         </DialogContent>
       </Dialog>
 
-      {/* History Dialog */}
-      <Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
-        <DialogContent className="sm:max-w-5xl">
-          <DialogHeader>
-            <DialogTitle>Riwayat Transaksi</DialogTitle>
-            <DialogDescription>
-              Riwayat untuk {item.name} ({item.unit})
-            </DialogDescription>
-          </DialogHeader>
-          <TransactionHistory projectId={projectId} itemId={item.id} />
-        </DialogContent>
-      </Dialog>
+      {/* ── History: Drawer on mobile, Dialog on desktop ──── */}
+      {isMobile ? (
+        <Drawer open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
+          <DrawerContent className="flex flex-col h-[85dvh]">
+            <DrawerHeader className="text-left shrink-0">
+              <DrawerTitle>Riwayat Transaksi</DrawerTitle>
+              <DrawerDescription>
+                {item.name} · {item.unit}
+              </DrawerDescription>
+            </DrawerHeader>
+            <div className="flex-1 overflow-y-auto px-4 pb-6">
+              <TransactionHistory projectId={projectId} itemId={item.id} />
+            </div>
+          </DrawerContent>
+        </Drawer>
+      ) : (
+        <Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
+          <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
+            <DialogHeader className="shrink-0">
+              <DialogTitle>Riwayat Transaksi</DialogTitle>
+              <DialogDescription>
+                {item.name} · {item.unit}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex-1 overflow-y-auto min-h-0 pr-1">
+              <TransactionHistory projectId={projectId} itemId={item.id} />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
-      {/* Delete Confirmation Dialog */}
+      {/* ── Delete Confirmation ────────────────────────────── */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -46,7 +46,7 @@ export function FundDialog({
   const title = isEdit ? "Edit Dana Masuk" : "Tambah Dana Darurat";
   const description = isEdit
     ? "Ubah detail transaksi dana masuk ini."
-    : "Add balance to the project's emergency fund. This will be recorded as a deposit.";
+    : "Tambah dana darurat untuk project ini.";
   const [draft, setDraft] = useState<FundFormDraft>({});
   const formRef = useRef<{ getValues: () => FundFormValues }>(null);
 
