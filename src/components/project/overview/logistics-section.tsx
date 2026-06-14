@@ -37,19 +37,6 @@ function getStockStatus(currentStock: number, totalIn: number) {
   return "ok";
 }
 
-function getStockProgressColor(status: ReturnType<typeof getStockStatus>) {
-  switch (status) {
-    case "out":
-      return "bg-destructive";
-    case "critical":
-      return "bg-amber-500";
-    case "low":
-      return "bg-yellow-400";
-    default:
-      return "bg-primary";
-  }
-}
-
 function getStockBadge(status: ReturnType<typeof getStockStatus>) {
   switch (status) {
     case "out":
@@ -202,49 +189,59 @@ export function LogisticsSection({
               <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 Kondisi Stok
               </p>
-              <div className="space-y-2">
+              <div className="grid gap-3 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {displayItems.map((item) => {
                   const status = getStockStatus(
                     item.currentStock,
                     item.totalIn,
                   );
-                  const progressValue =
-                    item.totalIn > 0
-                      ? Math.min((item.currentStock / item.totalIn) * 100, 100)
-                      : 0;
                   const badge = getStockBadge(status);
-                  const progressColor = getStockProgressColor(status);
 
                   return (
                     <div
                       key={item.id}
-                      className="rounded-xl border bg-card p-3 transition-colors hover:bg-muted/30"
+                      className="flex items-center justify-between rounded-xl border bg-card p-3 transition-colors hover:bg-muted/30"
                     >
-                      {/* Item Header */}
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <p className="text-sm font-medium truncate">
-                              {item.name}
-                            </p>
-                            {badge && (
-                              <Badge
-                                variant="outline"
-                                className={`text-[10px] px-1.5 py-0 h-4 shrink-0 ${badge.className}`}
-                              >
-                                {badge.label}
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-0.5">
-                            Satuan: {item.unit}
+                      <div className="flex-1 min-w-0 pr-3">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          <p className="text-sm font-medium truncate">
+                            {item.name}
                           </p>
+                          {badge && (
+                            <Badge
+                              variant="outline"
+                              className={`text-[10px] px-1.5 py-0 h-4 shrink-0 ${badge.className}`}
+                            >
+                              {badge.label}
+                            </Badge>
+                          )}
                         </div>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                          <span
+                            className="flex items-center gap-1"
+                            title="Total Masuk"
+                          >
+                            <IconTrendingUp className="h-3.5 w-3.5 text-green-500" />
+                            <span className="text-green-600 font-medium">
+                              {item.totalIn}
+                            </span>
+                          </span>
+                          <span
+                            className="flex items-center gap-1"
+                            title="Total Keluar"
+                          >
+                            <IconTrendingDown className="h-3.5 w-3.5 text-red-500" />
+                            <span className="text-red-600 font-medium">
+                              {item.totalOut}
+                            </span>
+                          </span>
+                        </div>
+                      </div>
 
-                        {/* Stock Number */}
-                        <div className="text-right shrink-0">
+                      <div className="flex items-center gap-3 shrink-0">
+                        <div className="text-right">
                           <p
-                            className={`text-lg font-bold leading-tight ${
+                            className={`text-lg font-bold leading-none mb-1 ${
                               status === "out"
                                 ? "text-destructive"
                                 : status === "critical"
@@ -254,41 +251,13 @@ export function LogisticsSection({
                           >
                             {item.currentStock}
                           </p>
-                          <p className="text-[10px] text-muted-foreground">
-                            tersisa
+                          <p className="text-[10px] text-muted-foreground leading-none">
+                            {item.unit}
                           </p>
-                        </div>
-                      </div>
-
-                      {/* Stock Progress Bar */}
-                      <div className="relative mb-2.5">
-                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                          <div
-                            className={`h-full rounded-full transition-all ${progressColor}`}
-                            style={{ width: `${progressValue}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* In/Out Stats + Actions */}
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <IconTrendingUp className="h-3 w-3 text-green-500" />
-                            <span className="text-green-600 font-medium">
-                              {item.totalIn}
-                            </span>
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <IconTrendingDown className="h-3 w-3 text-red-500" />
-                            <span className="text-red-600 font-medium">
-                              {item.totalOut}
-                            </span>
-                          </span>
                         </div>
 
                         {canRecordTransaction && (
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1 border-l pl-3 ml-1">
                             <button
                               type="button"
                               onClick={() =>
@@ -298,10 +267,10 @@ export function LogisticsSection({
                                   item,
                                 })
                               }
-                              className="flex h-7 w-7 items-center justify-center rounded-lg border border-green-200 bg-green-50 text-green-600 transition-all hover:bg-green-100 active:scale-95 dark:border-green-900 dark:bg-green-950 dark:text-green-400 dark:hover:bg-green-900"
+                              className="flex h-8 w-8 items-center justify-center rounded-lg border border-green-200 bg-green-50 text-green-600 transition-all hover:bg-green-100 active:scale-95 dark:border-green-900 dark:bg-green-950 dark:text-green-400 dark:hover:bg-green-900"
                               aria-label={`Tambah stok ${item.name}`}
                             >
-                              <IconPlus className="h-3.5 w-3.5" />
+                              <IconPlus className="h-4 w-4" />
                             </button>
                             <button
                               type="button"
@@ -312,10 +281,10 @@ export function LogisticsSection({
                                   item,
                                 })
                               }
-                              className="flex h-7 w-7 items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-600 transition-all hover:bg-red-100 active:scale-95 dark:border-red-900 dark:bg-red-950 dark:text-red-400 dark:hover:bg-red-900"
+                              className="flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-600 transition-all hover:bg-red-100 active:scale-95 dark:border-red-900 dark:bg-red-950 dark:text-red-400 dark:hover:bg-red-900"
                               aria-label={`Kurangi stok ${item.name}`}
                             >
-                              <IconMinus className="h-3.5 w-3.5" />
+                              <IconMinus className="h-4 w-4" />
                             </button>
                           </div>
                         )}

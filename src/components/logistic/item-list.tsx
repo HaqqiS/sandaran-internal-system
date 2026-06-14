@@ -69,19 +69,6 @@ function getStatusBadge(status: string) {
   }
 }
 
-function getProgressColor(status: string) {
-  switch (status) {
-    case "out":
-      return "bg-destructive";
-    case "critical":
-      return "bg-amber-500";
-    case "low":
-      return "bg-yellow-400";
-    default:
-      return "bg-primary";
-  }
-}
-
 function getStockColor(status: string) {
   switch (status) {
     case "out":
@@ -307,12 +294,7 @@ export function ItemList({ projectId }: ItemListProps) {
           <div className="md:hidden space-y-2">
             {filteredItems.map((item) => {
               const status = getStockStatus(item.currentStock, item.totalIn);
-              const progressValue =
-                item.totalIn > 0
-                  ? Math.min((item.currentStock / item.totalIn) * 100, 100)
-                  : 0;
               const badge = getStatusBadge(status);
-              const progressColor = getProgressColor(status);
 
               return (
                 <div
@@ -349,14 +331,6 @@ export function ItemList({ projectId }: ItemListProps) {
                         tersisa
                       </p>
                     </div>
-                  </div>
-
-                  {/* Progress */}
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted mb-3">
-                    <div
-                      className={`h-full rounded-full transition-all ${progressColor}`}
-                      style={{ width: `${progressValue}%` }}
-                    />
                   </div>
 
                   {/* Footer */}
@@ -446,12 +420,7 @@ export function ItemList({ projectId }: ItemListProps) {
                     item.currentStock,
                     item.totalIn,
                   );
-                  const progressValue =
-                    item.totalIn > 0
-                      ? Math.min((item.currentStock / item.totalIn) * 100, 100)
-                      : 0;
                   const badge = getStatusBadge(status);
-                  const progressColor = getProgressColor(status);
 
                   return (
                     <TableRow key={item.id}>
@@ -481,12 +450,6 @@ export function ItemList({ projectId }: ItemListProps) {
                               Aman
                             </Badge>
                           )}
-                          <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
-                            <div
-                              className={`h-full rounded-full ${progressColor}`}
-                              style={{ width: `${progressValue}%` }}
-                            />
-                          </div>
                         </div>
                       </TableCell>
                       <TableCell className="text-right">
