@@ -176,8 +176,8 @@ export function LogisticItemForm({
                   </PopoverAnchor>
                   <PopoverContent
                     className="w-[--radix-popover-trigger-width] p-0"
-                    onOpenAutoFocus={(e) => e.preventDefault()}
-                    onInteractOutside={(e) => {
+                    onOpenAutoFocus={(e: Event) => e.preventDefault()}
+                    onInteractOutside={(e: Event) => {
                       if (
                         e.target instanceof Element &&
                         e.target.closest(`#${field.name}`)
@@ -185,8 +185,8 @@ export function LogisticItemForm({
                         e.preventDefault();
                       }
                     }}
-                    onWheel={(e) => e.stopPropagation()}
-                    onTouchMove={(e) => e.stopPropagation()}
+                    onWheel={(e: React.WheelEvent) => e.stopPropagation()}
+                    onTouchMove={(e: React.TouchEvent) => e.stopPropagation()}
                   >
                     <Command shouldFilter={false}>
                       <CommandList>

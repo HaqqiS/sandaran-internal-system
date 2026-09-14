@@ -1,4 +1,4 @@
-import type { TransactionStatus, TransactionType } from "generated/prisma";
+import type { TransactionStatus, TransactionType } from "@prisma/client";
 import { api } from "~/trpc/react";
 
 /**

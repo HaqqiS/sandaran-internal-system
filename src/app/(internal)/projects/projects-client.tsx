@@ -64,7 +64,7 @@ import { useDeleteProject, useProjectList } from "~/hooks";
 import { isAdmin } from "~/lib/auth-guards";
 import type { projectRouter } from "~/server/api/routers/project.router";
 import { useSessionStore } from "~/stores/use-session-store";
-import type { GlobalRole } from "../../../../generated/prisma";
+import type { GlobalRole } from "@prisma/client";
 
 type ProjectListItem = inferRouterOutputs<
   typeof projectRouter
@@ -588,13 +588,13 @@ export function ProjectsClient() {
             : undefined
         }
         open={!!editProject}
-        onOpenChange={(open) => !open && setEditProject(null)}
+        onOpenChange={(open: boolean) => !open && setEditProject(null)}
       />
 
       {/* Delete Confirmation */}
       <AlertDialog
         open={!!deleteDialogProject}
-        onOpenChange={(open) => !open && setDeleteDialogProject(null)}
+        onOpenChange={(open: boolean) => !open && setDeleteDialogProject(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -621,7 +621,7 @@ export function ProjectsClient() {
         <TeamManagementDialog
           projectId={teamProjectId}
           open={!!teamProjectId}
-          onOpenChange={(open) => !open && setTeamProjectId(null)}
+          onOpenChange={(open: boolean) => !open && setTeamProjectId(null)}
         />
       )}
     </PageLayout>

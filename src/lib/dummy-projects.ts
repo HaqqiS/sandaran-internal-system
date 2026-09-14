@@ -1,4 +1,4 @@
-import type { Project, ProjectStatus } from "generated/prisma";
+import type { Project, ProjectStatus } from "@prisma/client";
 
 export const DUMMY_PROJECTS: Omit<Project, "createdAt" | "updatedAt">[] = [
   {

@@ -1,7 +1,7 @@
 "use client";
 
 import { IconPlus, IconTrash } from "@tabler/icons-react";
-import type { GlobalRole, ProjectRole } from "generated/prisma";
+import type { GlobalRole, ProjectRole } from "@prisma/client";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -257,7 +257,7 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
       {/* Remove Confirmation */}
       <AlertDialog
         open={!!memberToRemove}
-        onOpenChange={(open) => !open && setMemberToRemove(null)}
+        onOpenChange={(open: boolean) => !open && setMemberToRemove(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>

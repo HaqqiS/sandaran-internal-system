@@ -1,6 +1,6 @@
 "use client";
 
-import type { GlobalRole } from "generated/prisma";
+import type { GlobalRole } from "@prisma/client";
 import { Badge } from "~/components/ui/badge";
 
 interface RoleBadgeProps {

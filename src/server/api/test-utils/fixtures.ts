@@ -1,4 +1,4 @@
-import type { GlobalRole, ProjectRole, ProjectStatus } from "generated/prisma";
+import type { GlobalRole, ProjectRole, ProjectStatus } from "@prisma/client";
 import { db } from "~/server/db";
 
 /**

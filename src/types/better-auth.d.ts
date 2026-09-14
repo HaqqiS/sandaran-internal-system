@@ -1,4 +1,4 @@
-import type { GlobalRole } from "~/generated/prisma";
+import type { GlobalRole } from "~/@prisma/client";
 
 declare module "better-auth" {
   interface User {

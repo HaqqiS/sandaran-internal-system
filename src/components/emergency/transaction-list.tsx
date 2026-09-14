@@ -16,7 +16,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { format } from "date-fns";
-import type { EmergencyTransaction } from "generated/prisma";
+import type { EmergencyTransaction } from "@prisma/client";
 import { useState } from "react";
 import { toast } from "sonner";
 import { MediaPreview } from "~/components/shared/media-preview";
@@ -377,20 +377,20 @@ export function TransactionList({
         projectId={projectId}
         transactionId={verifyId}
         open={!!verifyId}
-        onOpenChange={(open) => !open && setVerifyId(null)}
+        onOpenChange={(open: boolean) => !open && setVerifyId(null)}
       />
 
       {/* Lightbox */}
       <MediaPreview
         url={lightboxImage}
         open={!!lightboxImage}
-        onOpenChange={(open) => !open && setLightboxImage(null)}
+        onOpenChange={(open: boolean) => !open && setLightboxImage(null)}
       />
 
       {/* Delete Confirmation AlertDialog */}
       <AlertDialog
         open={!!deleteTarget}
-        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        onOpenChange={(open: boolean) => !open && setDeleteTarget(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -419,7 +419,7 @@ export function TransactionList({
         projectId={projectId}
         projectSlug={projectSlug}
         open={!!editFund}
-        onOpenChange={(open) => !open && setEditFund(null)}
+        onOpenChange={(open: boolean) => !open && setEditFund(null)}
         mode="edit"
         transactionId={editFund?.transactionId}
         initialValues={
@@ -439,7 +439,7 @@ export function TransactionList({
         projectId={projectId}
         projectSlug={projectSlug}
         open={!!editWithdraw}
-        onOpenChange={(open) => !open && setEditWithdraw(null)}
+        onOpenChange={(open: boolean) => !open && setEditWithdraw(null)}
         mode="edit"
         transactionId={editWithdraw?.transactionId}
         initialValues={

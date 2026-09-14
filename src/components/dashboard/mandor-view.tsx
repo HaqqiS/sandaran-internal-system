@@ -246,7 +246,7 @@ export function MandorView() {
           projectId={selectedProject.id}
           projectSlug={selectedProject.slug}
           open={isReportOpen}
-          onOpenChange={(open) => {
+          onOpenChange={(open: boolean) => {
             setIsReportOpen(open);
             if (!open) setSelectedProject(null);
           }}

@@ -4,7 +4,7 @@ import { IconFileText, IconLoader2 } from "@tabler/icons-react";
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useDocumentsByProject } from "~/hooks/useDocument";
-import type { DocumentType, ProjectDocument } from "../../../generated/prisma";
+import type { DocumentType, ProjectDocument } from "@prisma/client";
 import { DocumentCard } from "./document-card";
 
 interface DocumentListProps {

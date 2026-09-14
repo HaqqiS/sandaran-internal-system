@@ -1,7 +1,7 @@
 "use client";
 
 import { IconX } from "@tabler/icons-react";
-import { Dialog as DialogPrimitive } from "radix-ui";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import * as React from "react";
 import { useLenis } from "~/components/providers/smooth-scroll-provider";
 import { Button } from "~/components/ui/button";

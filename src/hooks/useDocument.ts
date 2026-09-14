@@ -1,4 +1,4 @@
-import type { DocumentType } from "generated/prisma";
+import type { DocumentType } from "@prisma/client";
 import { api } from "~/trpc/react";
 
 /**

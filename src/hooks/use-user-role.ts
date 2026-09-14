@@ -1,4 +1,4 @@
-import { type GlobalRole, ProjectRole } from "generated/prisma";
+import { type GlobalRole, ProjectRole } from "@prisma/client";
 import { isAdmin, isAuthorizedRole } from "~/lib/auth-guards";
 import { useSession } from "~/stores/use-session-store";
 import { api } from "~/trpc/react";

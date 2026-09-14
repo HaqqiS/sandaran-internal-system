@@ -15,7 +15,7 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 import { format } from "date-fns";
-import type { GlobalRole } from "generated/prisma";
+import type { GlobalRole } from "@prisma/client";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";

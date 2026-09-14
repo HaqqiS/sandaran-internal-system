@@ -1,4 +1,4 @@
-import type { DailyReport, DailyReportTask } from "generated/prisma";
+import type { DailyReport, DailyReportTask } from "@prisma/client";
 
 export interface DummyDailyReport extends Omit<DailyReport, "createdAt"> {
   tasks: Omit<DailyReportTask, "id" | "reportId" | "createdAt" | "updatedAt">[];

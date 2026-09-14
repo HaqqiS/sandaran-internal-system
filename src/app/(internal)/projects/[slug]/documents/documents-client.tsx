@@ -1,7 +1,7 @@
 "use client";
 
 import { IconArrowLeft, IconLoader2, IconPlus } from "@tabler/icons-react";
-import type { ProjectDocument } from "generated/prisma";
+import type { ProjectDocument } from "@prisma/client";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -129,7 +129,7 @@ export function DocumentsClient({ projectSlug }: DocumentsClientProps) {
 
       <AlertDialog
         open={!!deleteDialogDoc}
-        onOpenChange={(open) => !open && setDeleteDialogDoc(null)}
+        onOpenChange={(open: boolean) => !open && setDeleteDialogDoc(null)}
       >
         <AlertDialogContent>
           <AlertDialogHeader>

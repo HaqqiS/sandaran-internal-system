@@ -10,7 +10,7 @@ import {
 } from "@tabler/icons-react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import type { DocumentType } from "generated/prisma";
+import type { DocumentType } from "@prisma/client";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";

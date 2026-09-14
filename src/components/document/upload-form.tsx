@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import type { DocumentType } from "generated/prisma";
+import type { DocumentType } from "@prisma/client";
 import { useImperativeHandle, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";

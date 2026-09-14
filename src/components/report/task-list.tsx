@@ -1,7 +1,7 @@
 "use client";
 
 import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
-import type { DailyReportTask } from "generated/prisma";
+import type { DailyReportTask } from "@prisma/client";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";

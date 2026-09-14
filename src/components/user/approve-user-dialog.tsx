@@ -111,7 +111,7 @@ export function ApproveUserDialog({
             <Label>Pilih Peran Global</Label>
             <RadioGroup
               value={role}
-              onValueChange={(v) => {
+              onValueChange={(v: string) => {
                 setRole(v as "USER" | "CEO" | "ADMIN");
                 if (v !== "USER") setAssignProject(false);
               }}

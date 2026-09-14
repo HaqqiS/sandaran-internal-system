@@ -3,7 +3,7 @@
 import { IconDots } from "@tabler/icons-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { formatDistanceToNow } from "date-fns";
-import type { GlobalRole } from "generated/prisma";
+import type { GlobalRole } from "@prisma/client";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";

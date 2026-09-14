@@ -116,7 +116,7 @@ export function ArchitectView() {
           projectId={uploadProject.id}
           projectSlug={uploadProject.slug}
           open={!!uploadProject}
-          onOpenChange={(open) => !open && setUploadProject(null)}
+          onOpenChange={(open: boolean) => !open && setUploadProject(null)}
           onSuccess={() => setUploadProject(null)}
         />
       )}

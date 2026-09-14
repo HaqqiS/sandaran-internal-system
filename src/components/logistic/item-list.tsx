@@ -520,7 +520,7 @@ export function ItemList({ projectId }: ItemListProps) {
       <TransactionDialog
         projectId={projectId}
         isOpen={transactionDialog.isOpen}
-        onOpenChange={(open) =>
+        onOpenChange={(open: boolean) =>
           setTransactionDialog((prev) => ({ ...prev, isOpen: open }))
         }
         type={transactionDialog.type}

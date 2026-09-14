@@ -11,7 +11,7 @@ import {
 } from "@tabler/icons-react";
 import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
-import type { GlobalRole, ProjectRole } from "generated/prisma";
+import type { GlobalRole, ProjectRole } from "@prisma/client";
 import { useState } from "react";
 import { FundDialog } from "~/components/emergency/fund-dialog";
 import { WithdrawDialog } from "~/components/emergency/withdraw-dialog";

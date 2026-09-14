@@ -8,7 +8,7 @@
  */
 
 import { initTRPC, TRPCError } from "@trpc/server";
-import type { ProjectRole } from "generated/prisma";
+import type { ProjectRole } from "@prisma/client";
 import superjson from "superjson";
 import z, { ZodError } from "zod";
 

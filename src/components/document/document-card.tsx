@@ -23,7 +23,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { useGetDownloadUrl } from "~/hooks/useDocument";
-import type { ProjectDocument } from "../../../generated/prisma";
+import type { ProjectDocument } from "@prisma/client";
 
 interface DocumentCardProps {
   document: ProjectDocument & {

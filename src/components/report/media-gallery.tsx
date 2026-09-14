@@ -68,7 +68,7 @@ export function MediaGallery({
       <MediaPreview
         url={lightboxImage}
         open={!!lightboxImage}
-        onOpenChange={(open) => !open && setLightboxImage(null)}
+        onOpenChange={(open: boolean) => !open && setLightboxImage(null)}
       />
     </>
   );

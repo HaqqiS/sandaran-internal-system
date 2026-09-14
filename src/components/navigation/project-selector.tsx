@@ -148,7 +148,11 @@ export function ProjectSelector() {
             <CommandEmpty>Proyek tidak ditemukan.</CommandEmpty>
             {groupedProjects &&
               Object.entries(groupedProjects).map(([status, groupProjects]) => (
-                <CommandGroup key={status} heading={status}>
+                <CommandGroup
+                  key={status}
+                  heading={status}
+                  className=" **:[[cmdk-group-items]]:space-y-1"
+                >
                   {groupProjects.map((project) => (
                     <CommandItem
                       key={project.id}
