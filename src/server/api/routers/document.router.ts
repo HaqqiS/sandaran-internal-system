@@ -1,6 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
+import {
+  deleteCloudinaryAsset,
+  generateSignedDownloadUrl,
+} from "~/lib/cloudinary";
 import { requireOwnership } from "~/server/api/helpers/permission";
 import {
   createTRPCRouter,
@@ -272,7 +276,26 @@ export const documentRouter = createTRPCRouter({
         });
       }
 
-      return { url: document.url };
+      // Extract file format/extension if present from fileName or mimeType
+      const fileExt = document.fileName.includes(".")
+        ? document.fileName.split(".").pop()
+        : undefined;
+
+      try {
+        const signedUrl = generateSignedDownloadUrl({
+          publicId: document.publicId,
+          resourceType: document.resourceType,
+          format: fileExt,
+          expiresInSeconds: 3600, // 1 hour expiration
+          attachment: true,
+        });
+
+        return { url: signedUrl, fileName: document.fileName };
+      } catch (err) {
+        console.error("Failed to generate signed download URL:", err);
+        // Fallback to stored URL if signing fails
+        return { url: document.url, fileName: document.fileName };
+      }
     }),
 
   /**
@@ -350,12 +373,29 @@ export const documentRouter = createTRPCRouter({
         },
       });
 
+      if (!document) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Document not found",
+        });
+      }
+
       // Check ownership (ADMIN bypasses this)
       requireOwnership(
         document,
         ctx.session.user.id,
         ctx.session.user.roleGlobal,
       );
+
+      // Delete asset from Cloudinary to prevent orphaned storage
+      if (document.publicId) {
+        await deleteCloudinaryAsset(document.publicId, {
+          resourceType: document.resourceType ?? undefined,
+        }).catch((err) => {
+          console.error("Failed to delete Cloudinary asset:", err);
+          // Continue with database record deletion
+        });
+      }
 
       await ctx.db.projectDocument.delete({
         where: { id: input.documentId },

@@ -59,10 +59,42 @@ export function generateUploadSignature(options: {
  */
 export async function deleteCloudinaryAsset(
   publicId: string,
-  options?: { type?: string },
+  options?: { type?: string; resourceType?: string },
 ) {
   return cloudinary.uploader.destroy(publicId, {
     type: options?.type || "authenticated",
+    resource_type: options?.resourceType || "image",
+  });
+}
+
+/**
+ * Generate a time-limited signed download URL for an authenticated or private asset
+ */
+export function generateSignedDownloadUrl(options: {
+  publicId: string;
+  resourceType?: string | null;
+  format?: string | null;
+  expiresInSeconds?: number;
+  attachment?: boolean;
+}) {
+  const {
+    publicId,
+    resourceType = "image",
+    format,
+    expiresInSeconds = 3600, // 1 hour default
+    attachment = true,
+  } = options;
+
+  const expiresAt = Math.floor(Date.now() / 1000) + expiresInSeconds;
+
+  // Use Cloudinary's private_download_url utility which creates time-expiring signed download links
+  const targetFormat = format ? format.replace(/^\./, "") : undefined;
+
+  return cloudinary.utils.private_download_url(publicId, targetFormat ?? "", {
+    resource_type: (resourceType as "image" | "video" | "raw") || "image",
+    type: "authenticated",
+    expires_at: expiresAt,
+    attachment,
   });
 }
 
