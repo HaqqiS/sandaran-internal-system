@@ -1,7 +1,7 @@
 "use client";
 
-import type { GlobalRole } from "generated/prisma";
-import { useState } from "react";
+import type { GlobalRole } from "@prisma/client";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
@@ -33,12 +33,12 @@ export function EditRoleDialog({
   onOpenChange,
 }: EditRoleDialogProps) {
   const [role, setRole] = useState<GlobalRole>("USER");
-  // Update role when user changes
-  useState(() => {
-    if (user) {
+  // Update role when user changes or dialog opens
+  useEffect(() => {
+    if (open && user) {
       setRole(user.roleGlobal);
     }
-  });
+  }, [user, open]);
 
   const updateRole = useUpdateUserRole();
 
@@ -92,7 +92,7 @@ export function EditRoleDialog({
             <Label>Pilih Peran Baru</Label>
             <RadioGroup
               value={role}
-              onValueChange={(v) => setRole(v as GlobalRole)}
+              onValueChange={(v: string) => setRole(v as GlobalRole)}
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="NONE" id="none" />
