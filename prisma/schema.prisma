@@ -3,7 +3,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 // NOTE: When using mysql or sqlserver, uncomment the //@db.Text annotations in model Account below
@@ -252,6 +251,11 @@ model ReportMedia {
   reportId      String
   publicId      String      // Cloudinary Public ID
   url           String      // Cloudinary Secure URL
+  resourceType  String      @default("image") // "image", "video", "raw" (crucial for Cloudinary API delete & transformations)
+  fileName      String?     // Original filename (e.g., "pondasi-retak.jpg")
+  fileSize      Int?        // File size in bytes (for storage quotas & audit)
+  mimeType      String?     // "image/jpeg", "image/png", etc.
+
   
   report        DailyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
   
