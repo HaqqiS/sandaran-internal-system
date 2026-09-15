@@ -6,7 +6,15 @@ import { MediaPreview } from "~/components/shared/media-preview";
 import { Button } from "~/components/ui/button";
 
 interface MediaGalleryProps {
-  media: { id: string; url: string; publicId: string }[];
+  media: {
+    id: string;
+    url: string;
+    publicId: string;
+    fileName?: string | null;
+    fileSize?: number | null;
+    mimeType?: string | null;
+    resourceType?: string | null;
+  }[];
   onDelete?: (mediaId: string) => void;
   canDelete?: boolean;
 }

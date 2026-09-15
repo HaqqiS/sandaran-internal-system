@@ -546,7 +546,11 @@ export const reportRouter = createTRPCRouter({
         projectId: z.string(),
         reportId: z.string(),
         publicId: z.string(),
-        url: z.string().url(),
+        url: z.url(),
+        resourceType: z.string().optional(),
+        fileName: z.string().optional(),
+        fileSize: z.number().int().optional(),
+        mimeType: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -570,6 +574,10 @@ export const reportRouter = createTRPCRouter({
           reportId: input.reportId,
           publicId: input.publicId,
           url: input.url,
+          resourceType: input.resourceType ?? "image",
+          fileName: input.fileName,
+          fileSize: input.fileSize,
+          mimeType: input.mimeType,
         },
       });
 
@@ -612,7 +620,9 @@ export const reportRouter = createTRPCRouter({
 
       // Delete from Cloudinary first
       if (media.publicId) {
-        await deleteCloudinaryAsset(media.publicId).catch((err) => {
+        await deleteCloudinaryAsset(media.publicId, {
+          resourceType: media.resourceType ?? "image",
+        }).catch((err) => {
           console.error("Failed to delete Cloudinary asset:", err);
           // Continue to delete from DB even if Cloudinary fails
         });

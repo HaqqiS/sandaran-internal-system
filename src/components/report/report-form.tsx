@@ -170,7 +170,14 @@ export function ReportForm({
           (img): img is File => img instanceof File,
         );
 
-        const uploadedMedia: { url: string; publicId: string }[] = [];
+        const uploadedMedia: {
+          url: string;
+          publicId: string;
+          fileName: string;
+          fileSize: number;
+          mimeType: string;
+          resourceType: string;
+        }[] = [];
 
         if (imagesToUpload.length > 0) {
           toast.info(`Mengunggah ${imagesToUpload.length} foto...`);
@@ -179,7 +186,14 @@ export function ReportForm({
               projectSlug,
               type: "reports",
             });
-            uploadedMedia.push({ url: res.secureUrl, publicId: res.publicId });
+            uploadedMedia.push({
+              url: res.secureUrl,
+              publicId: res.publicId,
+              fileName: file.name,
+              fileSize: file.size,
+              mimeType: file.type || "image/jpeg",
+              resourceType: res.resourceType || "image",
+            });
           }
         }
 
@@ -192,6 +206,10 @@ export function ReportForm({
               reportId: currentReportId,
               publicId: img.publicId,
               url: img.url,
+              fileName: img.fileName,
+              fileSize: img.fileSize,
+              mimeType: img.mimeType,
+              resourceType: img.resourceType,
             });
           }
           toast.success("Semua foto berhasil disimpan!");

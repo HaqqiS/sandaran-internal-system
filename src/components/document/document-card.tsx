@@ -1,5 +1,6 @@
 "use client";
 
+import type { ProjectDocument } from "@prisma/client";
 import {
   IconDownload,
   IconEdit,
@@ -23,7 +24,6 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { useGetDownloadUrl } from "~/hooks/useDocument";
-import type { ProjectDocument } from "@prisma/client";
 
 interface DocumentCardProps {
   document: ProjectDocument & {

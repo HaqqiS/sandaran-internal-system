@@ -16,7 +16,15 @@ interface MediaUploadProps {
   projectId: string;
   projectSlug: string;
   reportId: string;
-  existingMedia: { id: string; publicId: string; url: string }[];
+  existingMedia: {
+    id: string;
+    publicId: string;
+    url: string;
+    fileName?: string | null;
+    fileSize?: number | null;
+    mimeType?: string | null;
+    resourceType?: string | null;
+  }[];
   canEdit?: boolean;
 }
 
@@ -52,6 +60,10 @@ export function MediaUpload({
             reportId,
             publicId: result.publicId,
             url: result.secureUrl,
+            fileName: file.name,
+            fileSize: file.size,
+            mimeType: file.type || "image/jpeg",
+            resourceType: result.resourceType || "image",
           });
         }
         toast.success(`${acceptedFiles.length} image(s) uploaded successfully`);
