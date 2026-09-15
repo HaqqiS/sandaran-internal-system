@@ -1,7 +1,7 @@
 "use client";
 
-import { IconCheck, IconChevronRight } from "@tabler/icons-react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+import { IconCheck, IconChevronRight } from "@tabler/icons-react";
 import type * as React from "react";
 import { cn } from "~/lib/utils";
 

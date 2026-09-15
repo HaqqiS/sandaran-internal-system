@@ -1,5 +1,5 @@
-import { TRPCError } from "@trpc/server";
 import type { Session } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 import { expect } from "vitest";
 import { db } from "~/server/db";
 

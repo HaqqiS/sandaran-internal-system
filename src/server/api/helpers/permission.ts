@@ -6,8 +6,8 @@
  *
  */
 
-import { TRPCError } from "@trpc/server";
 import type { GlobalRole, PrismaClient, ProjectRole } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 
 /**
  * Get the project role of a user in a specific project.

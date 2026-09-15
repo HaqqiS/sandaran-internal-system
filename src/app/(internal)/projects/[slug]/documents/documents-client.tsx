@@ -1,7 +1,7 @@
 "use client";
 
-import { IconArrowLeft, IconLoader2, IconPlus } from "@tabler/icons-react";
 import type { ProjectDocument } from "@prisma/client";
+import { IconArrowLeft, IconLoader2, IconPlus } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";

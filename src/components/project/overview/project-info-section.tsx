@@ -1,5 +1,6 @@
 "use client";
 
+import type { ProjectStatus } from "@prisma/client";
 import {
   IconCalendar,
   IconClipboardList,
@@ -7,7 +8,6 @@ import {
 } from "@tabler/icons-react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import type { ProjectStatus } from "@prisma/client";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 

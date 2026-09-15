@@ -1,5 +1,6 @@
 "use client";
 
+import type { GlobalRole } from "@prisma/client";
 import {
   IconBox,
   IconCalendarEvent,
@@ -64,7 +65,6 @@ import { useDeleteProject, useProjectList } from "~/hooks";
 import { isAdmin } from "~/lib/auth-guards";
 import type { projectRouter } from "~/server/api/routers/project.router";
 import { useSessionStore } from "~/stores/use-session-store";
-import type { GlobalRole } from "@prisma/client";
 
 type ProjectListItem = inferRouterOutputs<
   typeof projectRouter

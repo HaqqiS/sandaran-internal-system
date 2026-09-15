@@ -1,5 +1,6 @@
 "use client";
 
+import type { GlobalRole } from "@prisma/client";
 import {
   IconArrowLeft,
   // IconCoin,
@@ -12,7 +13,6 @@ import {
   // IconReport,
   IconUsers,
 } from "@tabler/icons-react";
-import type { GlobalRole } from "@prisma/client";
 import { useParams } from "next/navigation";
 import type { ReactNode } from "react";
 import { DashboardLayout } from "~/components/layout";
