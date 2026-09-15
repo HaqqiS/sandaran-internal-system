@@ -184,7 +184,7 @@ export function ReportDetailClient({
                 <div className="rounded-lg border p-4 space-y-4 h-full">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Progress</span>
+                      <span className="text-muted-foreground">Progres</span>
                       <span className="font-medium">
                         {report.progressPercent}%
                       </span>

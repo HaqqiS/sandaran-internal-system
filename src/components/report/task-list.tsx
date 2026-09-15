@@ -35,23 +35,23 @@ export function TaskList({
   const deleteTask = useDeleteReportTask();
 
   const handleDelete = async (taskId: string) => {
-    if (!confirm("Are you sure you want to delete this task?")) return;
+    if (!confirm("Yakin ingin menghapus Tugas ini?")) return;
     try {
       await deleteTask.mutateAsync({ projectId, taskId });
-      toast.success("Task deleted");
+      toast.success("Tugas berhasil dihapus");
     } catch {
-      toast.error("Failed to delete task");
+      toast.error("Gagal menghapus Tugas");
     }
   };
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Task Breakdown</h3>
+        {/* <h3 className="text-lg font-semibold">Rincian Tugas</h3> */}
         {canEdit && !isAdding && (
           <Button size="sm" onClick={() => setIsAdding(true)}>
             <IconPlus className="mr-2 h-4 w-4" />
-            Add Task
+            Tambah Tugas
           </Button>
         )}
       </div>
@@ -67,7 +67,7 @@ export function TaskList({
 
       {tasks.length === 0 && !isAdding ? (
         <div className="rounded-lg border border-dashed p-8 text-center text-muted-foreground">
-          No tasks added yet.
+          Belum ada rincian tugas ditambahkan.
         </div>
       ) : (
         <div className="space-y-4">
@@ -119,11 +119,11 @@ export function TaskList({
                     </div>
                     <div className="flex items-center gap-4 text-sm">
                       <div className="flex items-center gap-1">
-                        <span className="text-muted-foreground">Workers:</span>
+                        <span className="text-muted-foreground">Pekerja:</span>
                         <span className="font-medium">{task.workerCount}</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <span className="text-muted-foreground">Progress:</span>
+                        <span className="text-muted-foreground">Progres:</span>
                         <span
                           className={cn(
                             "font-medium",
@@ -147,10 +147,10 @@ export function TaskList({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[40%]">Task Name</TableHead>
-                  <TableHead>Workers</TableHead>
-                  <TableHead>Progress</TableHead>
-                  <TableHead>Notes</TableHead>
+                  <TableHead className="w-[40%]">Nama Pekerjaan</TableHead>
+                  <TableHead>Jumlah Pekerja</TableHead>
+                  <TableHead>Progres</TableHead>
+                  <TableHead>Catatan</TableHead>
                   {canEdit && <TableHead className="w-[100px]"></TableHead>}
                 </TableRow>
               </TableHeader>

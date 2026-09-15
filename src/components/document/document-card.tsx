@@ -66,7 +66,7 @@ export function DocumentCard({
 
   const handleDownload = async () => {
     try {
-      const toastId = toast.loading("Downloading...");
+      const toastId = toast.loading("Mengunduh...");
 
       const { url } = await getDownloadUrl({
         projectId: doc.projectId,
@@ -91,10 +91,10 @@ export function DocumentCard({
       window.URL.revokeObjectURL(blobUrl);
 
       toast.dismiss(toastId);
-      toast.success("Download started");
+      toast.success("Unduhan dimulai");
     } catch (error) {
       console.error("Failed to download", error);
-      toast.error("Failed to download file");
+      toast.error("Gagal mengunduh file");
     }
   };
 
@@ -159,7 +159,7 @@ export function DocumentCard({
           ) : (
             <IconDownload className="mr-2 h-3.5 w-3.5" />
           )}
-          Download
+          Unduh
         </Button>
 
         {isOwner && (

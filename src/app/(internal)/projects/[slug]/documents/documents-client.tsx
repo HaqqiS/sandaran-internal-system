@@ -109,8 +109,8 @@ export function DocumentsClient({ projectSlug }: DocumentsClientProps) {
           >
             <Button size="sm">
               <IconPlus className="mr-2 size-4" />
-              <span className="block md:hidden">Upload</span>
-              <span className="hidden md:block">Upload Dokumen</span>
+              <span className="block md:hidden">Unggah</span>
+              <span className="hidden md:block">Unggah Dokumen</span>
             </Button>
           </UploadDialog>
         )

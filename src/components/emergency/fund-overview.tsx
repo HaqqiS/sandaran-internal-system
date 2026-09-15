@@ -16,7 +16,7 @@ export function FundOverview({ projectId, actions }: FundOverviewProps) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">
-          Emergency Fund Balance
+          Saldo Dana Darurat
         </CardTitle>
         <IconWallet className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
@@ -31,7 +31,7 @@ export function FundOverview({ projectId, actions }: FundOverviewProps) {
                   Rp {Number(fund?.currentBalance || 0).toLocaleString("id-ID")}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {fund?.transactions?.length || 0} total transactions
+                  {fund?.transactions?.length || 0} total transaksi
                 </p>
               </>
             )}

@@ -64,7 +64,7 @@ export default async function WaitingApprovalPage() {
           {/* Status Badge */}
           <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-yellow-50 px-4 py-2 text-sm font-medium text-yellow-800">
             <span className="h-2 w-2 animate-pulse rounded-full bg-yellow-600" />
-            Status: Pending Approval
+            Status: Menunggu Persetujuan
           </div>
 
           {/* Auto-detect polling — redirect otomatis saat admin approve */}

@@ -179,15 +179,13 @@ export function ReportCard({ report, projectSlug }: ReportCardProps) {
         </CardHeader>
         <CardContent className="space-y-3 pb-3">
           <p className="line-clamp-2 text-sm ">
-            {report.taskDescription || "No description provided."}
+            {report.taskDescription || "Belum ada deskripsi."}
           </p>
 
           {/* Progress */}
           <div className="space-y-1">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-medium text-muted-foreground">
-                Progress
-              </span>
+              <span className="font-medium text-muted-foreground">Progres</span>
               <span className="font-semibold text-primary">
                 {report.progressPercent}%
               </span>
@@ -199,7 +197,7 @@ export function ReportCard({ report, projectSlug }: ReportCardProps) {
           <div className="flex items-center justify-between border-t border-border/40 pt-3 text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
               <IconUsers className="h-3.5 w-3.5 shrink-0" />
-              <span>{report.totalWorkers} workers</span>
+              <span>{report.totalWorkers} pekerja</span>
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1">

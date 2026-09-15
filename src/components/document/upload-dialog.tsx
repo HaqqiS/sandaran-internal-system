@@ -43,8 +43,9 @@ export function UploadDialog({
   children,
 }: UploadDialogProps) {
   const isMobile = useIsMobile();
-  const title = "Upload Document";
-  const descriptionText = "Upload design files, drawings, or specifications.";
+  const title = "Unggah Dokumen";
+  const descriptionText =
+    "Unggah file desain, gambar teknis, spesifikasi, dll.";
   const [draft, setDraft] = useState<DocumentFormDraft>({});
   const formRef = useRef<{ getValues: () => DocumentFormValues }>(null);
 

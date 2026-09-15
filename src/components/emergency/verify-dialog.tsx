@@ -36,10 +36,10 @@ export function VerifyDialog({
         transactionId,
         status: "REVIEWED",
       });
-      toast.success("Transaction marked as reviewed");
+      toast.success("Transaksi berhasil direview");
       onOpenChange(false);
     } catch (error) {
-      toast.error("Failed to verify transaction");
+      toast.error("Gagal mereview transaksi");
       console.error(error);
     }
   };
@@ -48,19 +48,19 @@ export function VerifyDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Review Transaction</DialogTitle>
+          <DialogTitle>Review Transaksi</DialogTitle>
           <DialogDescription>
-            Are you sure you want to mark this transaction as reviewed? This
-            confirms that the expense is valid.
+            Apakah Anda yakin ingin menandai transaksi ini sebagai sudah
+            direview? Ini mengonfirmasi bahwa pengeluaran tersebut valid.
           </DialogDescription>
         </DialogHeader>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            Batal
           </Button>
           <Button onClick={handleVerify} disabled={verifyRequest.isPending}>
-            {verifyRequest.isPending ? "Processing..." : "Mark as Reviewed"}
+            {verifyRequest.isPending ? "Memproses..." : "Tandai Sudah Direview"}
           </Button>
         </DialogFooter>
       </DialogContent>

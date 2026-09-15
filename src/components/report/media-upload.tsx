@@ -66,10 +66,10 @@ export function MediaUpload({
             resourceType: result.resourceType || "image",
           });
         }
-        toast.success(`${acceptedFiles.length} image(s) uploaded successfully`);
+        toast.success(`${acceptedFiles.length} gambar berhasil diunggah`);
       } catch (error) {
         console.error("Upload failed:", error);
-        toast.error("Failed to upload images");
+        toast.error("Gagal mengunggah gambar");
       } finally {
         setUploading(false);
       }
@@ -83,9 +83,9 @@ export function MediaUpload({
         projectId,
         mediaId,
       });
-      toast.success("Image deleted");
+      toast.success("Gambar berhasil dihapus");
     } catch {
-      toast.error("Failed to delete image");
+      toast.error("Gagal menghapus gambar");
     }
   };
 
@@ -157,13 +157,13 @@ export function MediaUpload({
             )}
             <p className="text-sm text-muted-foreground">
               {isDragActive
-                ? "Drop images here"
+                ? "Letakkan gambar di sini"
                 : uploading
-                  ? "Uploading..."
-                  : "Drop images or click to upload"}
+                  ? "Mengunggah..."
+                  : "Letakkan gambar atau klik untuk unggah"}
             </p>
             <p className="text-xs text-muted-foreground">
-              JPG, PNG, WebP up to 5MB each
+              JPG, PNG, WebP maks. 5MB per file
             </p>
           </div>
         </div>

@@ -119,7 +119,7 @@ export function TaskForm({
           {(field) => (
             <FieldGroup>
               <Field>
-                <FieldLabel>Jml Pekerja Terlibat</FieldLabel>
+                <FieldLabel>Jumlah Pekerja Terlibat</FieldLabel>
                 <Input
                   type="number"
                   min={0}

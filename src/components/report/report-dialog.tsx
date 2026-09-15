@@ -69,10 +69,10 @@ export function ReportDialog({
     formRef.current?.submit();
   };
 
-  const title = isEditMode ? "Edit Report" : "Create New Report";
+  const title = isEditMode ? "Edit Laporan" : "Buat Laporan Baru";
   const description = isEditMode
-    ? "Update the daily report details"
-    : "Fill in the daily report for this project";
+    ? "Perbarui detail laporan harian"
+    : "Isi laporan harian untuk proyek ini";
 
   const submitLabel = isEditMode ? "Simpan Perubahan" : "Kirim Laporan";
 

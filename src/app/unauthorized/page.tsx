@@ -71,7 +71,7 @@ export default async function UnauthorizedPage() {
                 clipRule="evenodd"
               />
             </svg>
-            Unauthorized Access
+            Akses Tidak Sah
           </div>
 
           {/* Actions */}

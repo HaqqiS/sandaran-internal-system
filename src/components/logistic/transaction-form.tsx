@@ -116,8 +116,8 @@ export function TransactionForm({
                     <SelectValue placeholder="Pilih tipe transaksi" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="IN">Stok Masuk (IN)</SelectItem>
-                    <SelectItem value="OUT">Stok Keluar (OUT)</SelectItem>
+                    <SelectItem value="IN">Stok Masuk</SelectItem>
+                    <SelectItem value="OUT">Stok Keluar</SelectItem>
                   </SelectContent>
                 </Select>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}

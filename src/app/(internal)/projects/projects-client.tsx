@@ -180,7 +180,7 @@ export function ProjectsClient() {
                 htmlFor="expand-all"
                 className="text-sm font-medium leading-none text-muted-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                Expand Semua Proyek
+                Perluas Semua Proyek
               </label>
             </div>
 
@@ -268,7 +268,7 @@ export function ProjectsClient() {
                         onClick={() => toggleCard(project.id)}
                         className="text-muted-foreground"
                       >
-                        {isExpanded ? "Show Less" : "Show More"}
+                        {isExpanded ? "Sembunyikan" : "Lihat Lebih"}
                         {isExpanded ? (
                           <IconChevronUp className="ml-1.5 h-4 w-4" />
                         ) : (
@@ -534,7 +534,7 @@ export function ProjectsClient() {
                                 onClick={() => setTeamProjectId(project.id)}
                               >
                                 <IconUsers className="mr-1.5 h-3.5 w-3.5" />
-                                Manage Team
+                                Kelola Tim
                               </Button>
                             )}
                           </div>
