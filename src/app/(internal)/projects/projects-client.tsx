@@ -27,16 +27,7 @@ import { toast } from "sonner";
 import { PageLayout } from "~/components/layout";
 import { ProjectDialog } from "~/components/project/project-dialog";
 import { TeamManagementDialog } from "~/components/project/team-management-dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "~/components/ui/alert-dialog";
+import { ConfirmDeleteDialog } from "~/components/shared/confirm-delete-dialog";
 import {
   Avatar,
   AvatarFallback,
@@ -592,29 +583,14 @@ export function ProjectsClient() {
       />
 
       {/* Delete Confirmation */}
-      <AlertDialog
+      <ConfirmDeleteDialog
         open={!!deleteDialogProject}
         onOpenChange={(open: boolean) => !open && setDeleteDialogProject(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Proyek</AlertDialogTitle>
-            <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus "{deleteDialogProject?.name}"?
-              Tindakan ini tidak dapat dibatalkan.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {deleteProject.isPending ? "Menghapus..." : "Hapus"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        title="Hapus Proyek"
+        itemName={deleteDialogProject?.name}
+        onConfirm={handleDelete}
+        isPending={deleteProject.isPending}
+      />
 
       {/* Team Management Dialog */}
       {teamProjectId && (

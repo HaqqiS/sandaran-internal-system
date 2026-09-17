@@ -8,16 +8,7 @@ import { toast } from "sonner";
 import { DocumentList } from "~/components/document/document-list";
 import { UploadDialog } from "~/components/document/upload-dialog";
 import { PageLayout } from "~/components/layout";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "~/components/ui/alert-dialog";
+import { ConfirmDeleteDialog } from "~/components/shared/confirm-delete-dialog";
 import { Button } from "~/components/ui/button";
 import { useDeleteDocument } from "~/hooks/useDocument";
 import { useProjectBySlug, useProjectMembers } from "~/hooks/useProject";
@@ -127,33 +118,14 @@ export function DocumentsClient({ projectSlug }: DocumentsClientProps) {
         />
       </div>
 
-      <AlertDialog
+      <ConfirmDeleteDialog
         open={!!deleteDialogDoc}
         onOpenChange={(open: boolean) => !open && setDeleteDialogDoc(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Dokumen</AlertDialogTitle>
-            <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus{" "}
-              <span className="inline-block max-w-[200px] align-bottom font-semibold truncate sm:max-w-[300px]">
-                {deleteDialogDoc?.fileName}
-              </span>
-              ? Tindakan ini tidak dapat dibatalkan.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {deleteDocument.isPending ? "Menghapus..." : "Hapus"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        title="Hapus Dokumen"
+        itemName={deleteDialogDoc?.fileName}
+        onConfirm={handleDelete}
+        isPending={deleteDocument.isPending}
+      />
     </PageLayout>
   );
 }

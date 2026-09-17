@@ -19,17 +19,8 @@ import {
 import { format } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ConfirmDeleteDialog } from "~/components/shared/confirm-delete-dialog";
 import { MediaPreview } from "~/components/shared/media-preview";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "~/components/ui/alert-dialog";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
@@ -388,31 +379,23 @@ export function TransactionList({
       />
 
       {/* Delete Confirmation AlertDialog */}
-      <AlertDialog
+      <ConfirmDeleteDialog
         open={!!deleteTarget}
-        onOpenChange={(open: boolean) => !open && setDeleteTarget(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Transaksi?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus transaksi &quot;
-              {deleteTarget?.description}&quot;? Tindakan ini tidak dapat
-              dibatalkan dan saldo akan disesuaikan.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteConfirm}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={deleteTransaction.isPending}
-            >
-              {deleteTransaction.isPending ? "Menghapus..." : "Hapus"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title="Hapus Transaksi"
+        itemName={deleteTarget?.description}
+        description={
+          <>
+            Apakah Anda yakin ingin menghapus transaksi{" "}
+            <span className="inline-block max-w-[200px] align-bottom font-semibold truncate sm:max-w-[280px] text-foreground">
+              &quot;{deleteTarget?.description}&quot;
+            </span>
+            ? Tindakan ini tidak dapat dibatalkan dan saldo akan disesuaikan.
+          </>
+        }
+        onConfirm={handleDeleteConfirm}
+        isPending={deleteTransaction.isPending}
+      />
 
       {/* Edit Deposit Dialog */}
       <FundDialog

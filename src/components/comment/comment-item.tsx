@@ -3,18 +3,9 @@
 import { IconTrash } from "@tabler/icons-react";
 import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
+import { useState } from "react";
 import { toast } from "sonner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "~/components/ui/alert-dialog";
+import { ConfirmDeleteDialog } from "~/components/shared/confirm-delete-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { useSessionStore } from "~/stores/use-session-store";
@@ -57,6 +48,8 @@ export function CommentItem({ comment, projectId }: CommentItemProps) {
     .toUpperCase()
     .slice(0, 2);
 
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
   return (
     <div className="flex gap-4 group">
       <Avatar className="h-8 w-8">
@@ -75,41 +68,30 @@ export function CommentItem({ comment, projectId }: CommentItemProps) {
             </span>
           </div>
           {canDelete && (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <IconTrash className="h-4 w-4 text-destructive" />
-                  <span className="sr-only">Hapus komentar</span>
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Hapus Komentar?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Tindakan ini tidak dapat dibatalkan.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Batal</AlertDialogCancel>
-                  <AlertDialogAction
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    onClick={() =>
-                      deleteComment.mutate({
-                        projectId,
-                        commentId: comment.id,
-                      })
-                    }
-                    disabled={deleteComment.isPending}
-                  >
-                    {deleteComment.isPending ? "Menghapus..." : "Hapus"}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={() => setShowDeleteDialog(true)}
+              >
+                <IconTrash className="h-4 w-4 text-destructive" />
+                <span className="sr-only">Hapus komentar</span>
+              </Button>
+              <ConfirmDeleteDialog
+                open={showDeleteDialog}
+                onOpenChange={setShowDeleteDialog}
+                title="Hapus Komentar"
+                description="Apakah Anda yakin ingin menghapus komentar ini? Tindakan ini tidak dapat dibatalkan."
+                onConfirm={() =>
+                  deleteComment.mutate({
+                    projectId,
+                    commentId: comment.id,
+                  })
+                }
+                isPending={deleteComment.isPending}
+              />
+            </>
           )}
         </div>
         <p className="text-sm text-foreground whitespace-pre-wrap">

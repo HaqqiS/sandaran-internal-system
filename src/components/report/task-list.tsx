@@ -4,6 +4,7 @@ import type { DailyReportTask } from "@prisma/client";
 import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ConfirmDeleteDialog } from "~/components/shared/confirm-delete-dialog";
 import { Button } from "~/components/ui/button";
 import {
   Table,
@@ -32,13 +33,16 @@ export function TaskList({
 }: TaskListProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [deleteTaskTarget, setDeleteTaskTarget] =
+    useState<DailyReportTask | null>(null);
   const deleteTask = useDeleteReportTask();
 
-  const handleDelete = async (taskId: string) => {
-    if (!confirm("Yakin ingin menghapus Tugas ini?")) return;
+  const handleDelete = async () => {
+    if (!deleteTaskTarget) return;
     try {
-      await deleteTask.mutateAsync({ projectId, taskId });
+      await deleteTask.mutateAsync({ projectId, taskId: deleteTaskTarget.id });
       toast.success("Tugas berhasil dihapus");
+      setDeleteTaskTarget(null);
     } catch {
       toast.error("Gagal menghapus Tugas");
     }
@@ -110,7 +114,7 @@ export function TaskList({
                             variant="ghost"
                             size="icon"
                             className="text-destructive hover:text-destructive"
-                            onClick={() => handleDelete(task.id)}
+                            onClick={() => setDeleteTaskTarget(task)}
                           >
                             <IconTrash className="h-4 w-4" />
                           </Button>
@@ -203,7 +207,7 @@ export function TaskList({
                               variant="ghost"
                               size="icon"
                               className="text-destructive hover:text-destructive"
-                              onClick={() => handleDelete(task.id)}
+                              onClick={() => setDeleteTaskTarget(task)}
                             >
                               <IconTrash className="h-4 w-4" />
                             </Button>
@@ -218,6 +222,15 @@ export function TaskList({
           </div>
         </div>
       )}
+
+      <ConfirmDeleteDialog
+        open={!!deleteTaskTarget}
+        onOpenChange={(open) => !open && setDeleteTaskTarget(null)}
+        title="Hapus Tugas"
+        itemName={deleteTaskTarget?.taskName}
+        onConfirm={handleDelete}
+        isPending={deleteTask.isPending}
+      />
     </div>
   );
 }

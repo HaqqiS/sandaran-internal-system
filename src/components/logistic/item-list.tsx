@@ -409,7 +409,7 @@ export function ItemList({ projectId }: ItemListProps) {
                   <TableHead className="text-xs font-medium text-right">
                     Stok
                   </TableHead>
-                  <TableHead className="text-xs font-medium text-right w-[120px]">
+                  <TableHead className="text-xs font-medium text-center w-[120px]">
                     Aksi
                   </TableHead>
                 </TableRow>

@@ -8,16 +8,7 @@ import {
 } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "~/components/ui/alert-dialog";
+import { ConfirmDeleteDialog } from "~/components/shared/confirm-delete-dialog";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -173,30 +164,22 @@ export function ItemActions({ projectId, item }: ItemActionsProps) {
       )}
 
       {/* ── Delete Confirmation ────────────────────────────── */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Barang</AlertDialogTitle>
-            <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus <strong>{item.name}</strong>?
-              Tindakan ini tidak dapat dibatalkan dan akan menghapus semua
-              transaksi terkait.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteItem.isPending}>
-              Batal
-            </AlertDialogCancel>
-            <AlertDialogAction
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={deleteItem.isPending}
-            >
-              {deleteItem.isPending ? "Menghapus..." : "Hapus"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDeleteDialog
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        title="Hapus Barang"
+        itemName={item.name}
+        description={
+          <>
+            Apakah Anda yakin ingin menghapus{" "}
+            <strong className="text-foreground">{item.name}</strong>? Tindakan
+            ini tidak dapat dibatalkan dan akan menghapus semua transaksi
+            terkait.
+          </>
+        }
+        onConfirm={handleDelete}
+        isPending={deleteItem.isPending}
+      />
     </>
   );
 }

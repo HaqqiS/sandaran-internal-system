@@ -4,16 +4,7 @@ import type { GlobalRole, ProjectRole } from "@prisma/client";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "~/components/ui/alert-dialog";
+import { ConfirmDeleteDialog } from "~/components/shared/confirm-delete-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
@@ -255,29 +246,23 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
       )}
 
       {/* Remove Confirmation */}
-      <AlertDialog
+      <ConfirmDeleteDialog
         open={!!memberToRemove}
-        onOpenChange={(open: boolean) => !open && setMemberToRemove(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Anggota</AlertDialogTitle>
-            <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus "{memberToRemove?.name}" dari
-              proyek ini?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleRemoveMember}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {removeMember.isPending ? "Menghapus..." : "Hapus"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onOpenChange={(open) => !open && setMemberToRemove(null)}
+        title="Hapus Anggota"
+        itemName={memberToRemove?.name}
+        description={
+          <>
+            Apakah Anda yakin ingin menghapus{" "}
+            <span className="inline-block max-w-[200px] align-bottom font-semibold truncate sm:max-w-[280px] text-foreground">
+              &quot;{memberToRemove?.name}&quot;
+            </span>{" "}
+            dari proyek ini?
+          </>
+        }
+        onConfirm={handleRemoveMember}
+        isPending={removeMember.isPending}
+      />
     </div>
   );
 }

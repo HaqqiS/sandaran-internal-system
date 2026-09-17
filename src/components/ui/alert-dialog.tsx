@@ -154,12 +154,18 @@ function AlertDialogAction({
 }: React.ComponentProps<typeof AlertDialogPrimitive.Action> &
   Pick<React.ComponentProps<typeof Button>, "variant" | "size">) {
   return (
-    <Button variant={variant} size={size} asChild>
-      <AlertDialogPrimitive.Action
-        data-slot="alert-dialog-action"
-        className={cn(className)}
-        {...props}
-      />
+    <Button
+      variant={variant}
+      size={size}
+      asChild
+      className={cn(
+        "w-full sm:w-auto",
+        variant === "destructive" &&
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive/20 shadow-xs",
+        className,
+      )}
+    >
+      <AlertDialogPrimitive.Action data-slot="alert-dialog-action" {...props} />
     </Button>
   );
 }
@@ -172,12 +178,13 @@ function AlertDialogCancel({
 }: React.ComponentProps<typeof AlertDialogPrimitive.Cancel> &
   Pick<React.ComponentProps<typeof Button>, "variant" | "size">) {
   return (
-    <Button variant={variant} size={size} asChild>
-      <AlertDialogPrimitive.Cancel
-        data-slot="alert-dialog-cancel"
-        className={cn(className)}
-        {...props}
-      />
+    <Button
+      variant={variant}
+      size={size}
+      asChild
+      className={cn("w-full sm:w-auto", className)}
+    >
+      <AlertDialogPrimitive.Cancel data-slot="alert-dialog-cancel" {...props} />
     </Button>
   );
 }
