@@ -134,7 +134,14 @@ export function useDeleteLogisticItem() {
       await utils.logistic.getItems.cancel({
         projectId: deletedItem.projectId,
       });
+      await utils.logistic.getStockSummary.cancel({
+        projectId: deletedItem.projectId,
+      });
+
       const previousItems = utils.logistic.getItems.getData({
+        projectId: deletedItem.projectId,
+      });
+      const previousSummary = utils.logistic.getStockSummary.getData({
         projectId: deletedItem.projectId,
       });
 
@@ -144,13 +151,26 @@ export function useDeleteLogisticItem() {
           previousItems.filter((item) => item.id !== deletedItem.itemId),
         );
       }
-      return { previousItems };
+      if (previousSummary) {
+        utils.logistic.getStockSummary.setData(
+          { projectId: deletedItem.projectId },
+          previousSummary.filter((item) => item.id !== deletedItem.itemId),
+        );
+      }
+
+      return { previousItems, previousSummary };
     },
     onError: (_err, deletedItem, context) => {
       if (context?.previousItems) {
         utils.logistic.getItems.setData(
           { projectId: deletedItem.projectId },
           context.previousItems,
+        );
+      }
+      if (context?.previousSummary) {
+        utils.logistic.getStockSummary.setData(
+          { projectId: deletedItem.projectId },
+          context.previousSummary,
         );
       }
     },

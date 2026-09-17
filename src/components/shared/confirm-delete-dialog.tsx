@@ -1,7 +1,7 @@
 "use client";
 
 import { IconAlertTriangle, IconLoader2 } from "@tabler/icons-react";
-import type * as React from "react";
+import * as React from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,6 +39,25 @@ export function ConfirmDeleteDialog({
   cancelLabel = "Batal",
   showIcon = false,
 }: ConfirmDeleteDialogProps) {
+  // Safety cleanup: Ensure body pointer-events is restored if Radix leaves it stuck
+  React.useEffect(() => {
+    if (!open) {
+      const timer = setTimeout(() => {
+        if (document.body.style.pointerEvents === "none") {
+          document.body.style.pointerEvents = "";
+        }
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+    return () => {
+      setTimeout(() => {
+        if (document.body.style.pointerEvents === "none") {
+          document.body.style.pointerEvents = "";
+        }
+      }, 50);
+    };
+  }, [open]);
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>

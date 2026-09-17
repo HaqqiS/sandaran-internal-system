@@ -7,8 +7,6 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { useState } from "react";
-import { toast } from "sonner";
-import { ConfirmDeleteDialog } from "~/components/shared/confirm-delete-dialog";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -33,7 +31,6 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { useIsMobile } from "~/hooks/use-mobile";
-import { useDeleteLogisticItem } from "~/hooks/useLogistic";
 import { useProjectMembers } from "~/hooks/useProject";
 import { useSession } from "~/stores/use-session-store";
 import { LogisticItemForm } from "./item-form";
@@ -46,17 +43,15 @@ interface ItemActionsProps {
     name: string;
     unit: string;
   };
+  onDelete?: () => void;
 }
 
-export function ItemActions({ projectId, item }: ItemActionsProps) {
+export function ItemActions({ projectId, item, onDelete }: ItemActionsProps) {
   const { session } = useSession();
   const { data: members } = useProjectMembers(projectId);
   const isMobile = useIsMobile();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
-  const deleteItem = useDeleteLogisticItem();
 
   // Find user's role in this project
   const projectMember = members?.find((m) => m.userId === session?.user?.id);
@@ -64,22 +59,9 @@ export function ItemActions({ projectId, item }: ItemActionsProps) {
 
   const canManage = role === "FINANCE" || session?.user?.roleGlobal === "ADMIN";
 
-  const handleDelete = async () => {
-    try {
-      await deleteItem.mutateAsync({
-        projectId,
-        itemId: item.id,
-      });
-      toast.success("Barang berhasil dihapus");
-      setShowDeleteDialog(false);
-    } catch {
-      // Error handled by mutation
-    }
-  };
-
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
@@ -92,19 +74,19 @@ export function ItemActions({ projectId, item }: ItemActionsProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => setShowHistoryDialog(true)}>
+          <DropdownMenuItem onSelect={() => setShowHistoryDialog(true)}>
             <IconHistory className="mr-2 h-4 w-4" />
             Lihat Riwayat
           </DropdownMenuItem>
           {canManage && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
+              <DropdownMenuItem onSelect={() => setShowEditDialog(true)}>
                 <IconEdit className="mr-2 h-4 w-4" />
                 Edit Barang
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => setShowDeleteDialog(true)}
+                onSelect={() => onDelete?.()}
                 className="text-destructive focus:text-destructive"
               >
                 <IconTrash className="mr-2 h-4 w-4" />
@@ -162,24 +144,6 @@ export function ItemActions({ projectId, item }: ItemActionsProps) {
           </DialogContent>
         </Dialog>
       )}
-
-      {/* ── Delete Confirmation ────────────────────────────── */}
-      <ConfirmDeleteDialog
-        open={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
-        title="Hapus Barang"
-        itemName={item.name}
-        description={
-          <>
-            Apakah Anda yakin ingin menghapus{" "}
-            <strong className="text-foreground">{item.name}</strong>? Tindakan
-            ini tidak dapat dibatalkan dan akan menghapus semua transaksi
-            terkait.
-          </>
-        }
-        onConfirm={handleDelete}
-        isPending={deleteItem.isPending}
-      />
     </>
   );
 }

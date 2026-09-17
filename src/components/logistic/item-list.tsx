@@ -11,6 +11,8 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { useState } from "react";
+import { toast } from "sonner";
+import { ConfirmDeleteDialog } from "~/components/shared/confirm-delete-dialog";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -23,7 +25,10 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { useLogisticStockSummary } from "~/hooks/useLogistic";
+import {
+  useDeleteLogisticItem,
+  useLogisticStockSummary,
+} from "~/hooks/useLogistic";
 import { useProjectMembers } from "~/hooks/useProject";
 import { useSession } from "~/stores/use-session-store";
 import { ItemActions } from "./item-actions";
@@ -162,6 +167,28 @@ export function ItemList({ projectId }: ItemListProps) {
     role === "MANDOR" ||
     role === "FINANCE" ||
     session?.user?.roleGlobal === "ADMIN";
+
+  const deleteItem = useDeleteLogisticItem();
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+
+  const handleDeleteItem = async () => {
+    if (!deleteTarget) return;
+    try {
+      await deleteItem.mutateAsync({
+        projectId,
+        itemId: deleteTarget.id,
+      });
+      toast.success("Barang berhasil dihapus");
+      setDeleteTarget(null);
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Gagal menghapus barang",
+      );
+    }
+  };
 
   const handleTransactionSuccess = () => {
     setTransactionDialog((prev) => ({ ...prev, isOpen: false }));
@@ -383,7 +410,11 @@ export function ItemList({ projectId }: ItemListProps) {
                           </button>
                         </>
                       )}
-                      <ItemActions projectId={projectId} item={item} />
+                      <ItemActions
+                        projectId={projectId}
+                        item={item}
+                        onDelete={() => setDeleteTarget(item)}
+                      />
                     </div>
                   </div>
                 </div>
@@ -505,7 +536,11 @@ export function ItemList({ projectId }: ItemListProps) {
                               </Button>
                             </>
                           )}
-                          <ItemActions projectId={projectId} item={item} />
+                          <ItemActions
+                            projectId={projectId}
+                            item={item}
+                            onDelete={() => setDeleteTarget(item)}
+                          />
                         </div>
                       </TableCell>
                     </TableRow>
@@ -526,6 +561,23 @@ export function ItemList({ projectId }: ItemListProps) {
         type={transactionDialog.type}
         item={transactionDialog.item}
         onSuccess={handleTransactionSuccess}
+      />
+
+      <ConfirmDeleteDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title="Hapus Barang"
+        itemName={deleteTarget?.name}
+        description={
+          <>
+            Apakah Anda yakin ingin menghapus{" "}
+            <strong className="text-foreground">{deleteTarget?.name}</strong>?
+            Tindakan ini tidak dapat dibatalkan dan akan menghapus semua riwayat
+            transaksi terkait.
+          </>
+        }
+        onConfirm={handleDeleteItem}
+        isPending={deleteItem.isPending}
       />
     </div>
   );

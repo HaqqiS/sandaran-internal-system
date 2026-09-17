@@ -222,9 +222,14 @@ export const logisticRouter = createTRPCRouter({
         });
       }
 
-      await ctx.db.logisticItem.delete({
-        where: { id: input.itemId },
-      });
+      await ctx.db.$transaction([
+        ctx.db.logisticTransaction.deleteMany({
+          where: { itemId: input.itemId },
+        }),
+        ctx.db.logisticItem.delete({
+          where: { id: input.itemId },
+        }),
+      ]);
 
       return { success: true };
     }),
