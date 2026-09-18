@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
+import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload";
 import { useUploadDocument } from "~/hooks/useDocument";
 
 const documentSchema = z.object({
@@ -53,15 +54,9 @@ export function UploadForm({
   onCancel,
 }: UploadFormProps) {
   const uploadDocument = useUploadDocument();
+  const { upload, isLoading: isUploading, remove } = useCloudinaryUpload();
 
-  const [fileData, setFileData] = useState<{
-    url: string;
-    publicId: string;
-    fileName: string;
-    fileSize: number;
-    mimeType: string;
-    resourceType: string;
-  } | null>(null);
+  const [file, setFile] = useState<File | null>(null);
 
   useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
 
@@ -76,32 +71,56 @@ export function UploadForm({
       onSubmit: documentSchema,
     },
     onSubmit: async ({ value }) => {
-      if (!fileData) {
+      if (!file) {
         toast.error("Harap unggah sebuah file");
         return;
       }
 
+      let uploadedPublicId: string | null = null;
+
       try {
+        const isImage = file.type.startsWith("image/");
+        const resourceType = isImage ? "image" : "raw";
+
+        // Atomic Mode: Upload to Cloudinary only when form is submitted
+        const uploadResult = await upload(file, {
+          projectSlug,
+          type: "documents",
+          resourceType,
+        });
+        uploadedPublicId = uploadResult.publicId;
+
+        // Save document metadata to database
         await uploadDocument.mutateAsync({
           projectId,
-          fileName: fileData.fileName,
+          fileName: file.name,
           fileType: value.fileType,
-          publicId: fileData.publicId,
-          url: fileData.url,
-          fileSize: fileData.fileSize,
-          mimeType: fileData.mimeType,
-          resourceType: fileData.resourceType,
+          publicId: uploadResult.publicId,
+          url: uploadResult.secureUrl,
+          fileSize: uploadResult.bytes || file.size,
+          mimeType: file.type || undefined,
+          resourceType: uploadResult.resourceType || resourceType,
           title: value.title || undefined,
           description: value.description || undefined,
           version: value.version || undefined,
         });
-        toast.success("Dokumen berhasil diunggah");
-        onSuccess?.();
 
-        // Reset file state
-        setFileData(null);
-      } catch {
-        // Error handled by mutation
+        toast.success("Dokumen berhasil diunggah");
+        setFile(null);
+        onSuccess?.();
+      } catch (error) {
+        console.error("Upload document failed:", error);
+        // Rollback: if upload to Cloudinary succeeded but DB mutation failed, clean up Cloudinary asset
+        if (uploadedPublicId) {
+          try {
+            await remove(uploadedPublicId);
+          } catch (cleanupErr) {
+            console.error("Failed to cleanup Cloudinary asset:", cleanupErr);
+          }
+        }
+        toast.error(
+          error instanceof Error ? error.message : "Gagal mengunggah dokumen",
+        );
       }
     },
   });
@@ -121,18 +140,10 @@ export function UploadForm({
         <FileUpload
           projectSlug={projectSlug}
           type="documents"
-          value={fileData?.url}
-          onChange={(url, publicId, fileName, size, mimeType, resourceType) => {
-            setFileData({
-              url,
-              publicId,
-              fileName,
-              fileSize: size,
-              mimeType,
-              resourceType,
-            });
-          }}
-          onRemove={() => setFileData(null)}
+          value={file ?? undefined}
+          onFileChange={(selectedFile) => setFile(selectedFile)}
+          onRemove={() => setFile(null)}
+          disabled={isUploading}
         />
       </div>
 
@@ -227,9 +238,9 @@ export function UploadForm({
           children={([canSubmit, isSubmitting]) => (
             <Button
               type="submit"
-              disabled={!canSubmit || isSubmitting || !fileData}
+              disabled={!canSubmit || isSubmitting || isUploading || !file}
             >
-              {isSubmitting ? "Mengunggah..." : "Unggah Dokumen"}
+              {isSubmitting || isUploading ? "Mengunggah..." : "Unggah Dokumen"}
             </Button>
           )}
         />

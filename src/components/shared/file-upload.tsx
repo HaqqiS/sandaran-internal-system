@@ -17,7 +17,7 @@ interface FileUploadProps {
   /** Current file URL or File object */
   value?: string | File;
   /** Callback when file is uploaded */
-  onChange: (
+  onChange?: (
     url: string,
     publicId: string,
     originalFilename: string,
@@ -65,6 +65,8 @@ export function FileUpload({
   useEffect(() => {
     if (value instanceof File) {
       setFileName(value.name);
+    } else if (!value) {
+      setFileName(null);
     }
   }, [value]);
 
@@ -111,7 +113,7 @@ export function FileUpload({
           bytes: result.bytes,
         });
 
-        onChange(
+        onChange?.(
           result.secureUrl,
           result.publicId,
           file.name,
@@ -137,6 +139,7 @@ export function FileUpload({
   const handleRemove = () => {
     setFileName(null);
     reset();
+    onFileChange?.(null);
     onRemove?.();
   };
 
