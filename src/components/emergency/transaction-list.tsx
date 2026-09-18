@@ -41,7 +41,7 @@ import {
   useDeleteEmergencyTransaction,
   useEmergencyTransactions,
 } from "~/hooks/useEmergency";
-import { FundDialog } from "./fund-dialog";
+import { DepositDialog } from "./deposit-dialog";
 import { VerifyDialog } from "./verify-dialog";
 import { WithdrawDialog } from "./withdraw-dialog";
 
@@ -398,7 +398,7 @@ export function TransactionList({
       />
 
       {/* Edit Deposit Dialog */}
-      <FundDialog
+      <DepositDialog
         projectId={projectId}
         projectSlug={projectSlug}
         open={!!editFund}

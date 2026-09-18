@@ -1,11 +1,10 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { useImperativeHandle } from "react";
+import { useEffect, useImperativeHandle } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ImageUpload } from "~/components/shared/image-upload";
-import { Button } from "~/components/ui/button";
 import {
   Field,
   FieldDescription,
@@ -17,37 +16,41 @@ import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload";
 import {
-  useAddEmergencyBalance,
   useEditEmergencyTransaction,
+  useRequestEmergencyFund,
 } from "~/hooks/useEmergency";
 import { formatNumberIDR } from "~/lib/utils";
 
-const fundSchema = z.object({
+const withdrawSchema = z.object({
   amount: z
     .string()
     .refine((val) => !Number.isNaN(Number(val)) && Number(val) > 0, {
       message: "Nominal harus berupa angka lebih dari 0",
     }),
-  description: z.string().min(1, "Keterangan/sumber aliran harus diisi"),
+  description: z.string().min(1, "Keterangan / Keperluan wajib diisi"),
   proofPublicId: z.string().optional(),
   proofUrl: z.union([z.string(), z.instanceof(File)]).optional(),
 });
 
-export type FundFormValues = z.infer<typeof fundSchema>;
-export type FundFormDraft = Partial<FundFormValues>;
+export type WithdrawFormValues = z.infer<typeof withdrawSchema>;
+export type WithdrawFormDraft = Partial<WithdrawFormValues>;
+export type WithdrawFormRef = {
+  getValues: () => WithdrawFormValues;
+  submit: () => void;
+};
 
-interface FundFormProps {
+interface WithdrawFormProps {
   projectId: string;
   projectSlug: string;
   mode?: "create" | "edit";
   transactionId?: string;
-  draftValues?: FundFormDraft;
-  ref?: React.Ref<{ getValues: () => FundFormValues }>;
+  draftValues?: WithdrawFormDraft;
+  ref?: React.Ref<WithdrawFormRef>;
   onSuccess?: () => void;
-  onCancel?: () => void;
+  onPendingChange?: (isPending: boolean) => void;
 }
 
-export function FundForm({
+export function WithdrawForm({
   projectId,
   projectSlug,
   mode = "create",
@@ -55,17 +58,24 @@ export function FundForm({
   draftValues,
   ref,
   onSuccess,
-  onCancel,
-}: FundFormProps) {
-  const addBalance = useAddEmergencyBalance();
+  onPendingChange,
+}: WithdrawFormProps) {
+  const withdrawFund = useRequestEmergencyFund();
   const editTransaction = useEditEmergencyTransaction();
   const { upload, isLoading: isUploading } = useCloudinaryUpload();
 
   const isEdit = mode === "edit";
   const isPending =
-    addBalance.isPending || editTransaction.isPending || isUploading;
+    withdrawFund.isPending || editTransaction.isPending || isUploading;
 
-  useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
+  useEffect(() => {
+    onPendingChange?.(isPending);
+  }, [isPending, onPendingChange]);
+
+  useImperativeHandle(ref, () => ({
+    getValues: () => form.state.values,
+    submit: () => void form.handleSubmit(),
+  }));
 
   const form = useForm({
     defaultValues: {
@@ -73,9 +83,9 @@ export function FundForm({
       description: draftValues?.description ?? "",
       proofPublicId: draftValues?.proofPublicId ?? "",
       proofUrl: draftValues?.proofUrl ?? "",
-    } as FundFormValues,
+    } as WithdrawFormValues,
     validators: {
-      onChange: fundSchema,
+      onChange: withdrawSchema,
     },
     onSubmit: async ({ value }) => {
       try {
@@ -103,23 +113,21 @@ export function FundForm({
           });
           toast.success("Transaksi berhasil diperbarui");
         } else {
-          await addBalance.mutateAsync({
+          await withdrawFund.mutateAsync({
             projectId,
             amount: Number(value.amount),
             description: value.description,
             proofPublicId: finalPublicId || undefined,
             proofUrl: finalUrl || undefined,
           });
-          toast.success("Kas berhasil ditambahkan");
+          toast.success("Pengajuan dana berhasil dikirim");
         }
 
         form.reset();
         onSuccess?.();
       } catch (error) {
         toast.error(
-          isEdit
-            ? "Gagal memperbarui transaksi"
-            : "Gagal menambahkan dana ke kas",
+          isEdit ? "Gagal memperbarui transaksi" : "Gagal mengajukan dana",
         );
         console.error(error);
       }
@@ -139,7 +147,7 @@ export function FundForm({
         {(field) => (
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor={field.name}>Nominal Masuk (Rp) *</FieldLabel>
+              <FieldLabel htmlFor={field.name}>Nominal (Rp) *</FieldLabel>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground font-medium">
                   Rp
@@ -160,8 +168,7 @@ export function FundForm({
                 />
               </div>
               <FieldDescription>
-                Masukkan jumlah dana yang masuk ke kas. Format akan otomatis
-                muncul.
+                Masukkan jumlah dana yang diajukan. Format akan otomatis muncul.
               </FieldDescription>
               <FieldError errors={field.state.meta.errors} />
             </Field>
@@ -174,7 +181,7 @@ export function FundForm({
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor={field.name}>
-                Sumber Dana / Keterangan *
+                Keterangan / Keperluan *
               </FieldLabel>
               <Textarea
                 id={field.name}
@@ -182,11 +189,11 @@ export function FundForm({
                 value={field.state.value}
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
-                placeholder="Contoh: Pencairan Bon dari Akuntan, Titipan Mandor"
+                placeholder="Contoh: Beli paku tambahan pendukung, Makan siang tukang borongan"
                 rows={3}
               />
               <FieldDescription>
-                Jelaskan asal atau sumber aliran dana masuk ini.
+                Jelaskan rincian keperluan penggunaan dana darurat ini.
               </FieldDescription>
               <FieldError errors={field.state.meta.errors} />
             </Field>
@@ -200,7 +207,7 @@ export function FundForm({
             {(publicIdField) => (
               <FieldGroup>
                 <Field>
-                  <FieldLabel>Bukti Transfer (Opsional)</FieldLabel>
+                  <FieldLabel>Bukti Foto / Bon (Opsional)</FieldLabel>
                   <ImageUpload
                     projectSlug={projectSlug}
                     type="emergency"
@@ -215,8 +222,8 @@ export function FundForm({
                     }}
                   />
                   <FieldDescription>
-                    Lampirkan bukti transfer atau mutasi sebagai bukti aliran
-                    dana masuk.
+                    Ambil foto bon atau bukti pembayaran sebagai lampiran
+                    pengajuan.
                   </FieldDescription>
                 </Field>
               </FieldGroup>
@@ -224,19 +231,6 @@ export function FundForm({
           </form.Field>
         )}
       </form.Field>
-
-      <div className="flex justify-end gap-2 pt-2">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Batal
-        </Button>
-        <Button type="submit" disabled={isPending}>
-          {isPending
-            ? "Memproses..."
-            : isEdit
-              ? "Simpan Perubahan"
-              : "Tambah Kas Masuk"}
-        </Button>
-      </div>
     </form>
   );
 }

@@ -109,7 +109,7 @@ export function ReportDialog({
 
             {/* Scrollable body — min-h-0 is the key fix */}
             <div
-              className="flex-1 min-h-0 overflow-y-auto px-4 py-4"
+              className="flex-1 min-h-0 overflow-y-auto px-6 py-5"
               data-lenis-prevent
             >
               <ReportForm

@@ -13,7 +13,7 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
 import { useState } from "react";
-import { FundDialog } from "~/components/emergency/fund-dialog";
+import { DepositDialog } from "~/components/emergency/deposit-dialog";
 import { WithdrawDialog } from "~/components/emergency/withdraw-dialog";
 import { PageLayout } from "~/components/layout";
 import { ExportReportDialog } from "~/components/project/export-report-dialog";
@@ -271,7 +271,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
         onOpenChange={setIsCreateReportOpen}
       />
 
-      <FundDialog
+      <DepositDialog
         projectId={project.id}
         projectSlug={project.slug}
         open={isFundOpen}

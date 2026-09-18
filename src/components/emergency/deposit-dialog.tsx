@@ -1,6 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
+import {
+  DepositForm,
+  type DepositFormDraft,
+  type DepositFormRef,
+} from "~/components/emergency/deposit-form";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -17,23 +22,18 @@ import {
   DrawerTitle,
 } from "~/components/ui/drawer";
 import { useIsMobile } from "~/hooks/use-mobile";
-import {
-  WithdrawForm,
-  type WithdrawFormDraft,
-  type WithdrawFormRef,
-} from "./withdraw-form";
 
-interface WithdrawDialogProps {
+interface DepositDialogProps {
   projectId: string;
   projectSlug: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   mode?: "create" | "edit";
   transactionId?: string;
-  initialValues?: WithdrawFormDraft;
+  initialValues?: DepositFormDraft;
 }
 
-export function WithdrawDialog({
+export function DepositDialog({
   projectId,
   projectSlug,
   open,
@@ -41,16 +41,16 @@ export function WithdrawDialog({
   mode = "create",
   transactionId,
   initialValues,
-}: WithdrawDialogProps) {
+}: DepositDialogProps) {
   const isMobile = useIsMobile();
   const isEdit = mode === "edit";
-  const title = isEdit ? "Edit Penarikan Dana" : "Ajukan Penarikan Dana";
+  const title = isEdit ? "Edit Dana Masuk" : "Tambah Dana Darurat";
   const description = isEdit
-    ? "Ubah detail penarikan dana darurat ini."
-    : "Ajukan penarikan dana darurat untuk project ini. Lampirkan bukti jika ada.";
-  const [draft, setDraft] = useState<WithdrawFormDraft>({});
+    ? "Ubah detail transaksi dana masuk ini."
+    : "Tambah dana darurat untuk project ini.";
+  const [draft, setDraft] = useState<DepositFormDraft>({});
   const [isPending, setIsPending] = useState(false);
-  const formRef = useRef<WithdrawFormRef>(null);
+  const formRef = useRef<DepositFormRef>(null);
 
   // Use initialValues when available (edit mode), otherwise fall back to draft
   const formDraftValues = isEdit ? initialValues : draft;
@@ -75,7 +75,7 @@ export function WithdrawDialog({
     ? "Memproses..."
     : isEdit
       ? "Simpan Perubahan"
-      : "Ajukan Dana";
+      : "Tambah Kas Masuk";
 
   if (!isMobile) {
     return (
@@ -95,7 +95,7 @@ export function WithdrawDialog({
               className="flex-1 min-h-0 overflow-y-auto px-6 py-5"
               data-lenis-prevent
             >
-              <WithdrawForm
+              <DepositForm
                 ref={formRef}
                 projectId={projectId}
                 projectSlug={projectSlug}
@@ -138,7 +138,7 @@ export function WithdrawDialog({
           className="flex-1 min-h-0 overflow-y-auto px-4 py-4"
           data-lenis-prevent
         >
-          <WithdrawForm
+          <DepositForm
             ref={formRef}
             projectId={projectId}
             projectSlug={projectSlug}

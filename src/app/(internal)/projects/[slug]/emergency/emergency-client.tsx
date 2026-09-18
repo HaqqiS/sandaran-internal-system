@@ -8,7 +8,7 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState } from "react";
-import { FundDialog } from "~/components/emergency/fund-dialog";
+import { DepositDialog } from "~/components/emergency/deposit-dialog";
 import { FundOverview } from "~/components/emergency/fund-overview";
 import { TransactionList } from "~/components/emergency/transaction-list";
 import { WithdrawDialog } from "~/components/emergency/withdraw-dialog";
@@ -122,7 +122,7 @@ export function EmergencyClient({ projectSlug }: EmergencyClientProps) {
         </div>
       </div>
 
-      <FundDialog
+      <DepositDialog
         projectId={project.id}
         projectSlug={project.slug}
         open={isFundOpen}
