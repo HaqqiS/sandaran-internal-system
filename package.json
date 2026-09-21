@@ -10,6 +10,7 @@
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
+    "deploy": "opennextjs-cloudflare && opennextjs-cloudflare deploy",
     "dev": "next dev --turbo",
     "dev:no-turbo": "next dev",
     "format": "biome format --write src",
@@ -85,6 +86,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.13",
+    "@opennextjs/cloudflare": "^1.20.6",
     "@tailwindcss/postcss": "^4.0.15",
     "@types/node": "^20.14.10",
     "@types/react": "^19.0.0",
