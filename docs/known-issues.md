@@ -32,53 +32,18 @@ This requires a carefully orchestrated transaction to prevent data inconsistency
 
 Avoid renaming project slugs if they already contain uploaded files. If renaming is necessary, be aware that old file links will break.
 
-## 2. Improving form
+## 2. Form & Input Issues
 
-- **logistics Form**: error unknown value, amount can caracter. (fixed)
-- **Sheet Form**: broken in mobile view, when using keyboard its glitch
+- **Sheet Form**: Mengalami glitch pada tampilan mobile ketika keyboard virtual muncul.
 
-## 3. Improving UI/UX
+## 3. Mobile UI & Layout Issues
 
-**Sidebar Header**
+- **Project Detail (`/projects/[slug]/**`)**: Tampilan mobile pada header sidebar dan data-table masih overwidth (melebihi lebar layar).
+- **Sidebar Header**: Navigasi kembali ke halaman sebelumnya perlu disempurnakan.
+- **Emergency Page**:
+  - Data-table masih tembus / overflow layar pada perangkat mobile.
+  - Penyesuaian warna indikator pada chart.
 
-- just previus page
+## 4. Planned Enhancements / Feature Backlog
 
-**Project[slug]/\*\***
-
-- mobile view still broken, at header sidebar or even the data-table still overwidth
-
-## 4. Broken Mobile UI
-
-1. layout dashboard
-
-- close sidebar after klick menu (fixed)
-- select project broken if project's name to long (fixed)
-- sidebar header broken if many content link 2 button and project's name to long (fixed)
-
-2. admin dashboard
-
-- Quick Actions (fixed)
-
-3. projects
-
-- sheet create/edit project (fixed)
-- sheet create/edit project' report (fixed)
-
-4. emergency
-
-- the data-table break through screen
-- add fund emergency still using modal change to sheet (fixed)
-- emergency page, set colors of chart
-
-5. logistics
-
-- create & edit still using modal (fixed)
-- in and out stock still using modal (fixed)
-- change detele modal look a like delete modal in documents but button confirm is red (fixed)
-
-6. documents
-
-- create still using modal (fixed)
-- on the delete modal, the confirmation button is black. change to red (fixed)
-
-## 5. Make Gallerys UI for each project and recent gallery all projects
+- **Project Galleries**: Pembuatan antarmuka galeri foto untuk masing-masing proyek serta feed galeri terkini (*recent gallery*) dari seluruh proyek.
