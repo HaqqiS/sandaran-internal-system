@@ -387,7 +387,7 @@ export function TransactionList({
         description={
           <>
             Apakah Anda yakin ingin menghapus transaksi{" "}
-            <span className="inline-block max-w-[200px] align-bottom font-semibold truncate sm:max-w-[280px] text-foreground">
+            <span className="inline-block max-w-50 align-bottom font-semibold truncate sm:max-w-70 text-foreground">
               &quot;{deleteTarget?.description}&quot;
             </span>
             ? Tindakan ini tidak dapat dibatalkan dan saldo akan disesuaikan.

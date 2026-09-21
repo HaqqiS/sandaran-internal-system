@@ -307,9 +307,9 @@ export const documentRouter = createTRPCRouter({
       z.object({
         projectId: z.string(),
         documentId: z.string(),
-        title: z.string().optional(),
-        description: z.string().optional(),
-        version: z.string().optional(),
+        title: z.string().nullable().optional(),
+        description: z.string().nullable().optional(),
+        version: z.string().nullable().optional(),
         fileType: z
           .enum(["DESIGN", "DRAWING", "REFERENCE", "SPECIFICATION", "OTHER"])
           .optional(),
@@ -334,9 +334,16 @@ export const documentRouter = createTRPCRouter({
       const updated = await ctx.db.projectDocument.update({
         where: { id: input.documentId },
         data: {
-          title: input.title,
-          description: input.description,
-          version: input.version,
+          title:
+            input.title !== undefined ? input.title?.trim() || null : undefined,
+          description:
+            input.description !== undefined
+              ? input.description?.trim() || null
+              : undefined,
+          version:
+            input.version !== undefined
+              ? input.version?.trim() || null
+              : undefined,
           fileType: input.fileType,
         },
         include: {

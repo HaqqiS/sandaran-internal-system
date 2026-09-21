@@ -10,6 +10,7 @@ import { DocumentCard } from "./document-card";
 interface DocumentListProps {
   projectId: string;
   currentUserId: string;
+  isAdmin?: boolean;
   onEdit: (document: ProjectDocument) => void;
   onDelete: (document: ProjectDocument) => void;
 }
@@ -17,6 +18,7 @@ interface DocumentListProps {
 export function DocumentList({
   projectId,
   currentUserId,
+  isAdmin,
   onEdit,
   onDelete,
 }: DocumentListProps) {
@@ -32,27 +34,27 @@ export function DocumentList({
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="w-full justify-start overflow-x-auto h-auto p-1 bg-muted/50">
-          <TabsTrigger value="ALL" className="py-2">
+          <TabsTrigger value="ALL" className="px-3 py-2 shrink-0">
             Semua File
           </TabsTrigger>
-          <TabsTrigger value="DESIGN" className="py-2">
+          <TabsTrigger value="DESIGN" className="px-3 py-2 shrink-0">
             Desain/Denah
           </TabsTrigger>
-          <TabsTrigger value="DRAWING" className="py-2">
+          <TabsTrigger value="DRAWING" className="px-3 py-2 shrink-0">
             Gambar Teknis
           </TabsTrigger>
-          <TabsTrigger value="SPECIFICATION" className="py-2">
+          <TabsTrigger value="SPECIFICATION" className="px-3 py-2 shrink-0">
             Spesifikasi
           </TabsTrigger>
-          <TabsTrigger value="REFERENCE" className="py-2">
+          <TabsTrigger value="REFERENCE" className="px-3 py-2 shrink-0">
             Referensi
           </TabsTrigger>
-          <TabsTrigger value="OTHER" className="py-2">
+          <TabsTrigger value="OTHER" className="px-3 py-2 shrink-0">
             Lainnya
           </TabsTrigger>
         </TabsList>
 
-        <div className="mt-6 min-h-[200px]">
+        <div className="mt-6 min-h-50">
           {isLoading ? (
             <div className="flex h-40 items-center justify-center">
               <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -74,6 +76,7 @@ export function DocumentList({
                   key={doc.id}
                   document={doc}
                   currentUserId={currentUserId}
+                  isAdmin={isAdmin}
                   onEdit={onEdit}
                   onDelete={onDelete}
                 />

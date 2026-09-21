@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DocumentList } from "~/components/document/document-list";
+import { EditDialog } from "~/components/document/edit-dialog";
 import { UploadDialog } from "~/components/document/upload-dialog";
 import { PageLayout } from "~/components/layout";
 import { ConfirmDeleteDialog } from "~/components/shared/confirm-delete-dialog";
@@ -26,6 +27,8 @@ export function DocumentsClient({ projectSlug }: DocumentsClientProps) {
   const deleteDocument = useDeleteDocument();
 
   const [showUploadDialog, setShowUploadDialog] = useState(false);
+  const [editingDocument, setEditingDocument] =
+    useState<ProjectDocument | null>(null);
   const [deleteDialogDoc, setDeleteDialogDoc] =
     useState<ProjectDocument | null>(null);
 
@@ -111,12 +114,18 @@ export function DocumentsClient({ projectSlug }: DocumentsClientProps) {
         <DocumentList
           projectId={project.id}
           currentUserId={session?.user?.id ?? ""}
-          onEdit={(_doc) => {
-            toast.info("Fitur edit segera hadir");
-          }}
+          isAdmin={session?.user?.roleGlobal === "ADMIN"}
+          onEdit={(doc) => setEditingDocument(doc)}
           onDelete={(doc) => setDeleteDialogDoc(doc)}
         />
       </div>
+
+      <EditDialog
+        projectId={project.id}
+        document={editingDocument}
+        open={!!editingDocument}
+        onOpenChange={(open: boolean) => !open && setEditingDocument(null)}
+      />
 
       <ConfirmDeleteDialog
         open={!!deleteDialogDoc}

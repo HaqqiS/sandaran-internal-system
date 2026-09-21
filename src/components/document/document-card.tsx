@@ -33,6 +33,7 @@ interface DocumentCardProps {
     };
   };
   currentUserId: string;
+  isAdmin?: boolean;
   onEdit: (document: ProjectDocument) => void;
   onDelete: (document: ProjectDocument) => void;
 }
@@ -40,10 +41,12 @@ interface DocumentCardProps {
 export function DocumentCard({
   document: doc,
   currentUserId,
+  isAdmin,
   onEdit,
   onDelete,
 }: DocumentCardProps) {
   const isOwner = doc.userId === currentUserId;
+  const canModify = isOwner || !!isAdmin;
   const { mutateAsync: getDownloadUrl, isPending: isDownloading } =
     useGetDownloadUrl();
 
@@ -162,7 +165,7 @@ export function DocumentCard({
           Unduh
         </Button>
 
-        {isOwner && (
+        {canModify && (
           <>
             <Button
               variant="ghost"
