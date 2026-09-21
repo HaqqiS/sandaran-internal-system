@@ -31,6 +31,7 @@ interface WithdrawDialogProps {
   mode?: "create" | "edit";
   transactionId?: string;
   initialValues?: WithdrawFormDraft;
+  isReviewed?: boolean;
 }
 
 export function WithdrawDialog({
@@ -41,6 +42,7 @@ export function WithdrawDialog({
   mode = "create",
   transactionId,
   initialValues,
+  isReviewed,
 }: WithdrawDialogProps) {
   const isMobile = useIsMobile();
   const isEdit = mode === "edit";
@@ -102,6 +104,7 @@ export function WithdrawDialog({
                 mode={mode}
                 transactionId={transactionId}
                 draftValues={formDraftValues}
+                isReviewed={isReviewed}
                 onPendingChange={setIsPending}
                 onSuccess={handleSuccess}
               />
@@ -145,6 +148,7 @@ export function WithdrawDialog({
             mode={mode}
             transactionId={transactionId}
             draftValues={formDraftValues}
+            isReviewed={isReviewed}
             onPendingChange={setIsPending}
             onSuccess={handleSuccess}
           />

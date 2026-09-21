@@ -311,7 +311,7 @@ export function ImageUpload({
                   className="object-cover"
                   unoptimized={file.url.startsWith("blob:")}
                 />
-                {onRemove && !isLoading && (
+                {onRemove && !isLoading && !disabled && (
                   <Button
                     type="button"
                     variant="destructive"
@@ -339,7 +339,7 @@ export function ImageUpload({
                     "blob:",
                   )}
                 />
-                {onRemove && !isLoading && (
+                {onRemove && !isLoading && !disabled && (
                   <Button
                     type="button"
                     variant="destructive"
@@ -375,33 +375,35 @@ export function ImageUpload({
         </div>
       )}
 
-      <div
-        {...getRootProps()}
-        className={cn(
-          "cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors",
-          "hover:border-primary hover:bg-muted/50",
-          isDragActive && "border-primary bg-muted/50",
-          disabled && "cursor-not-allowed opacity-50",
-        )}
-      >
-        <input {...getInputProps()} capture="environment" />
-        <div className="flex flex-col items-center gap-2">
-          {isDragActive ? (
-            <IconUpload className="h-10 w-10 text-muted-foreground" />
-          ) : (
-            <IconPhoto className="h-10 w-10 text-muted-foreground" />
+      {(!disabled || (!multiple && !value && !filePreview)) && (
+        <div
+          {...getRootProps()}
+          className={cn(
+            "cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors",
+            "hover:border-primary hover:bg-muted/50",
+            isDragActive && "border-primary bg-muted/50",
+            disabled && "cursor-not-allowed opacity-50",
           )}
-          <p className="text-sm text-muted-foreground">
-            {isDragActive
-              ? "Drop the image(s) here"
-              : "Drag & drop or click to upload"}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            JPG, PNG, WebP up to {maxSizeMB}MB{" "}
-            {multiple ? "(Bisa pilih banyak foto)" : ""}
-          </p>
+        >
+          <input {...getInputProps()} capture="environment" />
+          <div className="flex flex-col items-center gap-2">
+            {isDragActive ? (
+              <IconUpload className="h-10 w-10 text-muted-foreground" />
+            ) : (
+              <IconPhoto className="h-10 w-10 text-muted-foreground" />
+            )}
+            <p className="text-sm text-muted-foreground">
+              {isDragActive
+                ? "Drop the image(s) here"
+                : "Drag & drop or click to upload"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              JPG, PNG, WebP up to {maxSizeMB}MB{" "}
+              {multiple ? "(Bisa pilih banyak foto)" : ""}
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {isLoading && <Progress value={progress} className="h-2" />}
 

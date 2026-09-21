@@ -45,6 +45,7 @@ interface DepositFormProps {
   mode?: "create" | "edit";
   transactionId?: string;
   draftValues?: DepositFormDraft;
+  isReviewed?: boolean;
   ref?: React.Ref<DepositFormRef>;
   onSuccess?: () => void;
   onPendingChange?: (isPending: boolean) => void;
@@ -56,6 +57,7 @@ export function DepositForm({
   mode = "create",
   transactionId,
   draftValues,
+  isReviewed = false,
   ref,
   onSuccess,
   onPendingChange,
@@ -92,8 +94,8 @@ export function DepositForm({
         let finalUrl = typeof value.proofUrl === "string" ? value.proofUrl : "";
         let finalPublicId = value.proofPublicId || "";
 
-        // Atomic Upload: Perform upload only if it's a File
-        if (value.proofUrl instanceof File) {
+        // Atomic Upload: Perform upload only if it's a File and not reviewed
+        if (value.proofUrl instanceof File && !isReviewed) {
           const result = await upload(value.proofUrl, {
             projectSlug,
             type: "emergency",
@@ -108,8 +110,12 @@ export function DepositForm({
             transactionId,
             amount: Number(value.amount),
             description: value.description,
-            proofPublicId: finalPublicId || undefined,
-            proofUrl: finalUrl || undefined,
+            proofPublicId: isReviewed
+              ? undefined
+              : finalPublicId
+                ? finalPublicId
+                : null,
+            proofUrl: isReviewed ? undefined : finalUrl ? finalUrl : null,
           });
           toast.success("Transaksi berhasil diperbarui");
         } else {
@@ -214,19 +220,23 @@ export function DepositForm({
                   <ImageUpload
                     projectSlug={projectSlug}
                     type="emergency"
+                    disabled={isReviewed}
                     value={field.state.value}
                     onFileChange={(files) => {
+                      if (isReviewed) return;
                       field.handleChange(files[0] ?? "");
                       publicIdField.handleChange("");
                     }}
                     onRemove={() => {
+                      if (isReviewed) return;
                       field.handleChange("");
                       publicIdField.handleChange("");
                     }}
                   />
                   <FieldDescription>
-                    Lampirkan bukti transfer atau mutasi sebagai bukti aliran
-                    dana masuk.
+                    {isReviewed
+                      ? "Bukti transaksi yang sudah ditinjau tidak dapat diubah."
+                      : "Lampirkan bukti transfer atau mutasi sebagai bukti aliran dana masuk."}
                   </FieldDescription>
                 </Field>
               </FieldGroup>

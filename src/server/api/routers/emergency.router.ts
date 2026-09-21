@@ -1,5 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { deleteCloudinaryAsset } from "~/lib/cloudinary";
 import {
   createTRPCRouter,
   projectProcedure,
@@ -321,15 +322,15 @@ export const emergencyRouter = createTRPCRouter({
     }),
 
   /**
-   * Verify (Review) emergency fund request
-   * Only FINANCE can verify
+   * Verify (Review) or Undo Review emergency fund request
+   * Only FINANCE can verify/unverify
    */
   verify: financeProcedure
     .input(
       z.object({
         projectId: z.string(),
         transactionId: z.string(),
-        status: z.enum(["REVIEWED"]),
+        status: z.enum(["REVIEWED", "UNREVIEWED"]),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -356,12 +357,30 @@ export const emergencyRouter = createTRPCRouter({
         });
       }
 
-      // Check if already verified
-      if (transaction.status !== "UNREVIEWED") {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Transaction already reviewed",
-        });
+      if (input.status === "REVIEWED") {
+        // Check if already verified
+        if (transaction.status !== "UNREVIEWED") {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Transaksi sudah ditinjau",
+          });
+        }
+      } else {
+        // Undo Review (UNREVIEWED)
+        if (transaction.status !== "REVIEWED") {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Transaksi belum ditinjau",
+          });
+        }
+
+        if (transaction.type === "DEPOSIT") {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message:
+              "Transaksi dana masuk (deposit) tidak dapat dibatalkan review-nya",
+          });
+        }
       }
 
       // Update transaction status
@@ -369,9 +388,10 @@ export const emergencyRouter = createTRPCRouter({
       const updated = await ctx.db.emergencyTransaction.update({
         where: { id: input.transactionId },
         data: {
-          status: input.status, // "REVIEWED"
-          verifiedById: ctx.session.user.id,
-          verifiedAt: new Date(),
+          status: input.status,
+          verifiedById:
+            input.status === "REVIEWED" ? ctx.session.user.id : null,
+          verifiedAt: input.status === "REVIEWED" ? new Date() : null,
         },
         include: {
           requester: {
@@ -408,8 +428,8 @@ export const emergencyRouter = createTRPCRouter({
         transactionId: z.string(),
         amount: z.number().positive(),
         description: z.string().min(1),
-        proofPublicId: z.string().optional(),
-        proofUrl: z.string().optional(),
+        proofPublicId: z.string().nullable().optional(),
+        proofUrl: z.string().nullable().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -456,6 +476,31 @@ export const emergencyRouter = createTRPCRouter({
         });
       }
 
+      // Issue 3: If transaction is REVIEWED, image cannot be changed
+      if (
+        transaction.status === "REVIEWED" &&
+        ((input.proofPublicId !== undefined &&
+          input.proofPublicId !== transaction.publicId) ||
+          (input.proofUrl !== undefined && input.proofUrl !== transaction.url))
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "Bukti foto transaksi yang sudah ditinjau tidak dapat diubah",
+        });
+      }
+
+      // Issue 4: When editing image, delete old image from Cloudinary
+      const isImageReplaced =
+        input.proofPublicId !== undefined &&
+        input.proofPublicId !== transaction.publicId;
+
+      if (isImageReplaced && transaction.publicId) {
+        await deleteCloudinaryAsset(transaction.publicId).catch((err) => {
+          console.error("Failed to delete old Cloudinary asset on edit:", err);
+        });
+      }
+
       // Calculate balance adjustment
       const oldAmount = Number(transaction.amount);
       const newAmount = input.amount;
@@ -486,8 +531,12 @@ export const emergencyRouter = createTRPCRouter({
           data: {
             amount: newAmount,
             description: input.description,
-            publicId: input.proofPublicId ?? transaction.publicId,
-            url: input.proofUrl ?? transaction.url,
+            publicId:
+              input.proofPublicId !== undefined
+                ? input.proofPublicId
+                : transaction.publicId,
+            url:
+              input.proofUrl !== undefined ? input.proofUrl : transaction.url,
           },
           include: {
             requester: {
@@ -584,6 +633,16 @@ export const emergencyRouter = createTRPCRouter({
           code: "BAD_REQUEST",
           message:
             "Menghapus transaksi ini akan menyebabkan saldo menjadi negatif. Operasi dibatalkan.",
+        });
+      }
+
+      // Issue 2: Delete asset from Cloudinary when deleting transaction
+      if (transaction.publicId) {
+        await deleteCloudinaryAsset(transaction.publicId).catch((err) => {
+          console.error(
+            "Failed to delete Cloudinary asset for emergency transaction:",
+            err,
+          );
         });
       }
 

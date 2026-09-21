@@ -17,6 +17,7 @@ interface VerifyDialogProps {
   transactionId: string | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  mode?: "review" | "undo";
 }
 
 export function VerifyDialog({
@@ -24,8 +25,10 @@ export function VerifyDialog({
   transactionId,
   open,
   onOpenChange,
+  mode = "review",
 }: VerifyDialogProps) {
   const verifyRequest = useVerifyEmergencyRequest();
+  const isUndo = mode === "undo";
 
   const handleVerify = async () => {
     if (!transactionId) return;
@@ -34,12 +37,20 @@ export function VerifyDialog({
       await verifyRequest.mutateAsync({
         projectId,
         transactionId,
-        status: "REVIEWED",
+        status: isUndo ? "UNREVIEWED" : "REVIEWED",
       });
-      toast.success("Transaksi berhasil direview");
+      toast.success(
+        isUndo
+          ? "Status review transaksi berhasil dibatalkan"
+          : "Transaksi berhasil direview",
+      );
       onOpenChange(false);
     } catch (error) {
-      toast.error("Gagal mereview transaksi");
+      toast.error(
+        isUndo
+          ? "Gagal membatalkan review transaksi"
+          : "Gagal mereview transaksi",
+      );
       console.error(error);
     }
   };
@@ -48,10 +59,13 @@ export function VerifyDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Review Transaksi</DialogTitle>
+          <DialogTitle>
+            {isUndo ? "Batalkan Review Transaksi" : "Review Transaksi"}
+          </DialogTitle>
           <DialogDescription>
-            Apakah Anda yakin ingin menandai transaksi ini sebagai sudah
-            direview? Ini mengonfirmasi bahwa pengeluaran tersebut valid.
+            {isUndo
+              ? "Apakah Anda yakin ingin membatalkan status review transaksi ini? Transaksi akan dikembalikan ke status belum ditinjau."
+              : "Apakah Anda yakin ingin menandai transaksi ini sebagai sudah direview? Ini mengonfirmasi bahwa pengeluaran tersebut valid."}
           </DialogDescription>
         </DialogHeader>
 
@@ -59,8 +73,16 @@ export function VerifyDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Batal
           </Button>
-          <Button onClick={handleVerify} disabled={verifyRequest.isPending}>
-            {verifyRequest.isPending ? "Memproses..." : "Tandai Sudah Direview"}
+          <Button
+            variant={isUndo ? "destructive" : "default"}
+            onClick={handleVerify}
+            disabled={verifyRequest.isPending}
+          >
+            {verifyRequest.isPending
+              ? "Memproses..."
+              : isUndo
+                ? "Batalkan Review"
+                : "Tandai Sudah Direview"}
           </Button>
         </DialogFooter>
       </DialogContent>

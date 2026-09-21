@@ -45,6 +45,7 @@ interface WithdrawFormProps {
   mode?: "create" | "edit";
   transactionId?: string;
   draftValues?: WithdrawFormDraft;
+  isReviewed?: boolean;
   ref?: React.Ref<WithdrawFormRef>;
   onSuccess?: () => void;
   onPendingChange?: (isPending: boolean) => void;
@@ -56,6 +57,7 @@ export function WithdrawForm({
   mode = "create",
   transactionId,
   draftValues,
+  isReviewed = false,
   ref,
   onSuccess,
   onPendingChange,
@@ -92,8 +94,8 @@ export function WithdrawForm({
         let finalUrl = typeof value.proofUrl === "string" ? value.proofUrl : "";
         let finalPublicId = value.proofPublicId || "";
 
-        // Atomic Upload: Perform upload only if it's a File
-        if (value.proofUrl instanceof File) {
+        // Atomic Upload: Perform upload only if it's a File and not reviewed
+        if (value.proofUrl instanceof File && !isReviewed) {
           const result = await upload(value.proofUrl, {
             projectSlug,
             type: "emergency",
@@ -108,8 +110,12 @@ export function WithdrawForm({
             transactionId,
             amount: Number(value.amount),
             description: value.description,
-            proofPublicId: finalPublicId || undefined,
-            proofUrl: finalUrl || undefined,
+            proofPublicId: isReviewed
+              ? undefined
+              : finalPublicId
+                ? finalPublicId
+                : null,
+            proofUrl: isReviewed ? undefined : finalUrl ? finalUrl : null,
           });
           toast.success("Transaksi berhasil diperbarui");
         } else {
@@ -211,19 +217,23 @@ export function WithdrawForm({
                   <ImageUpload
                     projectSlug={projectSlug}
                     type="emergency"
+                    disabled={isReviewed}
                     value={field.state.value}
                     onFileChange={(files) => {
+                      if (isReviewed) return;
                       field.handleChange(files[0] ?? "");
                       publicIdField.handleChange("");
                     }}
                     onRemove={() => {
+                      if (isReviewed) return;
                       field.handleChange("");
                       publicIdField.handleChange("");
                     }}
                   />
                   <FieldDescription>
-                    Ambil foto bon atau bukti pembayaran sebagai lampiran
-                    pengajuan.
+                    {isReviewed
+                      ? "Bukti transaksi yang sudah ditinjau tidak dapat diubah."
+                      : "Ambil foto bon atau bukti pembayaran sebagai lampiran pengajuan."}
                   </FieldDescription>
                 </Field>
               </FieldGroup>

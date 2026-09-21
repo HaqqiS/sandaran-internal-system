@@ -31,6 +31,7 @@ interface DepositDialogProps {
   mode?: "create" | "edit";
   transactionId?: string;
   initialValues?: DepositFormDraft;
+  isReviewed?: boolean;
 }
 
 export function DepositDialog({
@@ -41,6 +42,7 @@ export function DepositDialog({
   mode = "create",
   transactionId,
   initialValues,
+  isReviewed,
 }: DepositDialogProps) {
   const isMobile = useIsMobile();
   const isEdit = mode === "edit";
@@ -102,6 +104,7 @@ export function DepositDialog({
                 mode={mode}
                 transactionId={transactionId}
                 draftValues={formDraftValues}
+                isReviewed={isReviewed}
                 onPendingChange={setIsPending}
                 onSuccess={handleSuccess}
               />
@@ -145,6 +148,7 @@ export function DepositDialog({
             mode={mode}
             transactionId={transactionId}
             draftValues={formDraftValues}
+            isReviewed={isReviewed}
             onPendingChange={setIsPending}
             onSuccess={handleSuccess}
           />

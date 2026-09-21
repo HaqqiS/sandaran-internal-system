@@ -2,6 +2,7 @@
 
 import type { EmergencyTransaction } from "@prisma/client";
 import {
+  IconArrowBackUp,
   IconDotsVertical,
   IconEdit,
   IconTrash,
@@ -69,7 +70,10 @@ export function TransactionList({
   const { data: transactions, isLoading } = useEmergencyTransactions(projectId);
   const deleteTransaction = useDeleteEmergencyTransaction();
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [verifyId, setVerifyId] = useState<string | null>(null);
+  const [verifyTarget, setVerifyTarget] = useState<{
+    id: string;
+    mode: "review" | "undo";
+  } | null>(null);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
   // Delete confirmation state
@@ -85,6 +89,7 @@ export function TransactionList({
     description: string;
     proofPublicId?: string;
     proofUrl?: string;
+    isReviewed?: boolean;
   } | null>(null);
 
   // Edit state for WITHDRAWAL
@@ -94,6 +99,7 @@ export function TransactionList({
     description: string;
     proofPublicId?: string;
     proofUrl?: string;
+    isReviewed?: boolean;
   } | null>(null);
 
   /**
@@ -114,11 +120,13 @@ export function TransactionList({
   }
 
   function handleEditClick(row: TransactionWithRelations) {
+    const isReviewed = row.status === "REVIEWED";
     const initialValues = {
       amount: String(Number(row.amount)),
       description: row.description,
       proofPublicId: row.publicId ?? undefined,
       proofUrl: row.url ?? undefined,
+      isReviewed,
     };
 
     if (row.type === "DEPOSIT") {
@@ -241,9 +249,11 @@ export function TransactionList({
         const type = row.getValue("type") as string;
         const showReview =
           canReview && status === "UNREVIEWED" && type === "WITHDRAWAL";
+        const showUndoReview =
+          canReview && status === "REVIEWED" && type === "WITHDRAWAL";
         const showEditDelete = canEditDelete(row.original);
 
-        if (!showReview && !showEditDelete) return null;
+        if (!showReview && !showUndoReview && !showEditDelete) return null;
 
         return (
           <div className="flex items-center gap-1">
@@ -251,12 +261,14 @@ export function TransactionList({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setVerifyId(row.original.id)}
+                onClick={() =>
+                  setVerifyTarget({ id: row.original.id, mode: "review" })
+                }
               >
                 Tinjau
               </Button>
             )}
-            {showEditDelete && (
+            {(showEditDelete || showUndoReview) && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -269,24 +281,38 @@ export function TransactionList({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onClick={() => handleEditClick(row.original)}
-                  >
-                    <IconEdit className="mr-2 h-4 w-4" />
-                    Edit
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
-                    onClick={() =>
-                      setDeleteTarget({
-                        id: row.original.id,
-                        description: row.original.description,
-                      })
-                    }
-                  >
-                    <IconTrash className="mr-2 h-4 w-4" />
-                    Hapus
-                  </DropdownMenuItem>
+                  {showUndoReview && (
+                    <DropdownMenuItem
+                      onClick={() =>
+                        setVerifyTarget({ id: row.original.id, mode: "undo" })
+                      }
+                    >
+                      <IconArrowBackUp className="mr-2 h-4 w-4" />
+                      Batalkan Tinjauan
+                    </DropdownMenuItem>
+                  )}
+                  {showEditDelete && (
+                    <>
+                      <DropdownMenuItem
+                        onClick={() => handleEditClick(row.original)}
+                      >
+                        <IconEdit className="mr-2 h-4 w-4" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-destructive focus:text-destructive"
+                        onClick={() =>
+                          setDeleteTarget({
+                            id: row.original.id,
+                            description: row.original.description,
+                          })
+                        }
+                      >
+                        <IconTrash className="mr-2 h-4 w-4" />
+                        Hapus
+                      </DropdownMenuItem>
+                    </>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
@@ -363,12 +389,13 @@ export function TransactionList({
         </Table>
       </div>
 
-      {/* Review Dialog */}
+      {/* Review / Undo Review Dialog */}
       <VerifyDialog
         projectId={projectId}
-        transactionId={verifyId}
-        open={!!verifyId}
-        onOpenChange={(open: boolean) => !open && setVerifyId(null)}
+        transactionId={verifyTarget?.id ?? null}
+        open={!!verifyTarget}
+        onOpenChange={(open: boolean) => !open && setVerifyTarget(null)}
+        mode={verifyTarget?.mode ?? "review"}
       />
 
       {/* Lightbox */}
@@ -405,6 +432,7 @@ export function TransactionList({
         onOpenChange={(open: boolean) => !open && setEditFund(null)}
         mode="edit"
         transactionId={editFund?.transactionId}
+        isReviewed={editFund?.isReviewed}
         initialValues={
           editFund
             ? {
@@ -425,6 +453,7 @@ export function TransactionList({
         onOpenChange={(open: boolean) => !open && setEditWithdraw(null)}
         mode="edit"
         transactionId={editWithdraw?.transactionId}
+        isReviewed={editWithdraw?.isReviewed}
         initialValues={
           editWithdraw
             ? {
