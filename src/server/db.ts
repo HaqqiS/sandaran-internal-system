@@ -36,6 +36,33 @@ const createPrismaClient = () => {
 
   const adapter = new PrismaPg(pool);
 
+  // Intercept adapter.connect to log exact underlying driver errors
+  const originalConnect = adapter.connect.bind(adapter);
+  adapter.connect = async () => {
+    const conn = (await originalConnect()) as unknown as {
+      performIO: (query: unknown) => Promise<unknown>;
+    };
+    const originalPerformIO = conn.performIO.bind(conn);
+    conn.performIO = async (query: unknown) => {
+      try {
+        return await originalPerformIO(query);
+      } catch (err: unknown) {
+        const errorObj = err as Record<string, unknown> | null;
+        const queryObj = query as Record<string, unknown> | null;
+        console.error(">>> ACTUAL SQL ERROR IN WORKER <<<", {
+          message: errorObj?.message,
+          code: errorObj?.code,
+          detail: errorObj?.detail,
+          hint: errorObj?.hint,
+          name: errorObj?.name,
+          sql: queryObj?.sql,
+        });
+        throw err;
+      }
+    };
+    return conn as unknown as Awaited<ReturnType<typeof originalConnect>>;
+  };
+
   return new PrismaClient({
     adapter,
     log: ["error", "warn"],
