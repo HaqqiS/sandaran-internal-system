@@ -7,6 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 /** @type {import("next").NextConfig} */
 const config = {
   outputFileTracingRoot: __dirname,
+  serverExternalPackages: ["@prisma/client", ".prisma/client", "pg"],
   eslint: { ignoreDuringBuilds: true },
   images: {
     remotePatterns: [
