@@ -32,8 +32,17 @@ const getConnectionInfo = () => {
   }
 };
 
-const createPrismaClient = () => {
+const clientCache = new Map<string, PrismaClient>();
+
+export const getDb = (): PrismaClient => {
   const info = getConnectionInfo();
+  const cacheKey = info.string;
+
+  const existing = clientCache.get(cacheKey);
+  if (existing) {
+    return existing;
+  }
+
   const pool = new Pool({
     connectionString: info.string,
     ssl: info.isHyperdrive ? undefined : { rejectUnauthorized: false },
@@ -74,16 +83,19 @@ const createPrismaClient = () => {
     return conn as unknown as Awaited<ReturnType<typeof originalConnect>>;
   };
 
-  return new PrismaClient({
+  const client = new PrismaClient({
     adapter,
     log: ["error", "warn"],
   });
+
+  clientCache.set(cacheKey, client);
+  return client;
 };
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: ReturnType<typeof createPrismaClient> | undefined;
-};
-
-export const db = globalForPrisma.prisma ?? createPrismaClient();
-
-if (env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+export const db = new Proxy({} as PrismaClient, {
+  get(_target, prop, receiver) {
+    const client = getDb();
+    const value = Reflect.get(client, prop, receiver);
+    return typeof value === "function" ? value.bind(client) : value;
+  },
+});
