@@ -1,9 +1,20 @@
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 import { Pool } from "pg";
 import { env } from "~/env";
 
-const getConnectionString = () => {
+const getConnectionInfo = () => {
+  try {
+    const cf = getCloudflareContext();
+    const hyperdrive = (cf?.env as Record<string, unknown>)?.HYPERDRIVE as
+      | { connectionString?: string }
+      | undefined;
+    if (hyperdrive?.connectionString) {
+      return { string: hyperdrive.connectionString, isHyperdrive: true };
+    }
+  } catch {}
+
   let str = (env.DATABASE_URL || "").trim();
   // Strip surrounding quotes if accidentally included in wrangler secret
   str = str.replace(/^["']|["']$/g, "").trim();
@@ -15,18 +26,18 @@ const getConnectionString = () => {
     if (!url.searchParams.has("sslmode")) {
       url.searchParams.set("sslmode", "require");
     }
-    return url.toString();
+    return { string: url.toString(), isHyperdrive: false };
   } catch {
-    return str;
+    return { string: str, isHyperdrive: false };
   }
 };
 
 const createPrismaClient = () => {
-  const connectionString = getConnectionString();
+  const info = getConnectionInfo();
   const pool = new Pool({
-    connectionString,
-    ssl: { rejectUnauthorized: false },
-    max: 1,
+    connectionString: info.string,
+    ssl: info.isHyperdrive ? undefined : { rejectUnauthorized: false },
+    max: info.isHyperdrive ? 5 : 1,
     connectionTimeoutMillis: 10000,
   });
 

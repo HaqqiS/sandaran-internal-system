@@ -25,4 +25,10 @@
     "BETTER_AUTH_URL": "https://sandaran-internal-system.haqqi30sukmara.workers.dev",
     "CLOUDINARY_CLOUD_NAME": "dh1nhrlhu",
   },
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "8c2114ad081747c79ff14f5b4a1a6130"
+    }
+  ],
 }
