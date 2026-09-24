@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 // Public routes that don't require authentication
-const PUBLIC_ROUTES = ["/", "/unauthorized", "/waiting-approval"];
+const PUBLIC_ROUTES = ["/", "/login", "/unauthorized", "/waiting-approval"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

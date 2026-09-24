@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
+import { phoneNumber } from "better-auth/plugins";
 
 import { env } from "~/env";
 import { db } from "~/server/db";
@@ -10,6 +11,11 @@ export const auth = betterAuth({
     provider: "postgresql", // or "sqlite" or "mysql"
   }),
 
+  // Email and Password Authentication
+  emailAndPassword: {
+    enabled: true,
+  },
+
   // Session Configuration
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days in seconds
@@ -18,7 +24,7 @@ export const auth = betterAuth({
       enabled: false, // Disabled: polling di /waiting-approval butuh fresh data dari DB
     },
   },
-  plugins: [nextCookies()],
+  plugins: [nextCookies(), phoneNumber()],
 
   // Advanced Security Options
   advanced: {

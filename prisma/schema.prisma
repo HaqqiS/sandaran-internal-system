@@ -69,6 +69,10 @@ model User {
   emailVerified Boolean   @default(false)
   image         String? //@db.Text
 
+  // Phone number authentication
+  phoneNumber         String?   @unique
+  phoneNumberVerified Boolean?  @default(false)
+
   // custom fields
   roleGlobal    GlobalRole @default(NONE)
   isActive      Boolean    @default(false)
