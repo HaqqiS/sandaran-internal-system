@@ -1,14 +1,17 @@
 "use client";
 
+import { IconUserPlus } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { PageLayout } from "~/components/layout";
+import { Button } from "~/components/ui/button";
 import { DataTable } from "~/components/ui/data-table";
 import { Skeleton } from "~/components/ui/skeleton";
 import { ApproveUserDialog } from "~/components/user/approve-user-dialog";
 import { BulkActionsToolbar } from "~/components/user/bulk-actions-toolbar";
+import { CreateUserDialog } from "~/components/user/create-user-dialog";
 import { DeleteUserDialog } from "~/components/user/delete-user-dialog";
-import { EditRoleDialog } from "~/components/user/edit-role-dialog";
+import { EditUserDialog } from "~/components/user/edit-user-dialog";
 import { RejectUserDialog } from "~/components/user/reject-user-dialog";
 import {
   getUserColumnsWithActions,
@@ -25,9 +28,10 @@ export function UsersClient() {
   const isMobile = useIsMobile();
   const [filter, setFilter] = useState<FilterValue>("all");
   const [selectedUser, setSelectedUser] = useState<UserListItem | null>(null);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
-  const [editRoleDialogOpen, setEditRoleDialogOpen] = useState(false);
+  const [editUserDialogOpen, setEditUserDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
 
@@ -56,9 +60,9 @@ export function UsersClient() {
     setRejectDialogOpen(true);
   };
 
-  const handleEditRole = (user: UserListItem) => {
+  const handleEditUser = (user: UserListItem) => {
     setSelectedUser(user);
-    setEditRoleDialogOpen(true);
+    setEditUserDialogOpen(true);
   };
 
   const handleDelete = (user: UserListItem) => {
@@ -81,7 +85,7 @@ export function UsersClient() {
   const columns = getUserColumnsWithActions({
     onApprove: handleApprove,
     onReject: handleReject,
-    onEditRole: handleEditRole,
+    onEditUser: handleEditUser,
     onDelete: handleDelete,
   });
 
@@ -98,19 +102,41 @@ export function UsersClient() {
     : undefined;
 
   return (
-    <PageLayout title="Manajemen Pengguna">
+    <PageLayout
+      title="Manajemen Pengguna"
+      actions={
+        <Button
+          onClick={() => setCreateDialogOpen(true)}
+          size="sm"
+          className="flex items-center gap-1.5 font-semibold shadow-xs"
+        >
+          <IconUserPlus size={16} />
+          <span>Tambah Pengguna</span>
+        </Button>
+      }
+    >
       <div className="flex flex-col gap-4 p-4 md:gap-6 md:p-6">
         {/* Filter Controls - Responsive */}
-        <div className="flex items-center gap-4">
-          {isMobile ? (
-            <UserFilterDropdown value={filter} onValueChange={setFilter} />
-          ) : (
-            <UserFilterTabs
-              value={filter}
-              onValueChange={setFilter}
-              counts={counts}
-            />
-          )}
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex-1">
+            {isMobile ? (
+              <UserFilterDropdown value={filter} onValueChange={setFilter} />
+            ) : (
+              <UserFilterTabs
+                value={filter}
+                onValueChange={setFilter}
+                counts={counts}
+              />
+            )}
+          </div>
+          <Button
+            onClick={() => setCreateDialogOpen(true)}
+            size="sm"
+            className="flex items-center gap-1.5 font-semibold shrink-0 sm:hidden"
+          >
+            <IconUserPlus size={16} />
+            <span>Tambah</span>
+          </Button>
         </div>
 
         {/* Bulk Actions Toolbar */}
@@ -132,7 +158,7 @@ export function UsersClient() {
             columns={columns}
             data={users}
             filterColumn="name"
-            filterPlaceholder="Cari pengguna berdasarkan nama atau email..."
+            filterPlaceholder="Cari pengguna berdasarkan nama..."
             state={{ rowSelection }}
             onRowSelectionChange={setRowSelection}
           />
@@ -166,16 +192,21 @@ export function UsersClient() {
         onOpenChange={setRejectDialogOpen}
       />
 
-      <EditRoleDialog
+      <EditUserDialog
         user={selectedUser}
-        open={editRoleDialogOpen}
-        onOpenChange={setEditRoleDialogOpen}
+        open={editUserDialogOpen}
+        onOpenChange={setEditUserDialogOpen}
       />
 
       <DeleteUserDialog
         user={selectedUser}
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
+      />
+
+      <CreateUserDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
       />
     </PageLayout>
   );

@@ -21,6 +21,8 @@ export type UserListItem = {
   id: string;
   name: string;
   email: string;
+  phoneNumber?: string | null;
+  phoneNumberVerified?: boolean | null;
   image: string | null;
   roleGlobal: GlobalRole;
   isActive: boolean;
@@ -79,9 +81,33 @@ export function getUserColumns(): ColumnDef<UserListItem>[] {
     {
       accessorKey: "email",
       header: "Email",
-      cell: ({ row }) => (
-        <span className="text-muted-foreground">{row.original.email}</span>
-      ),
+      cell: ({ row }) => {
+        const email = row.original.email;
+        const isInternalFallback = email.endsWith("@sandaran.internal");
+        if (isInternalFallback) {
+          return (
+            <span className="text-muted-foreground text-xs italic">
+              (Daftar via No. HP)
+            </span>
+          );
+        }
+        return <span className="text-muted-foreground">{email}</span>;
+      },
+    },
+    {
+      accessorKey: "phoneNumber",
+      header: "No. HP / WA",
+      cell: ({ row }) => {
+        const phone = row.original.phoneNumber;
+        if (!phone) {
+          return <span className="text-muted-foreground text-xs">-</span>;
+        }
+        return (
+          <span className="font-mono text-xs font-medium text-foreground">
+            {phone}
+          </span>
+        );
+      },
     },
     {
       id: "status",
@@ -128,14 +154,14 @@ export function getUserColumns(): ColumnDef<UserListItem>[] {
 interface GetUserColumnsWithActionsProps {
   onApprove?: (user: UserListItem) => void;
   onReject?: (user: UserListItem) => void;
-  onEditRole?: (user: UserListItem) => void;
+  onEditUser?: (user: UserListItem) => void;
   onDelete?: (user: UserListItem) => void;
 }
 
 export function getUserColumnsWithActions({
   onApprove,
   onReject,
-  onEditRole,
+  onEditUser,
   onDelete,
 }: GetUserColumnsWithActionsProps): ColumnDef<UserListItem>[] {
   const baseColumns = getUserColumns();
@@ -178,13 +204,16 @@ export function getUserColumnsWithActions({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEditRole?.(user)}>
-              Edit Role
+            <DropdownMenuItem
+              onClick={() => onEditUser?.(user)}
+              className="cursor-pointer"
+            >
+              Edit Pengguna
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => onDelete?.(user)}
-              className="text-destructive"
+              className="text-destructive cursor-pointer"
               disabled={user.isActive}
             >
               Delete User
