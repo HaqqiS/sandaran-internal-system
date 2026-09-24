@@ -59,15 +59,6 @@ export function useRejectUser() {
   });
 }
 
-export function useUpdateUserRole() {
-  const utils = api.useUtils();
-  return api.user.updateGlobalRole.useMutation({
-    onSuccess: () => {
-      void utils.user.invalidate();
-    },
-  });
-}
-
 export function useDeleteUser() {
   const utils = api.useUtils();
   return api.user.deleteUser.useMutation({
@@ -93,6 +84,54 @@ export function useBulkApprove(options?: {
       if (options?.onError) {
         options.onError(error);
       }
+    },
+  });
+}
+
+export function useCreateUserWithCredentials(options?: {
+  onSuccess?: () => void;
+  onError?: (error: { message: string }) => void;
+}) {
+  const utils = api.useUtils();
+  return api.user.createUserWithCredentials.useMutation({
+    onSuccess: () => {
+      void utils.user.invalidate();
+      options?.onSuccess?.();
+    },
+    onError: (error) => {
+      options?.onError?.(error);
+    },
+  });
+}
+
+export function useUpdateUser(options?: {
+  onSuccess?: () => void;
+  onError?: (error: { message: string }) => void;
+}) {
+  const utils = api.useUtils();
+  return api.user.updateUser.useMutation({
+    onSuccess: () => {
+      void utils.user.invalidate();
+      options?.onSuccess?.();
+    },
+    onError: (error) => {
+      options?.onError?.(error);
+    },
+  });
+}
+
+export function useUpdateProfile(options?: {
+  onSuccess?: () => void;
+  onError?: (error: { message: string }) => void;
+}) {
+  const utils = api.useUtils();
+  return api.user.updateProfile.useMutation({
+    onSuccess: () => {
+      void utils.user.invalidate();
+      options?.onSuccess?.();
+    },
+    onError: (error) => {
+      options?.onError?.(error);
     },
   });
 }
