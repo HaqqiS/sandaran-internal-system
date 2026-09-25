@@ -331,15 +331,13 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
       </div>
 
       {/* Status Akun (Aktif / Nonaktif) */}
-      <div className="flex items-center justify-between rounded-lg border p-3 bg-muted/20">
+      <Label
+        htmlFor="edit-is-active"
+        className="flex items-center justify-between rounded-lg border p-3 bg-muted/20 cursor-pointer transition-colors hover:bg-muted/40 active:bg-muted/60 select-none"
+      >
         <div className="space-y-0.5">
-          <Label
-            htmlFor="edit-is-active"
-            className="text-xs font-semibold cursor-pointer"
-          >
-            Status Akun Aktif
-          </Label>
-          <p className="text-[11px] text-muted-foreground">
+          <span className="text-xs font-semibold block">Status Akun Aktif</span>
+          <p className="text-[11px] text-muted-foreground font-normal">
             {isActive
               ? "Akun dapat masuk dan mengakses fitur internal."
               : "Akun ditangguhkan (tidak dapat masuk sistem)."}
@@ -349,8 +347,9 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
           id="edit-is-active"
           checked={isActive}
           onCheckedChange={(checked) => setIsActive(Boolean(checked))}
+          onClick={(e) => e.stopPropagation()}
         />
-      </div>
+      </Label>
 
       {/* Seksi Ubah Kata Sandi */}
       <div className="space-y-3 pt-2 border-t">
