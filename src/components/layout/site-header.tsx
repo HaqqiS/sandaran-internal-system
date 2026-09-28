@@ -1,5 +1,6 @@
 import type * as React from "react";
 
+import { ThemeToggle } from "~/components/theme-toggle";
 import { Separator } from "~/components/ui/separator";
 import { SidebarTrigger } from "~/components/ui/sidebar";
 import { ParsedBreadcrumbs } from "./breadcrumbs";
@@ -20,9 +21,10 @@ export function SiteHeader({ actions }: SiteHeaderProps) {
 
         <ParsedBreadcrumbs />
 
-        {actions && (
-          <div className="ml-auto flex items-center gap-2">{actions}</div>
-        )}
+        <div className="ml-auto flex items-center gap-2">
+          {actions}
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );

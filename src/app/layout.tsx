@@ -8,8 +8,9 @@ import {
   Space_Mono,
   Syne,
 } from "next/font/google";
-import { Toaster } from "sonner";
 import { SmoothScrollProvider } from "~/components/providers/smooth-scroll-provider";
+import { ThemeProvider } from "~/components/providers/theme-provider";
+import { Toaster } from "~/components/ui/sonner";
 import { TRPCReactProvider } from "~/trpc/react";
 
 export const metadata: Metadata = {
@@ -63,15 +64,23 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${inter.variable} ${geist.variable} ${syne.variable} ${playfair.variable} ${spaceMono.variable}`}
     >
-      <body>
-        <TRPCReactProvider>
-          <SmoothScrollProvider>
-            <Toaster richColors position="top-center" duration={5000} />
-            {children}
-          </SmoothScrollProvider>
-        </TRPCReactProvider>
+      <body className="min-h-screen bg-background text-foreground antialiased">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <TRPCReactProvider>
+            <SmoothScrollProvider>
+              <Toaster richColors position="top-center" duration={5000} />
+              {children}
+            </SmoothScrollProvider>
+          </TRPCReactProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

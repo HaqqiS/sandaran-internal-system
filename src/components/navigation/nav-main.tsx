@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type * as React from "react";
-
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -12,6 +11,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "~/components/ui/sidebar";
+import { cn } from "~/lib/utils";
 import { ProjectSelector } from "./project-selector";
 
 export function NavMain({
@@ -26,6 +26,43 @@ export function NavMain({
   const pathname = usePathname();
   const { isMobile, setOpenMobile } = useSidebar();
 
+  const isItemActive = (itemUrl: string) => {
+    const cleanPath =
+      pathname.length > 1 && pathname.endsWith("/")
+        ? pathname.slice(0, -1)
+        : pathname;
+    const cleanUrl =
+      itemUrl.length > 1 && itemUrl.endsWith("/")
+        ? itemUrl.slice(0, -1)
+        : itemUrl;
+
+    // Exact match
+    if (cleanPath === cleanUrl) return true;
+
+    // Root path should only match exact
+    if (cleanUrl === "/") return false;
+
+    // Subpath match (e.g. /projects/slug-123 should activate /projects)
+    if (cleanPath.startsWith(`${cleanUrl}/`)) {
+      // Check if another item in navMain is a more specific match
+      const hasMoreSpecific = items.some((other) => {
+        const otherClean =
+          other.url.length > 1 && other.url.endsWith("/")
+            ? other.url.slice(0, -1)
+            : other.url;
+        return (
+          otherClean !== cleanUrl &&
+          (cleanPath === otherClean ||
+            cleanPath.startsWith(`${otherClean}/`)) &&
+          otherClean.length > cleanUrl.length
+        );
+      });
+      return !hasMoreSpecific;
+    }
+
+    return false;
+  };
+
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
@@ -34,15 +71,19 @@ export function NavMain({
             <ProjectSelector />
           </SidebarMenuItem>
         </SidebarMenu>
-        <SidebarMenu>
+        <SidebarMenu className="space-y-1">
           {items.map((item) => {
-            const isActive = pathname === item.url;
+            const isActive = isItemActive(item.url);
             return (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton
                   tooltip={item.title}
                   asChild
                   isActive={isActive}
+                  className={cn(
+                    isActive &&
+                      "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
+                  )}
                 >
                   <Link
                     href={item.url}
