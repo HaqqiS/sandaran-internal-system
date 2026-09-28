@@ -1,6 +1,6 @@
 import "~/styles/globals.css";
 
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import {
   Geist,
   Inter,
@@ -16,6 +16,11 @@ export const metadata: Metadata = {
   title: "Astaloka",
   description: "Astaloka Interior Design",
   icons: [{ rel: "icon", url: "/icon.webp" }],
+};
+
+// Required for env(safe-area-inset-*) to work correctly on iOS (notch / home indicator)
+export const viewport: Viewport = {
+  viewportFit: "cover",
 };
 
 const inter = Inter({

@@ -408,6 +408,15 @@ html.lenis body {
   -webkit-transform: translateZ(0);
 }
 
+/* ─── Mobile Safe Area Utilities ────────────────────────────────────────── */
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
 /* ─── Accessibility: Reduced Motion ──────────────────────────────────────── */
 /* Referensi: motion-design-rules.md § RULES PERFORMA & AKSESIBILITAS       */
 @media (prefers-reduced-motion: reduce) {

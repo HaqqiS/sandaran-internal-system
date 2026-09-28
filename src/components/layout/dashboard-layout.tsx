@@ -1,6 +1,7 @@
 "use client";
 
 import type * as React from "react";
+import { MobileBottomNav } from "~/components/navigation";
 import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar";
 import type { SidebarConfig } from "~/types/dashboard";
 import { AppSidebar } from "./app-sidebar";
@@ -31,12 +32,13 @@ export function DashboardLayout({
       <AppSidebar config={sidebarConfig} variant={sidebarVariant} />
       <SidebarInset>
         <SiteHeader actions={headerActions} />
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
           <div className="@container/main flex flex-1 flex-col gap-2">
             {children}
           </div>
         </div>
       </SidebarInset>
+      <MobileBottomNav />
     </SidebarProvider>
   );
 }

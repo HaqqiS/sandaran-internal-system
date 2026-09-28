@@ -129,14 +129,6 @@ export function UsersClient() {
               />
             )}
           </div>
-          <Button
-            onClick={() => setCreateDialogOpen(true)}
-            size="sm"
-            className="flex items-center gap-1.5 font-semibold shrink-0 sm:hidden"
-          >
-            <IconUserPlus size={16} />
-            <span>Tambah</span>
-          </Button>
         </div>
 
         {/* Bulk Actions Toolbar */}

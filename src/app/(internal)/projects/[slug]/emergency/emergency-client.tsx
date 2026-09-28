@@ -69,17 +69,7 @@ export function EmergencyClient({ projectSlug }: EmergencyClientProps) {
   const canReview = isAdmin || memberRole === "FINANCE";
 
   return (
-    <PageLayout
-      title={`${project.name} — Dana Darurat`}
-      navActions={
-        <Button asChild variant="outline" size="sm">
-          <Link href={`/projects/${projectSlug}`}>
-            <IconArrowLeft className="mr-2 h-4 w-4" />
-            Kembali
-          </Link>
-        </Button>
-      }
-    >
+    <PageLayout title={`${project.name} — Dana Darurat`}>
       <div className="flex flex-col gap-6 p-4 md:p-6 min-w-0 w-full overflow-hidden">
         <div className="flex flex-col gap-6 min-w-0 w-full">
           <FundOverview

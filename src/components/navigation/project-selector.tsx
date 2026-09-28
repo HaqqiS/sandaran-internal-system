@@ -74,7 +74,7 @@ export function ProjectSelector() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2 p-2 border rounded-lg h-14 w-full">
+      <div className="hidden md:flex items-center gap-2 p-2 border rounded-lg h-14 w-full">
         <Skeleton className="h-8 w-8 rounded-lg shrink-0" />
         <div className="space-y-1.5 flex-1 min-w-0">
           <Skeleton className="h-3.5 w-24" />
@@ -107,89 +107,93 @@ export function ProjectSelector() {
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between h-auto py-2 px-3 bg-sidebar-accent/50 hover:bg-sidebar-accent border-sidebar-border"
-        >
-          {selectedProject ? (
-            <div className="flex items-center gap-3 text-left min-w-0">
-              <Avatar className="h-8 w-8 rounded-lg bg-primary/10 text-primary border border-primary/20">
-                {/* Fallback to initials since image URL might be missing or not in schema yet */}
-                <AvatarFallback className="rounded-lg font-semibold text-xs">
-                  {getInitials(selectedProject.name)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col overflow-hidden">
-                <span className="truncate font-medium text-sm leading-none">
-                  {selectedProject.name}
-                </span>
-                <span className="truncate text-xs text-muted-foreground mt-1">
-                  {selectedProject.location || "Lokasi tidak tersedia"}
-                </span>
-              </div>
-            </div>
-          ) : (
-            <span className="text-muted-foreground">Pilih proyek...</span>
-          )}
-          <IconChevronDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-sm lg:w-lg p-0" align="start">
-        <Command defaultValue={selectedProject?.name}>
-          <CommandInput placeholder="Cari proyek..." />
-          <CommandList
-            className="max-h-[300px] overflow-y-scroll"
-            onWheel={(e) => e.stopPropagation()}
+    <div className="hidden md:block">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between h-auto py-2 px-3 bg-sidebar-accent/50 hover:bg-sidebar-accent border-sidebar-border"
           >
-            <CommandEmpty>Proyek tidak ditemukan.</CommandEmpty>
-            {groupedProjects &&
-              Object.entries(groupedProjects).map(([status, groupProjects]) => (
-                <CommandGroup
-                  key={status}
-                  heading={status}
-                  className=" **:[[cmdk-group-items]]:space-y-1"
-                >
-                  {groupProjects.map((project) => (
-                    <CommandItem
-                      key={project.id}
-                      value={project.name}
-                      onSelect={() => {
-                        setSelectedProjectId(project.id);
-                        setOpen(false);
-                        router.push(`/projects/${project.slug}`);
-                      }}
-                      className={cn(
-                        "gap-3 py-2 cursor-pointer",
-                        "data-[checked=true]:bg-sidebar-accent data-[checked=true]:text-sidebar-accent-foreground",
-                      )}
-                      data-checked={selectedProjectId === project.id}
+            {selectedProject ? (
+              <div className="flex items-center gap-3 text-left min-w-0">
+                <Avatar className="h-8 w-8 rounded-lg bg-primary/10 text-primary border border-primary/20">
+                  {/* Fallback to initials since image URL might be missing or not in schema yet */}
+                  <AvatarFallback className="rounded-lg font-semibold text-xs">
+                    {getInitials(selectedProject.name)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col overflow-hidden">
+                  <span className="truncate font-medium text-sm leading-none">
+                    {selectedProject.name}
+                  </span>
+                  <span className="truncate text-xs text-muted-foreground mt-1">
+                    {selectedProject.location || "Lokasi tidak tersedia"}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <span className="text-muted-foreground">Pilih proyek...</span>
+            )}
+            <IconChevronDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-sm lg:w-lg p-0" align="start">
+          <Command defaultValue={selectedProject?.name}>
+            <CommandInput placeholder="Cari proyek..." />
+            <CommandList
+              className="max-h-[300px] overflow-y-scroll"
+              onWheel={(e) => e.stopPropagation()}
+            >
+              <CommandEmpty>Proyek tidak ditemukan.</CommandEmpty>
+              {groupedProjects &&
+                Object.entries(groupedProjects).map(
+                  ([status, groupProjects]) => (
+                    <CommandGroup
+                      key={status}
+                      heading={status}
+                      className=" **:[[cmdk-group-items]]:space-y-1"
                     >
-                      <Avatar className="h-6 w-6 rounded-md bg-muted text-muted-foreground">
-                        <AvatarFallback className="rounded-md text-[10px]">
-                          {getInitials(project.name)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col flex-1 min-w-0">
-                        <span className="truncate font-medium">
-                          {project.name}
-                        </span>
-                        {project.location && (
-                          <span className="text-[10px] text-muted-foreground truncate">
-                            {project.location}
-                          </span>
-                        )}
-                      </div>
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              ))}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+                      {groupProjects.map((project) => (
+                        <CommandItem
+                          key={project.id}
+                          value={project.name}
+                          onSelect={() => {
+                            setSelectedProjectId(project.id);
+                            setOpen(false);
+                            router.push(`/projects/${project.slug}`);
+                          }}
+                          className={cn(
+                            "gap-3 py-2 cursor-pointer",
+                            "data-[checked=true]:bg-sidebar-accent data-[checked=true]:text-sidebar-accent-foreground",
+                          )}
+                          data-checked={selectedProjectId === project.id}
+                        >
+                          <Avatar className="h-6 w-6 rounded-md bg-muted text-muted-foreground">
+                            <AvatarFallback className="rounded-md text-[10px]">
+                              {getInitials(project.name)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col flex-1 min-w-0">
+                            <span className="truncate font-medium">
+                              {project.name}
+                            </span>
+                            {project.location && (
+                              <span className="text-[10px] text-muted-foreground truncate">
+                                {project.location}
+                              </span>
+                            )}
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  ),
+                )}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }

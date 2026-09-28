@@ -60,14 +60,6 @@ export function ReportsClient({ projectSlug }: ReportsClientProps) {
   return (
     <PageLayout
       title={`${project.name} — Laporan`}
-      navActions={
-        <Button asChild variant="outline" size="sm">
-          <Link href={`/projects/${projectSlug}`}>
-            <IconArrowLeft className="mr-2 h-4 w-4" />
-            Kembali ke Proyek
-          </Link>
-        </Button>
-      }
       actions={
         canCreate && (
           <Button size="sm" onClick={() => setIsCreateOpen(true)}>

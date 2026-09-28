@@ -124,20 +124,12 @@ export function ReportDetailClient({
     <PageLayout
       title={`Laporan - ${format(reportDate, "dd MMM yyyy")}`}
       actions={
-        <div className="flex items-center gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/projects/${projectSlug}/reports`}>
-              <IconArrowLeft className="mr-2 h-4 w-4" />
-              Kembali
-            </Link>
+        canEdit && (
+          <Button size="sm" onClick={() => setIsEditOpen(true)}>
+            <IconPencil className="mr-2 h-4 w-4" />
+            Edit
           </Button>
-          {canEdit && (
-            <Button size="sm" onClick={() => setIsEditOpen(true)}>
-              <IconPencil className="mr-2 h-4 w-4" />
-              Edit
-            </Button>
-          )}
-        </div>
+        )
       }
     >
       <div className="flex flex-col gap-6 p-4 md:p-6">

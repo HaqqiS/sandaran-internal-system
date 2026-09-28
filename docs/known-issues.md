@@ -34,7 +34,8 @@ Avoid renaming project slugs if they already contain uploaded files. If renaming
 
 ## 2. Form & Input Issues
 
-- **Sheet Form**: Mengalami glitch pada tampilan mobile ketika keyboard virtual muncul.
+- **Sheet Form**: ~~Mengalami glitch pada tampilan mobile ketika keyboard virtual muncul.~~
+  **[RESOLVED 2026-09-25]** Digantikan dengan bottom nav + `ProjectSwitcherDrawer` (Vaul Drawer top-level overlay).
 
 ## 3. Mobile UI & Layout Issues
 

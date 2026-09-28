@@ -5,7 +5,6 @@ import { SidebarTrigger } from "~/components/ui/sidebar";
 import { ParsedBreadcrumbs } from "./breadcrumbs";
 
 interface SiteHeaderProps {
-  // title?: string; // Removed title prop
   actions?: React.ReactNode;
 }
 

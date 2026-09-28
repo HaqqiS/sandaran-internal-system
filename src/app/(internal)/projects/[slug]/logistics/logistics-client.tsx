@@ -56,14 +56,6 @@ export function LogisticsClient({ projectSlug }: LogisticsClientProps) {
   return (
     <PageLayout
       title={`${project.name} — Logistik & Inventaris`}
-      navActions={
-        <Button asChild variant="outline" size="sm">
-          <Link href={`/projects/${projectSlug}`}>
-            <IconArrowLeft className="mr-2 h-4 w-4" />
-            Kembali
-          </Link>
-        </Button>
-      }
       actions={
         canManage && (
           <LogisticItemDialog

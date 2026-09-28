@@ -29,7 +29,7 @@ export function NavMain({
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
-        <SidebarMenu>
+        <SidebarMenu className="hidden md:block">
           <SidebarMenuItem>
             <ProjectSelector />
           </SidebarMenuItem>
