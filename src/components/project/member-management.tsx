@@ -113,7 +113,7 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0 w-full">
       {/* Add Member Section */}
       {canManage && (
         <div className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-end">
@@ -155,7 +155,7 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
 
       {/* Members Table */}
       {members && members.length > 0 ? (
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto min-w-0">
           <Table>
             <TableHeader>
               <TableRow>

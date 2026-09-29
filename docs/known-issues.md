@@ -39,12 +39,11 @@ Avoid renaming project slugs if they already contain uploaded files. If renaming
 
 ## 3. Mobile UI & Layout Issues
 
-- **Project Detail (`/projects/[slug]/**`)**: Tampilan mobile pada header sidebar dan data-table masih overwidth (melebihi lebar layar).
-- **Sidebar Header**: Navigasi kembali ke halaman sebelumnya perlu disempurnakan.
+- **Project Detail (`/projects/[slug]/**`)\*\*: Tampilan mobile pada header sidebar dan data-table masih overwidth (melebihi lebar layar).
 - **Emergency Page**:
   - Data-table masih tembus / overflow layar pada perangkat mobile.
   - Penyesuaian warna indikator pada chart.
 
 ## 4. Planned Enhancements / Feature Backlog
 
-- **Project Galleries**: Pembuatan antarmuka galeri foto untuk masing-masing proyek serta feed galeri terkini (*recent gallery*) dari seluruh proyek.
+- **Project Galleries**: Pembuatan antarmuka galeri foto untuk masing-masing proyek serta feed galeri terkini (_recent gallery_) dari seluruh proyek.

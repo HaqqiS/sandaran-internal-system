@@ -30,10 +30,10 @@ export function DashboardLayout({
       }
     >
       <AppSidebar config={sidebarConfig} variant={sidebarVariant} />
-      <SidebarInset>
+      <SidebarInset className="min-w-0">
         <SiteHeader actions={headerActions} />
-        <div className="flex flex-1 flex-col pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
-          <div className="@container/main flex flex-1 flex-col gap-2">
+        <div className="flex flex-1 flex-col min-w-0 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
+          <div className="@container/main flex flex-1 flex-col min-w-0 gap-2">
             {children}
           </div>
         </div>

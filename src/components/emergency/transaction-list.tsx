@@ -339,8 +339,8 @@ export function TransactionList({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-md border">
+    <div className="space-y-4 min-w-0 w-full">
+      <div className="rounded-md border overflow-x-auto min-w-0">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

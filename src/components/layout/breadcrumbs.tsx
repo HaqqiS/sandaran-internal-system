@@ -11,6 +11,7 @@ import {
   BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
 import { useIsMobile } from "~/hooks/use-mobile";
+import { cn } from "~/lib/utils";
 
 function generateBreadcrumbs(pathname: string) {
   const paths = pathname.split("/").filter(Boolean);
@@ -28,11 +29,13 @@ export function ParsedBreadcrumbs() {
   const isMobile = useIsMobile();
 
   return (
-    <Breadcrumb>
-      <BreadcrumbList>
+    <Breadcrumb className="min-w-0 w-full">
+      <BreadcrumbList className="flex-nowrap min-w-0 overflow-hidden">
         {breadcrumbs.length === 0 ? (
-          <BreadcrumbItem>
-            <BreadcrumbPage>Dashboard</BreadcrumbPage>
+          <BreadcrumbItem className="min-w-0">
+            <BreadcrumbPage className="truncate font-medium">
+              Dashboard
+            </BreadcrumbPage>
           </BreadcrumbItem>
         ) : (
           breadcrumbs.map((breadcrumb, index) => {
@@ -44,16 +47,24 @@ export function ParsedBreadcrumbs() {
 
             return (
               <React.Fragment key={breadcrumb.href}>
-                <BreadcrumbItem>
+                <BreadcrumbItem className={cn("min-w-0", isLast && "flex-1")}>
                   {isLast ? (
-                    <BreadcrumbPage>{breadcrumb.label}</BreadcrumbPage>
+                    <BreadcrumbPage
+                      title={breadcrumb.label}
+                      className="truncate block max-w-full font-medium"
+                    >
+                      {breadcrumb.label}
+                    </BreadcrumbPage>
                   ) : (
-                    <BreadcrumbLink href={breadcrumb.href}>
+                    <BreadcrumbLink
+                      href={breadcrumb.href}
+                      className="truncate max-w-[120px] sm:max-w-[200px]"
+                    >
                       {breadcrumb.label}
                     </BreadcrumbLink>
                   )}
                 </BreadcrumbItem>
-                {!isLast && <BreadcrumbSeparator />}
+                {!isLast && <BreadcrumbSeparator className="shrink-0" />}
               </React.Fragment>
             );
           })

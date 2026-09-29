@@ -92,7 +92,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
       title={project.name}
       actions={
         canManage && (
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button
               variant="outline"
               size="sm"
@@ -124,7 +124,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
         )
       }
     >
-      <div className="flex flex-col gap-6 p-4 md:p-6">
+      <div className="flex flex-col gap-6 p-4 md:p-6 min-w-0">
         {/* Enhanced Stat Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {/* Overall Progress */}

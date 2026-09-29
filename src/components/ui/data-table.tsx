@@ -87,8 +87,8 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="w-full space-y-4">
-      <div className="flex items-center py-4">
+    <div className="w-full min-w-0 space-y-4">
+      <div className="flex items-center gap-2 py-4">
         <Input
           placeholder={filterPlaceholder}
           value={
@@ -126,7 +126,7 @@ export function DataTable<TData, TValue>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-x-auto min-w-0">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
