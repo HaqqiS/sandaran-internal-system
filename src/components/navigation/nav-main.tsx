@@ -39,10 +39,10 @@ export function NavMain({
     // Exact match
     if (cleanPath === cleanUrl) return true;
 
-    // Root path should only match exact
-    if (cleanUrl === "/") return false;
+    // Root path and project list should only match exact
+    if (cleanUrl === "/" || cleanUrl === "/projects") return false;
 
-    // Subpath match (e.g. /projects/slug-123 should activate /projects)
+    // Subpath match (e.g. /users/123 should activate /users)
     if (cleanPath.startsWith(`${cleanUrl}/`)) {
       // Check if another item in navMain is a more specific match
       const hasMoreSpecific = items.some((other) => {
