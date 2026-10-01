@@ -46,9 +46,9 @@
 | Step | Expected | iOS Safari | Android Chrome |
 |---|---|---|---|
 | Open a tall form (Report / Project) | Form appears | ✅ | ✅ |
-| Swipe up on form body | Whole form scrolls natively | (Report ✅ / Project ❌ | (Report ✅ / Project ❌) |
-| Scroll to bottom | Footer buttons (Submit/Cancel) visible | (Report ✅ / Project ❌ | (Report ✅ / Project ❌) |
-| Tap Submit | Form closes successfully | same as android | (Report ✅ / Project ❌ not visible) |
+| Swipe up on form body | Whole form scrolls natively | (Report ✅ / Project ⚠️ | (Report ✅ / Project ⚠️) |
+| Scroll to bottom | Footer buttons (Submit/Cancel) visible | (Report ✅ / Project ⚠️ | (Report ✅ / Project ⚠️) |
+| Tap Submit | Form closes successfully | same as android | (Report ✅ / Project ⚠️ not visible) |
 
 ---
 
@@ -58,7 +58,7 @@
 |---|---|---|---|
 | Open a Drawer form | Drawer slides up | ✅ | ✅ |
 | Tap a textarea | Keyboard opens | ✅ | ✅ |
-| Drawer stays open | Does NOT close or jump | ✅ if taped 2 time it will jump | Report  / Project both jump but in project are worst |
+| Drawer stays open | Does NOT close or jump | ⚠️ if taped 2 time it will jump | Report  / ⚠️ Project both jump but in project are worst |
 | Focused field visible | Not hidden behind keyboard | ✅ | ✅ |
 | Dismiss keyboard | Drawer stays in place | ✅ | ✅ |
 
@@ -155,7 +155,7 @@
 | After Phase | Date | Tester | iOS result | Android result | Notes |
 |---|---|---|---|---|---|
 | Baseline (before any changes) | 2026-09-30 | — | 🔲 | 🔲 | Branch created, audit complete |
-| After Phase 1 | — | — | 🔲 | 🔲 | — |
+| After Phase 1 | 2026-10-1 | — | ⚠️ | ⚠️ | after phase 1 Some issue remain the same. |
 | After Phase 2 | — | — | 🔲 | 🔲 | — |
 | After Phase 3 | — | — | 🔲 | 🔲 | — |
 | After Phase 4 | — | — | 🔲 | 🔲 | — |
