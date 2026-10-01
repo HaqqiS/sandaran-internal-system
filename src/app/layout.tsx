@@ -8,7 +8,6 @@ import {
   Space_Mono,
   Syne,
 } from "next/font/google";
-import { SmoothScrollProvider } from "~/components/providers/smooth-scroll-provider";
 import { ThemeProvider } from "~/components/providers/theme-provider";
 import { Toaster } from "~/components/ui/sonner";
 import { TRPCReactProvider } from "~/trpc/react";
@@ -75,10 +74,8 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TRPCReactProvider>
-            <SmoothScrollProvider>
-              <Toaster richColors position="top-center" duration={5000} />
-              {children}
-            </SmoothScrollProvider>
+            <Toaster richColors position="top-center" duration={5000} />
+            {children}
           </TRPCReactProvider>
         </ThemeProvider>
       </body>
