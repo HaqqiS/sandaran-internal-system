@@ -32,12 +32,12 @@
 
 | Step | Expected | iOS Safari | Android Chrome |
 |---|---|---|---|
-| Open Projects page | Page loads, list visible | 🔲 | 🔲 |
-| Tap ⋯ menu → Edit | Dropdown opens | 🔲 | 🔲 |
-| Project form opens | Dialog/Drawer appears | 🔲 | 🔲 |
-| Tap "Name" input immediately | Input focuses, keyboard opens | 🔲 | 🔲 |
-| Tap "Description" input | Input focuses | 🔲 | 🔲 |
-| Tap outside to close | Form closes, page still interactive | 🔲 | 🔲 |
+| Open Projects page | Page loads, list visible | ✅ | ✅ |
+| Tap ⋯ menu → Edit | Dropdown opens | ✅ | ✅ |
+| Project form opens | Dialog/Drawer appears | ✅ | ✅ |
+| Tap "Name" input immediately | Input focuses, keyboard opens | ✅ | ✅ |
+| Tap "Description" input | Input focuses | ✅ | ✅ |
+| Tap outside to close | Form closes, page still interactive | ✅ | ✅ |
 
 ---
 
@@ -45,10 +45,10 @@
 
 | Step | Expected | iOS Safari | Android Chrome |
 |---|---|---|---|
-| Open a tall form (Report / Project) | Form appears | 🔲 | 🔲 |
-| Swipe up on form body | Whole form scrolls natively | 🔲 | 🔲 |
-| Scroll to bottom | Footer buttons (Submit/Cancel) visible | 🔲 | 🔲 |
-| Tap Submit | Form closes successfully | 🔲 | 🔲 |
+| Open a tall form (Report / Project) | Form appears | ✅ | ✅ |
+| Swipe up on form body | Whole form scrolls natively | (Report ✅ / Project ❌ | (Report ✅ / Project ❌) |
+| Scroll to bottom | Footer buttons (Submit/Cancel) visible | (Report ✅ / Project ❌ | (Report ✅ / Project ❌) |
+| Tap Submit | Form closes successfully | same as android | (Report ✅ / Project ❌ not visible) |
 
 ---
 
@@ -56,11 +56,11 @@
 
 | Step | Expected | iOS Safari | Android Chrome |
 |---|---|---|---|
-| Open a Drawer form | Drawer slides up | 🔲 | 🔲 |
-| Tap a textarea | Keyboard opens | 🔲 | 🔲 |
-| Drawer stays open | Does NOT close or jump | 🔲 | 🔲 |
-| Focused field visible | Not hidden behind keyboard | 🔲 | 🔲 |
-| Dismiss keyboard | Drawer stays in place | 🔲 | 🔲 |
+| Open a Drawer form | Drawer slides up | ✅ | ✅ |
+| Tap a textarea | Keyboard opens | ✅ | ✅ |
+| Drawer stays open | Does NOT close or jump | ✅ if taped 2 time it will jump | Report  / Project both jump but in project are worst |
+| Focused field visible | Not hidden behind keyboard | ✅ | ✅ |
+| Dismiss keyboard | Drawer stays in place | ✅ | ✅ |
 
 ---
 
@@ -68,9 +68,9 @@
 
 | Step | Expected | iOS Safari | Android Chrome |
 |---|---|---|---|
-| Submit any form successfully | Toast appears, overlay closes | 🔲 | 🔲 |
-| Scroll the page | Native scrolling works (no stuck lock) | 🔲 | 🔲 |
-| Open another overlay | Works normally | 🔲 | 🔲 |
+| Submit any form successfully | Toast appears, overlay closes | ✅ | ✅ |
+| Scroll the page | Native scrolling works (no stuck lock) | ✅ | ✅ |
+| Open another overlay | Works normally | ✅ | ✅ |
 
 ---
 
@@ -78,10 +78,10 @@
 
 | Step | Expected | iOS Safari | Android Chrome |
 |---|---|---|---|
-| Open Report form | Drawer/Dialog opens | 🔲 | 🔲 |
-| Tap date field | Calendar/picker opens | 🔲 | 🔲 |
-| Select a date | Date appears in field; parent does NOT close | 🔲 | 🔲 |
-| Dismiss picker | Form still open, data retained | 🔲 | 🔲 |
+| Open Report form | Drawer/Dialog opens | ✅ | ✅ |
+| Tap date field | Calendar/picker opens | ✅ | ✅ |
+| Select a date | Date appears in field; parent does NOT close | ✅ | ✅ |
+| Dismiss picker | Form still open, data retained | ✅ | ✅ |
 
 ---
 
@@ -89,9 +89,9 @@
 
 | Step | Expected | iOS Safari | Android Chrome |
 |---|---|---|---|
-| Open a form with a combobox/selector | Popover opens with a list | 🔲 | 🔲 |
-| Swipe up/down on list | List scrolls by touch | 🔲 | 🔲 |
-| Select an item | Selection applied, popover closes | 🔲 | 🔲 |
+| Open a form with a combobox/selector | Popover opens with a list | ✅ | ✅ |
+| Swipe up/down on list | List scrolls by touch | ❌ |  user select❌ |
+| Select an item | Selection applied, popover closes | ❌ | ✅ |
 
 ---
 
@@ -99,10 +99,10 @@
 
 | Step | Expected | iOS Safari | Android Chrome |
 |---|---|---|---|
-| Open any overlay | Opens normally | 🔲 | 🔲 |
-| Rotate from portrait → landscape | Layout adapts | 🔲 | 🔲 |
-| Form content / state preserved | No remount, no state loss | 🔲 | 🔲 |
-| Rotate back | Still works | 🔲 | 🔲 |
+| Open any overlay | Opens normally | ✅ | ✅ |
+| Rotate from portrait → landscape | Layout adapts | ✅ | ✅ |
+| Form content / state preserved | No remount, no state loss | ❌ | ❌ |
+| Rotate back | Still works | ✅ | ✅ |
 
 ---
 
@@ -110,9 +110,9 @@
 
 | Step | Expected | iOS Safari | Android Chrome |
 |---|---|---|---|
-| Visit `/` homepage | Loads, custom cursor visible (desktop) | 🔲 | 🔲 |
-| Scroll through hero, portfolio, philosophy | Lenis smooth scroll + GSAP pins work | 🔲 | 🔲 |
-| Scroll to bottom | No stuck scroll | 🔲 | 🔲 |
+| Visit `/` homepage | Loads, custom cursor visible (desktop) | ✅ | ✅ |
+| Scroll through hero, portfolio, philosophy | Lenis smooth scroll + GSAP pins work | ✅ | ✅ |
+| Scroll to bottom | No stuck scroll | ✅ | ✅ |
 
 ---
 
@@ -120,11 +120,11 @@
 
 | Step | Expected | iOS Safari | Android Chrome |
 |---|---|---|---|
-| Visit `/` → scroll down | Smooth scroll active | 🔲 | 🔲 |
-| Click Login / nav to `/dashboard` | Dashboard loads | 🔲 | 🔲 |
-| Dashboard page scrolls natively | No Lenis double-scroll effect | 🔲 | 🔲 |
-| Browser Back → homepage | Lenis re-activates, animations play | 🔲 | 🔲 |
-| No stuck scroll lock | — | 🔲 | 🔲 |
+| Visit `/` → scroll down | Smooth scroll active | ✅ | ✅ |
+| Click Login / nav to `/dashboard` | Dashboard loads | ✅ | ✅ |
+| Dashboard page scrolls natively | No Lenis double-scroll effect | ✅ | ✅ |
+| Browser Back → homepage | Lenis re-activates, animations play | ✅ | ✅ |
+| No stuck scroll lock | — | ✅ | ✅ |
 
 ---
 
@@ -132,11 +132,11 @@
 
 | Step | Expected | Desktop Chrome |
 |---|---|---|
-| Visit `/users` | Table visible | 🔲 |
-| Hover rows, click ⋯ | Dropdown opens | 🔲 |
-| Click Edit | Dialog opens | 🔲 |
-| Interact with all inputs | All focusable, no stuck pointer | 🔲 |
-| Delete action | Confirm dialog → deletes | 🔲 |
+| Visit `/users` | Table visible | ✅ |
+| Hover rows, click ⋯ | Dropdown opens | ✅ |
+| Click Edit | Dialog opens | ✅ |
+| Interact with all inputs | All focusable, no stuck pointer | ✅ |
+| Delete action | Confirm dialog → deletes | ✅ |
 
 ---
 
