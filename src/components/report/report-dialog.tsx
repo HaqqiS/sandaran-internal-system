@@ -144,7 +144,10 @@ export function ReportDialog({
           <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
 
-        <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4">
+        <div
+          className="flex-1 min-h-0 overflow-y-auto px-4 py-4 scroll-pb-24"
+          data-vaul-no-drag
+        >
           <ReportForm
             ref={formRef}
             projectId={projectId}

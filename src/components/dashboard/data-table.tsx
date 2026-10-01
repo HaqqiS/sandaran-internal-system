@@ -658,7 +658,10 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
             Showing total visitors for the last 6 months
           </DrawerDescription>
         </DrawerHeader>
-        <div className="flex flex-col gap-4 overflow-y-auto px-4 text-sm">
+        <div
+          className="flex flex-col gap-4 overflow-y-auto px-4 text-sm"
+          data-vaul-no-drag
+        >
           {!isMobile && (
             <>
               <ChartContainer config={chartConfig}>

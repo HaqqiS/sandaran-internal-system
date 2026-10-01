@@ -19,8 +19,10 @@ export const metadata: Metadata = {
 };
 
 // Required for env(safe-area-inset-*) to work correctly on iOS (notch / home indicator)
+// interactiveWidget: "resizes-content" ensures Android Chrome resizes layout viewport with keyboard
 export const viewport: Viewport = {
   viewportFit: "cover",
+  interactiveWidget: "resizes-content",
 };
 
 const inter = Inter({

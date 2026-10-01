@@ -493,7 +493,8 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
         </DrawerHeader>
 
         <div
-          className="flex-1 min-h-0 overflow-y-auto px-6 py-4"
+          className="flex-1 min-h-0 overflow-y-auto px-6 py-4 scroll-pb-24"
+          data-vaul-no-drag
           data-lenis-prevent
         >
           {formContent}

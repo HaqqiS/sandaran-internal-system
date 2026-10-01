@@ -94,7 +94,10 @@ export function UploadDialog({
           <DrawerTitle>{title}</DrawerTitle>
           <DrawerDescription>{descriptionText}</DrawerDescription>
         </DrawerHeader>
-        <div className="flex-1 overflow-y-auto px-4 pb-6">
+        <div
+          className="flex-1 min-h-0 overflow-y-auto px-4 pb-6 scroll-pb-24"
+          data-vaul-no-drag
+        >
           <UploadForm
             ref={formRef}
             projectId={projectId}
