@@ -101,7 +101,7 @@
 |---|---|---|---|
 | Open any overlay | Opens normally | ✅ | ✅ |
 | Rotate from portrait → landscape | Layout adapts | ✅ | ✅ |
-| Form content / state preserved | No remount, no state loss | ❌ | ❌ |
+| Form content / state preserved | No remount, no state loss | ✅ | ✅ |
 | Rotate back | Still works | ✅ | ✅ |
 
 ---
@@ -156,8 +156,8 @@
 |---|---|---|---|---|---|
 | Baseline (before any changes) | 2026-09-30 | — | 🔲 | 🔲 | Branch created, audit complete |
 | After Phase 1 | 2026-10-1 | — | ⚠️ | ⚠️ | after phase 1 Some issue remain the same. |
-| After Phase 2 | — | — | 🔲 | 🔲 | — |
-| After Phase 3 | — | — | 🔲 | 🔲 | — |
+| After Phase 2 | 2026-10-1 | — | 🔲 | 🔲 | i don't filled baseline repro checklist |
+| After Phase 3 | 2026-10-1 | — | ⚠️ | ⚠️ | after changed useIsMobile no state loss at Scenario 7 |
 | After Phase 4 | — | — | 🔲 | 🔲 | — |
 | After Phase 5 | — | — | 🔲 | 🔲 | — |
 | After Phase 6 | — | — | 🔲 | 🔲 | — |
