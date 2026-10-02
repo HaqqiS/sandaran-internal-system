@@ -2,23 +2,7 @@
 
 import type * as React from "react";
 import { useRef, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "~/components/ui/dialog";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "~/components/ui/drawer";
-import { useIsMobile } from "~/hooks/use-mobile";
+import { ResponsiveFormDialog } from "~/components/shared/responsive-form-dialog";
 import {
   type DocumentFormDraft,
   type DocumentFormValues,
@@ -42,7 +26,6 @@ export function UploadDialog({
   onSuccess,
   children,
 }: UploadDialogProps) {
-  const isMobile = useIsMobile();
   const title = "Unggah Dokumen";
   const descriptionText =
     "Unggah file desain, gambar teknis, spesifikasi, dll.";
@@ -62,52 +45,23 @@ export function UploadDialog({
     onSuccess?.();
   };
 
-  if (!isMobile) {
-    return (
-      <Dialog open={open} onOpenChange={handleOpenChange}>
-        {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-        <DialogContent className="sm:max-w-xl">
-          <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>{descriptionText}</DialogDescription>
-          </DialogHeader>
-          <div className="overflow-y-auto no-scrollbar max-h-[80vh] px-1">
-            <UploadForm
-              ref={formRef}
-              projectId={projectId}
-              projectSlug={projectSlug}
-              draftValues={draft}
-              onSuccess={handleSuccess}
-              onCancel={() => onOpenChange(false)}
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
   return (
-    <Drawer open={open} onOpenChange={handleOpenChange}>
-      {children && <DrawerTrigger asChild>{children}</DrawerTrigger>}
-      <DrawerContent className="flex flex-col h-[85dvh]">
-        <DrawerHeader className="text-left shrink-0">
-          <DrawerTitle>{title}</DrawerTitle>
-          <DrawerDescription>{descriptionText}</DrawerDescription>
-        </DrawerHeader>
-        <div
-          className="flex-1 min-h-0 overflow-y-auto px-4 pb-6 scroll-pb-24"
-          data-vaul-no-drag
-        >
-          <UploadForm
-            ref={formRef}
-            projectId={projectId}
-            projectSlug={projectSlug}
-            draftValues={draft}
-            onSuccess={handleSuccess}
-            onCancel={() => onOpenChange(false)}
-          />
-        </div>
-      </DrawerContent>
-    </Drawer>
+    <ResponsiveFormDialog
+      open={open}
+      onOpenChange={handleOpenChange}
+      title={title}
+      description={descriptionText}
+      trigger={children}
+      dialogClassName="sm:max-w-xl"
+    >
+      <UploadForm
+        ref={formRef}
+        projectId={projectId}
+        projectSlug={projectSlug}
+        draftValues={draft}
+        onSuccess={handleSuccess}
+        onCancel={() => onOpenChange(false)}
+      />
+    </ResponsiveFormDialog>
   );
 }

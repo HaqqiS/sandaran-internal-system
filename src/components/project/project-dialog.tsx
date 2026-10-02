@@ -2,23 +2,7 @@
 
 import type * as React from "react";
 import { useRef, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "~/components/ui/dialog";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "~/components/ui/drawer";
-import { useIsMobile } from "~/hooks/use-mobile";
+import { ResponsiveFormDialog } from "~/components/shared/responsive-form-dialog";
 import {
   ProjectForm,
   type ProjectFormDraft,
@@ -47,7 +31,6 @@ export function ProjectDialog({
   onOpenChange,
   children,
 }: ProjectDialogProps) {
-  const isMobile = useIsMobile();
   const isEditMode = !!project;
   const [draft, setDraft] = useState<ProjectFormDraft>({});
   const formRef = useRef<{ getValues: () => ProjectFormValues }>(null);
@@ -69,46 +52,21 @@ export function ProjectDialog({
     ? "Make changes to your project."
     : "Create a new construction project.";
 
-  if (!isMobile) {
-    return (
-      <Dialog open={open} onOpenChange={handleOpenChange}>
-        {children && <DialogTrigger asChild>{children}</DialogTrigger>}
-        <DialogContent className="sm:max-w-[525px]">
-          <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>{description}</DialogDescription>
-          </DialogHeader>
-          <ProjectForm
-            ref={formRef}
-            project={project}
-            draftValues={draft}
-            onSuccess={handleSuccess}
-          />
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
   return (
-    <Drawer open={open} onOpenChange={handleOpenChange}>
-      {children && <DrawerTrigger asChild>{children}</DrawerTrigger>}
-      <DrawerContent className="flex flex-col h-[85dvh]">
-        <DrawerHeader className="text-left shrink-0">
-          <DrawerTitle>{title}</DrawerTitle>
-          <DrawerDescription>{description}</DrawerDescription>
-        </DrawerHeader>
-        <div
-          className="flex-1 min-h-0 overflow-y-auto px-4 pb-6 scroll-pb-24"
-          data-vaul-no-drag
-        >
-          <ProjectForm
-            ref={formRef}
-            project={project}
-            draftValues={draft}
-            onSuccess={handleSuccess}
-          />
-        </div>
-      </DrawerContent>
-    </Drawer>
+    <ResponsiveFormDialog
+      open={open}
+      onOpenChange={handleOpenChange}
+      title={title}
+      description={description}
+      trigger={children}
+      dialogClassName="sm:max-w-[525px]"
+    >
+      <ProjectForm
+        ref={formRef}
+        project={project}
+        draftValues={draft}
+        onSuccess={handleSuccess}
+      />
+    </ResponsiveFormDialog>
   );
 }

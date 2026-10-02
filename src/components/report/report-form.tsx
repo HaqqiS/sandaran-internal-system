@@ -242,7 +242,7 @@ export function ReportForm({
           <FieldGroup>
             <Field>
               <FieldLabel>Tanggal Laporan *</FieldLabel>
-              <Popover>
+              <Popover modal={true}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"

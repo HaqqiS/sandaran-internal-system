@@ -1,21 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "~/components/ui/drawer";
-import { useIsMobile } from "~/hooks/use-mobile";
+import { ResponsiveFormDialog } from "~/components/shared/responsive-form-dialog";
 import {
   TransactionForm,
   type TransactionFormDraft,
@@ -39,7 +25,6 @@ export function TransactionDialog({
   item,
   onSuccess,
 }: TransactionDialogProps) {
-  const isMobile = useIsMobile();
   const title = type === "IN" ? "Barang Masuk" : "Barang Keluar";
   const description =
     type === "IN"
@@ -48,11 +33,11 @@ export function TransactionDialog({
   const [draft, setDraft] = useState<TransactionFormDraft>({});
   const formRef = useRef<{ getValues: () => TransactionFormValues }>(null);
 
-  const handleOpenChange = (isOpen: boolean) => {
-    if (!isOpen && formRef.current) {
+  const handleOpenChange = (open: boolean) => {
+    if (!open && formRef.current) {
       setDraft(formRef.current.getValues());
     }
-    onOpenChange(isOpen);
+    onOpenChange(open);
   };
 
   const handleSuccess = () => {
@@ -60,56 +45,25 @@ export function TransactionDialog({
     onSuccess();
   };
 
-  if (!isMobile) {
-    return (
-      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>{description}</DialogDescription>
-          </DialogHeader>
-          {item && (
-            <TransactionForm
-              ref={formRef}
-              projectId={projectId}
-              itemId={item.id}
-              itemName={item.name}
-              unit={item.unit}
-              defaultType={type}
-              draftValues={draft}
-              onSuccess={handleSuccess}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
   return (
-    <Drawer open={isOpen} onOpenChange={handleOpenChange}>
-      <DrawerContent className="flex flex-col h-[85dvh]">
-        <DrawerHeader className="text-left shrink-0">
-          <DrawerTitle>{title}</DrawerTitle>
-          <DrawerDescription>{description}</DrawerDescription>
-        </DrawerHeader>
-        <div
-          className="flex-1 min-h-0 overflow-y-auto px-4 pb-6 scroll-pb-24"
-          data-vaul-no-drag
-        >
-          {item && (
-            <TransactionForm
-              ref={formRef}
-              projectId={projectId}
-              itemId={item.id}
-              itemName={item.name}
-              unit={item.unit}
-              defaultType={type}
-              draftValues={draft}
-              onSuccess={handleSuccess}
-            />
-          )}
-        </div>
-      </DrawerContent>
-    </Drawer>
+    <ResponsiveFormDialog
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      title={title}
+      description={description}
+    >
+      {item && (
+        <TransactionForm
+          ref={formRef}
+          projectId={projectId}
+          itemId={item.id}
+          itemName={item.name}
+          unit={item.unit}
+          defaultType={type}
+          draftValues={draft}
+          onSuccess={handleSuccess}
+        />
+      )}
+    </ResponsiveFormDialog>
   );
 }

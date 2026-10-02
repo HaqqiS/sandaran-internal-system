@@ -157,7 +157,7 @@ export function LogisticItemForm({
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Satuan</FieldLabel>
-                <Popover open={open} onOpenChange={setOpen}>
+                <Popover open={open} onOpenChange={setOpen} modal={true}>
                   <PopoverAnchor asChild>
                     <Input
                       id={field.name}
@@ -185,8 +185,6 @@ export function LogisticItemForm({
                         e.preventDefault();
                       }
                     }}
-                    onWheel={(e: React.WheelEvent) => e.stopPropagation()}
-                    onTouchMove={(e: React.TouchEvent) => e.stopPropagation()}
                   >
                     <Command shouldFilter={false}>
                       <CommandList>

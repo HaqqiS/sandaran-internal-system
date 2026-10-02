@@ -108,7 +108,7 @@ export function ProjectSelector() {
 
   return (
     <div className="hidden md:block">
-      <Popover open={open} onOpenChange={setOpen}>
+      <Popover open={open} onOpenChange={setOpen} modal={true}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
@@ -142,10 +142,7 @@ export function ProjectSelector() {
         <PopoverContent className="w-sm lg:w-lg p-0" align="start">
           <Command defaultValue={selectedProject?.name}>
             <CommandInput placeholder="Cari proyek..." />
-            <CommandList
-              className="max-h-[300px] overflow-y-scroll"
-              onWheel={(e) => e.stopPropagation()}
-            >
+            <CommandList className="max-h-[300px] overflow-y-scroll">
               <CommandEmpty>Proyek tidak ditemukan.</CommandEmpty>
               {groupedProjects &&
                 Object.entries(groupedProjects).map(
