@@ -197,7 +197,7 @@ export function getUserColumnsWithActions({
 
       // Show dropdown menu for approved/rejected users
       return (
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm">
               <IconDots className="h-4 w-4" />

@@ -269,7 +269,7 @@ export function TransactionList({
               </Button>
             )}
             {(showEditDelete || showUndoReview) && (
-              <DropdownMenu>
+              <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"

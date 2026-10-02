@@ -267,7 +267,7 @@ export function ProjectsClient() {
                         )}
                       </Button>
 
-                      <DropdownMenu>
+                      <DropdownMenu modal={false}>
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
