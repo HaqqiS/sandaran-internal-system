@@ -372,10 +372,7 @@ export function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
   if (!isMobile) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent
-          className="sm:max-w-[480px] max-h-[90vh] overflow-y-auto"
-          data-lenis-prevent
-        >
+        <DialogContent className="sm:max-w-[480px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex items-center gap-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -435,7 +432,6 @@ export function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
           <div
             className="flex-1 min-h-0 overflow-y-auto px-6 py-4 scroll-pb-24"
             data-vaul-no-drag
-            data-lenis-prevent
           >
             {formContent}
           </div>

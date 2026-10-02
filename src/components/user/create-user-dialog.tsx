@@ -163,10 +163,7 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        className="sm:max-w-[480px] max-h-[90vh] overflow-y-auto"
-        data-lenis-prevent
-      >
+      <DialogContent className="sm:max-w-[480px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <IconUserPlus className="size-5 text-primary" />

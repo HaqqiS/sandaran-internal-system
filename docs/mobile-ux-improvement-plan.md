@@ -319,22 +319,22 @@ If overlay open/close animations or checked checkboxes look wrong, add after `tw
 
 ---
 
-## 9. Phase 7 — Cleanup, small extras, desktop polish
+## 9. Phase 7 — Cleanup, small extras, desktop polish (Completed)
 
-**Cleanup (only after phases 1–6 are verified):**
-- Remove `useLenis` imports from `dialog.tsx` and `drawer.tsx` (dead code once Lenis is homepage-only).
-- Remove `data-lenis-prevent` and `onWheel`/`onTouchMove` hacks from dialogs, `ProjectSelector`, `LogisticItemForm`.
-- Remove the `pointer-events` reset in `ConfirmDeleteDialog`.
+**Cleanup (verified & completed):**
+- [x] Remove `useLenis` imports from `dialog.tsx` and `drawer.tsx` (dead code once Lenis is homepage-only).
+- [x] Remove `data-lenis-prevent` and `onWheel`/`onTouchMove` hacks from dialogs, `ProjectSelector`, `LogisticItemForm`, `country-picker`, `terms-privacy-modal`.
+- [x] Remove the `pointer-events` reset in `ConfirmDeleteDialog`.
 
 **Small extras:**
-- `ImageUpload`: `capture="environment"` forces the camera on phones and hides the gallery. Remove it if users should also pick existing photos, or make it a prop.
-- `gsap.ticker.lagSmoothing(0)` + Lenis RAF currently run on every page; Phase 1 removes this cost from the dashboard (better battery on phones).
+- [x] `ImageUpload`: `capture="environment"` made optional prop with default `undefined` so mobile users can choose photos from their gallery or use the camera.
+- [x] `gsap.ticker.lagSmoothing(0)` + Lenis RAF scoped to homepage only (Phase 1).
 
-**Desktop polish for admin/CEO (optional, after stability):**
-- `UsersClient` / `DataTable`: on mobile show a card list per user (name, role badge, actions) instead of a wide table; keep the table from `md` up.
-- Use `max-w-screen-2xl mx-auto` for wide dashboards so content doesn't stretch on large monitors.
-- Sticky table headers and a visible horizontal scroll hint for wide tables.
-- Reuse the existing mobile-card / desktop-table pattern already used in `ItemList` and `TransactionHistory`.
+**Desktop polish for admin/CEO:**
+- [x] `UsersClient` / `DataTable`: on mobile show a responsive card list per user (name, avatar, role badge, status badge, projects count, time ago, selection checkbox, quick approve/reject or edit/delete actions, search bar) instead of a wide table; keep the TanStack table from `md` up.
+- [x] Use `max-w-screen-2xl mx-auto` for wide dashboards in `DashboardLayout` so content doesn't stretch on large monitors.
+- [x] Sticky table headers (`sticky top-0 z-10 bg-background/95 backdrop-blur-xs`) and visible horizontal scroll hint for wide tables in `DataTable`.
+- [x] Reused existing mobile-card / desktop-table pattern from `ItemList` and `TransactionHistory`.
 
 ---
 

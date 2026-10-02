@@ -32,10 +32,7 @@ export function TermsPrivacyModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        data-lenis-prevent
-        className="sm:max-w-xl max-h-[85vh] flex flex-col p-5 gap-3"
-      >
+      <DialogContent className="sm:max-w-xl max-h-[85vh] flex flex-col p-5 gap-3">
         <DialogHeader className="space-y-1 text-left border-b pb-3">
           <DialogTitle className="text-base font-bold flex items-center gap-2">
             {activeTab === "terms" ? (
@@ -75,11 +72,7 @@ export function TermsPrivacyModal({
         </Tabs>
 
         {/* Scrollable Document Content */}
-        <div
-          data-lenis-prevent
-          onWheel={(e) => e.stopPropagation()}
-          className="flex-1 overflow-y-auto overscroll-contain pr-2 text-xs leading-relaxed text-muted-foreground space-y-4 max-h-[50vh]"
-        >
+        <div className="flex-1 overflow-y-auto overscroll-contain pr-2 text-xs leading-relaxed text-muted-foreground space-y-4 max-h-[50vh]">
           {activeTab === "terms" ? (
             <div className="space-y-3.5 text-foreground/90">
               <h3 className="font-bold text-sm text-foreground">

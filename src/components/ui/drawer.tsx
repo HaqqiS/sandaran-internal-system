@@ -1,36 +1,19 @@
 "use client";
 
-import * as React from "react";
+import type * as React from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
-import { useLenis } from "~/components/providers/smooth-scroll-provider";
 import { cn } from "~/lib/utils";
 
 function Drawer({
   shouldScaleBackground = false,
   repositionInputs = false,
-  onOpenChange,
   ...props
 }: React.ComponentProps<typeof DrawerPrimitive.Root>) {
-  const lenis = useLenis();
-
-  const handleOpenChange = React.useCallback(
-    (open: boolean) => {
-      if (open) {
-        lenis.stop();
-      } else {
-        lenis.start();
-      }
-      onOpenChange?.(open);
-    },
-    [lenis, onOpenChange],
-  );
-
   return (
     <DrawerPrimitive.Root
       data-slot="drawer"
       shouldScaleBackground={shouldScaleBackground}
       repositionInputs={repositionInputs}
-      onOpenChange={handleOpenChange}
       {...props}
     />
   );

@@ -2,36 +2,14 @@
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { IconX } from "@tabler/icons-react";
-import * as React from "react";
-import { useLenis } from "~/components/providers/smooth-scroll-provider";
+import type * as React from "react";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
 
 function Dialog({
-  onOpenChange,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
-  const lenis = useLenis();
-
-  const handleOpenChange = React.useCallback(
-    (open: boolean) => {
-      if (open) {
-        lenis.stop();
-      } else {
-        lenis.start();
-      }
-      onOpenChange?.(open);
-    },
-    [lenis, onOpenChange],
-  );
-
-  return (
-    <DialogPrimitive.Root
-      data-slot="dialog"
-      onOpenChange={handleOpenChange}
-      {...props}
-    />
-  );
+  return <DialogPrimitive.Root data-slot="dialog" {...props} />;
 }
 
 function DialogTrigger({

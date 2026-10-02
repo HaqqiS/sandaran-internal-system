@@ -198,7 +198,6 @@ export function ProjectSwitcherDrawer({
         <div
           className="flex-1 min-h-0 overflow-y-auto px-2 pb-safe scroll-pb-24"
           data-vaul-no-drag
-          data-lenis-prevent
         >
           {isLoading ? (
             <SkeletonList />

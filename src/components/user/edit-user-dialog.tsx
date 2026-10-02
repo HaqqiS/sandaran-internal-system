@@ -453,10 +453,7 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
   if (!isMobile) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent
-          className="sm:max-w-[480px] max-h-[90vh] overflow-y-auto"
-          data-lenis-prevent
-        >
+        <DialogContent className="sm:max-w-[480px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-base font-semibold">
               <IconUserCheck className="size-5 text-primary" />
@@ -495,7 +492,6 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
         <div
           className="flex-1 min-h-0 overflow-y-auto px-6 py-4 scroll-pb-24"
           data-vaul-no-drag
-          data-lenis-prevent
         >
           {formContent}
         </div>

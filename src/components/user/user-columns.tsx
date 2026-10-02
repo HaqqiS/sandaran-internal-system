@@ -32,9 +32,12 @@ export type UserListItem = {
   _count: { projectMembers: number };
 };
 
-type UserStatus = "pending" | "approved" | "rejected";
+export type UserStatus = "pending" | "approved" | "rejected";
 
-function getUserStatus(isActive: boolean, reviewedAt: Date | null): UserStatus {
+export function getUserStatus(
+  isActive: boolean,
+  reviewedAt: Date | null,
+): UserStatus {
   if (!reviewedAt) return "pending";
   return isActive ? "approved" : "rejected";
 }

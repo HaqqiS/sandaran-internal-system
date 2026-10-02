@@ -43,6 +43,8 @@ interface ImageUploadProps {
   multiple?: boolean;
   /** Callback when file selection changes (Atomic Mode) */
   onFileChange?: (files: File[]) => void;
+  /** HTML input capture attribute ("environment" | "user" | undefined) */
+  capture?: boolean | "user" | "environment";
 }
 
 export function ImageUpload({
@@ -57,6 +59,7 @@ export function ImageUpload({
   maxSizeMB = 5,
   accept = { "image/*": [".jpg", ".jpeg", ".png", ".webp"] },
   multiple = false,
+  capture,
   onUploadChange,
   onFileChange,
 }: ImageUploadProps) {
@@ -385,7 +388,10 @@ export function ImageUpload({
             disabled && "cursor-not-allowed opacity-50",
           )}
         >
-          <input {...getInputProps()} capture="environment" />
+          <input
+            {...getInputProps()}
+            {...(capture !== undefined ? { capture } : {})}
+          />
           <div className="flex flex-col items-center gap-2">
             {isDragActive ? (
               <IconUpload className="h-10 w-10 text-muted-foreground" />

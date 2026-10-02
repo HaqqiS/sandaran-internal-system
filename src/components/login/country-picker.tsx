@@ -59,7 +59,6 @@ export function CountryPicker({
       <PopoverContent
         align="start"
         sideOffset={6}
-        data-lenis-prevent
         className="w-68 p-2.5 shadow-2xl border-border/80 bg-popover rounded-xl"
       >
         <div className="space-y-2">
@@ -79,11 +78,7 @@ export function CountryPicker({
           </div>
 
           {/* Countries list */}
-          <div
-            data-lenis-prevent
-            onWheel={(e) => e.stopPropagation()}
-            className="max-h-56 overflow-y-auto overscroll-contain space-y-0.5 pr-1 text-xs"
-          >
+          <div className="max-h-56 overflow-y-auto overscroll-contain space-y-0.5 pr-1 text-xs">
             {filteredCountries.length === 0 ? (
               <p className="py-4 text-center text-xs text-muted-foreground">
                 Negara tidak ditemukan
