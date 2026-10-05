@@ -101,7 +101,7 @@
 |---|---|---|---|
 | Open any overlay | Opens normally | ✅ | ✅ |
 | Rotate from portrait → landscape | Layout adapts | ✅ | ✅ |
-| Form content / state preserved | No remount, no state loss | ⚠️ the text in the input still loss  | ✅ |
+| Form content / state preserved | No remount, no state loss | ✅ | ✅ |
 | Rotate back | Still works | ✅ | ✅ |
 
 ---

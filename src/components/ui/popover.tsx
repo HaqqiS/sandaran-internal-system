@@ -3,7 +3,6 @@
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import type * as React from "react";
 
-import { usePortalContainer } from "~/components/ui/portal-container";
 import { cn } from "~/lib/utils";
 
 function Popover({
@@ -22,21 +21,38 @@ function PopoverContent({
   className,
   align = "center",
   sideOffset = 4,
+  onOpenAutoFocus,
+  portal = true,
+  container,
   ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Content>) {
-  const container = usePortalContainer();
+}: React.ComponentProps<typeof PopoverPrimitive.Content> & {
+  portal?: boolean;
+  container?: HTMLElement | null;
+}) {
+  const content = (
+    <PopoverPrimitive.Content
+      data-slot="popover-content"
+      align={align}
+      sideOffset={sideOffset}
+      onOpenAutoFocus={(e) => {
+        e.preventDefault();
+        onOpenAutoFocus?.(e);
+      }}
+      className={cn(
+        "bg-popover text-popover-foreground pointer-events-auto data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 ring-foreground/10 flex flex-col gap-2.5 rounded-lg p-2.5 text-sm shadow-md ring-1 duration-100 z-50 w-72 origin-(--radix-popover-content-transform-origin) outline-hidden",
+        className,
+      )}
+      {...props}
+    />
+  );
+
+  if (!portal) {
+    return content;
+  }
+
   return (
     <PopoverPrimitive.Portal container={container}>
-      <PopoverPrimitive.Content
-        data-slot="popover-content"
-        align={align}
-        sideOffset={sideOffset}
-        className={cn(
-          "bg-popover text-popover-foreground data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 ring-foreground/10 flex flex-col gap-2.5 rounded-lg p-2.5 text-sm shadow-md ring-1 duration-100 z-50 w-72 origin-(--radix-popover-content-transform-origin) outline-hidden",
-          className,
-        )}
-        {...props}
-      />
+      {content}
     </PopoverPrimitive.Portal>
   );
 }

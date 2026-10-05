@@ -108,7 +108,7 @@ export function ProjectSelector() {
 
   return (
     <div className="hidden md:block">
-      <Popover open={open} onOpenChange={setOpen} modal={true}>
+      <Popover open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
@@ -139,7 +139,11 @@ export function ProjectSelector() {
             <IconChevronDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-sm lg:w-lg p-0" align="start">
+        <PopoverContent
+          className="w-sm lg:w-lg p-0"
+          align="start"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
           <Command defaultValue={selectedProject?.name}>
             <CommandInput placeholder="Cari proyek..." />
             <CommandList className="max-h-[300px] overflow-y-scroll">

@@ -66,17 +66,28 @@ function CommandInput({
   ...props
 }: React.ComponentProps<typeof CommandPrimitive.Input>) {
   return (
-    <div data-slot="command-input-wrapper" className="p-1 pb-0">
-      <InputGroup className="bg-input/30 border-input/30 h-8! rounded-lg! shadow-none! *:data-[slot=input-group-addon]:pl-2!">
+    // biome-ignore lint/a11y/noStaticElementInteractions: Click delegates focus to the embedded input for reliable touch interactions
+    // biome-ignore lint/a11y/useKeyWithClickEvents: Keyboard navigation is handled by the embedded input
+    <div
+      data-slot="command-input-wrapper"
+      className="p-1 pb-0 pointer-events-auto cursor-text"
+      onClick={(e) => {
+        const input = e.currentTarget.querySelector("input");
+        if (input && document.activeElement !== input) {
+          input.focus();
+        }
+      }}
+    >
+      <InputGroup className="bg-input/30 border-input/30 h-9! rounded-lg! shadow-none! *:data-[slot=input-group-addon]:pl-2! pointer-events-auto">
         <CommandPrimitive.Input
           data-slot="command-input"
           className={cn(
-            "w-full text-base md:text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50",
+            "w-full text-base md:text-sm outline-hidden select-text pointer-events-auto disabled:cursor-not-allowed disabled:opacity-50",
             className,
           )}
           {...props}
         />
-        <InputGroupAddon>
+        <InputGroupAddon className="pointer-events-none">
           <IconSearch className="size-4 shrink-0 opacity-50" />
         </InputGroupAddon>
       </InputGroup>

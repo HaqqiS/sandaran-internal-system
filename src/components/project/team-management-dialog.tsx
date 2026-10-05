@@ -9,12 +9,12 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "~/components/ui/sheet";
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "~/components/ui/drawer";
 import { useIsMobile } from "~/hooks/use-mobile";
 
 interface TeamManagementDialogProps {
@@ -32,19 +32,22 @@ export function TeamManagementDialog({
 
   if (isMobile) {
     return (
-      <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent className="overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>Team Management</SheetTitle>
-            <SheetDescription>
+      <Drawer open={open} onOpenChange={onOpenChange}>
+        <DrawerContent className="flex max-h-[85dvh] flex-col">
+          <DrawerHeader className="shrink-0 border-b pb-3 text-left">
+            <DrawerTitle>Team Management</DrawerTitle>
+            <DrawerDescription>
               Add, remove, and manage roles for project members.
-            </SheetDescription>
-          </SheetHeader>
-          <div className="mt-6 mx-2">
+            </DrawerDescription>
+          </DrawerHeader>
+          <div
+            className="min-h-0 flex-1 overflow-y-auto px-4 py-4"
+            data-vaul-no-drag
+          >
             <MemberManagement projectId={projectId} />
           </div>
-        </SheetContent>
-      </Sheet>
+        </DrawerContent>
+      </Drawer>
     );
   }
 

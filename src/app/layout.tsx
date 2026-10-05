@@ -19,8 +19,12 @@ export const metadata: Metadata = {
 };
 
 // Required for env(safe-area-inset-*) to work correctly on iOS (notch / home indicator)
+// width, initialScale, maximumScale prevent iOS Safari from auto-zooming on input focus
 // interactiveWidget: "resizes-content" ensures Android Chrome resizes layout viewport with keyboard
 export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
   viewportFit: "cover",
   interactiveWidget: "resizes-content",
 };

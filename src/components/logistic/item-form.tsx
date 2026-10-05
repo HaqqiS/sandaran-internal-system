@@ -157,7 +157,7 @@ export function LogisticItemForm({
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Satuan</FieldLabel>
-                <Popover open={open} onOpenChange={setOpen} modal={true}>
+                <Popover open={open} onOpenChange={setOpen} modal={false}>
                   <PopoverAnchor asChild>
                     <Input
                       id={field.name}
@@ -176,6 +176,7 @@ export function LogisticItemForm({
                   </PopoverAnchor>
                   <PopoverContent
                     className="w-[--radix-popover-trigger-width] p-0"
+                    portal={false}
                     onOpenAutoFocus={(e: Event) => e.preventDefault()}
                     onInteractOutside={(e: Event) => {
                       if (
