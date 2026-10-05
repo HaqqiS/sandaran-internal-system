@@ -431,3 +431,12 @@ html.lenis body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* iOS Safari zooms the page when a focused field has font-size < 16px (also hits iPads >= md). Force 16px on touch devices. */
+@media (hover: none) and (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
