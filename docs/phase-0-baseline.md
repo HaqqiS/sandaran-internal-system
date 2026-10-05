@@ -35,8 +35,8 @@
 | Open Projects page | Page loads, list visible | ✅ | ✅ |
 | Tap ⋯ menu → Edit | Dropdown opens | ✅ | ✅ |
 | Project form opens | Dialog/Drawer appears | ✅ | ✅ |
-| Tap "Name" input immediately | Input focuses, keyboard opens | ✅ | ✅ |
-| Tap "Description" input | Input focuses | ✅ | ✅ |
+| Tap "Name" input immediately | Input focuses, keyboard opens | ⚠️ turns out the input will zoom in if i taped | ✅ |
+| Tap "Description" input | Input focuses | ⚠️ turns out the input will zoom in if i taped | ✅ |
 | Tap outside to close | Form closes, page still interactive | ✅ | ✅ |
 
 ---
@@ -46,9 +46,9 @@
 | Step | Expected | iOS Safari | Android Chrome |
 |---|---|---|---|
 | Open a tall form (Report / Project) | Form appears | ✅ | ✅ |
-| Swipe up on form body | Whole form scrolls natively | (Report ✅ / Project ⚠️ | (Report ✅ / Project ⚠️) |
-| Scroll to bottom | Footer buttons (Submit/Cancel) visible | (Report ✅ / Project ⚠️ | (Report ✅ / Project ⚠️) |
-| Tap Submit | Form closes successfully | same as android | (Report ✅ / Project ⚠️ not visible) |
+| Swipe up on form body | Whole form scrolls natively | (Report ✅ / Project ✅ | (Report ✅ / Project ✅) |
+| Scroll to bottom | Footer buttons (Submit/Cancel) visible | (Report ✅ / Project ✅ | (Report ✅ / Project ✅) |
+| Tap Submit | Form closes successfully | same as android | (Report ✅ / Project ✅ not visible) |
 
 ---
 
@@ -58,7 +58,7 @@
 |---|---|---|---|
 | Open a Drawer form | Drawer slides up | ✅ | ✅ |
 | Tap a textarea | Keyboard opens | ✅ | ✅ |
-| Drawer stays open | Does NOT close or jump | ⚠️ if taped 2 time it will jump | Report  / ⚠️ Project both jump but in project are worst |
+| Drawer stays open | Does NOT close or jump | ✅ | ✅ |
 | Focused field visible | Not hidden behind keyboard | ✅ | ✅ |
 | Dismiss keyboard | Drawer stays in place | ✅ | ✅ |
 
@@ -90,8 +90,8 @@
 | Step | Expected | iOS Safari | Android Chrome |
 |---|---|---|---|
 | Open a form with a combobox/selector | Popover opens with a list | ✅ | ✅ |
-| Swipe up/down on list | List scrolls by touch | ❌ |  user select❌ |
-| Select an item | Selection applied, popover closes | ❌ | ✅ |
+| Swipe up/down on list | List scrolls by touch | ✅ | ✅ |
+| Select an item | Selection applied, popover closes | ✅ | ✅ |
 
 ---
 
@@ -101,7 +101,7 @@
 |---|---|---|---|
 | Open any overlay | Opens normally | ✅ | ✅ |
 | Rotate from portrait → landscape | Layout adapts | ✅ | ✅ |
-| Form content / state preserved | No remount, no state loss | ✅ | ✅ |
+| Form content / state preserved | No remount, no state loss | ⚠️ the text in the input still loss  | ✅ |
 | Rotate back | Still works | ✅ | ✅ |
 
 ---
@@ -160,4 +160,4 @@
 | After Phase 3 | 2026-10-1 | — | ⚠️ | ⚠️ | after changed useIsMobile no state loss at Scenario 7 |
 | After Phase 4 | — | — | 🔲 | 🔲 | — |
 | After Phase 5 | — | — | 🔲 | 🔲 | — |
-| After Phase 6 | — | — | 🔲 | 🔲 | — |
+| After Phase 6 | 2026-10-5 | — | ⚠️ in ios some still issue, one of them are not in the scenario like input cant tap in user select | ✅ | — |
