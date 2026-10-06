@@ -33,7 +33,7 @@ export function TeamManagementDialog({
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="flex max-h-[85dvh] flex-col">
+        <DrawerContent className="flex min-h-[60dvh] max-h-[85dvh] flex-col">
           <DrawerHeader className="shrink-0 border-b pb-3 text-left">
             <DrawerTitle>Team Management</DrawerTitle>
             <DrawerDescription>
@@ -41,7 +41,7 @@ export function TeamManagementDialog({
             </DrawerDescription>
           </DrawerHeader>
           <div
-            className="min-h-0 flex-1 overflow-y-auto px-4 py-4"
+            className="flex min-h-0 flex-1 flex-col px-4 py-4"
             data-vaul-no-drag
           >
             <MemberManagement projectId={projectId} />
@@ -53,14 +53,14 @@ export function TeamManagementDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-3xl">
+      <DialogContent className="flex max-h-[85vh] min-h-[450px] flex-col sm:max-w-3xl">
         <DialogHeader>
           <DialogTitle>Team Management</DialogTitle>
           <DialogDescription>
             Add, remove, and manage roles for project members.
           </DialogDescription>
         </DialogHeader>
-        <div className="mt-4">
+        <div className="mt-4 flex min-h-0 flex-1 flex-col">
           <MemberManagement projectId={projectId} />
         </div>
       </DialogContent>

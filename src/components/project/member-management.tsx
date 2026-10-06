@@ -113,20 +113,23 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
   }
 
   return (
-    <div className="space-y-6 min-w-0 w-full">
+    <div className="flex h-full w-full min-w-0 flex-col gap-6">
       {/* Add Member Section */}
       {canManage && (
         <div className="flex flex-col gap-4 rounded-lg border p-4 sm:flex-row sm:items-end">
-          <div className="flex-1 space-y-2">
+          <div className="relative flex-1 space-y-2">
             <Label>Pilih Pengguna</Label>
-            <UserSelect
-              onSelect={(userId) => setSelectedUserId(userId)}
-              disabled={addMember.isPending}
-            />
+            <div>
+              <UserSelect
+                onSelect={(userId) => setSelectedUserId(userId)}
+                disabled={addMember.isPending}
+              />
+            </div>
           </div>
           <div className="w-full space-y-2 sm:w-40">
             <Label>Peran</Label>
-            <Select
+            <div>
+              <Select
               value={selectedRole}
               onValueChange={(value) => setSelectedRole(value as ProjectRole)}
               disabled={addMember.isPending}
@@ -141,7 +144,8 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
                   </SelectItem>
                 ))}
               </SelectContent>
-            </Select>
+              </Select>
+            </div>
           </div>
           <Button
             onClick={handleAddMember}
@@ -155,7 +159,7 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
 
       {/* Members Table */}
       {members && members.length > 0 ? (
-        <div className="rounded-md border overflow-x-auto min-w-0">
+        <div className="flex min-w-0 flex-1 flex-col [&>div]:h-full [&>div]:overflow-auto [&>div]:rounded-md [&>div]:border">
           <Table>
             <TableHeader>
               <TableRow>
@@ -235,7 +239,7 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
           </Table>
         </div>
       ) : (
-        <div className="rounded-lg border p-8 text-center">
+        <div className="flex flex-1 flex-col items-center justify-center rounded-lg border p-8 text-center">
           <p className="text-muted-foreground">Belum ada anggota.</p>
           {canManage && (
             <p className="mt-2 text-sm text-muted-foreground">

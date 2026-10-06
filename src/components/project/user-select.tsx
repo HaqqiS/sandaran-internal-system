@@ -82,7 +82,7 @@ export function UserSelect({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-[300px] max-w-[calc(100vw-2rem)] p-0"
+        className="w-[var(--radix-popover-trigger-width)] p-0"
         align="start"
         portal={false}
         onOpenAutoFocus={(e) => e.preventDefault()}
@@ -94,7 +94,7 @@ export function UserSelect({
             onValueChange={setSearch}
             autoFocus={false}
           />
-          <CommandList>
+          <CommandList className="max-h-[160px] mt-2">
             {isLoading ? (
               <CommandEmpty>
                 <div className="flex items-center justify-center py-2">
@@ -111,30 +111,23 @@ export function UserSelect({
                     key={user.id}
                     value={user.id}
                     onSelect={() => handleSelect(user)}
-                    className="flex items-center gap-2"
+                    className="mb-1 flex items-center gap-3 last:mb-0"
+                    data-checked={selectedUser?.id === user.id}
                   >
-                    <Avatar className="h-6 w-6">
+                    <Avatar className="h-6 w-6 shrink-0">
                       <AvatarImage src={user.image || undefined} />
                       <AvatarFallback className="text-xs">
                         {user.name?.charAt(0) || "U"}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">
+                    <div className="flex flex-1 flex-col min-w-0">
+                      <span className="truncate text-sm font-medium">
                         {user.name || "Tidak Diketahui"}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="truncate text-xs text-muted-foreground">
                         {user.email}
                       </span>
                     </div>
-                    <IconCheck
-                      className={cn(
-                        "ml-auto h-4 w-4",
-                        selectedUser?.id === user.id
-                          ? "opacity-100"
-                          : "opacity-0",
-                      )}
-                    />
                   </CommandItem>
                 ))}
               </CommandGroup>

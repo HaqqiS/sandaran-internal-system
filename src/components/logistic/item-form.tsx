@@ -157,7 +157,8 @@ export function LogisticItemForm({
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Satuan</FieldLabel>
-                <Popover open={open} onOpenChange={setOpen} modal={false}>
+                <div className="relative w-full">
+                  <Popover open={open} onOpenChange={setOpen} modal={false}>
                   <PopoverAnchor asChild>
                     <Input
                       id={field.name}
@@ -175,7 +176,9 @@ export function LogisticItemForm({
                     />
                   </PopoverAnchor>
                   <PopoverContent
-                    className="w-[--radix-popover-trigger-width] p-0"
+                    className="w-full p-0"
+                    align="start"
+                    sideOffset={4}
                     portal={false}
                     onOpenAutoFocus={(e: Event) => e.preventDefault()}
                     onInteractOutside={(e: Event) => {
@@ -188,7 +191,7 @@ export function LogisticItemForm({
                     }}
                   >
                     <Command shouldFilter={false}>
-                      <CommandList>
+                      <CommandList className="max-h-[200px]">
                         <CommandGroup>
                           {COMMON_UNITS.filter((u) =>
                             u
@@ -204,11 +207,10 @@ export function LogisticItemForm({
                                 field.handleChange(unit);
                                 setOpen(false);
                               }}
+                              className="mb-1 flex items-center gap-2 last:mb-0"
+                              data-checked={field.state.value === unit}
                             >
                               {unit}
-                              {field.state.value === unit && (
-                                <IconCheck className="ml-auto flex size-4 text-primary" />
-                              )}
                             </CommandItem>
                           ))}
                           {COMMON_UNITS.filter((u) =>
@@ -227,7 +229,8 @@ export function LogisticItemForm({
                       </CommandList>
                     </Command>
                   </PopoverContent>
-                </Popover>
+                  </Popover>
+                </div>
                 <FieldDescription>
                   Pilih dari daftar atau ketik kepanjangan satuan untuk barang
                   ini
