@@ -102,17 +102,11 @@ export function ProjectSwitcherDrawer({
     // Toggle deselect: clicking the already-active project deselects it
     // (mirrors project-selector.tsx behavior)
     if (selectedProjectSlug === project.slug) {
-      onDeselect?.();
-      clearSelectedProject();
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("selectedProjectId");
-      }
       onOpenChange(false);
-      router.push("/dashboard");
-      toast.success("Keluar dari proyek", {
-        description: "Kembali ke Dashboard",
-        position: "top-center",
-      });
+      const destination = targetRoute?.pathSuffix
+        ? `/projects/${project.slug}/${targetRoute.pathSuffix}`
+        : `/projects/${project.slug}`;
+      router.push(destination);
       return;
     }
 
@@ -143,11 +137,6 @@ export function ProjectSwitcherDrawer({
       <DrawerContent className="h-[80dvh] flex flex-col">
         <DrawerHeader className="text-left shrink-0 border-b pb-3 px-6 pt-4">
           <DrawerTitle>Pilih Proyek</DrawerTitle>
-          {selectedProjectName && (
-            <p className="text-xs text-muted-foreground mt-1">
-              Aktif: {selectedProjectName}
-            </p>
-          )}
         </DrawerHeader>
 
         {/* Guidance Banner when opened from disabled tab */}
@@ -243,12 +232,7 @@ export function ProjectSwitcherDrawer({
                         </span>
                       </div>
                       {selectedProjectSlug === project.slug && (
-                        <div className="ml-auto flex flex-col items-center gap-0.5 shrink-0">
-                          <IconCheck className="size-4 text-primary" />
-                          <span className="text-[9px] text-muted-foreground leading-none">
-                            Keluar
-                          </span>
-                        </div>
+                        <IconCheck className="ml-auto size-5 text-primary shrink-0" />
                       )}
                     </button>
                   ))}
