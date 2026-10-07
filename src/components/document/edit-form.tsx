@@ -9,8 +9,10 @@ import {
 } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
 import { format } from "date-fns";
+import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { FileUpload } from "~/components/shared/file-upload";
 import { Button } from "~/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
@@ -22,6 +24,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
+import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload";
 import { useUpdateDocument } from "~/hooks/useDocument";
 
 const editDocumentSchema = z.object({
@@ -41,6 +44,7 @@ export type EditDocumentFormValues = z.infer<typeof editDocumentSchema>;
 
 interface EditFormProps {
   projectId: string;
+  projectSlug: string;
   document: ProjectDocument;
   onSuccess?: () => void;
   onCancel?: () => void;
@@ -69,11 +73,17 @@ function getFileIcon(mimeType?: string | null) {
 
 export function EditForm({
   projectId,
+  projectSlug,
   document: doc,
   onSuccess,
   onCancel,
 }: EditFormProps) {
   const updateDocument = useUpdateDocument();
+  const { upload, isLoading: isUploading, remove } = useCloudinaryUpload();
+
+  const [isReplacingFile, setIsReplacingFile] = useState(false);
+  const [newFile, setNewFile] = useState<File | null>(null);
+
   const formattedSize = formatBytes(doc.fileSize);
 
   const form = useForm({
@@ -87,7 +97,32 @@ export function EditForm({
       onSubmit: editDocumentSchema,
     },
     onSubmit: async ({ value }) => {
+      let newPublicId: string | null = null;
+
       try {
+        let fileUpdateData = {};
+
+        if (isReplacingFile && newFile) {
+          const isImage = newFile.type.startsWith("image/");
+          const resourceType = isImage ? "image" : "raw";
+
+          const uploadResult = await upload(newFile, {
+            projectSlug,
+            type: "documents",
+            resourceType,
+          });
+          newPublicId = uploadResult.publicId;
+
+          fileUpdateData = {
+            fileName: newFile.name,
+            publicId: uploadResult.publicId,
+            url: uploadResult.secureUrl,
+            fileSize: uploadResult.bytes || newFile.size,
+            mimeType: newFile.type || undefined,
+            resourceType: uploadResult.resourceType || resourceType,
+          };
+        }
+
         await updateDocument.mutateAsync({
           projectId,
           documentId: doc.id,
@@ -95,11 +130,19 @@ export function EditForm({
           fileType: value.fileType,
           version: value.version || undefined,
           description: value.description || undefined,
+          ...fileUpdateData,
         });
 
         toast.success("Dokumen berhasil diperbarui");
         onSuccess?.();
       } catch (error) {
+        if (newPublicId) {
+          try {
+            await remove(newPublicId);
+          } catch (cleanupErr) {
+            console.error("Failed to cleanup Cloudinary asset:", cleanupErr);
+          }
+        }
         toast.error(
           error instanceof Error ? error.message : "Gagal memperbarui dokumen",
         );
@@ -116,24 +159,65 @@ export function EditForm({
       }}
       className="space-y-6"
     >
-      {/* File Overview (Read-Only) */}
-      <div className="flex items-center gap-3 rounded-lg border bg-muted/40 p-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border bg-background">
-          {getFileIcon(doc.mimeType)}
-        </div>
-        <div className="min-w-0 flex-1">
-          <p
-            className="truncate text-sm font-medium text-foreground"
-            title={doc.fileName}
-          >
-            {doc.fileName}
-          </p>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            {formattedSize && <span>{formattedSize}</span>}
-            {formattedSize && <span>•</span>}
-            <span>{format(new Date(doc.createdAt), "dd MMM yyyy")}</span>
+      {/* File Selection / Overview */}
+      <div className="space-y-2">
+        {!isReplacingFile ? (
+          <div className="flex items-center justify-between gap-3 rounded-lg border bg-muted/40 p-3">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border bg-background">
+                {getFileIcon(doc.mimeType)}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p
+                  className="truncate text-sm font-medium text-foreground"
+                  title={doc.fileName}
+                >
+                  {doc.fileName}
+                </p>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  {formattedSize && <span>{formattedSize}</span>}
+                  {formattedSize && <span>•</span>}
+                  <span>{format(new Date(doc.createdAt), "dd MMM yyyy")}</span>
+                </div>
+              </div>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsReplacingFile(true)}
+              className="shrink-0"
+            >
+              Ganti File
+            </Button>
           </div>
-        </div>
+        ) : (
+          <div className="space-y-2 rounded-lg border bg-muted/20 p-3">
+            <div className="flex items-center justify-between mb-2">
+              <FieldLabel className="mb-0">File Baru</FieldLabel>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setIsReplacingFile(false);
+                  setNewFile(null);
+                }}
+                className="h-8 px-2 text-xs"
+              >
+                Batal Ganti File
+              </Button>
+            </div>
+            <FileUpload
+              projectSlug={projectSlug}
+              type="documents"
+              value={newFile ?? undefined}
+              onFileChange={(file) => setNewFile(file)}
+              onRemove={() => setNewFile(null)}
+              disabled={isUploading}
+            />
+          </div>
+        )}
       </div>
 
       <FieldGroup>
@@ -232,9 +316,15 @@ export function EditForm({
           children={([canSubmit, isSubmitting]) => (
             <Button
               type="submit"
-              disabled={!canSubmit || isSubmitting || updateDocument.isPending}
+              disabled={
+                !canSubmit ||
+                isSubmitting ||
+                updateDocument.isPending ||
+                isUploading ||
+                (isReplacingFile && !newFile)
+              }
             >
-              {isSubmitting || updateDocument.isPending
+              {isSubmitting || updateDocument.isPending || isUploading
                 ? "Menyimpan..."
                 : "Simpan Perubahan"}
             </Button>

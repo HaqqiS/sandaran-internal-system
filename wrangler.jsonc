@@ -6,43 +6,43 @@
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": {
     "directory": ".open-next/assets",
-    "binding": "ASSETS",
+    "binding": "ASSETS"
   },
   "services": [
     {
       // Self-reference service binding, the service name must match the worker name
       // see https://opennext.js.org/cloudflare/caching
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "sandaran-internal-system",
-    },
+      "service": "sandaran-internal-system"
+    }
   ],
   "images": {
     // Enable image optimization
     // see https://opennext.js.org/cloudflare/howtos/image
-    "binding": "IMAGES",
+    "binding": "IMAGES"
   },
   "vars": {
     "BETTER_AUTH_URL": "https://sandaran-internal-system.haqqi30sukmara.workers.dev",
-    "CLOUDINARY_CLOUD_NAME": "dh1nhrlhu",
+    "CLOUDINARY_CLOUD_NAME": "dh1nhrlhu"
   },
   "hyperdrive": [
     {
       "binding": "HYPERDRIVE",
       "id": "8c2114ad081747c79ff14f5b4a1a6130",
-      "localConnectionString": "postgresql://postgres.qoxahcmtcvnodkncmidh:stfGEi0TX85w8zu2@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres",
-    },
+      "localConnectionString": "postgresql://postgres.qoxahcmtcvnodkncmidh:stfGEi0TX85w8zu2@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres"
+    }
   ],
   "observability": {
     "logs": {
       "enabled": true,
       "head_sampling_rate": 1,
       "invocation_logs": true,
-      "persist": true,
+      "persist": true
     },
     "traces": {
       "enabled": false,
       "head_sampling_rate": 1,
-      "persist": true,
-    },
-  },
+      "persist": true
+    }
+  }
 }

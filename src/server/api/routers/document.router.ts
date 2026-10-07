@@ -313,6 +313,12 @@ export const documentRouter = createTRPCRouter({
         fileType: z
           .enum(["DESIGN", "DRAWING", "REFERENCE", "SPECIFICATION", "OTHER"])
           .optional(),
+        fileName: z.string().optional(),
+        publicId: z.string().optional(),
+        url: z.string().url().optional(),
+        fileSize: z.number().int().optional(),
+        mimeType: z.string().optional(),
+        resourceType: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -324,12 +330,27 @@ export const documentRouter = createTRPCRouter({
         },
       });
 
+      if (!document) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Document not found",
+        });
+      }
+
       // Check ownership (ADMIN bypasses this)
       requireOwnership(
         document,
         ctx.session.user.id,
         ctx.session.user.roleGlobal,
       );
+
+      let oldPublicId: string | null = null;
+      let oldResourceType: string | null = null;
+
+      if (input.publicId && document.publicId) {
+        oldPublicId = document.publicId;
+        oldResourceType = document.resourceType;
+      }
 
       const updated = await ctx.db.projectDocument.update({
         where: { id: input.documentId },
@@ -345,6 +366,12 @@ export const documentRouter = createTRPCRouter({
               ? input.version?.trim() || null
               : undefined,
           fileType: input.fileType,
+          fileName: input.fileName,
+          publicId: input.publicId,
+          url: input.url,
+          fileSize: input.fileSize,
+          mimeType: input.mimeType,
+          resourceType: input.resourceType,
         },
         include: {
           uploader: {
@@ -356,6 +383,18 @@ export const documentRouter = createTRPCRouter({
           },
         },
       });
+
+      // Delete old file from Cloudinary if a new file was uploaded
+      if (oldPublicId && input.publicId && oldPublicId !== input.publicId) {
+        await deleteCloudinaryAsset(oldPublicId, {
+          resourceType: oldResourceType ?? undefined,
+        }).catch((err) => {
+          console.error(
+            "Failed to delete old Cloudinary asset during document update:",
+            err,
+          );
+        });
+      }
 
       return updated;
     }),

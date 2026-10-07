@@ -1,6 +1,5 @@
 "use client";
 
-import { IconCheck } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
 import { useImperativeHandle, useState } from "react";
 import { toast } from "sonner";
@@ -159,76 +158,76 @@ export function LogisticItemForm({
                 <FieldLabel htmlFor={field.name}>Satuan</FieldLabel>
                 <div className="relative w-full">
                   <Popover open={open} onOpenChange={setOpen} modal={false}>
-                  <PopoverAnchor asChild>
-                    <Input
-                      id={field.name}
-                      name={field.name}
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => {
-                        field.handleChange(e.target.value);
-                        if (!open) setOpen(true);
+                    <PopoverAnchor asChild>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => {
+                          field.handleChange(e.target.value);
+                          if (!open) setOpen(true);
+                        }}
+                        onFocus={() => setOpen(true)}
+                        aria-invalid={isInvalid}
+                        placeholder="Contoh: Sak, Kg, Pcs"
+                        autoComplete="off"
+                      />
+                    </PopoverAnchor>
+                    <PopoverContent
+                      className="w-full p-0"
+                      align="start"
+                      sideOffset={4}
+                      portal={false}
+                      onOpenAutoFocus={(e: Event) => e.preventDefault()}
+                      onInteractOutside={(e: Event) => {
+                        if (
+                          e.target instanceof Element &&
+                          e.target.closest(`#${field.name}`)
+                        ) {
+                          e.preventDefault();
+                        }
                       }}
-                      onFocus={() => setOpen(true)}
-                      aria-invalid={isInvalid}
-                      placeholder="Contoh: Sak, Kg, Pcs"
-                      autoComplete="off"
-                    />
-                  </PopoverAnchor>
-                  <PopoverContent
-                    className="w-full p-0"
-                    align="start"
-                    sideOffset={4}
-                    portal={false}
-                    onOpenAutoFocus={(e: Event) => e.preventDefault()}
-                    onInteractOutside={(e: Event) => {
-                      if (
-                        e.target instanceof Element &&
-                        e.target.closest(`#${field.name}`)
-                      ) {
-                        e.preventDefault();
-                      }
-                    }}
-                  >
-                    <Command shouldFilter={false}>
-                      <CommandList className="max-h-[200px]">
-                        <CommandGroup>
-                          {COMMON_UNITS.filter((u) =>
-                            u
-                              .toLowerCase()
-                              .includes(
-                                (field.state.value || "").toLowerCase(),
-                              ),
-                          ).map((unit) => (
-                            <CommandItem
-                              key={unit}
-                              value={unit}
-                              onSelect={() => {
-                                field.handleChange(unit);
-                                setOpen(false);
-                              }}
-                              className="mb-1 flex items-center gap-2 last:mb-0"
-                              data-checked={field.state.value === unit}
-                            >
-                              {unit}
-                            </CommandItem>
-                          ))}
-                          {COMMON_UNITS.filter((u) =>
-                            u
-                              .toLowerCase()
-                              .includes(
-                                (field.state.value || "").toLowerCase(),
-                              ),
-                          ).length === 0 && (
-                            <div className="py-6 text-center text-sm text-muted-foreground p-4">
-                              "{field.state.value}" akan disimpan sebagai satuan
-                              baru.
-                            </div>
-                          )}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
+                    >
+                      <Command shouldFilter={false}>
+                        <CommandList className="max-h-[200px]">
+                          <CommandGroup>
+                            {COMMON_UNITS.filter((u) =>
+                              u
+                                .toLowerCase()
+                                .includes(
+                                  (field.state.value || "").toLowerCase(),
+                                ),
+                            ).map((unit) => (
+                              <CommandItem
+                                key={unit}
+                                value={unit}
+                                onSelect={() => {
+                                  field.handleChange(unit);
+                                  setOpen(false);
+                                }}
+                                className="mb-1 flex items-center gap-2 last:mb-0"
+                                data-checked={field.state.value === unit}
+                              >
+                                {unit}
+                              </CommandItem>
+                            ))}
+                            {COMMON_UNITS.filter((u) =>
+                              u
+                                .toLowerCase()
+                                .includes(
+                                  (field.state.value || "").toLowerCase(),
+                                ),
+                            ).length === 0 && (
+                              <div className="py-6 text-center text-sm text-muted-foreground p-4">
+                                "{field.state.value}" akan disimpan sebagai
+                                satuan baru.
+                              </div>
+                            )}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
                   </Popover>
                 </div>
                 <FieldDescription>

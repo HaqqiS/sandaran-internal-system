@@ -20,6 +20,7 @@ import { EditForm } from "./edit-form";
 
 interface EditDialogProps {
   projectId: string;
+  projectSlug: string;
   document: ProjectDocument | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -28,6 +29,7 @@ interface EditDialogProps {
 
 export function EditDialog({
   projectId,
+  projectSlug,
   document: doc,
   open,
   onOpenChange,
@@ -55,6 +57,7 @@ export function EditDialog({
           <div className="max-h-[80vh] overflow-y-auto px-1 no-scrollbar">
             <EditForm
               projectId={projectId}
+              projectSlug={projectSlug}
               document={doc}
               onSuccess={handleSuccess}
               onCancel={() => onOpenChange(false)}
@@ -78,6 +81,7 @@ export function EditDialog({
         >
           <EditForm
             projectId={projectId}
+            projectSlug={projectSlug}
             document={doc}
             onSuccess={handleSuccess}
             onCancel={() => onOpenChange(false)}

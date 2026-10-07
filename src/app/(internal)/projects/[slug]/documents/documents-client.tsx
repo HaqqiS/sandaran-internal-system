@@ -114,6 +114,7 @@ export function DocumentsClient({ projectSlug }: DocumentsClientProps) {
 
       <EditDialog
         projectId={project.id}
+        projectSlug={project.slug}
         document={editingDocument}
         open={!!editingDocument}
         onOpenChange={(open: boolean) => !open && setEditingDocument(null)}

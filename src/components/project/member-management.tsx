@@ -130,20 +130,20 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
             <Label>Peran</Label>
             <div>
               <Select
-              value={selectedRole}
-              onValueChange={(value) => setSelectedRole(value as ProjectRole)}
-              disabled={addMember.isPending}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {PROJECT_ROLES.map((role) => (
-                  <SelectItem key={role.value} value={role.value}>
-                    {role.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
+                value={selectedRole}
+                onValueChange={(value) => setSelectedRole(value as ProjectRole)}
+                disabled={addMember.isPending}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PROJECT_ROLES.map((role) => (
+                    <SelectItem key={role.value} value={role.value}>
+                      {role.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
             </div>
           </div>

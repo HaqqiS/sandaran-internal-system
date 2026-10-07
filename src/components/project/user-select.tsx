@@ -1,6 +1,6 @@
 "use client";
 
-import { IconCheck, IconSelector, IconUserSearch } from "@tabler/icons-react";
+import { IconSelector, IconUserSearch } from "@tabler/icons-react";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -19,7 +19,6 @@ import {
 } from "~/components/ui/popover";
 import { useSearchUsers } from "~/hooks";
 import { useDebounce } from "~/hooks/use-debounce";
-import { cn } from "~/lib/utils";
 
 interface UserSelectProps {
   onSelect: (userId: string) => void;
