@@ -43,9 +43,17 @@ interface ReportCardProps {
 function getWeatherIcon(weather?: string | null) {
   if (!weather) return null;
   const lower = weather.toLowerCase();
-  if (lower.includes("hujan")) return <IconCloudRain className="h-4 w-4" />;
-  if (lower.includes("mendung")) return <IconCloud className="h-4 w-4" />;
-  return <IconSun className="h-4 w-4" />;
+  if (lower.includes("hujan"))
+    return (
+      <IconCloudRain className="h-3.5 w-3.5 text-sky-500 dark:text-sky-400 shrink-0" />
+    );
+  if (lower.includes("mendung"))
+    return (
+      <IconCloud className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400 shrink-0" />
+    );
+  return (
+    <IconSun className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400 shrink-0" />
+  );
 }
 
 export function ReportCard({ report, projectSlug }: ReportCardProps) {
@@ -144,11 +152,11 @@ export function ReportCard({ report, projectSlug }: ReportCardProps) {
         {report.weather && (
           <div className="absolute right-3 top-3">
             <Badge
-              variant="default"
-              className="flex items-center gap-1 bg-background/80 shadow-sm backdrop-blur-sm"
+              variant="outline"
+              className="flex items-center gap-1.5 bg-background/80 text-foreground border-border/50 shadow-xs backdrop-blur-md px-2.5 py-1 text-xs font-medium"
             >
               {getWeatherIcon(report.weather)}
-              {report.weather}
+              <span>{report.weather}</span>
             </Badge>
           </div>
         )}

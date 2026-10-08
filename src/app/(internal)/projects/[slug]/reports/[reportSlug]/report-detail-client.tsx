@@ -46,9 +46,17 @@ interface ReportDetailClientProps {
 function getWeatherIcon(weather?: string | null) {
   if (!weather) return null;
   const lower = weather.toLowerCase();
-  if (lower.includes("hujan")) return <IconCloudRain className="h-4 w-4" />;
-  if (lower.includes("mendung")) return <IconCloud className="h-4 w-4" />;
-  return <IconSun className="h-4 w-4" />;
+  if (lower.includes("hujan"))
+    return (
+      <IconCloudRain className="h-3.5 w-3.5 text-sky-500 dark:text-sky-400 shrink-0" />
+    );
+  if (lower.includes("mendung"))
+    return (
+      <IconCloud className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400 shrink-0" />
+    );
+  return (
+    <IconSun className="h-3.5 w-3.5 text-amber-500 dark:text-amber-400 shrink-0" />
+  );
 }
 
 export function ReportDetailClient({

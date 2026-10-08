@@ -5,6 +5,7 @@ import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ConfirmDeleteDialog } from "~/components/shared/confirm-delete-dialog";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Table,
@@ -147,22 +148,30 @@ export function TaskList({
           </div>
 
           {/* Desktop View (Table) - Visible on md+ */}
-          <div className="hidden rounded-lg border md:block">
+          <div className="hidden rounded-xl border overflow-hidden md:block">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[40%]">Nama Pekerjaan</TableHead>
-                  <TableHead>Jumlah Pekerja</TableHead>
-                  <TableHead>Progres</TableHead>
-                  <TableHead>Catatan</TableHead>
-                  {canEdit && <TableHead className="w-[100px]"></TableHead>}
+                <TableRow className="bg-muted/30 hover:bg-muted/30">
+                  <TableHead className="w-[35%] text-xs font-medium">
+                    Nama Pekerjaan
+                  </TableHead>
+                  <TableHead className="text-xs font-medium">
+                    Jumlah Pekerja
+                  </TableHead>
+                  <TableHead className="text-xs font-medium">Progres</TableHead>
+                  <TableHead className="text-xs font-medium">Catatan</TableHead>
+                  {canEdit && (
+                    <TableHead className="w-[110px] text-center text-xs font-medium">
+                      Aksi
+                    </TableHead>
+                  )}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {tasks.map((task) =>
                   editingTaskId === task.id ? (
-                    <TableRow key={task.id}>
-                      <TableCell colSpan={5} className="p-4">
+                    <TableRow key={task.id} className="bg-muted/10">
+                      <TableCell colSpan={canEdit ? 5 : 4} className="p-4">
                         <TaskForm
                           projectId={projectId}
                           reportId={reportId}
@@ -174,40 +183,50 @@ export function TaskList({
                     </TableRow>
                   ) : (
                     <TableRow key={task.id}>
-                      <TableCell className="font-medium">
-                        {task.taskName}
-                      </TableCell>
-                      <TableCell>{task.workerCount}</TableCell>
                       <TableCell>
-                        <span
+                        <div className="text-sm font-medium">
+                          {task.taskName}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm text-muted-foreground">
+                          {task.workerCount} orang
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
                           className={cn(
-                            "font-medium",
+                            "w-fit text-xs font-medium",
                             task.progress === 100
-                              ? "text-green-600"
-                              : "text-blue-600",
+                              ? "bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-400 dark:border-green-800"
+                              : "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-400 dark:border-blue-800",
                           )}
                         >
                           {task.progress}%
-                        </span>
+                        </Badge>
                       </TableCell>
-                      <TableCell className="max-w-[200px] truncate text-muted-foreground">
+                      <TableCell className="max-w-[200px] truncate text-xs text-muted-foreground">
                         {task.notes || "-"}
                       </TableCell>
                       {canEdit && (
                         <TableCell>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center justify-center gap-1">
                             <Button
                               variant="ghost"
                               size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-foreground"
                               onClick={() => setEditingTaskId(task.id)}
+                              aria-label={`Edit tugas ${task.taskName}`}
                             >
                               <IconEdit className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="text-destructive hover:text-destructive"
+                              className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                               onClick={() => setDeleteTaskTarget(task)}
+                              aria-label={`Hapus tugas ${task.taskName}`}
                             >
                               <IconTrash className="h-4 w-4" />
                             </Button>
