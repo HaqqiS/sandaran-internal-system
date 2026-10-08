@@ -51,7 +51,7 @@ export function CommentList({ projectId, reportId }: CommentListProps) {
 
       {/* Comment Body / ScrollArea */}
       {isLoading ? (
-        <div className="h-[380px] sm:h-[420px] space-y-4 py-2 pr-3">
+        <div className="h-[280px] sm:h-[320px] space-y-4 py-2 pr-3">
           {/* Bubble Skeleton 1: Left */}
           <div className="flex items-end gap-2.5">
             <Skeleton className="h-8 w-8 rounded-full shrink-0" />
@@ -80,7 +80,7 @@ export function CommentList({ projectId, reportId }: CommentListProps) {
           </div>
         </div>
       ) : (
-        <ScrollArea className="h-[380px] sm:h-[420px] pr-3">
+        <ScrollArea className="h-[280px] sm:h-[320px] pr-3">
           <div className="space-y-4 py-2">
             {orderedComments.map((comment) => (
               <CommentItem
@@ -91,9 +91,9 @@ export function CommentList({ projectId, reportId }: CommentListProps) {
             ))}
 
             {orderedComments.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-[300px] text-center p-6 text-muted-foreground">
-                <div className="h-12 w-12 rounded-full bg-muted/60 flex items-center justify-center mb-3">
-                  <IconMessageCircle className="h-6 w-6 text-muted-foreground/70" />
+              <div className="flex flex-col items-center justify-center h-[280px] text-center p-6 text-muted-foreground">
+                <div className="h-10 w-10 rounded-full bg-muted/60 flex items-center justify-center mb-2.5">
+                  <IconMessageCircle className="h-5 w-5 text-muted-foreground/70" />
                 </div>
                 <p className="font-medium text-foreground text-sm">
                   Belum ada komentar
