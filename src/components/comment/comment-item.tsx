@@ -7,7 +7,9 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { ConfirmDeleteDialog } from "~/components/shared/confirm-delete-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { cn } from "~/lib/utils";
 import { useSessionStore } from "~/stores/use-session-store";
 import type { RouterOutputs } from "~/trpc/react";
 import { api } from "~/trpc/react";
@@ -50,54 +52,116 @@ export function CommentItem({ comment, projectId }: CommentItemProps) {
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
+  const timeAgo = formatDistanceToNow(new Date(comment.createdAt), {
+    addSuffix: true,
+    locale: id,
+  });
+
   return (
-    <div className="flex gap-4 group">
-      <Avatar className="h-8 w-8">
-        <AvatarImage src={comment.author.image ?? undefined} />
-        <AvatarFallback>{initials}</AvatarFallback>
-      </Avatar>
-      <div className="flex-1 space-y-1">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold">{comment.author.name}</span>
-            <span className="text-xs text-muted-foreground">
-              {formatDistanceToNow(new Date(comment.createdAt), {
-                addSuffix: true,
-                locale: id,
-              })}
-            </span>
-          </div>
+    <div
+      className={cn(
+        "group/comment flex items-end gap-2.5 w-full",
+        isAuthor ? "justify-end" : "justify-start",
+      )}
+    >
+      {/* Avatar for other users (on left) */}
+      {!isAuthor && (
+        <Avatar className="h-8 w-8 shrink-0 mb-1 ring-1 ring-border/50">
+          <AvatarImage
+            src={comment.author.image ?? undefined}
+            alt={comment.author.name}
+          />
+          <AvatarFallback className="text-xs font-medium">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
+      )}
+
+      {/* Bubble container */}
+      <div
+        className={cn(
+          "flex flex-col space-y-1 max-w-[85%] sm:max-w-[75%]",
+          isAuthor ? "items-end" : "items-start",
+        )}
+      >
+        {/* Header meta */}
+        <div
+          className={cn(
+            "flex items-center gap-1.5 px-1 text-xs",
+            isAuthor ? "flex-row-reverse" : "flex-row",
+          )}
+        >
+          <span className="font-semibold text-foreground">
+            {isAuthor ? "Anda" : comment.author.name}
+          </span>
+
+          {!isAuthor && comment.author.roleGlobal && (
+            <Badge
+              variant="secondary"
+              className="h-4 px-1.5 text-[10px] font-semibold tracking-wide uppercase"
+            >
+              {comment.author.roleGlobal}
+            </Badge>
+          )}
+
+          <span className="text-muted-foreground/60">•</span>
+          <span className="text-muted-foreground text-[11px]">{timeAgo}</span>
+
           {canDelete && (
-            <>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={() => setShowDeleteDialog(true)}
-              >
-                <IconTrash className="h-4 w-4 text-destructive" />
-                <span className="sr-only">Hapus komentar</span>
-              </Button>
-              <ConfirmDeleteDialog
-                open={showDeleteDialog}
-                onOpenChange={setShowDeleteDialog}
-                title="Hapus Komentar"
-                description="Apakah Anda yakin ingin menghapus komentar ini? Tindakan ini tidak dapat dibatalkan."
-                onConfirm={() =>
-                  deleteComment.mutate({
-                    projectId,
-                    commentId: comment.id,
-                  })
-                }
-                isPending={deleteComment.isPending}
-              />
-            </>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-muted-foreground hover:text-destructive opacity-80 sm:opacity-0 sm:group-hover/comment:opacity-100 transition-opacity active:scale-95"
+              onClick={() => setShowDeleteDialog(true)}
+              aria-label="Hapus komentar"
+            >
+              <IconTrash className="h-3.5 w-3.5" />
+            </Button>
           )}
         </div>
-        <p className="text-sm text-foreground whitespace-pre-wrap">
+
+        {/* Chat Bubble */}
+        <div
+          className={cn(
+            "px-4 py-2.5 text-sm leading-relaxed shadow-xs transition-colors break-words whitespace-pre-wrap select-text",
+            isAuthor
+              ? "bg-primary text-primary-foreground rounded-2xl rounded-br-xs"
+              : "bg-muted/80 text-foreground border border-border/50 rounded-2xl rounded-bl-xs",
+          )}
+        >
           {comment.content}
-        </p>
+        </div>
       </div>
+
+      {/* Avatar for author (on right) */}
+      {isAuthor && (
+        <Avatar className="h-8 w-8 shrink-0 mb-1 ring-1 ring-primary/20">
+          <AvatarImage
+            src={comment.author.image ?? undefined}
+            alt={comment.author.name}
+          />
+          <AvatarFallback className="text-xs font-medium">
+            {initials}
+          </AvatarFallback>
+        </Avatar>
+      )}
+
+      {/* Delete confirmation dialog */}
+      {canDelete && (
+        <ConfirmDeleteDialog
+          open={showDeleteDialog}
+          onOpenChange={setShowDeleteDialog}
+          title="Hapus Komentar"
+          description="Apakah Anda yakin ingin menghapus komentar ini? Tindakan ini tidak dapat dibatalkan."
+          onConfirm={() =>
+            deleteComment.mutate({
+              projectId,
+              commentId: comment.id,
+            })
+          }
+          isPending={deleteComment.isPending}
+        />
+      )}
     </div>
   );
 }
