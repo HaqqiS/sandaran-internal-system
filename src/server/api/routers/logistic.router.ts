@@ -103,7 +103,7 @@ export const logisticRouter = createTRPCRouter({
       z.object({
         projectId: z.string(),
         name: z.string().min(1),
-        unit: z.string().min(1), // e.g., "Sack", "Pcs", "Kg"
+        unit: z.string().trim().min(1).max(20), // e.g., "Sack", "Pcs", "Kg"
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -165,7 +165,7 @@ export const logisticRouter = createTRPCRouter({
         projectId: z.string(),
         itemId: z.string(),
         name: z.string().min(1).optional(),
-        unit: z.string().min(1).optional(),
+        unit: z.string().trim().min(1).max(20).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {

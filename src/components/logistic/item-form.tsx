@@ -1,16 +1,14 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { useImperativeHandle, useState } from "react";
+import { useImperativeHandle } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Button } from "~/components/ui/button";
 import {
-  Command,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-} from "~/components/ui/command";
+  normalizeUnit,
+  UnitCombobox,
+} from "~/components/logistic/unit-combobox";
+import { Button } from "~/components/ui/button";
 import {
   Field,
   FieldDescription,
@@ -20,18 +18,17 @@ import {
 } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import {
-  Popover,
-  PopoverAnchor,
-  PopoverContent,
-} from "~/components/ui/popover";
-import {
   useCreateLogisticItem,
   useUpdateLogisticItem,
 } from "~/hooks/useLogistic";
 
 const itemSchema = z.object({
-  name: z.string().min(1, "Nama barang wajib diisi"),
-  unit: z.string().min(1, "Satuan pengukuran wajib diisi"),
+  name: z.string().trim().min(1, "Nama barang wajib diisi"),
+  unit: z
+    .string()
+    .trim()
+    .min(1, "Satuan pengukuran wajib diisi")
+    .max(20, "Satuan maksimal 20 karakter"),
 });
 
 export type ItemFormValues = z.infer<typeof itemSchema>;
@@ -49,22 +46,6 @@ interface ItemFormProps {
   onSuccess?: () => void;
 }
 
-const COMMON_UNITS = [
-  "Pcs",
-  "Box",
-  "Sak",
-  "Kg",
-  "Ton",
-  "Meter",
-  "M2",
-  "M3",
-  "Unit",
-  "Set",
-  "Roll",
-  "Batang",
-  "Lembar",
-];
-
 export function LogisticItemForm({
   projectId,
   item,
@@ -75,7 +56,6 @@ export function LogisticItemForm({
   const createItem = useCreateLogisticItem();
   const updateItem = useUpdateLogisticItem();
   const isEditMode = !!item;
-  const [open, setOpen] = useState(false);
 
   useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
 
@@ -89,19 +69,20 @@ export function LogisticItemForm({
     },
     onSubmit: async ({ value }) => {
       try {
+        const normalizedUnit = normalizeUnit(value.unit);
         if (isEditMode && item) {
           await updateItem.mutateAsync({
             projectId,
             itemId: item.id,
-            name: value.name,
-            unit: value.unit,
+            name: value.name.trim(),
+            unit: normalizedUnit,
           });
           toast.success("Data barang berhasil diperbarui");
         } else {
           await createItem.mutateAsync({
             projectId,
-            name: value.name,
-            unit: value.unit,
+            name: value.name.trim(),
+            unit: normalizedUnit,
           });
           toast.success("Barang baru berhasil ditambahkan");
         }
@@ -156,83 +137,15 @@ export function LogisticItemForm({
             return (
               <Field data-invalid={isInvalid}>
                 <FieldLabel htmlFor={field.name}>Satuan</FieldLabel>
-                <div className="relative w-full">
-                  <Popover open={open} onOpenChange={setOpen} modal={false}>
-                    <PopoverAnchor asChild>
-                      <Input
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onBlur={field.handleBlur}
-                        onChange={(e) => {
-                          field.handleChange(e.target.value);
-                          if (!open) setOpen(true);
-                        }}
-                        onFocus={() => setOpen(true)}
-                        aria-invalid={isInvalid}
-                        placeholder="Contoh: Sak, Kg, Pcs"
-                        autoComplete="off"
-                      />
-                    </PopoverAnchor>
-                    <PopoverContent
-                      className="w-full p-0"
-                      align="start"
-                      sideOffset={4}
-                      portal={false}
-                      onOpenAutoFocus={(e: Event) => e.preventDefault()}
-                      onInteractOutside={(e: Event) => {
-                        if (
-                          e.target instanceof Element &&
-                          e.target.closest(`#${field.name}`)
-                        ) {
-                          e.preventDefault();
-                        }
-                      }}
-                    >
-                      <Command shouldFilter={false}>
-                        <CommandList className="max-h-[200px]">
-                          <CommandGroup>
-                            {COMMON_UNITS.filter((u) =>
-                              u
-                                .toLowerCase()
-                                .includes(
-                                  (field.state.value || "").toLowerCase(),
-                                ),
-                            ).map((unit) => (
-                              <CommandItem
-                                key={unit}
-                                value={unit}
-                                onSelect={() => {
-                                  field.handleChange(unit);
-                                  setOpen(false);
-                                }}
-                                className="mb-1 flex items-center gap-2 last:mb-0"
-                                data-checked={field.state.value === unit}
-                              >
-                                {unit}
-                              </CommandItem>
-                            ))}
-                            {COMMON_UNITS.filter((u) =>
-                              u
-                                .toLowerCase()
-                                .includes(
-                                  (field.state.value || "").toLowerCase(),
-                                ),
-                            ).length === 0 && (
-                              <div className="py-6 text-center text-sm text-muted-foreground p-4">
-                                "{field.state.value}" akan disimpan sebagai
-                                satuan baru.
-                              </div>
-                            )}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                </div>
+                <UnitCombobox
+                  id={field.name}
+                  value={field.state.value}
+                  onChange={field.handleChange}
+                  onBlur={field.handleBlur}
+                  invalid={isInvalid}
+                />
                 <FieldDescription>
-                  Pilih dari daftar atau ketik kepanjangan satuan untuk barang
-                  ini
+                  Pilih dari daftar atau ketik satuan baru untuk barang ini
                 </FieldDescription>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>
