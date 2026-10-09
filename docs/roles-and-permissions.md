@@ -34,9 +34,10 @@ Role yang diberikan per-proyek. Satu user bisa memiliki role berbeda di proyek b
 
 | Role          | Kode        | Fokus Utama                                                                                                                                        |
 | :------------ | :---------- | :------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Mandor**    | `MANDOR`    | **Operasional Lapangan.**<br>• Membuat laporan harian.<br>• Request dana darurat.<br>• Catat barang masuk/keluar.                                  |
+| **Mandor**    | `MANDOR`    | **Operasional Lapangan.**<br>• Membuat laporan harian.<br>• Request dana darurat.<br>• Catat barang masuk/keluar di lapangan.                    |
 | **Architect** | `ARCHITECT` | **Teknis & Pengawasan.**<br>• Membuat laporan progress/pengawasan.<br>• Upload dokumen gambar/desain.<br>• Review laporan lapangan.                |
-| **Finance**   | `FINANCE`   | **Kontrol Biaya & Logistik.**<br>• Menyetujui request dana darurat.<br>• Kelola master data barang (logistik).<br>• Top-up saldo kas kecil proyek. |
+| **Finance**   | `FINANCE`   | **Kontrol Biaya & Kas Proyek.**<br>• Menyetujui request dana darurat.<br>• Top-up saldo kas kecil proyek.<br>• Monitoring anggaran & logistik (read-only). |
+| **Logistic**  | `LOGISTIC`  | **Pengelolaan Material & Rantai Pasok.**<br>• Kelola master data barang material.<br>• Catat & verifikasi barang masuk/keluar.<br>• Monitoring sisa stok & inventaris. |
 
 ---
 
@@ -48,11 +49,11 @@ Berikut detail siapa yang bisa melakukan apa di setiap fitur proyek.
 
 Fitur untuk membuat proyek baru dan mengatur siapa saja yang terlibat.
 
-| Aksi              | Pelaku         | Catatan                                                          |
-| :---------------- | :------------- | :--------------------------------------------------------------- |
-| **Buat Proyek**   | `ADMIN`        | User biasa/Project Role tidak bisa buat proyek.                  |
-| **Tambah Member** | `ADMIN`        | Hanya Admin yang bisa menunjuk Mandor/Arsitek/Finance.           |
-| **Lihat Proyek**  | `SEMUA MEMBER` | Member hanya lihat proyek dimana dia terdaftar. CEO lihat semua. |
+| Aksi              | Pelaku         | Catatan                                                               |
+| :---------------- | :------------- | :-------------------------------------------------------------------- |
+| **Buat Proyek**   | `ADMIN`        | User biasa/Project Role tidak bisa buat proyek.                       |
+| **Tambah Member** | `ADMIN`        | Hanya Admin yang bisa menunjuk Mandor/Arsitek/Finance/Logistic.       |
+| **Lihat Proyek**  | `SEMUA MEMBER` | Member hanya lihat proyek dimana dia terdaftar. CEO lihat semua.      |
 
 ### B. Laporan Harian (Daily Reports)
 
@@ -60,7 +61,7 @@ Fitur untuk mencatat progress harian, cuaca, jumlah pekerja, dan kendala.
 
 | Aksi              | Pelaku                | Catatan                                                              |
 | :---------------- | :-------------------- | :------------------------------------------------------------------- |
-| **Buat Laporan**  | `MANDOR`, `ARCHITECT` | `FINANCE` tidak bisa buat laporan.                                   |
+| **Buat Laporan**  | `MANDOR`, `ARCHITECT` | `FINANCE` & `LOGISTIC` tidak bisa buat laporan.                      |
 | **Lihat Laporan** | `SEMUA MEMBER`        | Semua yang terlibat di proyek bisa baca.                             |
 | **Edit/Hapus**    | `MANDOR`, `ARCHITECT` | **Hanya Laporan Milik Sendiri.** Tidak bisa edit laporan orang lain. |
 | **Komentar**      | `SEMUA` + `CEO`       | Semua member & CEO bisa diskusi di kolom komentar.                   |
@@ -70,22 +71,22 @@ Fitur untuk mencatat progress harian, cuaca, jumlah pekerja, dan kendala.
 
 Fitur pengelolaan kas kecil (petty cash) di proyek untuk belanja mendesak.
 
-| Aksi            | Pelaku         | Alur Kerja                                        |
-| :-------------- | :------------- | :------------------------------------------------ |
-| **Withdraw**    | `MANDOR`       | Mandor membuat permintaan -> Status `UNREVIEWED`. |
-| **Verifikasi**  | `FINANCE`      | Finance review permintaan -> Status `REVIEWED`.   |
-| **Fund Saldo**  | `FINANCE`      | Finance mengisi ulang (top-up) saldo kas proyek.  |
-| **Lihat Saldo** | `SEMUA MEMBER` | Transparansi saldo untuk semua member proyek.     |
+| Aksi            | Pelaku         | Alur Kerja                                                           |
+| :-------------- | :------------- | :------------------------------------------------------------------- |
+| **Withdraw**    | `MANDOR`       | Mandor membuat permintaan -> Status `UNREVIEWED`.                    |
+| **Verifikasi**  | `FINANCE`      | Finance review permintaan -> Status `REVIEWED`.                      |
+| **Fund Saldo**  | `FINANCE`      | Finance mengisi ulang (top-up) saldo kas proyek.                     |
+| **Lihat Saldo** | `SEMUA MEMBER` | Transparansi saldo untuk semua member proyek (`LOGISTIC` read-only). |
 
 ### D. Logistik & Material
 
 Fitur pencatatan keluar-masuk barang material di proyek.
 
-| Aksi                   | Pelaku         | Deskripsi                                              |
-| :--------------------- | :------------- | :----------------------------------------------------- |
-| **Kelola Master Item** | `FINANCE`      | Tambah/Edit/Hapus jenis barang (misal: Semen, Paku).   |
-| **Catat Transaksi**    | `MANDOR`       | Input barang masuk (`IN`) atau barang dipakai (`OUT`). |
-| **Lihat Stok**         | `SEMUA MEMBER` | Monitoring sisa stok di lapangan.                      |
+| Aksi                   | Pelaku              | Deskripsi                                                        |
+| :--------------------- | :------------------ | :--------------------------------------------------------------- |
+| **Kelola Master Item** | `LOGISTIC`          | Tambah/Edit/Hapus jenis barang (misal: Semen, Paku).             |
+| **Catat Transaksi**    | `LOGISTIC`, `MANDOR`| Input barang masuk (`IN`) atau barang dipakai (`OUT`).           |
+| **Lihat Stok**         | `SEMUA MEMBER`      | Monitoring sisa stok di lapangan (`FINANCE` & `ARCHITECT` read). |
 
 ### E. Dokumen Proyek
 
@@ -94,22 +95,23 @@ Fitur penyimpanan file gambar kerja, desain, dan spesifikasi.
 | Aksi               | Pelaku         | Catatan                                            |
 | :----------------- | :------------- | :------------------------------------------------- |
 | **Upload Dokumen** | `ARCHITECT`    | Hanya Arsitek yang berwenang upload gambar teknis. |
-| **Lihat Dokumen**  | `SEMUA MEMBER` | Mandor bisa melihat gambar kerja untuk acuan.      |
+| **Lihat Dokumen**  | `SEMUA MEMBER` | Mandor/Logistic bisa melihat gambar kerja acuan.   |
 | **Hapus Dokumen**  | `ARCHITECT`    | Hanya dokumen milik sendiri.                       |
 
 ---
 
 ## 5. Matriks Ringkasan (Cheat Sheet)
 
-| Fitur                |   Mandor   | Architect |    Finance     |  Admin  |   CEO    |
-| :------------------- | :--------: | :-------: | :------------: | :-----: | :------: |
-| **Manajemen Proyek** |  👁️ Lihat  | 👁️ Lihat  |    👁️ Lihat    | ⚡ Full | 👁️ Lihat |
-| **Laporan Harian**   |  ✅ Buat   |  ✅ Buat  |    👁️ Lihat    | ⚡ Full | 👁️ Lihat |
-| **Komentar**         |  ✅ Chat   |  ✅ Chat  |    ✅ Chat     | ⚡ Full | ✅ Chat  |
-| **Request Dana**     | ✅ Request |   ❌ -    | 🛡️ Verifikasi  | ⚡ Full | 👁️ Lihat |
-| **Topup Dana**       |    ❌ -    |   ❌ -    |    ✅ Topup    | ⚡ Full | 👁️ Lihat |
-| **Catat Material**   | ✅ In/Out  | 👁️ Lihat  | ⚙️ Kelola Item | ⚡ Full | 👁️ Lihat |
-| **Upload Gambar**    |  👁️ Lihat  | ✅ Upload |    👁️ Lihat    | ⚡ Full | 👁️ Lihat |
+| Fitur                |   Mandor   | Architect |   Finance    |   Logistic   |  Admin  |   CEO    |
+| :------------------- | :--------: | :-------: | :----------: | :----------: | :-----: | :------: |
+| **Manajemen Proyek** |  👁️ Lihat  | 👁️ Lihat  |   👁️ Lihat   |   👁️ Lihat   | ⚡ Full | 👁️ Lihat |
+| **Laporan Harian**   |  ✅ Buat   |  ✅ Buat  |   👁️ Lihat   |   👁️ Lihat   | ⚡ Full | 👁️ Lihat |
+| **Komentar**         |  ✅ Chat   |  ✅ Chat  |   ✅ Chat    |   ✅ Chat    | ⚡ Full | ✅ Chat  |
+| **Request Dana**     | ✅ Request |   ❌ -    | 🛡️ Verifikasi|     ❌ -     | ⚡ Full | 👁️ Lihat |
+| **Topup Dana**       |    ❌ -    |   ❌ -    |   ✅ Topup   |     ❌ -     | ⚡ Full | 👁️ Lihat |
+| **Kelola Master Item**|   ❌ -    |   ❌ -    |   👁️ Lihat   |⚙️ Kelola Item| ⚡ Full | 👁️ Lihat |
+| **Catat Material**   | ✅ In/Out  | 👁️ Lihat  |   👁️ Lihat   |  ✅ In/Out   | ⚡ Full | 👁️ Lihat |
+| **Upload Gambar**    |  👁️ Lihat  | ✅ Upload |   👁️ Lihat   |   👁️ Lihat   | ⚡ Full | 👁️ Lihat |
 
 **Keterangan:**
 

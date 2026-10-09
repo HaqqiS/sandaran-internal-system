@@ -206,11 +206,28 @@ flowchart TD
 
     Actions -->|Daily Report| Report[❌ No Access]
     Actions -->|Emergency Fund| Emergency[✅ Verify Requests<br/>✅ Add Balance]
-    Actions -->|Logistics| Logistics[✅ Full CRUD<br/>✅ Confirm Transactions]
+    Actions -->|Logistics| Logistics[📖 Read Only<br/>Cost & Stock Monitoring]
     Actions -->|Project Admin| Admin[❌ No Access]
 
     style Report fill:#ff6b6b
     style Emergency fill:#51cf66
+    style Logistics fill:#74c0fc
+    style Admin fill:#ff6b6b
+```
+
+### D. LOGISTIC Flow
+
+```mermaid
+flowchart TD
+    Logistic[LOGISTIC Role] --> Actions{Action Type?}
+
+    Actions -->|Daily Report| Report[📖 Read Only]
+    Actions -->|Emergency Fund| Emergency[📖 Read Only]
+    Actions -->|Logistics| Logistics[✅ Full CRUD Master Items<br/>✅ Record & Verify IN/OUT]
+    Actions -->|Project Admin| Admin[❌ No Access]
+
+    style Report fill:#74c0fc
+    style Emergency fill:#74c0fc
     style Logistics fill:#51cf66
     style Admin fill:#ff6b6b
 ```
@@ -248,29 +265,22 @@ sequenceDiagram
 
 ---
 
-## 8️⃣ Logistic Transaction Workflow (MANDOR Limited)
+## 8️⃣ Logistic Transaction Workflow (LOGISTIC & MANDOR)
 
 ```mermaid
 sequenceDiagram
-    participant M as MANDOR
+    participant M as MANDOR / LOGISTIC
     participant DB as Database
-    participant F as FINANCE
+    participant L as LOGISTIC (Supervisor)
 
-    M->>DB: Request Logistic OUT<br/>(status: PENDING)
-    DB-->>M: Request created
+    Note over L,DB: LOGISTIC manages master items
+    L->>DB: Create / Update LogisticItem
 
-    Note over M,F: Waiting for confirmation
+    M->>DB: Record Transaction (IN / OUT)
+    DB-->>M: Transaction recorded
+    DB->>DB: Update item stock
 
-    F->>DB: Get pending logistic requests
-    DB-->>F: List of PENDING
-
-    F->>DB: Confirm transaction<br/>(status: CONFIRMED)
-    DB-->>F: Status updated
-
-    DB->>DB: Update LogisticItem quantity
-    Note over DB: Stock updated
-
-    DB-->>M: Notification: Request confirmed
+    Note over L: LOGISTIC & FINANCE monitor stock levels
 ```
 
 ---
@@ -306,5 +316,5 @@ flowchart TD
 
 ---
 
-**Document Version:** 1.0  
-**Companion to:** [permission-matrix.md](file:///C:/Users/haqqi/.gemini/antigravity/brain/e7ca4093-7a8e-446d-92a7-8ac291978fb5/permission-matrix.md)
+**Document Version:** 2.0  
+**Companion to:** [permission-matrix.md](./permission-matrix.md)

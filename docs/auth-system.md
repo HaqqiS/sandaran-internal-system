@@ -118,6 +118,7 @@ const { isActive } = useSession();
     isMandor,
     isArchitect,
     isFinance,
+    isLogistic,
     // States
     isLoading,
     isAuthenticated,
@@ -264,6 +265,7 @@ export default function DashboardPage() {
     isMandor,
     isArchitect,
     isFinance,
+    isLogistic,
     isLoading
   } = useUserRole()
 
@@ -277,6 +279,7 @@ export default function DashboardPage() {
   if (isMandor) return <MandorView />
   if (isArchitect) return <ArchitectView />
   if (isFinance) return <FinanceView />
+  if (isLogistic) return <LogisticView />
 
   return <DefaultView />
 }

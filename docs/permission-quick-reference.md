@@ -20,10 +20,11 @@
 │  └─ YES → Continue ↓
 │
 ├─ Which project roles allowed?
-│  ├─ MANDOR only       → Use projectProcedure(['MANDOR'])
-│  ├─ FINANCE only      → Use projectProcedure(['FINANCE'])
-│  ├─ MANDOR + FINANCE  → Use projectProcedure(['MANDOR', 'FINANCE'])
-│  └─ All project roles → Use projectProcedure(['MANDOR', 'ARCHITECT', 'FINANCE'])
+│  ├─ MANDOR only            → Use projectProcedure(['MANDOR'])
+│  ├─ FINANCE only           → Use projectProcedure(['FINANCE'])
+│  ├─ LOGISTIC only          → Use projectProcedure(['LOGISTIC'])
+│  ├─ MANDOR + LOGISTIC      → Use projectProcedure(['MANDOR', 'LOGISTIC'])
+│  └─ All project roles      → Use projectProcedure(['MANDOR', 'ARCHITECT', 'FINANCE', 'LOGISTIC'])
 │
 └─ Needs ownership check?
    ├─ NO  → Done
@@ -32,21 +33,16 @@
 
 ---
 
-## 🔧 Available Procedures (Current + Future)
+## 🔧 Available Procedures
 
 ### ✅ Already Implemented
 
-| Procedure            | When to Use            | Example                    |
-| -------------------- | ---------------------- | -------------------------- |
-| `publicProcedure`    | No auth needed         | Health check, public info  |
-| `protectedProcedure` | Any authenticated user | User profile, settings     |
-| `adminProcedure`     | ADMIN or CEO only      | User management, approvals |
-
-### 🔜 To Be Implemented
-
-| Procedure          | When to Use                       | Example                       |
-| ------------------ | --------------------------------- | ----------------------------- |
-| `projectProcedure` | Project member with specific role | Daily reports, emergency fund |
+| Procedure            | When to Use                       | Example                                  |
+| -------------------- | --------------------------------- | ---------------------------------------- |
+| `publicProcedure`    | No auth needed                    | Health check, public info                |
+| `protectedProcedure` | Any authenticated user            | User profile, settings                   |
+| `adminProcedure`     | ADMIN or CEO only                 | User management, approvals               |
+| `projectProcedure`   | Project member with specific role | Daily reports, logistics, emergency fund |
 
 ---
 

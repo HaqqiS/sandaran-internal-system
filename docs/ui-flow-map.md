@@ -8,7 +8,8 @@ This document outlines the user interface flow and navigation structure for each
 - **CEO**: High-level overview, monitoring, and read-only insights.
 - **MANDOR**: Project-specific operations, report creation, and logistics requests.
 - **ARCHITECT**: Design-focused access, document management, and read-only logistics.
-- **FINANCE**: Financial oversight, approval workflows, and transaction history.
+- **FINANCE**: Financial oversight, emergency fund approvals, and budget monitoring.
+- **LOGISTIC**: Supply chain and material management, master item CRUD, and stock in/out logging.
 
 ---
 
@@ -196,7 +197,7 @@ Finance manages approvals and tracks transactions.
 ```mermaid
 graph TD
     Dashboard[Dashboard] --> PendingApprovals["Pending Approvals"]
-    Dashboard --> Alerts["Fund & Logistics Alerts"]
+    Dashboard --> Alerts["Fund Alerts"]
 
     Projects[Projects] --> JoinedProjects["View Joined Projects"]
     JoinedProjects --> ProjectDetail["Project Detail"]
@@ -208,13 +209,40 @@ graph TD
     Emergency --> VerifyRequests["Verify Requests"]
     Emergency --> AddBalance["Add Fund Balance"]
 
-    FinancialModules --> Logistics[Logistics]
-    Logistics --> ManageItems["Manage Items"]
-    Logistics --> ApproveRequest["Approve Request"]
-    Logistics --> History["Full Transaction History"]
+    FinancialModules --> Logistics["Logistics (View Only)"]
+    Logistics --> ViewItems["View Items & Stock"]
+    Logistics --> History["Transaction History"]
 
     FinancialModules --> Reports["Reports (View Only)"]
     FinancialModules --> Documents["Documents (View Only)"]
+
+    Profile[Profile] --> EditProfile["Edit Own Profile"]
+```
+
+---
+
+## 6. LOGISTIC Flow
+
+Logistics officers manage materials, suppliers, item catalog, and stock flow.
+
+```mermaid
+graph TD
+    Dashboard[Dashboard] --> AssignedProjects["Assigned Projects"]
+    Dashboard --> LogisticsOverview["Recent Logistics Activity"]
+
+    Projects[Projects] --> JoinedProjects["View Joined Projects"]
+    JoinedProjects --> ProjectDetail["Project Detail"]
+
+    ProjectDetail --> LogisticsModules["Logistics Modules"]
+
+    LogisticsModules --> Logistics[Logistics]
+    Logistics --> ManageItems["Create / Edit / Delete Items"]
+    Logistics --> RecordInOut["Record IN/OUT Transactions"]
+    Logistics --> History["Full Transaction History & Stock"]
+
+    LogisticsModules --> Reports["Reports (View Only)"]
+    LogisticsModules --> Emergency["Emergency (View Only)"]
+    LogisticsModules --> Documents["Documents (View Only)"]
 
     Profile[Profile] --> EditProfile["Edit Own Profile"]
 ```

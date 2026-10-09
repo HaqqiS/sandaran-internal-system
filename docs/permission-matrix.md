@@ -75,11 +75,12 @@
 
 ### Project Roles (from `ProjectRole` enum)
 
-| Role          | Code        | Description       | Primary Responsibilities                             |
-| ------------- | ----------- | ----------------- | ---------------------------------------------------- |
-| **Mandor**    | `MANDOR`    | Site supervisor   | Daily reports, emergency requests, limited logistics |
-| **Architect** | `ARCHITECT` | Project architect | Daily reports, project documents, design files       |
-| **Finance**   | `FINANCE`   | Financial officer | Emergency fund verification, logistics management    |
+| Role          | Code        | Description       | Primary Responsibilities                                         |
+| ------------- | ----------- | ----------------- | ---------------------------------------------------------------- |
+| **Mandor**    | `MANDOR`    | Site supervisor   | Daily reports, emergency requests, record field logistics in/out |
+| **Architect** | `ARCHITECT` | Project architect | Daily reports, project documents, design files                   |
+| **Finance**   | `FINANCE`   | Financial officer | Emergency fund verification, budget monitoring, logistics read   |
+| **Logistic**  | `LOGISTIC`  | Logistics officer | Master items CRUD, stock management, transaction in/out          |
 
 ---
 
@@ -113,26 +114,26 @@
 
 #### A. Project Management
 
-| Action          | ADMIN | CEO | MANDOR | ARCHITECT | FINANCE | Notes               |
-| --------------- | ----- | --- | ------ | --------- | ------- | ------------------- |
-| `PROJECT_READ`  | ✅    | 📖  | ✅     | ✅        | ✅      | All project members |
-| `PROJECT_ADMIN` | ✅    | ❌  | ❌     | ❌        | ❌      | ADMIN only          |
+| Action          | ADMIN | CEO | MANDOR | ARCHITECT | FINANCE | LOGISTIC | Notes               |
+| --------------- | ----- | --- | ------ | --------- | ------- | -------- | ------------------- |
+| `PROJECT_READ`  | ✅    | 📖  | ✅     | ✅        | ✅      | ✅       | All project members |
+| `PROJECT_ADMIN` | ✅    | ❌  | ❌     | ❌        | ❌      | ❌       | ADMIN only          |
 
 ---
 
 #### B. Daily Reports
 
-| Action                  | ADMIN | CEO | MANDOR | ARCHITECT | FINANCE | Notes                                 |
-| ----------------------- | ----- | --- | ------ | --------- | ------- | ------------------------------------- |
-| `REPORT_CREATE`         | ✅    | ❌  | ✅     | ✅        | ❌      | Field workers only                    |
-| `REPORT_EDIT_OWN`       | ✅    | ❌  | 🟢     | 🟢        | ❌      | Own reports only (ownership check)    |
-| `REPORT_EDIT_ANY`       | ✅    | ❌  | ❌     | ❌        | ❌      | ADMIN only                            |
-| `REPORT_DELETE_OWN`     | ✅    | ❌  | 🟢     | 🟢        | ❌      | Own reports only (ownership check)    |
-| `REPORT_DELETE_ANY`     | ✅    | ❌  | ❌     | ❌        | ❌      | ADMIN only                            |
-| `REPORT_MEDIA_UPLOAD`   | ✅    | ❌  | 🟢     | 🟢        | ❌      | Only to own reports (ownership check) |
-| `REPORT_TASK_CREATE`    | ✅    | ❌  | 🟢     | 🟢        | ❌      | Add task breakdown to own report      |
-| `REPORT_TASK_EDIT_OWN`  | ✅    | ❌  | 🟢     | 🟢        | ❌      | Edit tasks in own report              |
-| `REPORT_COMMENT_CREATE` | ✅    | ✅  | ✅     | ✅        | ✅      | CEO can comment for monitoring        |
+| Action                  | ADMIN | CEO | MANDOR | ARCHITECT | FINANCE | LOGISTIC | Notes                                 |
+| ----------------------- | ----- | --- | ------ | --------- | ------- | -------- | ------------------------------------- |
+| `REPORT_CREATE`         | ✅    | ❌  | ✅     | ✅        | ❌      | ❌       | Field workers only                    |
+| `REPORT_EDIT_OWN`       | ✅    | ❌  | 🟢     | 🟢        | ❌      | ❌       | Own reports only (ownership check)    |
+| `REPORT_EDIT_ANY`       | ✅    | ❌  | ❌     | ❌        | ❌      | ❌       | ADMIN only                            |
+| `REPORT_DELETE_OWN`     | ✅    | ❌  | 🟢     | 🟢        | ❌      | ❌       | Own reports only (ownership check)    |
+| `REPORT_DELETE_ANY`     | ✅    | ❌  | ❌     | ❌        | ❌      | ❌       | ADMIN only                            |
+| `REPORT_MEDIA_UPLOAD`   | ✅    | ❌  | 🟢     | 🟢        | ❌      | ❌       | Only to own reports (ownership check) |
+| `REPORT_TASK_CREATE`    | ✅    | ❌  | 🟢     | 🟢        | ❌      | ❌       | Add task breakdown to own report      |
+| `REPORT_TASK_EDIT_OWN`  | ✅    | ❌  | 🟢     | 🟢        | ❌      | ❌       | Edit tasks in own report              |
+| `REPORT_COMMENT_CREATE` | ✅    | ✅  | ✅     | ✅        | ✅      | ✅       | All members & CEO can comment         |
 
 **🟢 Conditional Rules:**
 
@@ -144,47 +145,48 @@
 
 #### C. Emergency Fund
 
-| Action                  | ADMIN | CEO | MANDOR | ARCHITECT | FINANCE | Notes                             |
-| ----------------------- | ----- | --- | ------ | --------- | ------- | --------------------------------- |
-| `EMERGENCY_REQUEST`     | ✅    | ❌  | ✅     | ❌        | ❌      | MANDOR requests, FINANCE verifies |
-| `EMERGENCY_VERIFY`      | ✅    | ❌  | ❌     | ❌        | ✅      | FINANCE approves/rejects          |
-| `EMERGENCY_BALANCE_ADD` | ✅    | ❌  | ❌     | ❌        | ✅      | FINANCE adds initial balance      |
+| Action                  | ADMIN | CEO | MANDOR | ARCHITECT | FINANCE | LOGISTIC | Notes                             |
+| ----------------------- | ----- | --- | ------ | --------- | ------- | -------- | --------------------------------- |
+| `EMERGENCY_REQUEST`     | ✅    | ❌  | ✅     | ❌        | ❌      | ❌       | MANDOR requests, FINANCE verifies |
+| `EMERGENCY_VERIFY`      | ✅    | ❌  | ❌     | ❌        | ✅      | ❌       | FINANCE approves/rejects          |
+| `EMERGENCY_BALANCE_ADD` | ✅    | ❌  | ❌     | ❌        | ✅      | ❌       | FINANCE adds initial balance      |
 
 **Flow:**
 
 1. MANDOR creates `EmergencyTransaction` (status: PENDING)
 2. FINANCE verifies → status: APPROVED/REJECTED
 3. Only FINANCE can add balance to `EmergencyFund`
+4. LOGISTIC has read-only access to balance for transparency
 
 ---
 
 #### D. Logistics
 
-| Action                 | ADMIN | CEO | MANDOR | ARCHITECT | FINANCE | Notes                                |
-| ---------------------- | ----- | --- | ------ | --------- | ------- | ------------------------------------ |
-| `LOGISTIC_READ`        | ✅    | 📖  | ✅     | 📖        | ✅      | All can view                         |
-| `LOGISTIC_CREATE_ITEM` | ✅    | ❌  | ❌     | ❌        | ✅      | FINANCE manages items                |
-| `LOGISTIC_REQUEST`     | ✅    | ❌  | ✅     | ❌        | ✅      | MANDOR requests, FINANCE full access |
-| `LOGISTIC_CONFIRM`     | ✅    | ❌  | ✅     | ❌        | ✅      | MANDOR confirms delivery/usage       |
-| `LOGISTIC_APPROVE`     | ✅    | ❌  | ❌     | ❌        | ✅      | FINANCE approves requests            |
+| Action                 | ADMIN | CEO | MANDOR | ARCHITECT | FINANCE | LOGISTIC | Notes                                  |
+| ---------------------- | ----- | --- | ------ | --------- | ------- | -------- | -------------------------------------- |
+| `LOGISTIC_READ`        | ✅    | 📖  | ✅     | 📖        | 📖      | ✅       | All can view                           |
+| `LOGISTIC_CREATE_ITEM` | ✅    | ❌  | ❌     | ❌        | ❌      | ✅       | LOGISTIC manages master items          |
+| `LOGISTIC_REQUEST`     | ✅    | ❌  | ✅     | ❌        | ❌      | ✅       | MANDOR & LOGISTIC record transactions  |
+| `LOGISTIC_CONFIRM`     | ✅    | ❌  | ✅     | ❌        | ❌      | ✅       | MANDOR & LOGISTIC confirm in/out       |
+| `LOGISTIC_APPROVE`     | ✅    | ❌  | ❌     | ❌        | ❌      | ✅       | LOGISTIC handles item approval/status  |
 
 **Flow:**
 
-1. MANDOR creates `LOGISTIC_REQUEST` (status: PENDING)
-2. FINANCE approves → `LOGISTIC_APPROVE` (status: APPROVED)
-3. MANDOR confirms delivery → `LOGISTIC_CONFIRM` (status: CONFIRMED)
-4. FINANCE can do all steps directly (bypass approval)
+1. LOGISTIC manages master data items (create/edit/delete)
+2. MANDOR & LOGISTIC record transactions masuk (`IN`) dan keluar (`OUT`)
+3. FINANCE & ARCHITECT memiliki akses read-only untuk monitoring anggaran & spesifikasi
+4. ADMIN retains full bypass access
 
 ---
 
-#### E. Project Documents (NEW)
+#### E. Project Documents
 
-| Action                        | ADMIN | CEO | MANDOR | ARCHITECT | FINANCE | Notes                              |
-| ----------------------------- | ----- | --- | ------ | --------- | ------- | ---------------------------------- |
-| `PROJECT_DOCUMENT_READ`       | ✅    | 📖  | ✅     | ✅        | ✅      | All project members can view       |
-| `PROJECT_DOCUMENT_UPLOAD`     | ✅    | ❌  | ❌     | ✅        | ❌      | ARCHITECT uploads design files     |
-| `PROJECT_DOCUMENT_EDIT_OWN`   | ✅    | ❌  | ❌     | 🟢        | ❌      | ARCHITECT edits own documents only |
-| `PROJECT_DOCUMENT_DELETE_OWN` | ✅    | ❌  | ❌     | 🟢        | ❌      | ARCHITECT deletes own documents    |
+| Action                        | ADMIN | CEO | MANDOR | ARCHITECT | FINANCE | LOGISTIC | Notes                              |
+| ----------------------------- | ----- | --- | ------ | --------- | ------- | -------- | ---------------------------------- |
+| `PROJECT_DOCUMENT_READ`       | ✅    | 📖  | ✅     | ✅        | ✅      | ✅       | All project members can view       |
+| `PROJECT_DOCUMENT_UPLOAD`     | ✅    | ❌  | ❌     | ✅        | ❌      | ❌       | ARCHITECT uploads design files     |
+| `PROJECT_DOCUMENT_EDIT_OWN`   | ✅    | ❌  | ❌     | 🟢        | ❌      | ❌       | ARCHITECT edits own documents only |
+| `PROJECT_DOCUMENT_DELETE_OWN` | ✅    | ❌  | ❌     | 🟢        | ❌      | ❌       | ARCHITECT deletes own documents    |
 
 **Document Types:**
 
@@ -301,21 +303,18 @@ const projectRole = membership.role; // MANDOR or FINANCE
 
 ## 5️⃣ Implementation Checklist
 
-### ✅ Already Implemented (Layer 1 & 2)
+### ✅ Already Implemented (Layer 1, 2, & 3)
 
 - [x] Authentication guard (`ctx.session?.user`)
 - [x] Active user check (`isActive === true`)
 - [x] Global role check (`roleGlobal !== "NONE"`)
 - [x] Admin procedure (`ADMIN` or `CEO` only)
 - [x] Protected procedure (`ADMIN`, `CEO`, `USER`)
-
-### 🔜 To Be Implemented (Layer 3)
-
-- [ ] **Project context guard** (check `ProjectMember` existence)
-- [ ] **Project role guard** (check `ProjectRole` for action)
-- [ ] **Ownership guard** (check `userId` for mutations)
-- [ ] **CEO read-only enforcement** (block mutations for CEO)
-- [ ] **Action-based permission helpers** (e.g., `requireProjectRole(['MANDOR', 'FINANCE'])`)
+- [x] **Project context guard** (check `ProjectMember` existence via `projectProcedure`)
+- [x] **Project role guard** (check `ProjectRole` for action in `requireProjectRole`)
+- [x] **Ownership guard** (check `userId` for mutations on reports, documents, etc.)
+- [x] **CEO read-only enforcement** (block mutations for CEO except comments)
+- [x] **Action-based permission helpers** (e.g., `projectProcedure(['MANDOR', 'LOGISTIC'])`)
 
 ---
 
@@ -339,37 +338,29 @@ const projectRole = membership.role; // MANDOR or FINANCE
 
 ### Immediate Actions
 
-1. **Review this matrix** with stakeholders
-2. **Confirm edge cases** (especially MANDOR logistics access)
-3. **Decide on MANDOR logistics flow:**
-   - Option A: MANDOR can directly IN/OUT (current matrix: ⚠️)
-   - Option B: MANDOR only requests, FINANCE approves (stricter)
-
-### After Approval
-
-1. Create **guard helper functions** (e.g., `requireProjectRole`)
-2. Implement **project context middleware**
-3. Update **tRPC routers** with new guards
-4. Write **integration tests** for permission scenarios
+1. Implement `LOGISTIC` enum in Prisma schema and database migration.
+2. Update tRPC `logistic.router.ts` to assign item management to `LOGISTIC`.
+3. Update UI dialogs (`member-management.tsx`, `create-user-dialog.tsx`, `approve-user-dialog.tsx`) to allow assigning the `LOGISTIC` role.
+4. Add `isLogistic` to `use-user-role.ts`.
 
 ---
 
 ## 📌 Summary
 
-| Layer                    | Status      | Coverage                   |
-| ------------------------ | ----------- | -------------------------- |
-| Layer 1: Authentication  | ✅ Complete | All users                  |
-| Layer 2: Global Role     | ✅ Complete | ADMIN, CEO, USER           |
-| Layer 3: Project Context | 🔜 Pending  | MANDOR, ARCHITECT, FINANCE |
+| Layer                    | Status      | Coverage                                      |
+| ------------------------ | ----------- | --------------------------------------------- |
+| Layer 1: Authentication  | ✅ Complete | All users                                     |
+| Layer 2: Global Role     | ✅ Complete | ADMIN, CEO, USER                              |
+| Layer 3: Project Context | ✅ Complete | MANDOR, ARCHITECT, FINANCE, LOGISTIC          |
 
-**Total Actions Defined:** 28 (4 global + 24 project-scoped)
-**Total Roles:** 3 Global + 3 Project = 6
-**Total Entities:** 11 (Project, User, DailyReport, DailyReportTask, ReportMedia, EmergencyFund, EmergencyTransaction, LogisticItem, LogisticTransaction, ProjectDocument, ReportComment)
-**Permission Combinations:** ~70+ scenarios covered
+**Total Actions Defined:** 28 (4 global + 24 project-scoped)  
+**Total Roles:** 3 Global + 4 Project = 7  
+**Total Entities:** 11 (Project, User, DailyReport, DailyReportTask, ReportMedia, EmergencyFund, EmergencyTransaction, LogisticItem, LogisticTransaction, ProjectDocument, ReportComment)  
+**Permission Combinations:** ~80+ scenarios covered  
 
 ---
 
-**Document Version:** 2.0  
-**Last Updated:** 2026-02-02 20:30 WIB  
-**Status:** Updated with User Requirements  
-**Changes:** Added DailyReportTask, ProjectDocument, refined CEO permissions, updated logistics flow
+**Document Version:** 3.0  
+**Last Updated:** 2026-10-09  
+**Status:** Updated with LOGISTIC Project Role & Layer 3 Verification  
+**Changes:** Added LOGISTIC project role, re-assigned logistics master item management to LOGISTIC, set FINANCE logistics to read-only, verified Layer 3 implementation.

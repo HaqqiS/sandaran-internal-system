@@ -12,13 +12,13 @@
    *Panduan Implementasi Auth & Route Protection* — Contoh praktis penggunaan `auth-guards.ts`, `server-auth.ts`, session store, dan hooks peran pengguna. Berisi contoh kode untuk Server Components, Client Components, dan Server Actions.
 
 2. **[roles-and-permissions.md](./roles-and-permissions.md)**  
-   *Panduan Hak Akses & Konsep Role (Bahasa Indonesia)* — Penjelasan konsep Global Role (`ADMIN`, `CEO`, `USER`) vs Project Role (`MANDOR`, `ARCHITECT`, `FINANCE`), batasan aksi per modul, dan matriks ringkas untuk tim teknis maupun pemangku kepentingan.
+   *Panduan Hak Akses & Konsep Role (Bahasa Indonesia)* — Penjelasan konsep Global Role (`ADMIN`, `CEO`, `USER`) vs Project Role (`MANDOR`, `ARCHITECT`, `FINANCE`, `LOGISTIC`), batasan aksi per modul, dan matriks ringkas untuk tim teknis maupun pemangku kepentingan.
 
 3. **[permission-matrix.md](./permission-matrix.md)**  
-   *Tabel Matriks Hak Akses Lengkap* — Spesifikasi teknis 28 action codes (global & project-scoped) terhadap seluruh role. Dilengkapi aturan kepemilikan data (*ownership guards*) dan penanganan kasus khusus (seperti CEO read-only).
+   *Tabel Matriks Hak Akses Lengkap* — Spesifikasi teknis action codes (global & project-scoped) terhadap seluruh 7 role (`ADMIN`, `CEO`, `USER`, `MANDOR`, `ARCHITECT`, `FINANCE`, `LOGISTIC`). Dilengkapi aturan kepemilikan data (*ownership guards*) dan penanganan kasus khusus.
 
 4. **[permission-flows.md](./permission-flows.md)**  
-   *Diagram Alur Permission (Mermaid)* — Visualisasi 3-Layer Permission Guard (Authentication → Global Role → Project Role) serta workflow approval dana darurat dan mutasi logistik.
+   *Diagram Alur Permission (Mermaid)* — Visualisasi 3-Layer Permission Guard (Authentication → Global Role → Project Role) serta workflow approval dana darurat dan transaksi logistik.
 
 5. **[permission-quick-reference.md](./permission-quick-reference.md)**  
    *Cheat-sheet Developer tRPC Guards* — Panduan cepat pemilihan procedure (`publicProcedure`, `protectedProcedure`, `adminProcedure`, `projectProcedure`), pola guard helpers, dan tips debugging permission.
@@ -35,26 +35,13 @@
 
 ---
 
-### 🚀 Spesifikasi Fitur Mendatang & Pemeliharaan
+### 🚀 Spesifikasi Fitur & Pemeliharaan
 
 8. **[dashboard-remodel-spec.md](./dashboard-remodel-spec.md)**  
    *Spesifikasi Pembaruan Dashboard* — Rencana arsitektur dan spesifikasi teknis untuk merombak tampilan Dashboard per role (`AdminDashboard`, `CeoDashboard`, `UserDashboard` dengan role lenses) dan menghapus metric hardcoded.
 
 9. **[known-issues.md](./known-issues.md)**  
    *Daftar Isu & Catatan Bug Aktif* — Catatan teknis gotcha Cloudinary folder rename, isu responsif/tabel di layar ponsel, dan backlog penyempurnaan UI galeri proyek.
-
----
-
-### 🗄️ Arsip Rencana yang Telah Terselesaikan (Completed / Historical)
-
-10. **[implementation_plan_export_excel.md](./implementation_plan_export_excel.md)**  
-    *Rencana Ekspor Laporan ke Excel* — [SELESAI] Fitur telah diimplementasikan di `src/app/api/projects/[id]/export/route.ts`.
-
-11. **[frontend-implementation-plan.md](./frontend-implementation-plan.md)**  
-    *Rencana Implementasi Frontend UI* — [SELESAI] Dokumen perencanaan Fase 2–9 (Februari 2026) untuk pembangunan modul Projects, Reports, Emergency Fund, Logistics, dan Documents.
-
-12. **[phase1-summary.md](./phase1-summary.md)**  
-    *Ringkasan Arsitektur Fase 1* — [SELESAI] Dokumentasi transisi layout dan session internal awal.
 
 ---
 
@@ -86,7 +73,7 @@ Layer 2: Global Role Check
 └── USER  : Lanjut ke pemeriksaan Layer 3
 
 Layer 3: Project Context Check
-└── Bergantung pada role di ProjectMember (MANDOR / ARCHITECT / FINANCE)
+└── Bergantung pada role di ProjectMember (MANDOR / ARCHITECT / FINANCE / LOGISTIC)
 ```
 
 ### File Utama dalam Codebase
