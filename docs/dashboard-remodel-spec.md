@@ -1,290 +1,592 @@
-# Dashboard Remodel — Implementation Spec
+# Dashboard Remodel — Implementation Spec & Handoff Guide
 
-Audience: an AI coding agent working inside this repo. Read the whole file before writing code. Work phase by phase (section 9).
-
----
-
-## 0. Rules (mandatory)
-
-**UI RULE — use shadcn/ui for every UI element. Only if shadcn/ui has no suitable component (first check `src/components/ui`, then try `pnpm dlx shadcn@latest add <name>`), build it from scratch with Tailwind + `cn()` + the existing CSS tokens, following shadcn conventions (`data-slot`, `cva` variants, forwarded `className`). Never introduce another UI library.**
-
-Other rules:
-
-1. **No fake data.** Every number, percentage, trend and status label on a dashboard must be computed from Prisma data. No literals such as `"75%"`, `"Sehat"`, `"+2"`, `"Kerja bagus!"`.
-2. **Authorization is server-side.** A `USER` must only receive data for projects where they have a `ProjectMember` row. Never send other projects' data and hide it in the UI.
-3. Follow existing patterns: server `page.tsx` + `*-client.tsx`; tRPC hooks live in `src/hooks/useDashboard.ts` and are re-exported from `src/hooks/index.ts`; UI copy is Indonesian.
-4. Do not change `prisma/schema.prisma` except the items listed under "Optional schema changes" — and only if asked.
-5. After each phase run `pnpm typecheck` and `pnpm check` (Biome). Add Vitest tests for pure helpers (`pnpm test`).
-
-Stack: Next.js 15 App Router, React 19, tRPC 11 + React Query 5, Prisma 6 (PostgreSQL), better-auth, Tailwind v4, shadcn/ui, Tabler icons, Recharts 2.15.4 (via `~/components/ui/chart`), pnpm.
+> **Audience:** AI coding agent & tim pengembang *sandaran-internal-system*.  
+> **Status:** Spesifikasi Aktif & Living Document (Target Milestone M5).  
+> **Peran:** `ADMIN` · `EXECUTIVE` (sebelumnya `CEO`) · `USER` (Role Lenses: `SUPERVISOR` [sebelumnya `MANDOR`], `ARCHITECT`, `FINANCE`, `LOGISTIC`).
 
 ---
 
-## 1. Scope and roles
+## 0. Rules (Mandatory)
 
-`src/app/(internal)/dashboard/page.tsx` selects the dashboard by `roleGlobal`:
+**UI RULE — Gunakan `shadcn/ui` untuk setiap elemen UI.**  
+Periksa terlebih dahulu komponen yang tersedia di `src/components/ui`. Jika belum ada, pasang menggunakan `pnpm dlx shadcn@latest add <nama-komponen>`. Bangun komponen kustom hanya jika shadcn/ui benar-benar tidak memilikinya dengan standar Tailwind CSS + `cn()` + CSS variables token yang ada (`data-slot`, varian `cva`, forwarded `className`). Dilarang keras menginstal atau mengimpor library UI eksternal lainnya.
 
-| `roleGlobal` | Renders | Job |
+Aturan fundamental lainnya:
+1. **No Fake Data (Nol Data Palsu).**  
+   Setiap angka, persentase, tren, dan status label di dashboard wajib dihitung murni dari query database Prisma. Dilarang mencantumkan teks/angka hardcoded seperti `"75%"`, `"Sehat"`, `"+2"`, `"Kerja bagus!"`, atau `"Sesuai Target"`.
+2. **Otorisasi Ketat di Server-Side.**  
+   Pengguna dengan `roleGlobal = USER` hanya berhak menerima data proyek di mana mereka terdaftar di tabel `ProjectMember` pada proyek aktif. Jangan pernah mengirim data proyek lain ke client lalu menyembunyikannya di UI.
+3. **Pola Arsitektur Konsisten.**  
+   Gunakan struktur Server Component `page.tsx` + Client Component `*-client.tsx` (atau modular dashboard view). Hook tRPC diletakkan di `src/hooks/useDashboard.ts` dan diekspor ulang melalui `src/hooks/index.ts`. Seluruh label antarmuka menggunakan bahasa Indonesia yang baku dan profesional.
+4. **Stabilitas Skema Database.**  
+   Jangan mengubah `prisma/schema.prisma` kecuali penambahan indeks performa atau perubahan opsional yang disetujui (misalnya field `minStock` pada `LogisticItem`).
+5. **Verifikasi Kualitas Kode.**  
+   Setelah menyelesaikan setiap fase, pastikan `pnpm typecheck` dan `pnpm check` (Biome) berhasil tanpa error. Tambahkan unit test Vitest (`pnpm test`) untuk helper fungsi murni (misalnya kalkulator zona waktu WITA).
+
+**Tech Stack:** Next.js 15 (App Router), React 19, tRPC v11 + TanStack Query v5, Prisma v6 (PostgreSQL), Better Auth v1.3, Tailwind CSS v4, shadcn/ui + Radix UI, Tabler Icons (`@tabler/icons-react`), Recharts 2.15.4 (via `~/components/ui/chart`), pnpm.
+
+---
+
+## 1. Scope & Peran
+
+Halaman utama `/dashboard` (`src/app/(internal)/dashboard/page.tsx`) memilih tampilan dashboard berdasarkan `roleGlobal`:
+
+| `roleGlobal` | Komponen Dashboard | Tanggung Jawab Utama |
 |---|---|---|
-| `ADMIN` | `AdminDashboard` | Keep the system running: approve users, staffing, reporting, data problems |
-| `EXECUTIVE` | `ExecutiveDashboard` | Portfolio overview (sebelumnya CeoDashboard) |
-| `USER` | `UserDashboard` | Do today's work on *my* projects, built from `ProjectMember.role` (SUPERVISOR / ARCHITECT / FINANCE / LOGISTIC) as "lenses" |
-| `NONE` | never reaches it | Handled by `/waiting-approval` |
+| `ADMIN` | `AdminDashboard` | Menjaga kelancaran sistem: persetujuan pengguna, kelengkapan staf proyek, deteksi keterlambatan pelaporan, dan anomali data. |
+| `EXECUTIVE` | `ExecutiveDashboard` | Tinjauan portofolio eksekutif read-only: progres riil vs waktu kalender, total tenaga kerja lapangan, kendala dilaporkan, dan kesehatan arus kas darurat. *(Menggantikan CeoDashboard).* |
+| `USER` | `UserDashboard` | Eksekusi pekerjaan harian pada proyek aktif saya, diorganisir dalam bentuk **Role Lenses** (`SUPERVISOR`, `ARCHITECT`, `FINANCE`, `LOGISTIC`). |
+| `NONE` | *Tidak mencapai dashboard* | Dicegat dan dialihkan otomatis ke `/waiting-approval`. |
 
-An ADMIN who is also a project member still sees the Admin dashboard.
-
-The old `SupervisorView` (sebelumnya `MandorView`), `ArchitectView`, `FinanceView`, `LogisticView` are folded into `UserDashboard` as lenses. Today `page.tsx` renders every matching view, so a user who is Supervisor in one project and Finance/Logistic in another gets two full layouts stacked.
+### Prinsip Multi-Role & Lensa:
+- Pengguna dengan `roleGlobal = ADMIN` yang juga menjadi anggota proyek tertentu tetap diarahkan ke `AdminDashboard`. Akses ke proyek spesifik dilakukan melalui baris tabel *Kesehatan Proyek*.
+- Pengguna dengan `roleGlobal = USER` yang memegang lebih dari satu peran (misalnya menjadi Supervisor di Proyek A dan Logistik di Proyek B) akan melihat **satu halaman `UserDashboard`** dengan tab lensa peran (`RoleLensTabs`), bukan tampilan bertumpuk (*stacked layouts*) seperti implementasi sebelumnya.
 
 ---
 
-## 2. Audit — what to remove or replace
+## 2. Audit — Kondisi Saat Ini vs Target Pengganti
 
-| Where | Current | Problem | Replacement |
+Kondisi file dashboard saat ini di `src/components/dashboard/`:
+
+| Lokasi / File Eksisting | Kondisi Saat Ini | Masalah | Target Pengganti Remodel |
 |---|---|---|---|
-| `ceo-view` | "Progres Keseluruhan 75% +5%" | Hardcoded | Per-project latest reported progress + time-elapsed bar. No portfolio average |
-| `ceo-view` | "Kesehatan Keuangan: Sehat" | Hardcoded; no budget in schema | Fund balance, withdrawals this month, unreviewed count |
-| `ceo-view` | "Analitik & Tren — segera hadir" | Placeholder | Real charts (section 5) |
-| `architect-view` | "+2 minggu ini" | Hardcoded | Documents where `userId = me` in last 7 days |
-| `mandor-view` | "sebelum jam 5 sore", "Kerja bagus!" | Deadline rule not stored | Only computed status: reported today / not yet |
-| `admin-view` | "Peringatan Logistik", "Cek Stok Menipis" | `LogisticItem` has no minimum stock | "Item stok minus" (Σ IN − Σ OUT < 0) |
-| `finance-view` | "Total disetujui bulan ini" | No approve state, only `UNREVIEWED`/`REVIEWED` | "Penarikan bulan ini" + "n belum ditinjau" |
-| `project-detail-client` | "Progres Keseluruhan" = mean of `progressPercent` | Field is cumulative → mean is wrong | Latest report's value + its date |
-| `StatCard` | `trend` accepts free text | Root cause of fake trends | `MetricCard` with `previous?: { value: number; periodLabel: string }`; delta computed inside |
-| `StatsGrid` | `desktop: 5` → `lg:grid-cols-4`; `tablet/desktop: 2` → unprefixed `grid-cols-2` | Broken breakpoint mapping | Explicit literal-class lookup per breakpoint (Tailwind needs literal class names) |
-| `DashboardLayout` | `p-6` + `space-y-8` inside `PageLayout` | Double spacing | Use `flex flex-col gap-6 p-4 md:p-6` |
+| `ceo-view.tsx` *(juga dialiaskan sebagai `executive-view.tsx`)* | Teks "Progres Keseluruhan 75% +5%" & "Kesehatan Keuangan: Sehat" | Hardcoded literal; skema belum memiliki budget proyek. Chart "Analitik & Tren" hanya placeholder. | `ExecutiveDashboard`: Progres laporan terakhir per proyek + bar waktu kalender berlalu. Chart riil: Tenaga kerja 30 hari & Arus kas darurat 6 bulan. |
+| `mandor-view.tsx` *(juga dialiaskan sebagai `supervisor-view.tsx`)* | "sebelum jam 5 sore", "Kerja bagus!" | Aturan deadline jam 5 sore tidak tersimpan di database; teks ucapan dekoratif. | `SupervisorLens` di dalam `UserDashboard`: Status komputasi riil: *Sudah lapor hari ini* / *Belum lapor hari ini*. |
+| `architect-view.tsx` | "+2 minggu ini" | Tren kenaikan hardcoded. | `ArchitectLens` di dalam `UserDashboard`: Dihitung dari `ProjectDocument` di mana `userId = me` dalam 7 hari terakhir. |
+| `finance-view.tsx` | "Total disetujui bulan ini" | Status persetujuan tidak ada; skema hanya mengenal `UNREVIEWED` / `REVIEWED`. | `FinanceLens` di dalam `UserDashboard`: "Penarikan bulan ini" + antrean "n transaksi belum ditinjau". |
+| `logistic-view.tsx` | Belum terintegrasi sebagai lensa, minim penanganan anomali | Belum menyatu dalam lensa `UserDashboard`; belum ada peringatan stok minus dan tindakan mitigasi restock cepat. | `LogisticLens` mendalam di dalam `UserDashboard`: Monitoring stok minus, mutasi 7 hari, feed transaksi terbaru, dan aksi cepat modal mutasi/item. |
+| `admin-view.tsx` | "Peringatan Logistik", "Cek Stok Menipis" | Model `LogisticItem` tidak memiliki field `minStock` (stok minimum). | `AdminDashboard`: Item stok minus riil (Σ IN − Σ OUT < 0) di seluruh proyek. |
+| `project-detail-client.tsx` | "Progres Keseluruhan" = rata-rata `progressPercent` | Nilai `progressPercent` bersifat kumulatif; merata-ratakan nilai menghasilkan angka yang salah. | Kartu menampilkan nilai dari laporan harian terakhir (`reportDate desc, createdAt desc`) beserta tanggal pelaporannya. |
+| `stat-card.tsx` | Menerima string bebas untuk prop `trend` | Celah utama munculnya tren palsu seperti `+5%`. | `MetricCard`: Menerima prop numerik `previous: { value, periodLabel }` dan menghitung delta secara internal. |
+| `DashboardLayout` | `p-6` + `space-y-8` di dalam `PageLayout` | Terjadi double spacing vertikal. | Standardisasi wrapper: `flex flex-col gap-6 p-4 md:p-6`. |
+| `StatsGrid` | Breakpoint mapping tidak konsisten | Mapping Tailwind dinamis yang memicu styling class hilang saat kompilasi. | Menggunakan lookup kelas literal Tailwind yang eksplisit per breakpoint. |
 
-Do **not** build (schema cannot support): overall/portfolio progress %, financial health, low-stock alerts, "behind schedule", worker productivity, "unread" comments (no read state), "open" issues (no resolved flag).
+> [!NOTE]
+> **Fitur yang Sengaja Ditiadakan (Karena Ketiadaan Dukungan Skema):**  
+> Persentase rata-rata progres seluruh portofolio, label "Kesehatan Keuangan", peringatan stok menipis berdasarkan ambang batas (*low-stock threshold*), deteksi keterlambatan jadwal vs kurva S (*schedule variance*), produktivitas pekerja, status "Komentar Belum Dibaca" (karena tidak ada flag `isRead`), dan kendala berstatus "Open" (karena kolom `issues` tidak memiliki flag `isResolved`).
 
 ---
 
-## 3. Data rules
+## 3. Data Rules & Aturan Komputasi
 
-Policy constants (put in `src/lib/dashboard-constants.ts`; values are proposals):
+### Kebijakan Konstanta (`src/lib/dashboard-constants.ts`)
 
 ```ts
-export const REPORT_STALE_DAYS = 2;   // ACTIVE project with no report in N days
-export const ISSUE_WINDOW_DAYS = 7;   // issues KPI + feed
-export const TZ_OFFSET_HOURS = 8;     // WITA, no DST
+export const REPORT_STALE_DAYS = 2; // Proyek aktif tanpa laporan harian dalam >= 2 hari
+export const ISSUE_WINDOW_DAYS = 7; // Jendela waktu monitoring kendala & mutasi mingguan
+export const TZ_OFFSET_HOURS = 8;   // Zona waktu WITA (UTC+8, Bali/Lombok), tanpa DST
 ```
 
-**Timezone.** `reportDate` is stored in UTC; a UTC server would treat 00:00–07:59 WITA as "yesterday". One shared helper (unit-tested):
+### Penanganan Zona Waktu (WITA)
+Field `reportDate` disimpan dalam format UTC. Server cloud yang berjalan pada jam UTC akan menganggap rentang 00:00–07:59 WITA sebagai "kemarin". Seluruh batasan "hari ini", "minggu ini", dan "bulan ini" wajib menggunakan helper terpusat:
 
 ```ts
-startOfTodayWita = new Date(Math.floor((now + 8h) / 1d) * 1d - 8h)
+export function getStartOfTodayWita(now = new Date()): Date {
+  const MS_PER_DAY = 86_400_000;
+  const TZ_OFFSET_MS = TZ_OFFSET_HOURS * 3_600_000;
+  return new Date(Math.floor((now.getTime() + TZ_OFFSET_MS) / MS_PER_DAY) * MS_PER_DAY - TZ_OFFSET_MS);
+}
 ```
 
-Use it (and a matching month/week variant) for every "today" / "this month" boundary.
+### Logika Kumulatif `DailyReport.progressPercent`
+- Nilai `DailyReport.progressPercent` merupakan persentase penyelesaian proyek secara kumulatif pada saat laporan tersebut dibuat.
+- Progres proyek saat ini = nilai dari laporan harian paling mutakhir (`orderBy: [{ reportDate: "desc" }, { createdAt: "desc" }]`). **Jangan pernah dirata-ratakan.**
+- Jika laporan terbaru bernilai *lebih kecil* daripada laporan sebelumnya, ini mengindikasikan anomali input data → tampilkan pill badge peringatan `"Progres turun"`.
+- Untuk menghitung total pekerja hari ini (`totalWorkers`), ambil 1 laporan terakhir per proyek pada hari ini agar proyek dengan multi-laporan tidak dihitung ganda.
 
-**`DailyReport.progressPercent` is cumulative project completion as of that report (confirmed).**
-- Current progress = latest report, ordered `reportDate desc, createdAt desc`. Never average.
-- Value lower than the previous report = data-entry anomaly → "Progres turun" warning.
-- "Latest report per project per day" is used when summing `totalWorkers`, so several reports on one day are not double-counted.
-
-**Definitions**
-- Pending user: `reviewedAt = null`. Active: `isActive && reviewedAt`. Rejected: `!isActive && reviewedAt` (same as `users-client`).
-- Kendala dilaporkan: `issues` not null and not `""`. Called "dilaporkan", never "terbuka".
-- Negative stock: Σ `LogisticTransaction` IN − Σ OUT < 0 per item.
-- "Tanpa bukti": `EmergencyTransaction.url` is null.
-- Elapsed % = `clamp((now − startDate) / (endDate − startDate), 0, 1)`; needs both dates.
+### Definisi Status Data
+- **Status Pengguna:**
+  - *Menunggu Persetujuan:* `reviewedAt === null`
+  - *Aktif:* `isActive === true && reviewedAt !== null`
+  - *Ditolak:* `isActive === false && reviewedAt !== null`
+- **Kendala Dilaporkan:** Laporan di mana kolom `issues !== null && issues.trim() !== ""`. Disebut sebagai *"Kendala dilaporkan"*, bukan *"Kendala terbuka"*.
+- **Stok Minus Logistik:** Item barang di mana total kuantitas masuk dikurangi total kuantitas keluar menghasilkan nilai negatif (`Σ IN − Σ OUT < 0`).
+- **Transaksi Tanpa Bukti:** Transaksi kas darurat di mana `url === null`.
+- **Waktu Kalender Berlalu (Elapsed %):**  
+  `Math.min(Math.max((now - startDate) / (endDate - startDate), 0), 1) * 100`. Membutuhkan kedua tanggal terisi; jika tidak ada, beri label *"Tanggal belum diatur"*.
 
 ---
 
-## 4. tRPC procedures and queries
+## 4. tRPC Procedures & Query Contracts
 
-| Procedure | Guard | Returns |
+Router dashboard (`src/server/api/routers/dashboard.ts` atau `dashboard.router.ts`) menyediakan prosedur terpisah:
+
+| Prosedur | Otorisasi Guard | Data Kembalian |
 |---|---|---|
-| `dashboard.getAdminOverview` | ADMIN | `attention, counts, pendingUsers[5], projectHealth[]` |
-| `dashboard.getCeoOverview` | CEO | `kpis, portfolio[], issues[5], fund` |
-| `dashboard.getCeoTrends` | CEO | `workersDaily30d[], fundMonthly6m[], progressSeries?` (split so slow charts don't block) |
-| `dashboard.getUserOverview` | USER | `memberships[], mandor?, architect?, finance?` — a lens key exists only if the user holds that role on an ACTIVE project |
-
-Find the existing dashboard router under `src/server/api/routers/` (likely `dashboard.router.ts`) and replace the per-role procedures (`getCEOStats`, `getAdminStats`, `getMandorStats`, …) once the new ones are wired. Keep `getEmergencyFundBreakdown` / `emergency.*` if other screens use them.
-
-### Admin
-
-| Widget | Query | Rule |
-|---|---|---|
-| Users pending/active/rejected | `user.count` ×3 | definitions in section 3 |
-| Projects by status | `project.groupBy({ by: ["status"] })` | – |
-| Sudah lapor hari ini (x dari y) | ACTIVE projects with ≥1 `dailyReport` ≥ `startOfTodayWita` | – |
-| Role gaps | `projectMember.groupBy(projectId, role)` | ACTIVE project lacking MANDOR, ARCHITECT or FINANCE |
-| Stale project | `max(reportDate)` per project | < now − `REPORT_STALE_DAYS`, or no report and `startDate ≤ today` |
-| Unreviewed tx | `emergencyTransaction.count({ status: "UNREVIEWED" })` | – |
-| Negative stock | `logisticTransaction.groupBy(itemId, type)` → sum | `recordTransaction` doesn't block negatives, so this can really happen |
-| Pending users list | `user` where `reviewedAt null`, `createdAt asc`, take 5 | "menunggu" = now − `createdAt` |
-| Project health row | project + role counts + last report + unreviewed + negative stock + document count | – |
-
-### CEO
-
-| Widget | Query | Rule |
-|---|---|---|
-| Proyek aktif | `project.groupBy(status)` | – |
-| Laporan 7 hari vs 7 hari sebelumnya | `dailyReport.count` ×2 | Rolling windows; delta computed in component |
-| Pekerja hari ini | latest report per ACTIVE project today | Σ `totalWorkers` |
-| Kendala dilaporkan (7 hari) | `dailyReport.count` | `issues` filter above |
-| Portfolio row | project + latest report (+ previous for anomaly) + fund + unreviewed count | elapsed % rule; both dates missing → "Tanggal belum diatur"; `endDate < today` and ACTIVE → "Lewat tenggat"; no reports → "Belum ada laporan" (never render 0% as reported) |
-| Progress anomaly | top 2 reports per project | latest < previous → "Progres turun" |
-| Issues feed | `dailyReport` where `issues` set, `reportDate desc`, take 5 | text clamped to 2 lines |
-| Fund total / withdrawals | `emergencyFund._sum.currentBalance`; `emergencyTransaction._sum.amount` type WITHDRAWAL this month | counts reviewed and unreviewed |
-| Fund flow 6 mo | reuse `emergency.getAnalytics` monthly aggregation | – |
-| Workers 30 d | raw SQL `DISTINCT ON ("projectId", date)` then sum per day | missing days stay gaps, not zeros |
-| Progress trend (optional) | `reportDate, progressPercent` per ACTIVE project | one line per project; ≥2 reports, else empty state |
-
-### User lenses (all scoped to the caller's ACTIVE memberships)
-
-| Lens | Widget | Query / rule |
-|---|---|---|
-| Mandor | Laporan hari ini (per project) | `dailyReport` with `userId = me`, project = P, today |
-| Mandor | Penarikan saya belum ditinjau | `requestedById = me`, `UNREVIEWED`, WITHDRAWAL |
-| Mandor | Komentar 7 hari | `reportComment` on reports where `userId = me`, `author ≠ me` (count, not "unread") |
-| Mandor | Saldo darurat, laporan terakhir + progres | `emergencyFund.currentBalance`, latest `dailyReport` |
-| Mandor | Laporan terbaru saya | `dailyReport` `userId = me`, `reportDate desc`, take 3, first `ReportMedia` as thumbnail |
-| Arsitek | Dokumen per proyek | `projectDocument.groupBy(projectId, fileType)` + latest (`title ?? fileName`, `version`, `createdAt`) |
-| Arsitek | Saya unggah 7 hari | `userId = me`, `createdAt ≥ now − 7d` |
-| Keuangan | Antrean tinjauan | `UNREVIEWED` tx in projects where I'm FINANCE, `createdAt asc`, take 10; flag "Tanpa bukti" |
-| Keuangan | Saldo, penarikan bulan ini, item stok minus | same rules as Admin/CEO, scoped to my FINANCE projects |
-
-Open point: "Laporan hari ini" is "by me". If several mandors share a project, confirm whether it should be "by anyone in the project".
-
-### Optional schema changes (only if asked)
-
-- `LogisticItem.minStock Float?` — restores a real low-stock alert.
-- Indexes for the aggregates: `DailyReport @@index([projectId, reportDate])`, `EmergencyTransaction @@index([status, createdAt])`, `LogisticTransaction @@index([itemId])`.
-- A real "financial health" card would need `Project.budget` and a record of spend. Neither exists.
+| `dashboard.getAdminOverview` | `adminProcedure` | `{ attention, counts, pendingUsers, projectHealth }` |
+| `dashboard.getExecutiveOverview` | `executiveProcedure` | `{ kpis, portfolio, recentIssues, fundSummary }` |
+| `dashboard.getExecutiveTrends` | `executiveProcedure` | `{ workersDaily30d, fundMonthly6m, progressSeries? }` *(dipisah agar query analitik lambat tidak memblokir render utama)* |
+| `dashboard.getUserOverview` | `authedProcedure` | `{ memberships, supervisor?, architect?, finance?, logistic? }` *(Lensa hanya disertakan jika user memegang peran tersebut pada proyek AKTIF)* |
 
 ---
 
-## 5. Screens
+### Detail Query per Dashboard
 
-Order on every dashboard: (1) attention list, (2) KPI row, (3) main content, (4) charts. Split rows: `grid gap-4 lg:grid-cols-7` with `lg:col-span-4` / `lg:col-span-3`.
+#### A. Admin (`dashboard.getAdminOverview`)
+- **Counts & KPIs:**
+  - Pengguna: hitung `user.count` untuk status pending, aktif, dan ditolak.
+  - Proyek: `project.groupBy({ by: ["status"] })`.
+  - Sudah lapor hari ini: Jumlah proyek `ACTIVE` dengan ≥1 laporan pada `reportDate >= startOfTodayWita`.
+  - Transaksi belum ditinjau: `emergencyTransaction.count({ where: { status: "UNREVIEWED" } })`.
+- **Daftar Perhatian (`attention`):**
+  - Jumlah pengguna menunggu persetujuan (`count > 0`).
+  - Proyek aktif yang belum memiliki peran kunci (`SUPERVISOR`, `ARCHITECT`, `FINANCE`, atau `LOGISTIC`).
+  - Proyek aktif tanpa laporan ≥ 2 hari (`REPORT_STALE_DAYS`).
+  - Transaksi darurat belum ditinjau.
+  - Item logistik dengan stok minus.
+- **Persetujuan Pengguna:** 5 user terlama menunggu (`reviewedAt: null`, `orderBy: { createdAt: "asc" }`).
+- **Kesehatan Proyek:** Daftar proyek aktif dengan coverage peran tim, tanggal laporan terakhir, jumlah transaksi belum ditinjau, jumlah stok minus, dan total dokumen.
 
-### Admin
-```
-[ Perlu tindakan ]  rows only when count > 0 (all zero → "Tidak ada yang perlu ditindaklanjuti")
-   • n pengguna menunggu persetujuan        → /users
-   • n proyek aktif belum punya <peran>     → project team dialog
-   • n proyek aktif tanpa laporan ≥ 2 hari  → project
-   • n transaksi belum ditinjau             → /emergency
-   • n item logistik bersaldo minus         → /logistics
-[ Proyek ][ Pengguna ][ Sudah lapor hari ini ][ Belum ditinjau ]
-[ Persetujuan pengguna (4/7) ]      [ Aksi cepat (3/7) ]
-[ Kesehatan proyek: Proyek | Status | Tim M A K | Laporan terakhir | Belum ditinjau | Stok minus | Dokumen ]
-```
-
-### CEO
-```
-[ Proyek aktif ][ Laporan 7 hari (Δ vs 7 hari lalu) ][ Pekerja hari ini ][ Kendala dilaporkan 7 hari ]
-[ Portofolio proyek: Proyek | Status | Waktu vs progres | Pekerja hari ini | Saldo darurat | Belum ditinjau ]
-     Waktu vs progres = two tracks: elapsed time (thin, muted) + latest reported progress (primary).
-     Neutral: no "behind schedule" label — there is no plan baseline.
-[ Kendala terbaru (1/2) ]           [ Dana darurat: total + fund-flow chart 6 bln (1/2) ]
-[ Pekerja per hari, 30 hari ]  (+ optional progress trend)
-```
-
-### User
-```
-[ Proyek saya: chips "Proyek · Peran" ]
-[ RoleLensTabs ]  hidden if 1 lens; default = lens with most action items; URL ?lens=
-  Mandor:   KPIs (laporan hari ini, penarikan belum ditinjau, komentar 7 hari)
-            list per project (status pill, saldo, laporan terakhir + progres, [Tarik dana] [Buat laporan])
-            laporan terbaru saya (3)
-  Arsitek:  KPIs (dokumen di proyek saya, saya unggah 7 hari)
-            per project (count, last doc, type badges, [Lihat] [Unggah])
-  Keuangan: KPIs (antrean, penarikan bulan ini, item stok minus)
-            antrean tinjauan (Tandai ditinjau) + saldo per proyek ([Tambah dana])
-No memberships → empty state "Belum ditugaskan ke proyek".
-```
-Keep the existing dialogs: `ReportDialog`, `WithdrawDialog`, `DepositDialog`, `UploadDialog`.
+#### B. Executive (`dashboard.getExecutiveOverview` & `getExecutiveTrends`)
+- **Executive KPIs:**
+  - Total proyek aktif (`project.count({ where: { status: "ACTIVE" } })`).
+  - Laporan 7 hari terakhir vs 7 hari sebelumnya (dihitung delta numeriknya di sisi client).
+  - Total pekerja hari ini: Penjumlahan `totalWorkers` dari laporan terakhir setiap proyek aktif hari ini.
+  - Kendala dilaporkan dalam 7 hari terakhir: `dailyReport.count({ where: { issues: { not: null }, reportDate: { gte: now - 7d } } })`.
+- **Portofolio Proyek:**
+  - Setiap proyek menyertakan: rentang tanggal, progres terakhir, progres sebelumnya (untuk deteksi anomali penurunan), saldo kas darurat, jumlah penarikan belum ditinjau, dan pekerja hari ini.
+- **Feed Kendala Terbaru:** 5 laporan harian terkini dengan kolom kendala terisi (`take: 5`, `orderBy: { reportDate: "desc" }`).
+- **Dana Darurat & Tren:**
+  - Total saldo seluruh proyek (`emergencyFund._sum.currentBalance`).
+  - Total penarikan bulan ini (`emergencyTransaction._sum.amount` tipe `WITHDRAWAL` bulan berjalan).
+  - Trend pekerja 30 hari (agregasi `DISTINCT ON ("projectId", date)` lalu dijumlahkan per hari; hari kosong dibiarkan sebagai gap, bukan angka 0).
+  - Cash flow 6 bulan (memanfaatkan logika agregasi bulanan dari modul dana darurat).
 
 ---
 
-## 6. Components — built from shadcn/ui
+#### C. User Dashboard & Role Lenses (`dashboard.getUserOverview`)
 
-Existing in `src/components/ui` (seen in imports): `card`, `badge`, `button`, `table`, `tabs`, `chart`, `progress`, `skeleton`, `tooltip`, `separator`, `avatar`, `data-table`, `select`, `dropdown-menu`, `dialog`-family. Add anything missing with `pnpm dlx shadcn@latest add <name>` (e.g. `alert`).
+Seluruh data lensa dibatasi secara ketat di database dengan filter:
+`project: { status: "ACTIVE", members: { some: { userId: ctx.user.id, role: TARGET_ROLE } } }`
 
-| Component | Built from | Notes |
+```ts
+// Struktur Response dashboard.getUserOverview
+type UserOverviewOutput = {
+  memberships: Array<{
+    projectId: string;
+    projectName: string;
+    projectSlug: string;
+    role: "SUPERVISOR" | "ARCHITECT" | "FINANCE" | "LOGISTIC";
+  }>;
+  supervisor?: {
+    kpis: {
+      pendingReportsToday: number;
+      unreviewedWithdrawalsCount: number;
+      weeklyCommentsCount: number;
+    };
+    projects: Array<{
+      id: string;
+      name: string;
+      slug: string;
+      hasReportedToday: boolean;
+      emergencyBalance: string;
+      latestReport?: {
+        progressPercent: number;
+        reportDate: Date;
+      };
+    }>;
+    recentReports: Array<{
+      id: string;
+      slug: string;
+      reportDate: Date;
+      title: string;
+      totalWorkers: number;
+      projectName: string;
+      projectSlug: string;
+      thumbnailUrl?: string;
+    }>;
+  };
+  architect?: {
+    kpis: {
+      totalDocuments: number;
+      myUploadsLast7Days: number;
+    };
+    projects: Array<{
+      id: string;
+      name: string;
+      slug: string;
+      totalDocs: number;
+      byType: Record<string, number>;
+      latestDoc?: {
+        name: string;
+        version: string;
+        createdAt: Date;
+      };
+    }>;
+  };
+  finance?: {
+    kpis: {
+      unreviewedCount: number;
+      monthlyWithdrawalsAmount: string;
+      negativeStockCount: number;
+    };
+    unreviewedQueue: Array<{
+      id: string;
+      projectId: string;
+      projectName: string;
+      amount: string;
+      requesterName: string;
+      description: string;
+      hasReceipt: boolean;
+      createdAt: Date;
+    }>;
+    projectFunds: Array<{
+      projectId: string;
+      projectName: string;
+      projectSlug: string;
+      currentBalance: string;
+    }>;
+  };
+  logistic?: {
+    kpis: {
+      negativeStockItemCount: number;
+      weeklyMutationCount: number;
+      assignedProjectsCount: number;
+      totalItemsCount: number;
+    };
+    negativeStockItems: Array<{
+      id: string;
+      name: string;
+      unit: string;
+      projectId: string;
+      projectName: string;
+      projectSlug: string;
+      currentStock: number; // Nilai < 0
+      lastMutationAt: Date;
+    }>;
+    projectInventory: Array<{
+      projectId: string;
+      projectName: string;
+      projectSlug: string;
+      itemCount: number;
+      negativeStockCount: number;
+      lastActivityAt?: Date;
+    }>;
+    recentTransactions: Array<{
+      id: string;
+      type: "IN" | "OUT";
+      quantity: number;
+      unit: string;
+      itemName: string;
+      projectId: string;
+      projectName: string;
+      projectSlug: string;
+      operatorName: string;
+      notes?: string;
+      createdAt: Date;
+    }>;
+  };
+};
+```
+
+---
+
+## 5. Screens, Wireframes & Mockups
+
+Urutan blok tata letak pada setiap dashboard:
+1. **Daftar Perhatian / Action Items** (jika ada item kritis)
+2. **Baris Kartu KPI (`MetricCard`)**
+3. **Konten Utama** (Grid split `lg:grid-cols-7` dengan porsi `lg:col-span-4` dan `lg:col-span-3`)
+4. **Grafik & Analitik Lanjutan**
+
+---
+
+### A. Admin Dashboard
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ PERLU TINDAKAN (Hanya muncul jika count > 0)                                 │
+│  • 3 pengguna menunggu persetujuan                        [Tinjau →]         │
+│  • 1 proyek aktif belum memiliki anggota Logistik        [Kelola Tim →]      │
+│  • 2 proyek aktif tanpa laporan ≥ 2 hari                 [Lihat →]           │
+│  • 4 transaksi dana darurat belum ditinjau                [Periksa →]        │
+│  • 1 item logistik bersaldo minus                         [Atasi →]          │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────┐ ┌──────────────┐ ┌──────────────────────┐ ┌───────────────────┐
+│ Proyek Aktif │ │ Pengguna     │ │ Lapor Hari Ini       │ │ Belum Ditinjau    │
+│ 5 Aktif      │ │ 12 Aktif     │ │ 3 dari 5             │ │ 4 Transaksi       │
+│ 1 tunda · 1 sel│ 3 tunggu · 1 tlk│ proyek aktif         │ │ Dana Darurat      │
+└──────────────┘ └──────────────┘ └──────────────────────┘ └───────────────────┘
+
+┌───────────────────────────────────────┐ ┌────────────────────────────────────┐
+│ Persetujuan Pengguna (4/7)            │ │ Aksi Cepat (3/7)                   │
+│ Ni Made Ayu (ayu@mail.com) · 4 hr lalu │ │ • Tinjau Pengguna Baru             │
+│ Komang Adi (adi@mail.com)  · 2 hr lalu │ │ • Buat Proyek Baru                 │
+│ Wayan Sari (sari@mail.com) · 3 jam lalu│ │ • Ekspor Rekapitulasi Laporan      │
+└───────────────────────────────────────┘ └────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ KESEHATAN PROYEK (Tabel interaktif, klik baris → Detail Proyek)              │
+│ Proyek           | Status  | Tim (S A K L) | Laporan Terakhir | Minus | Dok  │
+│ Villa Jimbaran   | Aktif   | [S][A][K][L]  | Hari ini         | -     | 14   │
+│ Ruko Sanur       | Aktif   | [S][A][K][!L] | 3 hari lalu      | 1     | 6    │
+│ Interior Ubud    | Tertunda| [S][A][!K][!L]| 12 hari lalu     | -     | 0    │
+│ (Catatan: [!L] menunjukkan role Logistik belum ditugaskan pada proyek)       │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### B. Executive Dashboard
+
+```
+┌──────────────┐ ┌──────────────────────┐ ┌──────────────┐ ┌───────────────────┐
+│ Proyek Aktif │ │ Laporan 7 Hari       │ │ Pekerja      │ │ Kendala Dilaporkan│
+│ 5            │ │ 18                   │ │ 64 Orang     │ │ 3 Laporan         │
+│ Dari 7 proyek│ │ ▲ 4 dari pekan lalu  │ │ 3 proyek lapor│ │ 7 hari terakhir  │
+└──────────────┘ └──────────────────────┘ └──────────────┘ └───────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ PORTOFOLIO PROYEK                                                            │
+│ Proyek               | Waktu vs Progres Kumulatif      | Pekerja | Kas Darurat│
+│ Villa Jimbaran       | Waktu 62%   ████████░░░░        | 24      | Rp 12.5 jt │
+│ 1 Mar – 30 Nov 2026  | Progres 48% ██████░░░░░░ (Hari) |         |            │
+│ Ruko Sanur           | Waktu 88%   ███████████░        | -       | Rp 3.2 jt  │
+│ 10 Jun – 10 Okt 2026 | Progres 71% █████████░░░ (3 hr) |         | (2 pending)│
+│ Interior Ubud        | Belum ada laporan               | -       | Rp 0       │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────┐ ┌────────────────────────────────────┐
+│ Kendala Terbaru Dilaporkan (1/2)      │ │ Posisi Dana Darurat (1/2)          │
+│ • Ruko Sanur (16 Sep)                 │ │ Saldo Total: Rp 15.700.000         │
+│   "Pengiriman semen tertunda 2 hari"  │ │ Penarikan Bulan Ini: Rp 2.400.000  │
+│ • Villa Jimbaran (15 Sep)             │ │ [Grafik Cash Flow 6 Bulan Masuk/   │
+│   "Hujan deras, cor lantai 2 ditunda" │ │  Keluar Recharts]                  │
+└───────────────────────────────────────┘ └────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ Tren Tenaga Kerja Lapangan (30 Hari Terakhir)                                │
+│ [Grafik Area / Bar Recharts: Akumulasi pekerja harian di proyek aktif]       │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### C. User Dashboard & Role Lenses
+
+#### Header Bersama & Navigasi Lensa
+```
+[Proyek Saya: Villa Jimbaran (Supervisor, Logistik) · Ruko Sanur (Logistik)]
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ [Tab: Supervisor (1)]  [Tab: Logistik (1)]  [Tab: Keuangan]  [Tab: Arsitek]  │
+│ (Tab disinkronkan ke query parameter ?lens=; badge angka = item aksi aktif) │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+Jika pengguna belum ditugaskan ke proyek aktif mana pun:
+> **Status:** Belum Ditugaskan ke Proyek  
+> *"Akun Anda telah aktif, namun belum ada penugasan proyek. Silakan hubungi Administrator untuk penugasan tim."*
+
+---
+
+#### 1. Lensa Supervisor (`SUPERVISOR`)
+- **KPI Row:**
+  - *Laporan Hari Ini:* "1 Belum Lapor" (dari 2 proyek Anda).
+  - *Penarikan Belum Ditinjau:* "1 Transaksi" (Rp 1.500.000 diajukan oleh saya).
+  - *Komentar (7 Hari):* "4 Komentar" pada laporan saya dari anggota tim lain.
+- **Daftar Proyek Saya:**
+  - Kartu proyek dengan status pelaporan hari ini, saldo kas darurat, laporan terakhir & persentase progres.
+  - Aksi cepat: Tombol `[+ Buat Laporan Harian]` (buka `ReportDialog`) dan `[Tarik Dana Darurat]` (buka `WithdrawDialog`).
+- **Laporan Terbaru Saya:** List 3 laporan harian terakhir yang dibuat oleh pengguna lengkap dengan tanggal, jumlah pekerja, dan thumbnail foto pertama.
+
+---
+
+#### 2. Lensa Arsitek (`ARCHITECT`)
+- **KPI Row:**
+  - *Dokumen di Proyek Saya:* Total berkas gambar/desain yang tersimpan.
+  - *Saya Unggah (7 Hari):* Total dokumen yang diunggah oleh saya dalam sepekan terakhir.
+- **Ringkasan Dokumen per Proyek:**
+  - Kartu per proyek dengan rincian kategori dokumen (Desain, Gambar Kerja, Spesifikasi), versi dokumen terbaru, dan tanggal pembaruan.
+  - Aksi cepat: Tombol `[Lihat Dokumen]` dan `[+ Unggah Dokumen Baru]` (buka `UploadDialog`).
+
+---
+
+#### 3. Lensa Keuangan (`FINANCE`)
+- **KPI Row:**
+  - *Antrean Tinjauan:* Jumlah transaksi dana darurat berstatus `UNREVIEWED` di proyek yang saya kelola.
+  - *Penarikan Bulan Ini:* Total pengeluaran kas darurat bulan berjalan.
+  - *Item Stok Minus:* Jumlah item material yang bersaldo minus di proyek saya.
+- **Antrean Tinjauan Kas Darurat:**
+  - Daftar transaksi menunggu verifikasi (maksimal 10, urutan terlama lebih dulu).
+  - Indikator badge: *"Tanpa Bukti"* jika kuitansi/nota belum diunggah.
+  - Aksi: Tombol langsung `[Tandai Ditinjau]`.
+- **Saldo Kas Darurat per Proyek:**
+  - Tampilan saldo kas aktif per proyek dengan tombol cepat `[+ Tambah Saldo / Deposit]` (buka `DepositDialog`).
+
+---
+
+#### 4. Lensa Logistik (`LOGISTIC`) — Spesifikasi Mendalam
+
+Lensa Logistik didesain khusus untuk staf operasional gudang dan pengawas material lapangan yang bertanggung jawab memastikan ketersediaan barang dan akurasi mutasi fisik.
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ LENSA LOGISTIK                                                               │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────┐ ┌───────────────────┐ ┌───────────────────┐ ┌─────────────┐
+│ Item Stok Minus   │ │ Mutasi 7 Hari     │ │ Proyek Dikelola   │ │ Total Barang│
+│ 1 Item            │ │ 9 Transaksi       │ │ 2 Proyek          │ │ 23 Master   │
+│ Butuh restock     │ │ Masuk & Keluar    │ │ Status Aktif      │ │ Material    │
+└───────────────────┘ └───────────────────┘ └───────────────────┘ └─────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ ⚠️ PERHATIAN: ITEM MATERIAL BERSALDO MINUS                                    │
+│ Terjadi selisih pencatatan di mana pengeluaran barang melebihi stok tercatat: │
+│ • Ruko Sanur: Semen Tiga Roda (Saldo: -4 Sak)                                 │
+│   Aksi: [Catat Masuk / Restock]  [Buka Gudang Proyek →]                      │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────┐ ┌────────────────────────────────────┐
+│ Inventaris per Proyek (4/7)           │ │ Pintasan & Aksi Cepat (3/7)        │
+│ Villa Jimbaran                        │ │ • [+ Catat Mutasi Masuk/Keluar]    │
+│ 14 item terdaftar · Stok aman         │ │   (Buka TransactionDialog)         │
+│ [Buka Modul Logistik →]               │ │ • [+ Tambah Master Barang Baru]    │
+│ ───────────────────────────────────── │ │   (Buka LogisticItemDialog)        │
+│ Ruko Sanur                            │ │ • Tanggung Jawab:                  │
+│ 9 item terdaftar · ⚠️ 1 item minus     │ │   Pastikan setiap barang keluar    │
+│ [Buka Modul Logistik →]               │ │   memiliki catatan peruntukan.     │
+└───────────────────────────────────────┘ └────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ RIWAYAT MUTASI TERBARU (5 Transaksi Terakhir di Proyek Anda)                 │
+│ Waktu         | Proyek        | Barang           | Tipe   | Kuantitas | Oleh │
+│ Hari ini 14:10| Ruko Sanur    | Semen Tiga Roda  | [MASUK]| +20 Sak   | Made │
+│ Kemarin 09:30 | Villa Jimbaran| Paku Ukuran 5cm  | [KELUAR| -5 Kg     | Budi │
+│ 08 Okt 16:00  | Ruko Sanur    | Pasir Pasang     | [MASUK]| +2 Dump   | Made │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+##### Komponen Utama Lensa Logistik:
+1. **4x Kartu Metrik KPI (`MetricCard`):**
+   - *Item Stok Minus:* Menggunakan `tone="attention"` berwarna merah/oranye jika nilai > 0. Caption: `"Σ IN − Σ OUT < 0"`.
+   - *Mutasi 7 Hari:* Jumlah pergerakan barang dalam 7 hari terakhir.
+   - *Proyek Dikelola:* Jumlah proyek aktif di mana pengguna menjabat sebagai Logistik.
+   - *Total Master Barang:* Akumulasi ragam material yang terdaftar di proyek pengguna.
+2. **Banner Peringatan Stok Minus:**
+   - Muncul otomatis jika `negativeStockItemCount > 0`.
+   - Menampilkan nama barang, satuan, proyek bersangkutan, dan jumlah minus.
+   - Tombol aksi terintegrasi: `[Catat Masuk]` yang langsung membuka `TransactionDialog` tipe `IN` ter-prefill, serta tautan cepat ke modul logistik proyek.
+3. **Ringkasan Inventaris Proyek:**
+   - Menampilkan status kesehatan stok masing-masing proyek (Aman / Ada Stok Minus).
+   - Tautan langsung ke `/projects/[slug]/logistics`.
+4. **Feed Riwayat Mutasi Terkini:**
+   - 5 transaksi mutasi terakhir di seluruh proyek pengguna.
+   - Badge warna: Hijau untuk barang masuk (`IN` dengan ikon panah naik) dan Oranye/Merah untuk barang keluar (`OUT` dengan ikon panah turun).
+   - Menampilkan kuantitas, satuan, nama petugas penginput, dan catatan ringkas.
+5. **Integrasi Dialog Langsung:**
+   - Staf Logistik dapat mencatat barang masuk/keluar secara langsung dari dashboard melalui `TransactionDialog` tanpa perlu navigasi berpindah halaman.
+
+---
+
+## 6. Components & Design System
+
+Semua komponen dibangun di atas primitif `shadcn/ui`:
+
+| Komponen Remodel | Primitif Dasar | Catatan & Perilaku Teknis |
 |---|---|---|
-| `MetricCard` (replaces `StatCard`) | `Card`, `CardHeader`, `CardTitle`, `CardContent`, `Skeleton` | Props: `label, value, caption?, previous?, href?, tone?: "default"\|"attention", isLoading, isError`. No free-text trend. Delta hidden when `previous` undefined. `tone` derives from data (count > 0) |
-| `AttentionList` | `Card`, `Button asChild variant="ghost"` + `Link`, `Badge` | `items: { key, count, label, href, severity }[]`; filters `count > 0`; empty → all-clear line |
-| `ProjectHealthTable`, `PortfolioTable` | `Table` primitives (`DataTable` if paginating) | Table ≥ md; `Card` list below md |
-| `TimelineProgress` | `Progress` (reported progress) + **custom** thin time track | shadcn has no two-track bar. States: normal, not started, overdue, no dates, no reports |
-| `RoleCoverage` | `Badge variant="outline"` | M/A/K; missing role = dashed border via `className` |
-| `IssueFeed` | `Card`, `Separator`, `Button asChild` links | 2-line clamp; whole row is a link |
-| `RoleLensTabs` | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` | Radix Tabs already implements the ARIA tabs pattern; sync to `?lens=` with `useSearchParams` |
-| `FundFlowChart`, `WorkersChart`, `ProgressChart` | `ChartContainer`, `ChartTooltip`, `ChartTooltipContent` + Recharts | `accessibilityLayer` on; reuse the config style from `emergency-client.tsx` |
-| Error state | `Alert` (add) + `Button` retry | Per widget, not per page |
-| Empty state | `Card` (or shadcn `Empty` if added) | Single state with next step; never a grid of zeros |
-| Status pills | `Badge` + new `success` / `warning` variants in `badge.tsx` via `cva` | Tokens below |
+| `MetricCard` *(menggantikan `StatCard`)* | `Card`, `Skeleton`, `Badge` | Props: `label, value, caption?, previous?: { value: number; periodLabel: string }, href?, tone?: "default" \| "attention", isLoading, isError`. Tidak ada tren teks bebas. Delta dihitung otomatis. |
+| `AttentionList` | `Card`, `Button` (`variant="ghost"`), `Badge` | Props: `items: { key, count, label, href, severity }[]`. Hanya merender item dengan `count > 0`. Jika semua 0, tampilkan pesan all-clear. |
+| `TimelineProgress` | `Progress` + custom elapsed bar | Dua track visual: Garis tipis atas untuk waktu kalender berlalu (*elapsed time*), dan garis utama untuk progres kumulatif yang dilaporkan. |
+| `RoleCoverage` | `Badge` (`variant="outline"`) | Menampilkan pil [S] [A] [K] [L]. Jika peran belum terisi di proyek, pil menggunakan border putus-putus (`border-dashed opacity-60`). |
+| `RoleLensTabs` | `Tabs`, `TabsList`, `TabsTrigger` | Menggunakan standar keyboard WAI-ARIA Tabs. Pilihan tab tersinkronisasi otomatis dengan query parameter URL (`?lens=`). |
+| `IssueFeed` | `Card`, `Separator`, `Link` | Membatasi teks kendala maksimal 2 baris (`line-clamp-2`). Baris dapat diklik langsung menuju laporan terkait. |
+| `ProjectHealthTable` / `PortfolioTable` | `Table`, `DataTable` | Ditampilkan sebagai tabel penuh pada layar desktop/tablet (≥ 768px), dan beralih menjadi format kartu pada layar ponsel (< 768px). |
+| `FundFlowChart` & `WorkersChart` | `ChartContainer`, Recharts | Mengaktifkan `accessibilityLayer`. Warna grafik mengambil token `--chart-1` dan `--chart-2`. |
 
-**Tokens.** Reuse `--primary`, `--muted`, `--muted-foreground`, `--card`, `--border`, `--destructive`, `--chart-1`, `--chart-2`. Add `--status-success` and `--status-warning` (+ `-foreground`/bg) in the global CSS where the shadcn tokens live, and register them in Tailwind v4's `@theme inline` so `bg-status-success` etc. work. Light: green-700 / amber-700 text on a 50 tint; dark: green-400 / amber-400 text on a 950 tint. Remove hardcoded `bg-green-50/50`, `text-green-600` etc. (no dark variant today).
-
-Typography: KPI value `text-2xl font-bold`; label `text-sm font-medium`; caption `text-xs text-muted-foreground`. Spacing: page `p-4 md:p-6`, sections `gap-6`, cards `gap-4`.
-
----
-
-## 7. States, responsive, motion
-
-**States**
-
-| Element | State | Behavior |
-|---|---|---|
-| MetricCard | Loading | `Skeleton`, keep card height |
-| MetricCard | Error | "—" + "Gagal memuat" + retry; other cards unaffected |
-| MetricCard | Zero | Show `0`, never hide |
-| MetricCard / AttentionList row with link | Hover, focus | `border-primary/50` or `bg-muted/50`, 150 ms; visible focus ring |
-| "Tandai ditinjau" | Pending | Disabled + "Meninjau…"; on success toast and invalidate `emergency.*` **and** `dashboard.*` |
-| Dashboard | Stale | `staleTime` 60 s; footer "Diperbarui {relative time}" from `dataUpdatedAt` |
-| Any mutation that changes counts (create report, review tx, approve user, upload doc, logistic tx) | Success | Invalidate the relevant `dashboard.*` query |
-
-**Responsive**
-
-| Breakpoint | Changes |
-|---|---|
-| ≥ 1024px | KPI row 4 columns; main splits 4/3; tables full width |
-| 768–1023px | KPI row 2 columns; splits stack; tables scroll in `overflow-x-auto` |
-| < 768px | KPI row 2 columns; tables become card lists (name + status, then 2–3 facts); lens tabs scroll horizontally; primary buttons full width. Mandors and finance staff are mostly on phones on site |
-
-**Motion.** Card hover border 150 ms ease-out. Skeleton uses Tailwind's pulse. Mobile row expand may reuse the `projects-client` animation (300 ms, `[0.04, 0.62, 0.23, 0.98]`) and must honor `useReducedMotion()`. **No count-up on numbers.** The GSAP `MOTION` tokens are for the marketing site, not here.
-
-**Edge cases**
-- No projects at all: one empty state with the next step (Admin → "Buat proyek").
-- Project without dates: "Tanggal belum diatur", no time bar. Without reports: "Belum ada laporan", no progress bar.
-- `Decimal(15,2)` balances: serialize as string, format with `Intl.NumberFormat("id-ID")`. Abbreviations ("Rp 2,4 jt") only in narrow KPI cards; tables show full value.
-- Long names: `truncate` + `title`. More than 20 projects: tables paginate at 10; user lens lists cap at 5 with "Lihat semua".
-- Negative or unreviewed-only data is shown as-is with a pill, never clamped.
-- Slow connection: overview renders first; charts have their own skeletons.
+### Design Tokens & CSS Variables
+Gunakan token CSS semantik dari tema global:
+- `--primary`: Aksen utama dan bar pengisian progres laporan.
+- `--muted`, `--muted-foreground`: Teks sekunder, caption, dan track waktu kalender.
+- `--card`, `--border`: Seluruh container kartu dan garis batas tabel.
+- `--destructive`: Indikator stok minus dan batas tenggat terlampaui.
+- `--status-success` & `--status-warning` (+ background tint): Token status semantik untuk badge. Light mode: teks hijau/amber pekat di atas tint 50. Dark mode: teks hijau/amber cerah di atas tint 950. Dilarang menggunakan kombinasi warna Tailwind statis yang tidak mendukung dark mode (seperti `bg-green-50/50`).
 
 ---
 
-## 8. Accessibility
+## 7. Responsive, State & Motion
 
-- `PageLayout` title is the h1; each card title is an h2 (`section aria-labelledby`).
-- Focus order = visual order: attention list → KPIs → main content → charts.
-- Status is never colour-only: every pill has text; overdue/negative also gets an icon.
-- `TimelineProgress`: reported progress is `role="progressbar"` with `aria-valuenow`; the time track is `aria-hidden` and its value is in the visible label ("Waktu 62% · Progres 48%").
-- Tables: `<caption className="sr-only">`, `scope="col"`; icon-only buttons need `aria-label`.
-- Charts: `accessibilityLayer`, an `aria-label` summarising range and latest value, and a visually hidden table with the same data.
-- Announce lens count changes with `aria-live="polite"` only after a user action, not on refetch.
+### Perilaku Responsif (Mobile-First Stack)
+- **Desktop (≥ 1024px):** Baris KPI 4 kolom; area utama terbagi 4:3 (`lg:grid-cols-7`); tabel dirender penuh.
+- **Tablet (768px – 1023px):** Baris KPI 2 kolom; layout split bertumpuk secara vertikal; tabel dapat digeser mendatar (`overflow-x-auto`).
+- **Ponsel (< 768px):** Baris KPI 2 kolom kompak; tabel bertransformasi menjadi **daftar kartu (card list)** dengan nama proyek dan status di bagian atas, diikuti informasi kunci di bawahnya; tab lensa peran dapat digeser horizontal (*scrollable pills*); tombol tindakan utama memenuhi lebar kontainer (*full-width*).
+
+### State Management & Mutasi
+- **Loading State:** Menggunakan skeleton animasi shimmer (`Skeleton`), menjaga tinggi komponen agar tidak terjadi Cumulative Layout Shift (CLS).
+- **Error State:** Tampilan per-widget berupa kartu peringatan dengan pesan kegagalan dan tombol aksi `[Coba Lagi]`. Kegagalan satu widget tidak merusak seluruh dashboard.
+- **Zero / Empty State:** Menampilkan angka `0` (bukan disembunyikan). Untuk daftar proyek kosong, tampilkan ilustrasi atau pesan bantuan dengan tombol aksi pertama.
+- **Cache Invalidation:** Ketika pengguna melakukan mutasi (membuat laporan harian, meninjau transaksi, mencatat mutasi logistik, mengunggah dokumen, atau menyetujui user), query `dashboard.*` terkait wajib di-invalidasi bersamaan dengan query modul asalnya.
+
+### Prinsip Motion
+- Hover border kartu: Transisi 150ms `ease-out`.
+- Ekspansi kartu pada mobile: 300ms dengan transisi halus dan wajib mematuhi preferensi sistem `useReducedMotion()`.
+- **Dilarang menggunakan efek animasi angka bergulir (count-up):** Angka metrik harus muncul langsung dan tegas agar terbaca sebagai data analitik yang presisi, bukan elemen dekoratif.
 
 ---
 
-## 9. Implementation phases
+## 8. Aksesibilitas (WCAG AA)
 
-**Phase 1 — foundation.** `dashboard-constants.ts`, WITA time helpers (+ tests), status tokens and `Badge` variants, `MetricCard`, `AttentionList`, fixed `StatsGrid`, `DashboardLayout` spacing.
+1. **Struktur Heading Semantis:** Judul halaman utama menggunakan tag `<h1>`, judul masing-masing kartu menggunakan `<h2>` atau `<section aria-labelledby="...">`.
+2. **Status Multi-Indikator:** Status tidak boleh hanya dibedakan berdasarkan warna. Setiap status wajib memiliki label teks yang jelas, dan status kritis (seperti stok minus atau lewat tenggat) harus menyertakan ikon pembeda.
+3. **Aksesibilitas Bar Progres:** Komponen `TimelineProgress` menetapkan atribut `role="progressbar"` dan `aria-valuenow` pada track progres laporan utama. Track waktu kalender ditandai dengan `aria-hidden="true"`, dengan nilainya dijelaskan melalui label teks tampak.
+4. **Navigasi Keyboard Penuh:** Seluruh baris tabel, link kartu, dan tab lensa dapat diakses melalui tombol Tab dan diaktifkan dengan tombol Enter/Space.
 
-**Phase 2 — Admin.** `getAdminOverview`, hook in `useDashboard.ts` + `hooks/index.ts`, `AdminDashboard`, remove `AdminView`.
+---
 
-**Phase 3 — CEO.** `getCeoOverview`, `getCeoTrends`, `TimelineProgress`, `PortfolioTable`, `IssueFeed`, charts, remove `CEOView`.
+## 9. Rencana Implementasi Bertahap (Phases)
 
-**Phase 4 — User.** `getUserOverview`, `RoleLensTabs`, Mandor / Arsitek / Keuangan lenses reusing the existing dialogs, remove `MandorView`, `ArchitectView`, `FinanceView`.
+Pengerjaan remodel dashboard dilakukan secara bertahap untuk memastikan stabilitas sistem:
 
-**Phase 5 — switch and cleanup.** Rewrite `dashboard/page.tsx` to pick by `roleGlobal`; wire cache invalidation; replace the project-detail "Progres Keseluruhan" card with the latest report value + date; delete `StatCard` when unused.
+### Fase 1 — Pondasi & Komponen Dasar
+- Buat file `src/lib/dashboard-constants.ts` dan fungsi helper zona waktu WITA (`src/lib/time-utils.ts` atau sejenisnya) beserta unit test Vitest.
+- Daftarkan token status di CSS variabel dan tema Tailwind.
+- Bangun komponen fondasi: `MetricCard`, `AttentionList`, perbaikan grid responsif, dan layout wrapper.
 
-**Acceptance criteria**
-- Grep finds no hardcoded metric literals (`75%`, `Sehat`, `Sesuai Target`, `+2`, `Kerja bagus`) in `src/components/dashboard`.
-- Every `MetricCard` value traces to a procedure field.
-- Empty database → every role shows empty states, not zeros or crashes.
-- Test accounts: ADMIN, CEO, USER with one role, USER with Mandor + Finance, USER with no membership.
-- A USER cannot see any project they are not a member of (verify at the API, not the UI).
-- Dark mode looks correct; no hardcoded Tailwind colour scales left in dashboard components.
-- `pnpm typecheck`, `pnpm check`, `pnpm test` pass.
+### Fase 2 — Admin Dashboard
+- Buat prosedur tRPC `dashboard.getAdminOverview`.
+- Hubungkan hook query di `src/hooks/useDashboard.ts`.
+- Bangun komponen `AdminDashboard` dan verifikasi seluruh widget berfungsi dari data Prisma.
+
+### Fase 3 — Executive Dashboard
+- Buat prosedur tRPC `dashboard.getExecutiveOverview` dan `dashboard.getExecutiveTrends`.
+- Bangun komponen `TimelineProgress`, `PortfolioTable`, `IssueFeed`, serta grafik pekerja & arus kas Recharts.
+- Satukan ke dalam komponen `ExecutiveDashboard`.
+
+### Fase 4 — User Dashboard & Role Lenses
+- Buat prosedur tRPC `dashboard.getUserOverview` dengan penanganan lensa `supervisor`, `architect`, `finance`, dan `logistic`.
+- Bangun komponen `RoleLensTabs`.
+- Bangun masing-masing lensa:
+  - `SupervisorLens` (integrasi `ReportDialog` & `WithdrawDialog`).
+  - `ArchitectLens` (integrasi `UploadDialog`).
+  - `FinanceLens` (aksi verifikasi transaksi & `DepositDialog`).
+  - `LogisticLens` (tabel stok minus, feed mutasi, integrasi `TransactionDialog` & `LogisticItemDialog`).
+- Tangani state kosong bagi pengguna tanpa penugasan proyek aktif.
+
+### Fase 5 — Switch Routing & Pembersihan File Warisan
+- Perbarui `src/app/(internal)/dashboard/page.tsx` untuk melakukan percabangan bersih berdasarkan `roleGlobal` (`AdminDashboard`, `ExecutiveDashboard`, `UserDashboard`).
+- Hubungkan invalidasi cache React Query pada aksi-aksi mutasi terkait.
+- Perbaiki perhitungan rata-rata keliru pada kartu *Progres Keseluruhan* di halaman detail proyek agar menggunakan laporan harian terakhir.
+- **Pembersihan File Warisan:** Setelah dashboard baru beroperasi stabil, hapus atau ganti file-file lama berikut:
+  - `src/components/dashboard/ceo-view.tsx` & `executive-view.tsx`
+  - `src/components/dashboard/mandor-view.tsx` & `supervisor-view.tsx`
+  - `src/components/dashboard/admin-view.tsx`
+  - `src/components/dashboard/architect-view.tsx`
+  - `src/components/dashboard/finance-view.tsx`
+  - `src/components/dashboard/logistic-view.tsx`
+  - `src/components/dashboard/stat-card.tsx` (jika tidak lagi digunakan)
+- Jalankan verifikasi menyeluruh: `pnpm typecheck`, `pnpm check`, `pnpm test`.
+
+---
+
+## 10. Kriteria Penerimaan (Acceptance Criteria)
+
+- [ ] Tidak ditemukan lagi teks atau angka metrik palsu/hardcoded di seluruh komponen dashboard.
+- [ ] Setiap angka pada `MetricCard` dapat ditelusuri langsung ke field query database Prisma.
+- [ ] Pengguna dengan `roleGlobal = USER` terisolasi secara mutlak: tidak dapat melihat data proyek yang tidak menjadi bagian dari keanggotaannya.
+- [ ] Pengguna dengan multi-peran pada proyek berbeda dapat berganti lensa secara mulus melalui tab peran tanpa terjadi penumpukan layout.
+- [ ] Lensa Logistik menampilkan data stok minus riil dengan aksi cepat mitigasi pencatatan mutasi masuk.
+- [ ] Tampilan responsif diuji dan nyaman digunakan pada perangkat seluler (< 768px).
+- [ ] Mode gelap (*dark mode*) teruji kontras dan tampil harmonis pada seluruh komponen.
+- [ ] Perintah `pnpm typecheck`, `pnpm check`, dan `pnpm test` berhasil 100% tanpa error.
