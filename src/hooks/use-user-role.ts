@@ -22,21 +22,26 @@ export function useUserRole() {
         .map((member) => member.role),
     ) ?? [];
 
-  const isMandor = projectRoles.includes(ProjectRole.MANDOR);
+  const isSupervisor = projectRoles.includes(ProjectRole.SUPERVISOR);
   const isArchitect = projectRoles.includes(ProjectRole.ARCHITECT);
   const isFinance = projectRoles.includes(ProjectRole.FINANCE);
+  const isLogistic = projectRoles.includes(ProjectRole.LOGISTIC);
+  const isExecutive = globalRole === "EXECUTIVE";
 
   return {
     // Global Roles
     role: globalRole,
     isAdmin: isAdmin(globalRole),
-    isCEO: globalRole === "CEO",
+    isExecutive,
+    isCEO: isExecutive, // Backward compatibility alias
     isGlobalAdmin: globalRole === "ADMIN",
 
     // Project Roles
-    isMandor,
+    isSupervisor,
+    isMandor: isSupervisor, // Backward compatibility alias
     isArchitect,
     isFinance,
+    isLogistic,
 
     // State
     isLoading: isLoading,

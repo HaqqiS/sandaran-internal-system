@@ -41,11 +41,44 @@ export const dashboardRouter = createTRPCRouter({
   }),
 
   /**
-   * Get stats for CEO dashboard
+   * Get stats for Executive dashboard
    */
+  getExecutiveStats: protectedProcedure.query(async ({ ctx }) => {
+    // Check if Executive or Admin
+    if (
+      ctx.session.user.roleGlobal !== "EXECUTIVE" &&
+      ctx.session.user.roleGlobal !== "ADMIN"
+    ) {
+      throw new Error("Unauthorized");
+    }
+
+    const projects = await ctx.db.project.findMany({
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        status: true,
+        _count: {
+          select: {
+            dailyReports: true,
+          },
+        },
+      },
+    });
+
+    return {
+      totalProjects: projects.length,
+      activeProjects: projects.filter((p) => p.status === "ACTIVE").length,
+      projects,
+    };
+  }),
+
+  // Backward compatibility alias
   getCEOStats: protectedProcedure.query(async ({ ctx }) => {
-    // Check if CEO
-    if (ctx.session.user.roleGlobal !== "CEO") {
+    if (
+      ctx.session.user.roleGlobal !== "EXECUTIVE" &&
+      ctx.session.user.roleGlobal !== "ADMIN"
+    ) {
       throw new Error("Unauthorized");
     }
 
@@ -71,13 +104,16 @@ export const dashboardRouter = createTRPCRouter({
   }),
 
   /**
-   * Get recent reports across all projects (CEO only)
+   * Get recent reports across all projects (Executive)
    */
-  getCEORecentReports: protectedProcedure
+  getExecutiveRecentReports: protectedProcedure
     .input(z.object({ limit: z.number().default(5).optional() }))
     .query(async ({ ctx, input }) => {
-      // Check if CEO
-      if (ctx.session.user.roleGlobal !== "CEO") {
+      // Check if Executive or Admin
+      if (
+        ctx.session.user.roleGlobal !== "EXECUTIVE" &&
+        ctx.session.user.roleGlobal !== "ADMIN"
+      ) {
         throw new Error("Unauthorized");
       }
 
@@ -110,11 +146,49 @@ export const dashboardRouter = createTRPCRouter({
       return reports;
     }),
 
+  // Backward compatibility alias
+  getCEORecentReports: protectedProcedure
+    .input(z.object({ limit: z.number().default(5).optional() }))
+    .query(async ({ ctx, input }) => {
+      if (
+        ctx.session.user.roleGlobal !== "EXECUTIVE" &&
+        ctx.session.user.roleGlobal !== "ADMIN"
+      ) {
+        throw new Error("Unauthorized");
+      }
+
+      return ctx.db.dailyReport.findMany({
+        take: input.limit ?? 5,
+        orderBy: { reportDate: "desc" },
+        select: {
+          id: true,
+          slug: true,
+          reportDate: true,
+          taskDescription: true,
+          progressPercent: true,
+          project: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+      });
+    }),
+
   /**
-   * Get stats for MANDOR dashboard
-   * Returns data for projects where user is MANDOR
+   * Get stats for SUPERVISOR dashboard
+   * Returns data for projects where user is SUPERVISOR
    */
-  getMandorStats: protectedProcedure.query(async ({ ctx }) => {
+  getSupervisorStats: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id;
 
     const startOfDay = new Date();
@@ -123,13 +197,13 @@ export const dashboardRouter = createTRPCRouter({
     const endOfDay = new Date();
     endOfDay.setHours(23, 59, 59, 999);
 
-    // Find projects where user is MANDOR
+    // Find projects where user is SUPERVISOR
     const projects = await ctx.db.project.findMany({
       where: {
         members: {
           some: {
             userId,
-            role: "MANDOR",
+            role: "SUPERVISOR",
           },
         },
         status: "ACTIVE", // Only active projects need reports
@@ -165,18 +239,118 @@ export const dashboardRouter = createTRPCRouter({
     };
   }),
 
+  // Backward compatibility alias
+  getMandorStats: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const projects = await ctx.db.project.findMany({
+      where: {
+        members: {
+          some: {
+            userId,
+            role: "SUPERVISOR",
+          },
+        },
+        status: "ACTIVE",
+      },
+      include: {
+        _count: {
+          select: {
+            dailyReports: true,
+          },
+        },
+        dailyReports: {
+          where: {
+            reportDate: {
+              gte: startOfDay,
+              lte: endOfDay,
+            },
+          },
+          select: { id: true },
+          take: 1,
+        },
+      },
+    });
+
+    const reportsDue =
+      projects.length -
+      projects.filter((p) => p.dailyReports.length > 0).length;
+
+    return {
+      projectCount: projects.length,
+      projects,
+      reportsDue,
+    };
+  }),
+
   /**
-   * Get recent reports for MANDOR with media thumbnails
+   * Get recent reports for SUPERVISOR with media thumbnails
    */
+  getSupervisorRecentReports: protectedProcedure
+    .input(z.object({ limit: z.number().default(3).optional() }))
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      // Get projects where user is SUPERVISOR
+      const projectIds = await ctx.db.projectMember
+        .findMany({
+          where: { userId, role: "SUPERVISOR" },
+          select: { projectId: true },
+        })
+        .then((members) => members.map((m) => m.projectId));
+
+      if (!projectIds.length) return [];
+
+      const reports = await ctx.db.dailyReport.findMany({
+        where: {
+          projectId: { in: projectIds },
+          userId,
+        },
+        take: input.limit ?? 3,
+        orderBy: { reportDate: "desc" },
+        select: {
+          id: true,
+          slug: true,
+          reportDate: true,
+          taskDescription: true,
+          project: {
+            select: {
+              id: true,
+              name: true,
+              slug: true,
+            },
+          },
+          media: {
+            take: 1,
+            select: {
+              url: true,
+              publicId: true,
+            },
+          },
+        },
+      });
+
+      return reports.map((report) => ({
+        ...report,
+        thumbnail: report.media[0]?.url ?? null,
+      }));
+    }),
+
+  // Backward compatibility alias
   getMandorRecentReports: protectedProcedure
     .input(z.object({ limit: z.number().default(3).optional() }))
     .query(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
 
-      // Get projects where user is MANDOR
       const projectIds = await ctx.db.projectMember
         .findMany({
-          where: { userId, role: "MANDOR" },
+          where: { userId, role: "SUPERVISOR" },
           select: { projectId: true },
         })
         .then((members) => members.map((m) => m.projectId));
@@ -405,4 +579,102 @@ export const dashboardRouter = createTRPCRouter({
       currentBalance: fund.currentBalance,
     }));
   }),
+
+  /**
+   * Get stats for LOGISTIC dashboard
+   */
+  getLogisticStats: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+
+    // Get projects where user is LOGISTIC
+    const projects = await ctx.db.project.findMany({
+      where: {
+        members: {
+          some: {
+            userId,
+            role: "LOGISTIC",
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        _count: {
+          select: {
+            logistics: true,
+          },
+        },
+      },
+    });
+
+    const projectIds = projects.map((p) => p.id);
+
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const monthlyTransactionsCount = await ctx.db.logisticTransaction.count({
+      where: {
+        item: {
+          projectId: { in: projectIds },
+        },
+        createdAt: { gte: startOfMonth },
+      },
+    });
+
+    return {
+      projectCount: projects.length,
+      totalItems: projects.reduce((sum, p) => sum + p._count.logistics, 0),
+      monthlyTransactionsCount,
+      projects,
+    };
+  }),
+
+  /**
+   * Get recent transactions for LOGISTIC dashboard
+   */
+  getLogisticRecentTransactions: protectedProcedure
+    .input(z.object({ limit: z.number().default(5).optional() }))
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const projectIds = await ctx.db.projectMember
+        .findMany({
+          where: { userId, role: "LOGISTIC" },
+          select: { projectId: true },
+        })
+        .then((members) => members.map((m) => m.projectId));
+
+      if (!projectIds.length) return [];
+
+      return ctx.db.logisticTransaction.findMany({
+        where: {
+          item: { projectId: { in: projectIds } },
+        },
+        take: input.limit ?? 5,
+        orderBy: { createdAt: "desc" },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          item: {
+            select: {
+              id: true,
+              name: true,
+              unit: true,
+              project: {
+                select: {
+                  id: true,
+                  name: true,
+                  slug: true,
+                },
+              },
+            },
+          },
+        },
+      });
+    }),
 });

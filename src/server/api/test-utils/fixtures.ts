@@ -27,22 +27,25 @@ export async function createAdminUser(overrides?: {
   });
 }
 
-export async function createCEOUser(overrides?: {
+export async function createExecutiveUser(overrides?: {
   id?: string;
   name?: string;
   email?: string;
 }) {
   return await db.user.create({
     data: {
-      id: overrides?.id ?? `ceo-${Date.now()}`,
-      name: overrides?.name ?? "CEO User",
-      email: overrides?.email ?? `ceo-${Date.now()}@test.com`,
-      roleGlobal: "CEO" as GlobalRole,
+      id: overrides?.id ?? `exec-${Date.now()}`,
+      name: overrides?.name ?? "Executive User",
+      email: overrides?.email ?? `exec-${Date.now()}@test.com`,
+      roleGlobal: "EXECUTIVE" as GlobalRole,
       isActive: true,
       emailVerified: true,
     },
   });
 }
+
+// Backward compatibility alias
+export const createCEOUser = createExecutiveUser;
 
 export async function createRegularUser(overrides?: {
   id?: string;
@@ -107,21 +110,28 @@ export async function createProject(overrides?: {
 }
 
 export async function createProjectWithMembers(config?: {
+  supervisor?: { id?: string; name?: string };
   mandor?: { id?: string; name?: string };
   architect?: { id?: string; name?: string };
   finance?: { id?: string; name?: string };
+  logistic?: { id?: string; name?: string };
 }) {
   const project = await createProject();
 
   const members: {
-    mandor?: Awaited<ReturnType<typeof createMandorMember>>;
+    supervisor?: Awaited<ReturnType<typeof createSupervisorMember>>;
+    mandor?: Awaited<ReturnType<typeof createSupervisorMember>>;
     architect?: Awaited<ReturnType<typeof createArchitectMember>>;
     finance?: Awaited<ReturnType<typeof createFinanceMember>>;
+    logistic?: Awaited<ReturnType<typeof createLogisticMember>>;
   } = {};
 
-  if (config?.mandor !== undefined) {
-    const user = await createRegularUser(config.mandor);
-    members.mandor = await createMandorMember(project.id, user.id);
+  const supervisorConfig = config?.supervisor ?? config?.mandor;
+  if (supervisorConfig !== undefined) {
+    const user = await createRegularUser(supervisorConfig);
+    const supervisorMember = await createSupervisorMember(project.id, user.id);
+    members.supervisor = supervisorMember;
+    members.mandor = supervisorMember;
   }
 
   if (config?.architect !== undefined) {
@@ -134,6 +144,11 @@ export async function createProjectWithMembers(config?: {
     members.finance = await createFinanceMember(project.id, user.id);
   }
 
+  if (config?.logistic !== undefined) {
+    const user = await createRegularUser(config.logistic);
+    members.logistic = await createLogisticMember(project.id, user.id);
+  }
+
   return {
     project,
     members,
@@ -142,12 +157,32 @@ export async function createProjectWithMembers(config?: {
 
 // ==================== PROJECT MEMBER FIXTURES ====================
 
-export async function createMandorMember(projectId: string, userId: string) {
+export async function createSupervisorMember(
+  projectId: string,
+  userId: string,
+) {
   return await db.projectMember.create({
     data: {
       projectId,
       userId,
-      role: "MANDOR" as ProjectRole,
+      role: "SUPERVISOR" as ProjectRole,
+    },
+    include: {
+      user: true,
+      project: true,
+    },
+  });
+}
+
+// Backward compatibility alias
+export const createMandorMember = createSupervisorMember;
+
+export async function createLogisticMember(projectId: string, userId: string) {
+  return await db.projectMember.create({
+    data: {
+      projectId,
+      userId,
+      role: "LOGISTIC" as ProjectRole,
     },
     include: {
       user: true,

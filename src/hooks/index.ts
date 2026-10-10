@@ -19,11 +19,17 @@ export {
   useArchitectStats,
   useCEORecentReports,
   useCEOStats,
+  useExecutiveRecentReports,
+  useExecutiveStats,
   useFinanceFundBreakdown,
   useFinanceRecentTransactions,
   useFinanceStats,
+  useLogisticRecentTransactions,
+  useLogisticStats,
   useMandorRecentReports,
   useMandorStats,
+  useSupervisorRecentReports,
+  useSupervisorStats,
 } from "./useDashboard";
 // Document hooks
 export {

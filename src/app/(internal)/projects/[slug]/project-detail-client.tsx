@@ -56,7 +56,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
 
   // Check user roles
   const userRole = session?.user?.roleGlobal as GlobalRole | undefined;
-  const isAdminRole = userRole === "ADMIN" || userRole === "CEO";
+  const isAdminRole = userRole === "ADMIN" || userRole === "EXECUTIVE";
 
   const projectMember = project?.members.find(
     (m) => m.userId === session?.user?.id,
@@ -64,7 +64,7 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
   const memberRole = projectMember?.role as ProjectRole | undefined;
 
   const canCreateReport =
-    isAdminRole || memberRole === "MANDOR" || memberRole === "ARCHITECT";
+    isAdminRole || memberRole === "SUPERVISOR" || memberRole === "ARCHITECT";
 
   if (isLoading) {
     return (
@@ -164,10 +164,11 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
               <div className="mt-2 flex flex-wrap gap-1">
                 {[
                   {
-                    role: "MANDOR",
-                    label: "Mandor",
-                    count: project.members.filter((m) => m.role === "MANDOR")
-                      .length,
+                    role: "SUPERVISOR",
+                    label: "Supervisor",
+                    count: project.members.filter(
+                      (m) => m.role === "SUPERVISOR",
+                    ).length,
                   },
                   {
                     role: "ARCHITECT",
@@ -179,6 +180,12 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
                     role: "FINANCE",
                     label: "Keuangan",
                     count: project.members.filter((m) => m.role === "FINANCE")
+                      .length,
+                  },
+                  {
+                    role: "LOGISTIC",
+                    label: "Logistik",
+                    count: project.members.filter((m) => m.role === "LOGISTIC")
                       .length,
                   },
                 ]

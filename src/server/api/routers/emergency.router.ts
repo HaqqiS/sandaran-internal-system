@@ -13,22 +13,24 @@ import {
  * Handles emergency fund management and transactions.
  *
  * Permissions:
- * - MANDOR can request funds (Withdraw)
+ * - SUPERVISOR can request funds (Withdraw)
  * - FINANCE can add balance (Deposit) and verify requests
  * - All project members can view
  */
 
-// MANDOR can request
-const mandorProcedure = projectProcedure(["MANDOR"]);
+// SUPERVISOR can request
+const supervisorProcedure = projectProcedure(["SUPERVISOR"]);
+const mandorProcedure = supervisorProcedure; // Backward compatibility
 
 // FINANCE can manage
 const financeProcedure = projectProcedure(["FINANCE"]);
 
 // All can view
 const projectMemberProcedure = projectProcedure([
-  "MANDOR",
+  "SUPERVISOR",
   "ARCHITECT",
   "FINANCE",
+  "LOGISTIC",
 ]);
 
 export const emergencyRouter = createTRPCRouter({
@@ -37,11 +39,11 @@ export const emergencyRouter = createTRPCRouter({
    */
   getAnalytics: protectedProcedure.query(async ({ ctx }) => {
     const user = ctx.session.user;
-    const isAdminOrCEO =
-      user.roleGlobal === "ADMIN" || user.roleGlobal === "CEO";
+    const isAdminOrExecutive =
+      user.roleGlobal === "ADMIN" || user.roleGlobal === "EXECUTIVE";
 
     const projects = await ctx.db.project.findMany({
-      where: isAdminOrCEO
+      where: isAdminOrExecutive
         ? { status: "ACTIVE" }
         : {
             status: "ACTIVE",
@@ -421,7 +423,7 @@ export const emergencyRouter = createTRPCRouter({
    * - FINANCE can edit their own DEPOSITs
    * - ADMIN can edit any transaction (with balance safety)
    */
-  edit: projectProcedure(["MANDOR", "FINANCE"])
+  edit: projectProcedure(["SUPERVISOR", "FINANCE"])
     .input(
       z.object({
         projectId: z.string(),
@@ -563,7 +565,7 @@ export const emergencyRouter = createTRPCRouter({
    * - FINANCE can delete their own DEPOSITs
    * - ADMIN can delete any transaction (with balance safety)
    */
-  delete: projectProcedure(["MANDOR", "FINANCE"])
+  delete: projectProcedure(["SUPERVISOR", "FINANCE"])
     .input(
       z.object({
         projectId: z.string(),

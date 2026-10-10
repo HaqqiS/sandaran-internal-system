@@ -146,23 +146,26 @@ export function requireOwnership(
 }
 
 /**
- * Check if a user is ADMIN or CEO (for global access).
+ * Check if a user is ADMIN or EXECUTIVE (for global access).
  *
  * @param globalRole - User's global role
- * @returns true if user is ADMIN or CEO
+ * @returns true if user is ADMIN or EXECUTIVE
  *
  * @example
- * if (isAdminOrCEO(ctx.session.user.roleGlobal)) {
+ * if (isAdminOrExecutive(ctx.session.user.roleGlobal)) {
  *   // User has global access
  * }
  */
-export function isAdminOrCEO(globalRole: GlobalRole): boolean {
-  return globalRole === "ADMIN" || globalRole === "CEO";
+export function isAdminOrExecutive(globalRole: GlobalRole): boolean {
+  return globalRole === "ADMIN" || globalRole === "EXECUTIVE";
 }
 
+// Backward compatibility alias
+export const isAdminOrCEO = isAdminOrExecutive;
+
 /**
- * Require that a user is ADMIN (not CEO).
- * Use this for mutations that even CEO shouldn't be able to do.
+ * Require that a user is ADMIN (not EXECUTIVE).
+ * Use this for mutations that even EXECUTIVE shouldn't be able to do.
  *
  * @param globalRole - User's global role
  * @throws TRPCError with code FORBIDDEN if user is not ADMIN
@@ -181,39 +184,42 @@ export function requireAdmin(globalRole: GlobalRole): void {
 }
 
 /**
- * Check if CEO is attempting a forbidden mutation.
- * CEO can only do specific mutations (profile edit, comments).
+ * Check if Executive is attempting a forbidden mutation.
+ * Executive can only do specific mutations (profile edit, comments).
  *
  * @param globalRole - User's global role
  * @param action - Action code being attempted
- * @throws TRPCError with code FORBIDDEN if CEO attempts forbidden mutation
+ * @throws TRPCError with code FORBIDDEN if Executive attempts forbidden mutation
  *
  * @example
- * checkCEORestriction(
+ * checkExecutiveRestriction(
  *   ctx.session.user.roleGlobal,
  *   "REPORT_CREATE"
  * );
- * // Throws error if CEO tries to create report
+ * // Throws error if Executive tries to create report
  */
-export function checkCEORestriction(
+export function checkExecutiveRestriction(
   globalRole: string | null | undefined,
   action: string,
 ): void {
-  if (globalRole !== "CEO") {
-    return; // Not CEO, no restriction
+  if (globalRole !== "EXECUTIVE") {
+    return; // Not Executive, no restriction
   }
 
-  // Actions CEO is allowed to do
-  const allowedCEOActions = [
+  // Actions Executive is allowed to do
+  const allowedExecutiveActions = [
     "PROFILE_EDIT_OWN",
     "REPORT_COMMENT_CREATE",
     // Add more as needed
   ];
 
-  if (!allowedCEOActions.includes(action)) {
+  if (!allowedExecutiveActions.includes(action)) {
     throw new TRPCError({
       code: "FORBIDDEN",
-      message: "CEO has read-only access to project operations",
+      message: "Executive has read-only access to project operations",
     });
   }
 }
+
+// Backward compatibility alias
+export const checkCEORestriction = checkExecutiveRestriction;

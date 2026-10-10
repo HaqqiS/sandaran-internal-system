@@ -13,10 +13,10 @@ export function RoleBadge({ role }: RoleBadgeProps) {
     { variant: "default" | "secondary" | "outline" | "destructive" }
   > = {
     ADMIN: { variant: "default" },
-    CEO: { variant: "secondary" },
+    EXECUTIVE: { variant: "secondary" },
     USER: { variant: "outline" },
     NONE: { variant: "destructive" },
   };
 
-  return <Badge variant={config[role].variant}>{role}</Badge>;
+  return <Badge variant={config[role]?.variant ?? "outline"}>{role}</Badge>;
 }

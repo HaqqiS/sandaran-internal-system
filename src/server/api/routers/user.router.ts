@@ -174,11 +174,13 @@ export const userRouter = createTRPCRouter({
     .input(
       z.object({
         userId: z.string(),
-        roleGlobal: z.enum(["ADMIN", "CEO", "USER", "NONE"]).default("USER"),
+        roleGlobal: z
+          .enum(["ADMIN", "EXECUTIVE", "USER", "NONE"])
+          .default("USER"),
         projectAssignment: z
           .object({
             projectId: z.string(),
-            role: z.enum(["MANDOR", "ARCHITECT", "FINANCE"]),
+            role: z.enum(["SUPERVISOR", "ARCHITECT", "FINANCE", "LOGISTIC"]),
           })
           .optional(),
       }),
@@ -279,7 +281,7 @@ export const userRouter = createTRPCRouter({
     .input(
       z.object({
         userIds: z.array(z.string()),
-        roleGlobal: z.enum(["ADMIN", "CEO", "USER"]).default("USER"),
+        roleGlobal: z.enum(["ADMIN", "EXECUTIVE", "USER"]).default("USER"),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -377,11 +379,11 @@ export const userRouter = createTRPCRouter({
           .optional()
           .or(z.literal("")),
         password: z.string().min(6, "Kata sandi minimal 6 karakter"),
-        roleGlobal: z.enum(["USER", "ADMIN", "CEO"]).default("USER"),
+        roleGlobal: z.enum(["USER", "ADMIN", "EXECUTIVE"]).default("USER"),
         projectAssignment: z
           .object({
             projectId: z.string(),
-            role: z.enum(["MANDOR", "ARCHITECT", "FINANCE"]),
+            role: z.enum(["SUPERVISOR", "ARCHITECT", "FINANCE", "LOGISTIC"]),
           })
           .optional(),
       }),
@@ -521,7 +523,7 @@ export const userRouter = createTRPCRouter({
           .min(6, "Kata sandi minimal 6 karakter")
           .optional()
           .or(z.literal("")),
-        roleGlobal: z.enum(["USER", "ADMIN", "CEO", "NONE"]),
+        roleGlobal: z.enum(["USER", "ADMIN", "EXECUTIVE", "NONE"]),
         isActive: z.boolean(),
       }),
     )

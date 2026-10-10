@@ -76,7 +76,7 @@ export function ReportDetailClient({
 
   const isLoading = projectLoading || reportLoading;
   const userRole = session?.user?.roleGlobal as GlobalRole | undefined;
-  const isAdmin = userRole === "ADMIN" || userRole === "CEO";
+  const isAdmin = userRole === "ADMIN" || userRole === "EXECUTIVE";
   const isOwner = report?.userId === session?.user?.id;
   const canEdit = isAdmin || isOwner;
 

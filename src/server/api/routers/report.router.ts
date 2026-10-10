@@ -14,17 +14,18 @@ import {
  * Handles daily reports, task breakdowns, and media uploads.
  *
  * Permissions:
- * - MANDOR, ARCHITECT can create reports
+ * - SUPERVISOR, ARCHITECT can create reports
  * - All project members can view
  * - Only report owner can edit/delete
  */
 
 // Procedures for different role combinations
-const reportCreatorProcedure = projectProcedure(["MANDOR", "ARCHITECT"]);
+const reportCreatorProcedure = projectProcedure(["SUPERVISOR", "ARCHITECT"]);
 const projectMemberProcedure = projectProcedure([
-  "MANDOR",
+  "SUPERVISOR",
   "ARCHITECT",
   "FINANCE",
+  "LOGISTIC",
 ]);
 
 export const reportRouter = createTRPCRouter({
@@ -194,7 +195,7 @@ export const reportRouter = createTRPCRouter({
     const { id: userId, roleGlobal } = ctx.session.user;
 
     // 1. Get projects based on role
-    const isAdmin = roleGlobal === "CEO" || roleGlobal === "ADMIN";
+    const isAdmin = roleGlobal === "EXECUTIVE" || roleGlobal === "ADMIN";
     const projects = await ctx.db.project.findMany({
       where: {
         status: "ACTIVE",

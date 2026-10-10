@@ -7,16 +7,20 @@ import { api } from "~/trpc/react";
  */
 
 // ============================================
-// CEO Dashboard Hooks
+// Executive Dashboard Hooks (formerly CEO)
 // ============================================
 
-export function useCEOStats() {
-  return api.dashboard.getCEOStats.useQuery();
+export function useExecutiveStats() {
+  return api.dashboard.getExecutiveStats.useQuery();
 }
 
-export function useCEORecentReports(limit?: number) {
-  return api.dashboard.getCEORecentReports.useQuery({ limit });
+export function useExecutiveRecentReports(limit?: number) {
+  return api.dashboard.getExecutiveRecentReports.useQuery({ limit });
 }
+
+// Backward compatibility aliases
+export const useCEOStats = useExecutiveStats;
+export const useCEORecentReports = useExecutiveRecentReports;
 
 // ============================================
 // Admin Dashboard Hooks
@@ -46,16 +50,20 @@ export function useFinanceRecentTransactions(
 }
 
 // ============================================
-// Mandor Dashboard Hooks
+// Supervisor Dashboard Hooks (formerly Mandor)
 // ============================================
 
-export function useMandorStats() {
-  return api.dashboard.getMandorStats.useQuery();
+export function useSupervisorStats() {
+  return api.dashboard.getSupervisorStats.useQuery();
 }
 
-export function useMandorRecentReports(limit?: number) {
-  return api.dashboard.getMandorRecentReports.useQuery({ limit });
+export function useSupervisorRecentReports(limit?: number) {
+  return api.dashboard.getSupervisorRecentReports.useQuery({ limit });
 }
+
+// Backward compatibility aliases
+export const useMandorStats = useSupervisorStats;
+export const useMandorRecentReports = useSupervisorRecentReports;
 
 // ============================================
 // Architect Dashboard Hooks
@@ -67,4 +75,16 @@ export function useArchitectStats() {
 
 export function useArchitectDashboard() {
   return api.dashboard.getArchitectDashboard.useQuery();
+}
+
+// ============================================
+// Logistic Dashboard Hooks
+// ============================================
+
+export function useLogisticStats() {
+  return api.dashboard.getLogisticStats.useQuery();
+}
+
+export function useLogisticRecentTransactions(limit?: number) {
+  return api.dashboard.getLogisticRecentTransactions.useQuery({ limit });
 }

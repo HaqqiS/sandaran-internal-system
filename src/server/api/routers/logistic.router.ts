@@ -12,22 +12,23 @@ import {
  * Handles logistic items and transactions.
  *
  * Permissions:
- * - FINANCE can create/manage items
- * - MANDOR can record IN/OUT transactions
+ * - LOGISTIC can create/manage items
+ * - SUPERVISOR and LOGISTIC can record IN/OUT transactions
  * - All project members can view
  */
 
-// FINANCE manages items
-const financeProcedure = projectProcedure(["FINANCE"]);
+// LOGISTIC manages items
+const logisticAdminProcedure = projectProcedure(["LOGISTIC"]);
 
-// MANDOR and FINANCE record transactions
-const logisticProcedure = projectProcedure(["MANDOR", "FINANCE"]);
+// SUPERVISOR and LOGISTIC record transactions
+const logisticMutationProcedure = projectProcedure(["SUPERVISOR", "LOGISTIC"]);
 
 // All can view
 const projectMemberProcedure = projectProcedure([
-  "MANDOR",
+  "SUPERVISOR",
   "ARCHITECT",
   "FINANCE",
+  "LOGISTIC",
 ]);
 
 export const logisticRouter = createTRPCRouter({
@@ -36,11 +37,11 @@ export const logisticRouter = createTRPCRouter({
    */
   getAnalytics: protectedProcedure.query(async ({ ctx }) => {
     const user = ctx.session.user;
-    const isAdminOrCEO =
-      user.roleGlobal === "ADMIN" || user.roleGlobal === "CEO";
+    const isAdminOrExecutive =
+      user.roleGlobal === "ADMIN" || user.roleGlobal === "EXECUTIVE";
 
     const projects = await ctx.db.project.findMany({
-      where: isAdminOrCEO
+      where: isAdminOrExecutive
         ? { status: "ACTIVE" }
         : {
             status: "ACTIVE",
@@ -96,9 +97,9 @@ export const logisticRouter = createTRPCRouter({
 
   /**
    * Create a new logistic item
-   * Only FINANCE can create items
+   * Only LOGISTIC can create items
    */
-  createItem: financeProcedure
+  createItem: logisticAdminProcedure
     .input(
       z.object({
         projectId: z.string(),
@@ -157,9 +158,9 @@ export const logisticRouter = createTRPCRouter({
 
   /**
    * Update a logistic item
-   * Only FINANCE can update
+   * Only LOGISTIC can update
    */
-  updateItem: financeProcedure
+  updateItem: logisticAdminProcedure
     .input(
       z.object({
         projectId: z.string(),
@@ -197,9 +198,9 @@ export const logisticRouter = createTRPCRouter({
 
   /**
    * Delete a logistic item
-   * Only FINANCE can delete
+   * Only LOGISTIC can delete
    */
-  deleteItem: financeProcedure
+  deleteItem: logisticAdminProcedure
     .input(
       z.object({
         projectId: z.string(),
@@ -236,9 +237,9 @@ export const logisticRouter = createTRPCRouter({
 
   /**
    * Record a logistic transaction (IN or OUT)
-   * MANDOR and FINANCE can record transactions
+   * SUPERVISOR and LOGISTIC can record transactions
    */
-  recordTransaction: logisticProcedure
+  recordTransaction: logisticMutationProcedure
     .input(
       z.object({
         projectId: z.string(),

@@ -38,12 +38,12 @@ export function ApproveUserDialog({
   open,
   onOpenChange,
 }: ApproveUserDialogProps) {
-  const [role, setRole] = useState<"USER" | "CEO" | "ADMIN">("USER");
+  const [role, setRole] = useState<"USER" | "EXECUTIVE" | "ADMIN">("USER");
   const [assignProject, setAssignProject] = useState(false);
   const [projectId, setProjectId] = useState<string>("");
   const [projectRole, setProjectRole] = useState<
-    "MANDOR" | "ARCHITECT" | "FINANCE"
-  >("MANDOR");
+    "SUPERVISOR" | "ARCHITECT" | "FINANCE" | "LOGISTIC"
+  >("SUPERVISOR");
 
   const { data: projects } = useProjectList({
     enabled: open && role === "USER" && assignProject,
@@ -79,7 +79,7 @@ export function ApproveUserDialog({
           setRole("USER");
           setAssignProject(false);
           setProjectId("");
-          setProjectRole("MANDOR");
+          setProjectRole("SUPERVISOR");
         },
         onError: (error) => {
           toast.error(error.message || "Gagal menyetujui pengguna");
@@ -112,7 +112,7 @@ export function ApproveUserDialog({
             <RadioGroup
               value={role}
               onValueChange={(v: string) => {
-                setRole(v as "USER" | "CEO" | "ADMIN");
+                setRole(v as "USER" | "EXECUTIVE" | "ADMIN");
                 if (v !== "USER") setAssignProject(false);
               }}
             >
@@ -124,10 +124,10 @@ export function ApproveUserDialog({
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="CEO" id="ceo" />
-                <Label htmlFor="ceo" className="font-normal">
-                  <span className="font-medium">CEO</span> - Akses baca seluruh
-                  proyek
+                <RadioGroupItem value="EXECUTIVE" id="executive" />
+                <Label htmlFor="executive" className="font-normal">
+                  <span className="font-medium">EXECUTIVE</span> - Akses baca
+                  seluruh proyek
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
@@ -175,16 +175,23 @@ export function ApproveUserDialog({
                     <Select
                       value={projectRole}
                       onValueChange={(v) =>
-                        setProjectRole(v as "MANDOR" | "ARCHITECT" | "FINANCE")
+                        setProjectRole(
+                          v as
+                            | "SUPERVISOR"
+                            | "ARCHITECT"
+                            | "FINANCE"
+                            | "LOGISTIC",
+                        )
                       }
                     >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="MANDOR">Mandor</SelectItem>
+                        <SelectItem value="SUPERVISOR">Supervisor</SelectItem>
                         <SelectItem value="ARCHITECT">Arsitek</SelectItem>
                         <SelectItem value="FINANCE">Keuangan</SelectItem>
+                        <SelectItem value="LOGISTIC">Logistik</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

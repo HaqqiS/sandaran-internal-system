@@ -28,9 +28,10 @@ const architectProcedure = projectProcedure(["ARCHITECT"]);
 
 // All project members can view
 const projectMemberProcedure = projectProcedure([
-  "MANDOR",
+  "SUPERVISOR",
   "ARCHITECT",
   "FINANCE",
+  "LOGISTIC",
 ]);
 
 export const documentRouter = createTRPCRouter({
@@ -39,11 +40,11 @@ export const documentRouter = createTRPCRouter({
    */
   getAnalytics: protectedProcedure.query(async ({ ctx }) => {
     const user = ctx.session.user;
-    const isAdminOrCEO =
-      user.roleGlobal === "ADMIN" || user.roleGlobal === "CEO";
+    const isAdminOrExecutive =
+      user.roleGlobal === "ADMIN" || user.roleGlobal === "EXECUTIVE";
 
     const projects = await ctx.db.project.findMany({
-      where: isAdminOrCEO
+      where: isAdminOrExecutive
         ? { status: "ACTIVE" }
         : {
             status: "ACTIVE",
@@ -252,9 +253,12 @@ export const documentRouter = createTRPCRouter({
    * Get signed download URL for a specific document
    * This generates a fresh link with expiry
    */
-  getDownloadUrl: projectProcedure(["MANDOR", "ARCHITECT", "FINANCE"], {
-    allowCEO: true,
-  })
+  getDownloadUrl: projectProcedure(
+    ["SUPERVISOR", "ARCHITECT", "FINANCE", "LOGISTIC"],
+    {
+      allowExecutive: true,
+    },
+  )
     .input(
       z.object({
         projectId: z.string(),

@@ -25,7 +25,7 @@ export async function requireAdmin() {
   const session = await requireAuth();
 
   const role = session?.user?.roleGlobal;
-  if (role !== "ADMIN" && role !== "CEO") {
+  if (role !== "ADMIN" && role !== "EXECUTIVE") {
     redirect("/unauthorized");
   }
 

@@ -14,16 +14,20 @@ import { createTRPCRouter, projectProcedure } from "~/server/api/trpc";
  * - Only comment owner can edit/delete
  */
 
-// All project members can comment (CEO allowed!)
-const commentProcedure = projectProcedure(["MANDOR", "ARCHITECT", "FINANCE"], {
-  allowCEO: true,
-});
+// All project members can comment (Executive allowed!)
+const commentProcedure = projectProcedure(
+  ["SUPERVISOR", "ARCHITECT", "FINANCE", "LOGISTIC"],
+  {
+    allowExecutive: true,
+  },
+);
 
-// For viewing (no mutation, so CEO can access)
+// For viewing (no mutation, so Executive can access)
 const projectMemberProcedure = projectProcedure([
-  "MANDOR",
+  "SUPERVISOR",
   "ARCHITECT",
   "FINANCE",
+  "LOGISTIC",
 ]);
 
 export const commentRouter = createTRPCRouter({

@@ -4,17 +4,25 @@ import { IconLoader2 } from "@tabler/icons-react";
 import {
   AdminView,
   ArchitectView,
-  CEOView,
+  ExecutiveView,
   FinanceView,
-  MandorView,
+  LogisticView,
+  SupervisorView,
 } from "~/components/dashboard";
 import { useUserRole } from "~/hooks/use-user-role";
 import { useSession } from "~/stores/use-session-store";
 
 export default function DashboardPage() {
   const { user } = useSession();
-  const { isAdmin, isCEO, isMandor, isArchitect, isFinance, isLoading } =
-    useUserRole();
+  const {
+    isAdmin,
+    isExecutive,
+    isSupervisor,
+    isArchitect,
+    isFinance,
+    isLogistic,
+    isLoading,
+  } = useUserRole();
 
   if (isLoading) {
     return (
@@ -25,14 +33,22 @@ export default function DashboardPage() {
   }
 
   // If user has a role, show their dashboard
-  if (isCEO || isAdmin || isMandor || isArchitect || isFinance) {
+  if (
+    isExecutive ||
+    isAdmin ||
+    isSupervisor ||
+    isArchitect ||
+    isFinance ||
+    isLogistic
+  ) {
     return (
       <>
-        {isCEO && <CEOView />}
-        {isAdmin && !isCEO && <AdminView />}
-        {isMandor && <MandorView />}
+        {isExecutive && <ExecutiveView />}
+        {isAdmin && !isExecutive && <AdminView />}
+        {isSupervisor && <SupervisorView />}
         {isArchitect && <ArchitectView />}
         {isFinance && <FinanceView />}
+        {isLogistic && <LogisticView />}
       </>
     );
   }

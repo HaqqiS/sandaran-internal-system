@@ -103,7 +103,7 @@ function getSidebarConfig(
         ],
       };
 
-    case "CEO":
+    case "EXECUTIVE":
       if (projectSlug) {
         return {
           ...baseConfig,

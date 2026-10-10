@@ -65,7 +65,7 @@ export function EmergencyClient({ projectSlug }: EmergencyClientProps) {
   const memberRole = projectMember?.role;
 
   const canAddFund = isAdmin || memberRole === "FINANCE";
-  const canWithdraw = isAdmin || memberRole === "MANDOR";
+  const canWithdraw = isAdmin || memberRole === "SUPERVISOR";
   const canReview = isAdmin || memberRole === "FINANCE";
 
   return (

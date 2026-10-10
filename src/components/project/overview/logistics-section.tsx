@@ -82,8 +82,8 @@ export function LogisticsSection({
   const projectMember = members?.find((m) => m.userId === session?.user?.id);
   const role = projectMember?.role;
   const canRecordTransaction =
-    role === "MANDOR" ||
-    role === "FINANCE" ||
+    role === "SUPERVISOR" ||
+    role === "LOGISTIC" ||
     session?.user?.roleGlobal === "ADMIN";
 
   const totalItems = items?.length ?? 0;

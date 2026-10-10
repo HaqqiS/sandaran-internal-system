@@ -13,12 +13,18 @@ type Context = {
       id: string;
       name: string;
       email: string;
-      roleGlobal: "ADMIN" | "CEO" | "USER" | "NONE";
+      roleGlobal: "ADMIN" | "EXECUTIVE" | "CEO" | "USER" | "NONE";
       isActive: boolean;
     };
   } | null;
   projectId?: string;
-  projectRole?: "MANDOR" | "ARCHITECT" | "FINANCE" | null;
+  projectRole?:
+    | "SUPERVISOR"
+    | "ARCHITECT"
+    | "FINANCE"
+    | "LOGISTIC"
+    | "MANDOR"
+    | null;
 };
 
 /**
@@ -37,11 +43,17 @@ export function createMockContext(
     id: string;
     name: string;
     email: string;
-    roleGlobal: "ADMIN" | "CEO" | "USER" | "NONE";
+    roleGlobal: "ADMIN" | "EXECUTIVE" | "CEO" | "USER" | "NONE";
     isActive: boolean;
   },
   projectId?: string,
-  projectRole?: "MANDOR" | "ARCHITECT" | "FINANCE" | null,
+  projectRole?:
+    | "SUPERVISOR"
+    | "ARCHITECT"
+    | "FINANCE"
+    | "LOGISTIC"
+    | "MANDOR"
+    | null,
 ): Context {
   const session: Session & {
     user: typeof user;
@@ -94,19 +106,22 @@ export function createAdminContext(user: {
 }
 
 /**
- * Create CEO context
+ * Create EXECUTIVE context
  */
-export function createCEOContext(user: {
+export function createExecutiveContext(user: {
   id: string;
   name: string;
   email: string;
 }): Context {
   return createMockContext({
     ...user,
-    roleGlobal: "CEO",
+    roleGlobal: "EXECUTIVE",
     isActive: true,
   });
 }
+
+// Backward compatibility alias
+export const createCEOContext = createExecutiveContext;
 
 /**
  * Create USER context with optional project role
@@ -118,7 +133,7 @@ export function createUserContext(
     email: string;
   },
   projectId?: string,
-  projectRole?: "MANDOR" | "ARCHITECT" | "FINANCE",
+  projectRole?: "SUPERVISOR" | "ARCHITECT" | "FINANCE" | "LOGISTIC" | "MANDOR",
 ): Context {
   if (projectId && projectRole) {
     return createMockContext(

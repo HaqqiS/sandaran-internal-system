@@ -300,15 +300,15 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
 
           <div>
             <RadioGroupItem
-              value="CEO"
-              id="edit-role-ceo"
+              value="EXECUTIVE"
+              id="edit-role-executive"
               className="peer sr-only"
             />
             <Label
-              htmlFor="edit-role-ceo"
+              htmlFor="edit-role-executive"
               className="flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer text-xs font-medium text-center transition-all"
             >
-              <span className="font-semibold">CEO</span>
+              <span className="font-semibold">EXECUTIVE</span>
               <span className="text-[9px] text-muted-foreground">View</span>
             </Label>
           </div>

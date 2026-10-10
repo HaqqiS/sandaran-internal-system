@@ -24,7 +24,8 @@ export function LogisticsClient({ projectSlug }: LogisticsClientProps) {
   // Find user's role
   const projectMember = members?.find((m) => m.userId === session?.user?.id);
   const role = projectMember?.role;
-  const canManage = role === "FINANCE" || session?.user?.roleGlobal === "ADMIN";
+  const canManage =
+    role === "LOGISTIC" || session?.user?.roleGlobal === "ADMIN";
 
   if (isLoading) {
     return (

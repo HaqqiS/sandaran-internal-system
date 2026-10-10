@@ -17,14 +17,15 @@ import {
  * - ADMIN can create, update, delete projects
  * - ADMIN can manage project members
  * - All project members can view project details
- * - CEO can view all projects (read-only)
+ * - EXECUTIVE can view all projects (read-only)
  */
 
 // All project members can view
 const projectMemberProcedure = projectProcedure([
-  "MANDOR",
+  "SUPERVISOR",
   "ARCHITECT",
   "FINANCE",
+  "LOGISTIC",
 ]);
 
 export const projectRouter = createTRPCRouter({
@@ -94,8 +95,8 @@ export const projectRouter = createTRPCRouter({
   getAll: protectedProcedure.query(async ({ ctx }) => {
     const { id: userId, roleGlobal } = ctx.session.user;
 
-    // CEO and ADMIN can see all projects
-    if (roleGlobal === "CEO" || roleGlobal === "ADMIN") {
+    // EXECUTIVE and ADMIN can see all projects
+    if (roleGlobal === "EXECUTIVE" || roleGlobal === "ADMIN") {
       const projects = await ctx.db.project.findMany({
         include: {
           members: {
@@ -336,8 +337,8 @@ export const projectRouter = createTRPCRouter({
         });
       }
 
-      // Check access: ADMIN/CEO or Project Member
-      if (roleGlobal === "ADMIN" || roleGlobal === "CEO") {
+      // Check access: ADMIN/EXECUTIVE or Project Member
+      if (roleGlobal === "ADMIN" || roleGlobal === "EXECUTIVE") {
         return project;
       }
 
@@ -461,7 +462,7 @@ export const projectRouter = createTRPCRouter({
       z.object({
         projectId: z.string(),
         userId: z.string(),
-        role: z.enum(["MANDOR", "ARCHITECT", "FINANCE"]),
+        role: z.enum(["SUPERVISOR", "ARCHITECT", "FINANCE", "LOGISTIC"]),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -535,7 +536,7 @@ export const projectRouter = createTRPCRouter({
     .input(
       z.object({
         memberId: z.string(),
-        role: z.enum(["MANDOR", "ARCHITECT", "FINANCE"]),
+        role: z.enum(["SUPERVISOR", "ARCHITECT", "FINANCE", "LOGISTIC"]),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -590,8 +591,8 @@ export const projectRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const { id: userId, roleGlobal } = ctx.session.user;
 
-      // Check access: ADMIN/CEO or Project Member
-      if (roleGlobal !== "ADMIN" && roleGlobal !== "CEO") {
+      // Check access: ADMIN/EXECUTIVE or Project Member
+      if (roleGlobal !== "ADMIN" && roleGlobal !== "EXECUTIVE") {
         const isMember = await ctx.db.projectMember.findUnique({
           where: {
             userId_projectId: {

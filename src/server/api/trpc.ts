@@ -148,10 +148,10 @@ export const protectedProcedure = t.procedure
       });
     }
 
-    // Only allow ADMIN, CEO, USER roles
+    // Only allow ADMIN, EXECUTIVE, USER roles
     if (
       roleGlobal !== "ADMIN" &&
-      roleGlobal !== "CEO" &&
+      roleGlobal !== "EXECUTIVE" &&
       roleGlobal !== "USER"
     ) {
       throw new TRPCError({
@@ -171,7 +171,7 @@ export const protectedProcedure = t.procedure
 /**
  * Admin-only procedure
  *
- * Only accessible to users with ADMIN or CEO role.
+ * Only accessible to users with ADMIN or EXECUTIVE role.
  * Use this for sensitive operations like user management, approvals, etc.
  */
 export const adminProcedure = t.procedure
@@ -195,7 +195,7 @@ export const adminProcedure = t.procedure
     }
 
     // Check if user has admin role
-    if (roleGlobal !== "ADMIN" && roleGlobal !== "CEO") {
+    if (roleGlobal !== "ADMIN" && roleGlobal !== "EXECUTIVE") {
       throw new TRPCError({
         code: "FORBIDDEN",
         message: "Admin access required.",
@@ -211,13 +211,13 @@ export const adminProcedure = t.procedure
   });
 
 /**
- * Admin or CEO procedure (read-only for CEO)
+ * Admin or Executive procedure (read-only for Executive)
  *
- * Allows both ADMIN and CEO to access procedures.
+ * Allows both ADMIN and EXECUTIVE to access procedures.
  * Use this for read-only operations like viewing users, reports, etc.
- * CEO can query but cannot mutate.
+ * Executive can query but cannot mutate.
  */
-export const adminOrCeoProcedure = t.procedure
+export const adminOrExecutiveProcedure = t.procedure
   .use(timingMiddleware)
   .use(({ ctx, next }) => {
     if (!ctx.session?.user) {
@@ -237,21 +237,24 @@ export const adminOrCeoProcedure = t.procedure
       });
     }
 
-    // Check if user has admin or CEO role
-    if (roleGlobal !== "ADMIN" && roleGlobal !== "CEO") {
+    // Check if user has admin or executive role
+    if (roleGlobal !== "ADMIN" && roleGlobal !== "EXECUTIVE") {
       throw new TRPCError({
         code: "FORBIDDEN",
-        message: "Admin or CEO access required.",
+        message: "Admin or Executive access required.",
       });
     }
 
     return next({
       ctx: {
-        // infers the `session` as non-nullable with admin/CEO role
+        // infers the `session` as non-nullable with admin/executive role
         session: { ...ctx.session, user: ctx.session.user },
       },
     });
   });
+
+// Backward compatibility alias
+export const adminOrCeoProcedure = adminOrExecutiveProcedure;
 
 /**
  * Project-scoped procedure factory (Layer 3: Project Context Guard)
@@ -264,21 +267,14 @@ export const adminOrCeoProcedure = t.procedure
  * @returns A procedure builder with project context
  *
  * @example
- * // Only MANDOR and FINANCE can access
- * export const mandorFinanceProcedure = createProjectProcedure(["MANDOR", "FINANCE"]);
- *
- * // Use in router
- * mandorFinanceProcedure
- *   .input(z.object({ projectId: z.string(), ... }))
- *   .mutation(async ({ ctx, input }) => {
- *     // ctx.projectRole is guaranteed to be MANDOR or FINANCE
- *     // ctx.projectId is available
- *   })
+ * // Only SUPERVISOR and FINANCE can access
+ * export const supervisorFinanceProcedure = createProjectProcedure(["SUPERVISOR", "FINANCE"]);
  */
 export const projectProcedure = (
   allowedRoles: ProjectRole[],
   options?: {
-    allowCEO?: boolean; // Allow CEO to perform mutations (default: false)
+    allowExecutive?: boolean; // Allow Executive to perform mutations (default: false)
+    allowCEO?: boolean; // Backward compatibility alias
   },
 ) => {
   return protectedProcedure
@@ -296,8 +292,9 @@ export const projectProcedure = (
 
       const { id: userId, roleGlobal } = ctx.session.user;
 
-      // ADMIN and CEO have special access
-      const isAdminOrCEO = roleGlobal === "ADMIN" || roleGlobal === "CEO";
+      // ADMIN and EXECUTIVE have special access
+      const isAdminOrExecutive =
+        roleGlobal === "ADMIN" || roleGlobal === "EXECUTIVE";
 
       // Get user's project role
       const member = await ctx.db.projectMember.findUnique({
@@ -306,8 +303,8 @@ export const projectProcedure = (
         },
       });
 
-      // Check if user is a project member (unless ADMIN/CEO)
-      if (!member && !isAdminOrCEO) {
+      // Check if user is a project member (unless ADMIN/EXECUTIVE)
+      if (!member && !isAdminOrExecutive) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "You are not a member of this project",
@@ -328,15 +325,17 @@ export const projectProcedure = (
         });
       }
 
-      // CEO read-only enforcement (unless explicitly allowed)
-      if (roleGlobal === "CEO" && !options?.allowCEO) {
+      // Executive read-only enforcement (unless explicitly allowed)
+      const canExecutiveMutate =
+        options?.allowExecutive ?? options?.allowCEO ?? false;
+      if (roleGlobal === "EXECUTIVE" && !canExecutiveMutate) {
         // Check if this is a mutation (write operation)
         const isMutation = type === "mutation";
 
         if (isMutation) {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "CEO has read-only access to project operations",
+            message: "Executive has read-only access to project operations",
           });
         }
       }

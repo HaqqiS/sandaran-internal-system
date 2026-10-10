@@ -8,7 +8,7 @@ type Session = typeof auth.$Infer.Session;
  */
 export function isAuthorizedRole(role: GlobalRole | null | undefined): boolean {
   if (!role) return false;
-  return role === "ADMIN" || role === "CEO" || role === "USER";
+  return role === "ADMIN" || role === "EXECUTIVE" || role === "USER";
 }
 
 /**
@@ -30,7 +30,7 @@ export function isReviewedUser(reviewedAt: Date | null | undefined): boolean {
  */
 export function isAdmin(role: GlobalRole | null | undefined): boolean {
   if (!role) return false;
-  return role === "ADMIN" || role === "CEO";
+  return role === "ADMIN" || role === "EXECUTIVE";
 }
 
 /**
@@ -77,9 +77,9 @@ export function validateSessionAccess(session: Session | null): {
 /**
  * Get allowed roles as array
  */
-export const ALLOWED_ROLES: GlobalRole[] = ["ADMIN", "CEO", "USER"];
+export const ALLOWED_ROLES: GlobalRole[] = ["ADMIN", "EXECUTIVE", "USER"];
 
 /**
  * Get admin roles as array
  */
-export const ADMIN_ROLES: GlobalRole[] = ["ADMIN", "CEO"];
+export const ADMIN_ROLES: GlobalRole[] = ["ADMIN", "EXECUTIVE"];

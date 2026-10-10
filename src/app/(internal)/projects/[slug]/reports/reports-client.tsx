@@ -20,15 +20,15 @@ export function ReportsClient({ projectSlug }: ReportsClientProps) {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const session = useSessionStore((state) => state.session);
 
-  // Check if user can create reports (MANDOR or ARCHITECT, or ADMIN)
+  // Check if user can create reports (SUPERVISOR or ARCHITECT, or ADMIN)
   const userRole = session?.user?.roleGlobal as GlobalRole | undefined;
-  const isAdmin = userRole === "ADMIN" || userRole === "CEO";
+  const isAdmin = userRole === "ADMIN" || userRole === "EXECUTIVE";
   const projectMember = project?.members.find(
     (m) => m.userId === session?.user?.id,
   );
   const memberRole = projectMember?.role as ProjectRole | undefined;
   const canCreate =
-    isAdmin || memberRole === "MANDOR" || memberRole === "ARCHITECT";
+    isAdmin || memberRole === "SUPERVISOR" || memberRole === "ARCHITECT";
 
   if (isLoading) {
     return (

@@ -51,12 +51,12 @@ export function CreateUserDialog({
     useState<Country>(DEFAULT_COUNTRY);
   const [password, setPassword] = useState("Sandaran123!");
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState<"USER" | "ADMIN" | "CEO">("USER");
+  const [role, setRole] = useState<"USER" | "ADMIN" | "EXECUTIVE">("USER");
   const [assignProject, setAssignProject] = useState(false);
   const [projectId, setProjectId] = useState<string>("");
   const [projectRole, setProjectRole] = useState<
-    "MANDOR" | "ARCHITECT" | "FINANCE"
-  >("MANDOR");
+    "SUPERVISOR" | "ARCHITECT" | "FINANCE" | "LOGISTIC"
+  >("SUPERVISOR");
 
   const { data: projects } = useProjectList({
     enabled: open && assignProject,
@@ -101,7 +101,7 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
     setRole("USER");
     setAssignProject(false);
     setProjectId("");
-    setProjectRole("MANDOR");
+    setProjectRole("SUPERVISOR");
   };
 
   const handleGeneratePassword = () => {
@@ -292,7 +292,9 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
             </Label>
             <RadioGroup
               value={role}
-              onValueChange={(val) => setRole(val as "USER" | "ADMIN" | "CEO")}
+              onValueChange={(val) =>
+                setRole(val as "USER" | "ADMIN" | "EXECUTIVE")
+              }
               className="grid grid-cols-3 gap-2"
             >
               <div>
@@ -307,7 +309,7 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
                 >
                   <span className="font-semibold">USER</span>
                   <span className="text-[10px] text-muted-foreground">
-                    Staf / Mandor
+                    Staf / Tim Lapangan
                   </span>
                 </Label>
               </div>
@@ -331,15 +333,15 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
 
               <div>
                 <RadioGroupItem
-                  value="CEO"
-                  id="role-ceo"
+                  value="EXECUTIVE"
+                  id="role-executive"
                   className="peer sr-only"
                 />
                 <Label
-                  htmlFor="role-ceo"
+                  htmlFor="role-executive"
                   className="flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-2.5 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer text-xs font-medium text-center transition-all"
                 >
-                  <span className="font-semibold">CEO</span>
+                  <span className="font-semibold">EXECUTIVE</span>
                   <span className="text-[10px] text-muted-foreground">
                     Eksekutif / View
                   </span>
@@ -399,7 +401,13 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
                   <Select
                     value={projectRole}
                     onValueChange={(val) =>
-                      setProjectRole(val as "MANDOR" | "ARCHITECT" | "FINANCE")
+                      setProjectRole(
+                        val as
+                          | "SUPERVISOR"
+                          | "ARCHITECT"
+                          | "FINANCE"
+                          | "LOGISTIC",
+                      )
                     }
                   >
                     <SelectTrigger
@@ -409,9 +417,10 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="MANDOR">MANDOR</SelectItem>
+                      <SelectItem value="SUPERVISOR">SUPERVISOR</SelectItem>
                       <SelectItem value="ARCHITECT">ARCHITECT</SelectItem>
                       <SelectItem value="FINANCE">FINANCE</SelectItem>
+                      <SelectItem value="LOGISTIC">LOGISTIC</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

@@ -38,9 +38,10 @@ interface MemberManagementProps {
 }
 
 const PROJECT_ROLES: { value: ProjectRole; label: string }[] = [
-  { value: "MANDOR", label: "Mandor" },
+  { value: "SUPERVISOR", label: "Supervisor" },
   { value: "ARCHITECT", label: "Architect" },
   { value: "FINANCE", label: "Finance" },
+  { value: "LOGISTIC", label: "Logistic" },
 ];
 
 export function MemberManagement({ projectId }: MemberManagementProps) {
@@ -55,7 +56,7 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
   const removeMember = useRemoveMember();
 
   const [selectedUserId, setSelectedUserId] = useState<string>("");
-  const [selectedRole, setSelectedRole] = useState<ProjectRole>("MANDOR");
+  const [selectedRole, setSelectedRole] = useState<ProjectRole>("SUPERVISOR");
   const [memberToRemove, setMemberToRemove] = useState<{
     id: string;
     name: string | null;
@@ -75,7 +76,7 @@ export function MemberManagement({ projectId }: MemberManagementProps) {
       });
       toast.success("Anggota berhasil ditambahkan");
       setSelectedUserId("");
-      setSelectedRole("MANDOR");
+      setSelectedRole("SUPERVISOR");
     } catch {
       // Error handled by global mutation cache
     }
