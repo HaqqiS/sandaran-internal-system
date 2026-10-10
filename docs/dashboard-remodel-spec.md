@@ -27,13 +27,13 @@ Stack: Next.js 15 App Router, React 19, tRPC 11 + React Query 5, Prisma 6 (Postg
 | `roleGlobal` | Renders | Job |
 |---|---|---|
 | `ADMIN` | `AdminDashboard` | Keep the system running: approve users, staffing, reporting, data problems |
-| `CEO` | `CeoDashboard` | Read-only portfolio overview |
-| `USER` | `UserDashboard` | Do today's work on *my* projects, built from `ProjectMember.role` (MANDOR / ARCHITECT / FINANCE / LOGISTIC) as "lenses" |
+| `EXECUTIVE` | `ExecutiveDashboard` | Portfolio overview (sebelumnya CeoDashboard) |
+| `USER` | `UserDashboard` | Do today's work on *my* projects, built from `ProjectMember.role` (SUPERVISOR / ARCHITECT / FINANCE / LOGISTIC) as "lenses" |
 | `NONE` | never reaches it | Handled by `/waiting-approval` |
 
 An ADMIN who is also a project member still sees the Admin dashboard.
 
-The old `MandorView`, `ArchitectView`, `FinanceView`, `LogisticView` are folded into `UserDashboard` as lenses. Today `page.tsx` renders every matching view, so a user who is Mandor in one project and Finance/Logistic in another gets two full layouts stacked.
+The old `SupervisorView` (sebelumnya `MandorView`), `ArchitectView`, `FinanceView`, `LogisticView` are folded into `UserDashboard` as lenses. Today `page.tsx` renders every matching view, so a user who is Supervisor in one project and Finance/Logistic in another gets two full layouts stacked.
 
 ---
 
