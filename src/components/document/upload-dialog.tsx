@@ -30,6 +30,8 @@ export function UploadDialog({
   const descriptionText =
     "Unggah file desain, gambar teknis, spesifikasi, dll.";
   const [draft, setDraft] = useState<DocumentFormDraft>({});
+  const [isPending, setIsPending] = useState(false);
+  const [hasFile, setHasFile] = useState(false);
   const formRef = useRef<{ getValues: () => DocumentFormValues }>(null);
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -51,16 +53,22 @@ export function UploadDialog({
       onOpenChange={handleOpenChange}
       title={title}
       description={descriptionText}
+      formId="upload-doc-form"
+      submitLabel={isPending ? "Mengunggah..." : "Unggah Dokumen"}
+      isPending={isPending}
+      submitDisabled={!hasFile}
       trigger={children}
       dialogClassName="sm:max-w-xl"
     >
       <UploadForm
+        id="upload-doc-form"
         ref={formRef}
         projectId={projectId}
         projectSlug={projectSlug}
         draftValues={draft}
+        onPendingChange={setIsPending}
+        onFileStatusChange={setHasFile}
         onSuccess={handleSuccess}
-        onCancel={() => onOpenChange(false)}
       />
     </ResponsiveFormDialog>
   );

@@ -9,12 +9,17 @@ import {
 } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { FileUpload } from "~/components/shared/file-upload";
 import { Button } from "~/components/ui/button";
-import { Field, FieldGroup, FieldLabel } from "~/components/ui/field";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import {
   Select,
@@ -48,6 +53,9 @@ interface EditFormProps {
   document: ProjectDocument;
   onSuccess?: () => void;
   onCancel?: () => void;
+  id?: string;
+  onPendingChange?: (isPending: boolean) => void;
+  onCanSubmitChange?: (canSubmit: boolean) => void;
 }
 
 function formatBytes(bytes?: number | null) {
@@ -76,7 +84,9 @@ export function EditForm({
   projectSlug,
   document: doc,
   onSuccess,
-  onCancel,
+  id = "edit-doc-form",
+  onPendingChange,
+  onCanSubmitChange,
 }: EditFormProps) {
   const updateDocument = useUpdateDocument();
   const { upload, isLoading: isUploading, remove } = useCloudinaryUpload();
@@ -85,6 +95,19 @@ export function EditForm({
   const [newFile, setNewFile] = useState<File | null>(null);
 
   const formattedSize = formatBytes(doc.fileSize);
+  const isPending = updateDocument.isPending || isUploading;
+
+  useEffect(() => {
+    onPendingChange?.(isPending);
+  }, [isPending, onPendingChange]);
+
+  useEffect(() => {
+    if (isReplacingFile && !newFile) {
+      onCanSubmitChange?.(false);
+    } else {
+      onCanSubmitChange?.(true);
+    }
+  }, [isReplacingFile, newFile, onCanSubmitChange]);
 
   const form = useForm({
     defaultValues: {
@@ -152,6 +175,7 @@ export function EditForm({
 
   return (
     <form
+      id={id}
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -235,6 +259,7 @@ export function EditForm({
                   onChange={(e) => field.handleChange(e.target.value)}
                   placeholder="Judul dokumen"
                 />
+                <FieldError errors={field.state.meta.errors} />
               </Field>
             )}
           />
@@ -261,6 +286,7 @@ export function EditForm({
                     <SelectItem value="OTHER">Lainnya</SelectItem>
                   </SelectContent>
                 </Select>
+                <FieldError errors={field.state.meta.errors} />
               </Field>
             )}
           />
@@ -279,6 +305,7 @@ export function EditForm({
                 onChange={(e) => field.handleChange(e.target.value)}
                 placeholder="cth: v1.0, Revisi A"
               />
+              <FieldError errors={field.state.meta.errors} />
             </Field>
           )}
         />
@@ -297,40 +324,11 @@ export function EditForm({
                 placeholder="Deskripsi singkat mengenai isi dokumen..."
                 rows={3}
               />
+              <FieldError errors={field.state.meta.errors} />
             </Field>
           )}
         />
       </FieldGroup>
-
-      <div className="flex justify-end gap-2 pt-2">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={updateDocument.isPending}
-        >
-          Batal
-        </Button>
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-          children={([canSubmit, isSubmitting]) => (
-            <Button
-              type="submit"
-              disabled={
-                !canSubmit ||
-                isSubmitting ||
-                updateDocument.isPending ||
-                isUploading ||
-                (isReplacingFile && !newFile)
-              }
-            >
-              {isSubmitting || updateDocument.isPending || isUploading
-                ? "Menyimpan..."
-                : "Simpan Perubahan"}
-            </Button>
-          )}
-        />
-      </div>
     </form>
   );
 }

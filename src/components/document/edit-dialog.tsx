@@ -1,21 +1,8 @@
 "use client";
 
 import type { ProjectDocument } from "@prisma/client";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "~/components/ui/drawer";
-import { useIsMobile } from "~/hooks/use-mobile";
+import { useState } from "react";
+import { ResponsiveFormDialog } from "~/components/shared/responsive-form-dialog";
 import { EditForm } from "./edit-form";
 
 interface EditDialogProps {
@@ -35,9 +22,8 @@ export function EditDialog({
   onOpenChange,
   onSuccess,
 }: EditDialogProps) {
-  const isMobile = useIsMobile();
-  const title = "Edit Dokumen";
-  const descriptionText = "Perbarui informasi dan metadata dokumen.";
+  const [isPending, setIsPending] = useState(false);
+  const [canSubmit, setCanSubmit] = useState(true);
 
   if (!doc) return null;
 
@@ -46,48 +32,27 @@ export function EditDialog({
     onSuccess?.();
   };
 
-  if (!isMobile) {
-    return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-xl">
-          <DialogHeader>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>{descriptionText}</DialogDescription>
-          </DialogHeader>
-          <div className="max-h-[80vh] overflow-y-auto px-1 no-scrollbar">
-            <EditForm
-              projectId={projectId}
-              projectSlug={projectSlug}
-              document={doc}
-              onSuccess={handleSuccess}
-              onCancel={() => onOpenChange(false)}
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="flex h-[85dvh] flex-col">
-        <DrawerHeader className="shrink-0 text-left">
-          <DrawerTitle>{title}</DrawerTitle>
-          <DrawerDescription>{descriptionText}</DrawerDescription>
-        </DrawerHeader>
-        <div
-          className="flex-1 min-h-0 overflow-y-auto px-4 pb-6 scroll-pb-24"
-          data-vaul-no-drag
-        >
-          <EditForm
-            projectId={projectId}
-            projectSlug={projectSlug}
-            document={doc}
-            onSuccess={handleSuccess}
-            onCancel={() => onOpenChange(false)}
-          />
-        </div>
-      </DrawerContent>
-    </Drawer>
+    <ResponsiveFormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Edit Dokumen"
+      description="Perbarui informasi dan metadata dokumen."
+      formId="edit-doc-form"
+      submitLabel={isPending ? "Menyimpan..." : "Simpan Perubahan"}
+      isPending={isPending}
+      submitDisabled={!canSubmit}
+      dialogClassName="sm:max-w-xl"
+    >
+      <EditForm
+        id="edit-doc-form"
+        projectId={projectId}
+        projectSlug={projectSlug}
+        document={doc}
+        onPendingChange={setIsPending}
+        onCanSubmitChange={setCanSubmit}
+        onSuccess={handleSuccess}
+      />
+    </ResponsiveFormDialog>
   );
 }
