@@ -1,8 +1,22 @@
-export { AdminView } from "./admin-view";
-export { ArchitectView } from "./architect-view";
-export { DataTable } from "./data-table";
-export { CEOView, ExecutiveView } from "./executive-view";
-export { FinanceView } from "./finance-view";
-export { LogisticView } from "./logistic-view";
-export { StatCard } from "./stat-card";
-export { MandorView, SupervisorView } from "./supervisor-view";
+export { AdminDashboard } from "./admin-dashboard";
+export { ExecutiveDashboard } from "./executive-dashboard";
+export {
+  ArchitectLens,
+  FinanceLens,
+  LogisticLens,
+  RoleLensTabs,
+  type RoleLensType,
+  SupervisorLens,
+} from "./lenses";
+
+export {
+  type AttentionItem,
+  AttentionList,
+  DashboardLayout,
+  EmptyDashboardState,
+  MetricCard,
+  type MetricCardProps,
+  QuickActionCard,
+  StatsGrid,
+} from "./shared";
+export { UserDashboard } from "./user-dashboard";
