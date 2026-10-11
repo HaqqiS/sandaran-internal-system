@@ -155,12 +155,70 @@ import { ProjectStatusBadge } from "~/components/shared/status-badge";
 <ProjectStatusBadge status="DONE" />   {/* Otomatis: "Selesai", variant "outline" */}
 ```
 
-### 5.3 Pola Adaptive Dialog vs Drawer (`ResponsiveFormDialog`)
-Semua dialog formulir wajib mengadopsi standar adaptif:
-- **Desktop (>= 768px)**: Tampil sebagai Radix `Dialog` di tengah layar.
-- **Mobile (< 768px)**: Tampil sebagai Vaul `Drawer` yang meluncur dari bawah.
-- **Header Ramping**: Padding vertikal kompak (`px-5 py-3.5` / `px-4 py-2.5`) dengan judul `text-base font-semibold` agar ruang formulir maksimal.
-- **Footer Sticky**: Tombol Batal & Simpan wajib **selalu terlihat (sticky)** di bagian bawah dengan efek latar `bg-muted/40 backdrop-blur-xs` (desktop) atau `bg-background/95 pb-safe` (mobile).
+### 5.3 Arsitektur Standar: Form + Dialog/Drawer (`ResponsiveFormDialog`)
+
+Seluruh dialog modal dan drawer formulir di Sandaran Internal System wajib mengadopsi struktur standar **3-Zona Universal**:
+
+```
+┌────────────────────────────────────────────────────────┐  ← Container: flex flex-col, max-h-[90dvh], overflow-hidden
+│ 1. HEADER   (shrink-0)                                 │  ← Tidak ikut scroll (border-b px-4 py-3 sm:px-5)
+├────────────────────────────────────────────────────────┤
+│ 2. BODY     (flex-1 min-h-0 overflow-y-auto            │  ← SATU-SATUNYA AREA SCROLL
+│              data-vaul-no-drag scroll-pb-24)           │
+├────────────────────────────────────────────────────────┤
+│ 3. FOOTER   (shrink-0 pb-[max(0.75rem,env(safe-area... │  ← Sticky di dasar, selalu terlihat
+└────────────────────────────────────────────────────────┘
+```
+
+#### Aturan Baku Implementasi:
+1. **Container**: `flex flex-col` + batas tinggi (`max-h-[90dvh]` desktop, `max-h-[88dvh]` mobile drawer, wajib unit `dvh`) + `overflow-hidden`.
+2. **Header & Footer**: Menggunakan `shrink-0`. Tidak perlu `position: sticky` internal karena keduanya berada di luar elemen scroll.
+3. **Body**: `flex-1 min-h-0 overflow-y-auto`. `min-h-0` wajib agar child flex menyusut dan scroll berfungsi.
+4. **Hanya Satu Elemen Scroll**: `DialogContent` / `DrawerContent` tidak boleh memiliki `overflow-y-auto` untuk mencegah double scrollbar.
+5. **Mobile Vaul Drawer Guard**: Body wajib memiliki atribut `data-vaul-no-drag` agar gesture scroll isi tidak menutup drawer secara tidak sengaja.
+6. **Mobile Keyboard Clearance**: Body diberi `scroll-pb-24` agar field input paling bawah tidak tertutup oleh keyboard virtual atau footer.
+7. **Safe Area iOS**: Footer wajib memiliki `pb-[max(0.75rem,env(safe-area-inset-bottom))]` untuk home bar gesture indicator iPhone.
+8. **Form Binding Standar HTML (`form="formId"`)**:
+   - Form `<form id="form-id" onSubmit={...}>` ditempatkan di dalam Body slot.
+   - Tombol submit `<Button type="submit" form="form-id">` berada di Footer slot di luar tag form.
+   - Pola ini mempertahankan validasi native browser dan submit keyboard `Enter` tanpa ref imperatif.
+
+#### Contoh Pemakaian Terpadu:
+```tsx
+<ResponsiveFormDialog
+  open={open}
+  onOpenChange={setOpen}
+  title="Buat Laporan Baru"
+  description="Isi laporan harian untuk proyek ini"
+  formId="report-form"
+  submitLabel="Kirim Laporan"
+  isPending={isPending}
+>
+  <form id="report-form" onSubmit={handleSubmit} className="space-y-4">
+    {/* Field-field form */}
+  </form>
+</ResponsiveFormDialog>
+```
+
+### 5.4 Standar Validasi Formulir: TanStack Form + Zod + FieldError
+
+Seluruh formulir di aplikasi wajib menerapkan pola validasi data deklaratif yang terpadu:
+
+1. **Skema Zod sebagai Single Source of Truth**:
+   - Setiap formulir memiliki skema validasi Zod (`z.object({...})`) yang mendefinisikan batasan tipe data dan pesan kesalahan human-friendly dalam Bahasa Indonesia.
+   - Inferensi tipe TypeScript wajib menggunakan `z.infer<typeof formSchema>`.
+
+2. **TanStack Form (`@tanstack/react-form`)**:
+   - Menangani state formulir reaktif tanpa re-render berlebih pada parent dialog.
+   - Validasi skema didaftarkan melalui opsi `validators: { onSubmit: formSchema }`.
+
+3. **Penampil Kesalahan Inline (`FieldError`)**:
+   - Pesan kesalahan wajib ditampilkan secara inline tepat di bawah masing-masing input menggunakan komponen `<FieldError errors={field.state.meta.errors} />` dari `~/components/ui/field`.
+   - Dilarang hanya mengandalkan notifikasi toast untuk validasi field individual, karena pengguna membutuhkan konteks visual langsung pada input yang bermasalah.
+
+4. **Ukuran Komponen Input Baku**:
+   - Seluruh elemen `<Input />` wajib menggunakan ukuran default (`h-8`, padding standar `px-2.5 py-1`).
+   - Dilarang menambahkan override tinggi (`h-10`) atau padding kiri manual (`pl-9`) yang merusak konsistensi ritme visual formulir.
 
 ---
 
