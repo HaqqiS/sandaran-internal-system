@@ -17,10 +17,10 @@ interface UserFilterDropdownProps {
 }
 
 const filterLabels: Record<FilterValue, string> = {
-  all: "All Users",
-  pending: "Pending",
-  active: "Active",
-  rejected: "Rejected",
+  all: "Semua Pengguna",
+  pending: "Menunggu",
+  active: "Aktif",
+  rejected: "Ditolak",
 };
 
 export function UserFilterDropdown({
@@ -39,11 +39,15 @@ export function UserFilterDropdown({
           value={value}
           onValueChange={(v) => onValueChange(v as FilterValue)}
         >
-          <DropdownMenuRadioItem value="all">All Users</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="pending">Pending</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="active">Active</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="all">
+            Semua Pengguna
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="pending">
+            Menunggu
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="active">Aktif</DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="rejected">
-            Rejected
+            Ditolak
           </DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>

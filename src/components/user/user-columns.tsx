@@ -123,12 +123,12 @@ export function getUserColumns(): ColumnDef<UserListItem>[] {
     },
     {
       accessorKey: "roleGlobal",
-      header: "Role",
+      header: "Peran",
       cell: ({ row }) => <RoleBadge role={row.original.roleGlobal} />,
     },
     {
       accessorKey: "createdAt",
-      header: "Registered",
+      header: "Terdaftar",
       cell: ({ row }) => {
         const date = row.original.createdAt;
         return (
@@ -140,13 +140,11 @@ export function getUserColumns(): ColumnDef<UserListItem>[] {
     },
     {
       id: "projects",
-      header: "Projects",
+      header: "Proyek",
       cell: ({ row }) => {
         const count = row.original._count.projectMembers;
         return (
-          <span className="text-sm text-muted-foreground">
-            {count} {count === 1 ? "project" : "projects"}
-          </span>
+          <span className="text-sm text-muted-foreground">{count} proyek</span>
         );
       },
     },
@@ -171,7 +169,7 @@ export function getUserColumnsWithActions({
 
   const actionsColumn: ColumnDef<UserListItem> = {
     id: "actions",
-    header: "Actions",
+    header: "Aksi",
     cell: ({ row }) => {
       const user = row.original;
       const status = getUserStatus(user.isActive, user.reviewedAt);
@@ -185,14 +183,14 @@ export function getUserColumnsWithActions({
               variant="default"
               onClick={() => onApprove?.(user)}
             >
-              Approve
+              Setujui
             </Button>
             <Button
               size="sm"
               variant="outline"
               onClick={() => onReject?.(user)}
             >
-              Reject
+              Tolak
             </Button>
           </div>
         );
@@ -219,10 +217,10 @@ export function getUserColumnsWithActions({
               className="text-destructive cursor-pointer"
               disabled={user.isActive}
             >
-              Delete User
+              Hapus Pengguna
               {user.isActive && (
                 <span className="ml-2 text-xs text-muted-foreground">
-                  (Inactive only)
+                  (Hanya nonaktif)
                 </span>
               )}
             </DropdownMenuItem>

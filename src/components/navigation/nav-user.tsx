@@ -99,7 +99,7 @@ export function NavUser({
                 className="cursor-pointer"
               >
                 <IconUserCircle />
-                Account
+                Pengaturan Akun
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem

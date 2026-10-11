@@ -35,9 +35,9 @@ export function TeamManagementDialog({
       <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerContent className="flex min-h-[60dvh] max-h-[85dvh] flex-col">
           <DrawerHeader className="shrink-0 border-b pb-3 text-left">
-            <DrawerTitle>Team Management</DrawerTitle>
+            <DrawerTitle>Manajemen Tim</DrawerTitle>
             <DrawerDescription>
-              Add, remove, and manage roles for project members.
+              Tambah, hapus, dan kelola peran anggota proyek.
             </DrawerDescription>
           </DrawerHeader>
           <div
@@ -55,9 +55,9 @@ export function TeamManagementDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[85vh] min-h-[450px] flex-col sm:max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Team Management</DialogTitle>
+          <DialogTitle>Manajemen Tim</DialogTitle>
           <DialogDescription>
-            Add, remove, and manage roles for project members.
+            Tambah, hapus, dan kelola peran anggota proyek.
           </DialogDescription>
         </DialogHeader>
         <div className="mt-4 flex min-h-0 flex-1 flex-col">

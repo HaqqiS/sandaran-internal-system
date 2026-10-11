@@ -47,10 +47,10 @@ export function ProjectDialog({
     onOpenChange?.(false);
   };
 
-  const title = isEditMode ? "Edit Project" : "New Project";
+  const title = isEditMode ? "Edit Proyek" : "Proyek Baru";
   const description = isEditMode
-    ? "Make changes to your project."
-    : "Create a new construction project.";
+    ? "Ubah data dan detail proyek Anda."
+    : "Buat proyek konstruksi atau interior baru.";
 
   return (
     <ResponsiveFormDialog

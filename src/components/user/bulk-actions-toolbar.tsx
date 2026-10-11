@@ -21,12 +21,11 @@ export function BulkActionsToolbar({
   return (
     <div className="flex items-center gap-4 rounded-md border bg-muted/50 p-3">
       <div className="flex-1 text-sm">
-        <span className="font-medium">{selectedCount}</span> user
-        {selectedCount !== 1 ? "s" : ""} selected
+        <span className="font-medium">{selectedCount}</span> pengguna dipilih
       </div>
       <div className="flex items-center gap-2">
         <Button size="sm" onClick={onApproveAll} disabled={isLoading}>
-          {isLoading ? "Approving..." : "Approve All"}
+          {isLoading ? "Menyetujui..." : "Setujui Semua"}
         </Button>
         <Separator orientation="vertical" className="h-6" />
         <Button
@@ -35,7 +34,7 @@ export function BulkActionsToolbar({
           onClick={onClearSelection}
           disabled={isLoading}
         >
-          Clear
+          Batal Pilihan
         </Button>
       </div>
     </div>
