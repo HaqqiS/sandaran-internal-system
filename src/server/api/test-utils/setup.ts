@@ -9,9 +9,11 @@ import { db } from "~/server/db";
  */
 
 beforeEach(async () => {
-  // Clean up database before each test
-  // Note: In a real scenario, you might want to use transactions
-  // For now, we'll manually clean tables in reverse dependency order
+  // Only clean database if explicitly enabled for database integration tests
+  // to prevent accidental data loss during unit tests.
+  if (process.env.TEST_DATABASE !== "true") {
+    return;
+  }
 
   await db.reportComment.deleteMany();
   await db.reportMedia.deleteMany();
