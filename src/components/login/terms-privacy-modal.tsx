@@ -2,15 +2,7 @@
 
 import { IconFileText, IconShieldCheck } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
+import { ResponsiveFormDialog } from "~/components/shared/responsive-form-dialog";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
 interface TermsPrivacyModalProps {
@@ -31,22 +23,16 @@ export function TermsPrivacyModal({
   }, [defaultTab]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl max-h-[85vh] flex flex-col p-5 gap-3">
-        <DialogHeader className="space-y-1 text-left border-b pb-3">
-          <DialogTitle className="text-base font-bold flex items-center gap-2">
-            {activeTab === "terms" ? (
-              <IconFileText size={18} className="text-primary" />
-            ) : (
-              <IconShieldCheck size={18} className="text-primary" />
-            )}
-            <span>Legal & Kebijakan Internal</span>
-          </DialogTitle>
-          <DialogDescription className="text-xs">
-            Standar kepatuhan & privasi operasional Sandaran Home Living
-          </DialogDescription>
-        </DialogHeader>
-
+    <ResponsiveFormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Legal & Kebijakan Internal"
+      description="Standar kepatuhan & privasi operasional Sandaran Home Living"
+      cancelLabel="Saya Mengerti"
+      showCancelOnly
+      dialogClassName="sm:max-w-xl"
+    >
+      <div className="space-y-4">
         {/* Tab Selector */}
         <Tabs
           value={activeTab}
@@ -71,8 +57,8 @@ export function TermsPrivacyModal({
           </TabsList>
         </Tabs>
 
-        {/* Scrollable Document Content */}
-        <div className="flex-1 overflow-y-auto overscroll-contain pr-2 text-xs leading-relaxed text-muted-foreground space-y-4 max-h-[50vh]">
+        {/* Document Content */}
+        <div className="text-xs leading-relaxed text-muted-foreground space-y-4">
           {activeTab === "terms" ? (
             <div className="space-y-3.5 text-foreground/90">
               <h3 className="font-bold text-sm text-foreground">
@@ -100,152 +86,105 @@ export function TermsPrivacyModal({
                   2. Tanggung Jawab Pengguna
                 </h4>
                 <p className="text-muted-foreground">
-                  Setiap tindakan yang dilakukan menggunakan akun Anda
-                  sepenuhnya merupakan tanggung jawab Anda. Seluruh pengguna,
-                  baik internal maupun pihak ketiga, diwajibkan untuk:
-                </p>
-                <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
-                  <li>
-                    Menggunakan sistem semata-mata untuk kepentingan
-                    operasional, proyek, dan bisnis Sandaran Home Living.
-                  </li>
-                  <li>
-                    Memastikan data yang diinput (seperti progres pengerjaan,
-                    laporan proyek, dll) akurat dan sesuai dengan kondisi di
-                    lapangan.
-                  </li>
-                  <li>
-                    Segera melaporkan kepada administrator jika mencurigai
-                    adanya penggunaan akun oleh pihak yang tidak bertanggung
-                    jawab.
-                  </li>
-                </ul>
-              </div>
-
-              <div className="space-y-1">
-                <h4 className="font-semibold text-xs text-foreground">
-                  3. Kerahasiaan Data (Confidentiality)
-                </h4>
-                <p className="text-muted-foreground">
-                  Seluruh informasi di dalam sistem ini, termasuk data klien,
-                  rancangan desain, detail operasional proyek, dan informasi
-                  internal lainnya adalah Rahasia Perusahaan. Pengguna dilarang
-                  mengunduh, menyalin, menyebarkan, atau menggunakan data
-                  tersebut untuk kepentingan pribadi atau pihak lain di luar
-                  lingkup kerja sama dengan Sandaran Home Living.
+                  Setiap pengguna bertanggung jawab penuh atas segala aktivitas,
+                  perubahan status proyek, input logistik, transaksi keuangan,
+                  dan pelaporan harian yang dilakukan menggunakan akun
+                  masing-masing. Pengguna wajib memastikan bahwa seluruh data
+                  yang dimasukkan adalah akurat, faktual, dan dapat
+                  dipertanggungjawabkan kebenarannya.
                 </p>
               </div>
 
               <div className="space-y-1">
                 <h4 className="font-semibold text-xs text-foreground">
-                  4. Pemantauan Sistem
+                  3. Kerahasiaan Data & Desain Proyek
                 </h4>
                 <p className="text-muted-foreground">
-                  Manajemen Sandaran Home Living berhak memantau dan mencatat
-                  semua aktivitas pengguna di dalam sistem untuk memastikan
-                  kelancaran operasional dan mencegah kebocoran data.
+                  Seluruh dokumen konstruksi, gambar denah 2D/3D, spesifikasi
+                  material, kalkulasi anggaran biaya (RAB), dan dokumen tender
+                  yang tersimpan di dalam sistem merupakan rahasia dagang
+                  perusahaan. Mengunduh, menyebarluaskan, mengambil tangkapan
+                  layar (screenshot) tanpa izin tertulis, atau memanfaatkan data
+                  tersebut untuk kepentingan pribadi maupun pihak ketiga di luar
+                  lingkup pekerjaan resmi adalah pelanggaran berat dan tunduk
+                  pada sanksi hukum yang berlaku.
                 </p>
               </div>
 
               <div className="space-y-1">
                 <h4 className="font-semibold text-xs text-foreground">
-                  5. Pelanggaran dan Sanksi
+                  4. Logistik dan Dana Operasional
                 </h4>
                 <p className="text-muted-foreground">
-                  Penyalahgunaan data atau pelanggaran terhadap ketentuan ini
-                  dapat mengakibatkan pencabutan hak akses secara langsung.
-                  Manajemen berhak menjatuhkan sanksi berupa teguran, pemutusan
-                  hubungan kerja (untuk karyawan internal), pemutusan kontrak
-                  kerja sama (untuk pekerja lepas/pihak ketiga), hingga menempuh
-                  jalur hukum apabila ditemukan kerugian materiil atau imateriil
-                  bagi perusahaan.
+                  Pencatatan pengeluaran barang keluar (OUT) maupun barang masuk
+                  (IN) wajib diverifikasi sesuai kondisi fisik aktual di
+                  lapangan. Setiap pengajuan dana darurat (Emergency Fund) harus
+                  disertai nota/bukti transaksi otentik dan akan melalui proses
+                  tinjauan berjenjang oleh tim Finance atau Administrator.
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <h4 className="font-semibold text-xs text-foreground">
+                  5. Pemutusan Akses & Audit Jejak Aktivitas
+                </h4>
+                <p className="text-muted-foreground">
+                  Manajemen berhak menonaktifkan akun sewaktu-waktu apabila
+                  ditemukan indikasi penyalahgunaan wewenang, kelalaian dalam
+                  pelaporan, atau pelanggaran disiplin kerja. Setiap aksi di
+                  dalam sistem dicatat dalam log audit yang dapat dipantau oleh
+                  tim Executive dan Administrator untuk keperluan akuntabilitas.
                 </p>
               </div>
             </div>
           ) : (
             <div className="space-y-3.5 text-foreground/90">
               <h3 className="font-bold text-sm text-foreground">
-                Kebijakan Privasi Sistem Internal Sandaran Home Living
+                Kebijakan Privasi & Perlindungan Data Internal
               </h3>
 
               <div className="space-y-1">
                 <h4 className="font-semibold text-xs text-foreground">
-                  1. Pengumpulan Data
+                  1. Informasi yang Kami Kumpulkan
                 </h4>
                 <p className="text-muted-foreground">
-                  Dalam pengoperasian Sandaran Internal System, kami
-                  mengumpulkan data teknis dan operasional yang meliputi:
-                </p>
-                <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
-                  <li>
-                    <strong className="text-foreground">
-                      Data Profil Pengguna:
-                    </strong>{" "}
-                    Nama, peran/divisi, dan informasi kontak (berlaku untuk
-                    karyawan, freelancer, maupun pihak ketiga).
-                  </li>
-                  <li>
-                    <strong className="text-foreground">Log Aktivitas:</strong>{" "}
-                    Catatan waktu akses (login/logout), modifikasi data
-                    (penambahan, perubahan, penghapusan data), alamat IP, dan
-                    jenis perangkat yang digunakan.
-                  </li>
-                  <li>
-                    <strong className="text-foreground">
-                      Data Operasional:
-                    </strong>{" "}
-                    File, laporan, atau media yang diunggah pengguna ke dalam
-                    sistem terkait dengan proyek.
-                  </li>
-                </ul>
-                <p className="rounded bg-muted/60 p-2 text-[11px] text-muted-foreground italic border-l-2 border-primary">
-                  Catatan: Sistem ini tidak melakukan pengumpulan data geolokasi
-                  (pelacakan lokasi fisik) pengguna dari perangkat yang
-                  digunakan.
+                  Sistem mengumpulkan data profil pengguna berupa Nama Lengkap,
+                  Nomor WhatsApp/HP aktif, Alamat Email resmi, foto profil,
+                  riwayat sesi masuk (IP address, peramban, dan waktu akses),
+                  serta riwayat unggahan dokumen proyek yang Anda lakukan.
                 </p>
               </div>
 
               <div className="space-y-1">
                 <h4 className="font-semibold text-xs text-foreground">
-                  2. Penggunaan Data
+                  2. Tujuan Penggunaan Data
                 </h4>
                 <p className="text-muted-foreground">
-                  Data yang dikumpulkan secara eksklusif digunakan untuk:
-                </p>
-                <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
-                  <li>
-                    Memonitor progres proyek dan kelancaran operasional harian
-                    Sandaran Home Living.
-                  </li>
-                  <li>
-                    Menjaga keamanan jaringan dan integritas sistem dari akses
-                    yang tidak sah.
-                  </li>
-                  <li>
-                    Keperluan audit, investigasi insiden, dan evaluasi
-                    kinerja/pekerjaan.
-                  </li>
-                </ul>
-              </div>
-
-              <div className="space-y-1">
-                <h4 className="font-semibold text-xs text-foreground">
-                  3. Masa Penyimpanan Data (Retention) dan Keamanan
-                </h4>
-                <p className="text-muted-foreground">
-                  Semua data disimpan di dalam infrastruktur yang dikelola oleh
-                  Sandaran Home Living dengan kontrol akses berbasis peran
-                  (RBAC). Data log aktivitas pengguna dan riwayat operasional
-                  akan disimpan selama periode 2 (dua) hingga 3 (tiga) tahun.
-                  Setelah periode tersebut, data log dapat dihapus secara
-                  permanen atau diarsipkan secara tertutup sesuai dengan
-                  kebijakan pembersihan data perusahaan.
+                  Data yang dikumpulkan semata-mata digunakan untuk: (a)
+                  identifikasi dan autentikasi otorisasi hak akses pengguna, (b)
+                  komunikasi operasional proyek via WhatsApp/Email resmi, (c)
+                  distribusi tugas proyek sesuai divisi (Supervisor, Arsitek,
+                  Keuangan, Logistik), dan (d) pencatatan riwayat
+                  pertanggungjawaban kerja harian (Daily Reports).
                 </p>
               </div>
 
               <div className="space-y-1">
                 <h4 className="font-semibold text-xs text-foreground">
-                  4. Pembagian Data
+                  3. Keamanan Penyimpanan Data
+                </h4>
+                <p className="text-muted-foreground">
+                  Kata sandi akun dienkripsi menggunakan algoritma hashing
+                  standar industri dan tidak dapat dibaca oleh staf umum. Berkas
+                  foto dokumentasi serta dokumen lampiran disimpan pada
+                  infrastruktur penyimpanan awan (cloud storage) terproteksi
+                  dengan kontrol hak akses yang ketat.
+                </p>
+              </div>
+
+              <div className="space-y-1">
+                <h4 className="font-semibold text-xs text-foreground">
+                  4. Pembagian Data kepada Pihak Ketiga
                 </h4>
                 <p className="text-muted-foreground">
                   Data di dalam sistem ini dijaga kerahasiaannya dan tidak akan
@@ -257,18 +196,7 @@ export function TermsPrivacyModal({
             </div>
           )}
         </div>
-
-        <DialogFooter className="pt-2 border-t mt-1">
-          <Button
-            type="button"
-            size="sm"
-            onClick={() => onOpenChange(false)}
-            className="w-full sm:w-auto h-8 text-xs font-semibold"
-          >
-            Saya Mengerti
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </ResponsiveFormDialog>
   );
 }

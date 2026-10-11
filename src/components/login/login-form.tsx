@@ -10,6 +10,7 @@ import {
 } from "@tabler/icons-react";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -19,10 +20,22 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Checkbox } from "~/components/ui/checkbox";
+import { FieldError } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { cn } from "~/lib/utils";
+
+const loginEmailSchema = z.object({
+  email: z.email("Format alamat email tidak valid"),
+  password: z.string().min(1, "Silakan masukkan kata sandi"),
+});
+
+const loginPhoneSchema = z.object({
+  phone: z.string().trim().min(1, "Silakan masukkan nomor telepon"),
+  password: z.string().min(1, "Silakan masukkan kata sandi"),
+});
+
 import { authClient } from "~/server/better-auth/client";
 import { type Country, DEFAULT_COUNTRY } from "../../app/login/_data/countries";
 import { CountryPicker } from "./country-picker";
@@ -70,6 +83,7 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // Legal Modal State
   const [legalModalOpen, setLegalModalOpen] = useState(false);
@@ -98,14 +112,18 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setFieldErrors({});
 
     if (authMode === "email") {
-      if (!email.trim()) {
-        toast.error("Silakan masukkan alamat email");
-        return;
-      }
-      if (!password) {
-        toast.error("Silakan masukkan kata sandi");
+      const validation = loginEmailSchema.safeParse({ email, password });
+      if (!validation.success) {
+        const errors: Record<string, string> = {};
+        for (const issue of validation.error.issues) {
+          if (issue.path[0]) {
+            errors[issue.path[0].toString()] = issue.message;
+          }
+        }
+        setFieldErrors(errors);
         return;
       }
 
@@ -135,12 +153,15 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
         setIsLoading(false);
       }
     } else {
-      if (!phone.trim()) {
-        toast.error("Silakan masukkan nomor telepon");
-        return;
-      }
-      if (!password) {
-        toast.error("Silakan masukkan kata sandi");
+      const validation = loginPhoneSchema.safeParse({ phone, password });
+      if (!validation.success) {
+        const errors: Record<string, string> = {};
+        for (const issue of validation.error.issues) {
+          if (issue.path[0]) {
+            errors[issue.path[0].toString()] = issue.message;
+          }
+        }
+        setFieldErrors(errors);
         return;
       }
 
@@ -219,7 +240,10 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
             <div className="space-y-1.5">
               <Tabs
                 value={authMode}
-                onValueChange={(val) => setAuthMode(val as "email" | "phone")}
+                onValueChange={(val) => {
+                  setAuthMode(val as "email" | "phone");
+                  setFieldErrors({});
+                }}
                 className="w-full"
               >
                 <TabsList className="bg-muted/80 grid h-8 w-full grid-cols-2 p-0.5">
@@ -259,10 +283,15 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
                     placeholder="nama@sandaran.id"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required
                     className="h-10 rounded-lg pl-9 text-xs transition-colors"
                   />
                 </div>
+                {fieldErrors.email && (
+                  <FieldError
+                    errors={[fieldErrors.email]}
+                    className="text-xs"
+                  />
+                )}
               </div>
             ) : (
               <div className="space-y-1">
@@ -283,13 +312,18 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
                     placeholder="812-3456-7890"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    required
                     style={{
                       paddingLeft: `${selectedCountry.dialCode.length * 8 + 72}px`,
                     }}
                     className="h-10 rounded-lg text-xs transition-colors"
                   />
                 </div>
+                {fieldErrors.phone && (
+                  <FieldError
+                    errors={[fieldErrors.phone]}
+                    className="text-xs"
+                  />
+                )}
               </div>
             )}
 
@@ -310,7 +344,6 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required
                   className="h-10 rounded-lg pl-9 pr-10 text-xs transition-colors"
                 />
                 <button
@@ -330,6 +363,12 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
                   )}
                 </button>
               </div>
+              {fieldErrors.password && (
+                <FieldError
+                  errors={[fieldErrors.password]}
+                  className="text-xs"
+                />
+              )}
             </div>
 
             {/* Remember Me */}
