@@ -3,6 +3,7 @@
 import { IconArrowRight } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ProjectStatusBadge } from "~/components/shared/status-badge";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardHeader, CardTitle } from "~/components/ui/card";
@@ -138,17 +139,10 @@ export function ProjectHealthTable({
                   </TableCell>
 
                   <TableCell>
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        "text-[11px] capitalize",
-                        project.status === "ACTIVE"
-                          ? "border-status-success-border bg-status-success-bg text-status-success"
-                          : "text-muted-foreground",
-                      )}
-                    >
-                      {project.status === "ACTIVE" ? "Aktif" : project.status}
-                    </Badge>
+                    <ProjectStatusBadge
+                      status={project.status}
+                      className="text-[11px]"
+                    />
                   </TableCell>
 
                   <TableCell>
@@ -259,17 +253,10 @@ export function ProjectHealthTable({
                     </p>
                   )}
                 </div>
-                <Badge
-                  variant="outline"
-                  className={cn(
-                    "text-[10px] capitalize",
-                    project.status === "ACTIVE"
-                      ? "border-status-success-border bg-status-success-bg text-status-success"
-                      : "text-muted-foreground",
-                  )}
-                >
-                  {project.status === "ACTIVE" ? "Aktif" : project.status}
-                </Badge>
+                <ProjectStatusBadge
+                  status={project.status}
+                  className="text-[10px]"
+                />
               </div>
 
               <div className="flex items-center justify-between text-xs py-1 border-y border-border/50">

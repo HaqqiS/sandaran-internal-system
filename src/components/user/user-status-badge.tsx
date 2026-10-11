@@ -11,11 +11,11 @@ interface UserStatusBadgeProps {
 export function UserStatusBadge({ status }: UserStatusBadgeProps) {
   const config: Record<
     Status,
-    { label: string; variant: "outline" | "default" | "destructive" }
+    { label: string; variant: "warning" | "success" | "attention" }
   > = {
-    pending: { label: "Pending", variant: "outline" },
-    approved: { label: "Active", variant: "default" },
-    rejected: { label: "Rejected", variant: "destructive" },
+    pending: { label: "Menunggu", variant: "warning" },
+    approved: { label: "Aktif", variant: "success" },
+    rejected: { label: "Ditolak", variant: "attention" },
   };
 
   const { label, variant } = config[status];

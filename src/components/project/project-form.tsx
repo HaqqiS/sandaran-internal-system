@@ -365,7 +365,7 @@ export function ProjectForm({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ACTIVE">Aktif</SelectItem>
-                    <SelectItem value="PAUSED">Ditunda</SelectItem>
+                    <SelectItem value="PAUSED">Dijeda</SelectItem>
                     <SelectItem value="DONE">Selesai</SelectItem>
                   </SelectContent>
                 </Select>

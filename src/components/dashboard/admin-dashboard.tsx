@@ -45,7 +45,7 @@ export function AdminDashboard() {
           caption={
             isLoading
               ? undefined
-              : `${counts?.pausedProjects ?? 0} tunda · ${counts?.doneProjects ?? 0} selesai`
+              : `${counts?.pausedProjects ?? 0} dijeda · ${counts?.doneProjects ?? 0} selesai`
           }
           href="/projects"
           icon={IconBuildingSkyscraper}
