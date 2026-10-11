@@ -53,10 +53,6 @@ export function WithdrawDialog({
     onOpenChange(false);
   };
 
-  const handleSubmit = () => {
-    formRef.current?.submit();
-  };
-
   const submitLabel = isPending
     ? "Memproses..."
     : isEdit
@@ -69,11 +65,12 @@ export function WithdrawDialog({
       onOpenChange={handleOpenChange}
       title={title}
       description={description}
+      formId="withdraw-form"
       submitLabel={submitLabel}
-      onSubmit={handleSubmit}
       isPending={isPending}
     >
       <WithdrawForm
+        id="withdraw-form"
         ref={formRef}
         projectId={projectId}
         projectSlug={projectSlug}

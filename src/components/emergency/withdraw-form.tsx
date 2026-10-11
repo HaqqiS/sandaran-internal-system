@@ -36,7 +36,7 @@ export type WithdrawFormValues = z.infer<typeof withdrawSchema>;
 export type WithdrawFormDraft = Partial<WithdrawFormValues>;
 export type WithdrawFormRef = {
   getValues: () => WithdrawFormValues;
-  submit: () => void;
+  submit?: () => void;
 };
 
 interface WithdrawFormProps {
@@ -48,6 +48,7 @@ interface WithdrawFormProps {
   isReviewed?: boolean;
   ref?: React.Ref<WithdrawFormRef>;
   onSuccess?: () => void;
+  id?: string;
   onPendingChange?: (isPending: boolean) => void;
 }
 
@@ -60,6 +61,7 @@ export function WithdrawForm({
   isReviewed = false,
   ref,
   onSuccess,
+  id = "withdraw-form",
   onPendingChange,
 }: WithdrawFormProps) {
   const withdrawFund = useRequestEmergencyFund();
@@ -142,6 +144,7 @@ export function WithdrawForm({
 
   return (
     <form
+      id={id}
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();

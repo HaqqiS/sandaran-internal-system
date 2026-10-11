@@ -36,7 +36,7 @@ export type DepositFormValues = z.infer<typeof depositSchema>;
 export type DepositFormDraft = Partial<DepositFormValues>;
 export type DepositFormRef = {
   getValues: () => DepositFormValues;
-  submit: () => void;
+  submit?: () => void;
 };
 
 interface DepositFormProps {
@@ -48,6 +48,7 @@ interface DepositFormProps {
   isReviewed?: boolean;
   ref?: React.Ref<DepositFormRef>;
   onSuccess?: () => void;
+  id?: string;
   onPendingChange?: (isPending: boolean) => void;
 }
 
@@ -60,6 +61,7 @@ export function DepositForm({
   isReviewed = false,
   ref,
   onSuccess,
+  id = "deposit-form",
   onPendingChange,
 }: DepositFormProps) {
   const addBalance = useAddEmergencyBalance();
@@ -144,6 +146,7 @@ export function DepositForm({
 
   return (
     <form
+      id={id}
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();

@@ -1,10 +1,9 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { useImperativeHandle } from "react";
+import { useEffect, useImperativeHandle } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Button } from "~/components/ui/button";
 import {
   Field,
   FieldError,
@@ -40,6 +39,8 @@ interface TransactionFormProps {
   draftValues?: TransactionFormDraft;
   ref?: React.Ref<{ getValues: () => TransactionFormValues }>;
   onSuccess?: () => void;
+  id?: string;
+  onPendingChange?: (isPending: boolean) => void;
 }
 
 export function TransactionForm({
@@ -51,10 +52,17 @@ export function TransactionForm({
   draftValues,
   ref,
   onSuccess,
+  id = "transaction-form",
+  onPendingChange,
 }: TransactionFormProps) {
   const recordTransaction = useRecordLogisticTransaction();
+  const isPending = recordTransaction.isPending;
 
   useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
+
+  useEffect(() => {
+    onPendingChange?.(isPending);
+  }, [isPending, onPendingChange]);
 
   const form = useForm({
     defaultValues: {
@@ -72,18 +80,26 @@ export function TransactionForm({
           itemId,
           type: value.type,
           quantity: value.quantity,
-          notes: value.notes,
+          notes: value.notes || undefined,
         });
-        toast.success(`Transaksi berhasil dicatat untuk ${itemName}`);
+
+        toast.success(
+          value.type === "IN"
+            ? "Barang masuk berhasil dicatat"
+            : "Barang keluar berhasil dicatat",
+        );
         onSuccess?.();
-      } catch {
-        // Error handled by mutation
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Terjadi kesalahan",
+        );
       }
     },
   });
 
   return (
     <form
+      id={id}
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -91,10 +107,10 @@ export function TransactionForm({
       }}
       className="space-y-4"
     >
-      <div className="bg-muted/50 rounded-lg p-3 text-sm">
-        <p>
-          Mencatat transaksi untuk: <strong>{itemName}</strong>
-        </p>
+      <div className="rounded-lg border bg-muted/40 p-3 text-xs">
+        <div className="text-muted-foreground">Barang</div>
+        <div className="font-semibold text-foreground text-sm">{itemName}</div>
+        <div className="text-muted-foreground mt-0.5">Satuan: {unit}</div>
       </div>
 
       <FieldGroup>
@@ -105,19 +121,21 @@ export function TransactionForm({
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel>Tipe Transaksi *</FieldLabel>
+                <FieldLabel>Jenis Transaksi</FieldLabel>
                 <Select
                   value={field.state.value}
-                  onValueChange={(value) =>
-                    field.handleChange(value as "IN" | "OUT")
+                  onValueChange={(val) =>
+                    field.handleChange(val as "IN" | "OUT")
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih tipe transaksi" />
+                    <SelectValue placeholder="Pilih jenis transaksi" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="IN">Stok Masuk</SelectItem>
-                    <SelectItem value="OUT">Stok Keluar</SelectItem>
+                    <SelectItem value="IN">Masuk (Penambahan Stok)</SelectItem>
+                    <SelectItem value="OUT">
+                      Keluar (Pengurangan Stok)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -133,7 +151,7 @@ export function TransactionForm({
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Jumlah ({unit}) *</FieldLabel>
+                <FieldLabel htmlFor={field.name}>Jumlah ({unit})</FieldLabel>
                 <Input
                   id={field.name}
                   name={field.name}
@@ -178,17 +196,6 @@ export function TransactionForm({
           }}
         />
       </FieldGroup>
-
-      <div className="flex justify-end gap-2 pt-4">
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-          children={([canSubmit, isSubmitting]) => (
-            <Button type="submit" disabled={!canSubmit || isSubmitting}>
-              {isSubmitting ? "Menyimpan..." : "Catat Transaksi"}
-            </Button>
-          )}
-        />
-      </div>
     </form>
   );
 }

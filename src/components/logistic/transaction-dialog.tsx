@@ -31,6 +31,7 @@ export function TransactionDialog({
       ? `Catat penambahan stok untuk ${item?.name}`
       : `Catat pengeluaran stok untuk ${item?.name}`;
   const [draft, setDraft] = useState<TransactionFormDraft>({});
+  const [isPending, setIsPending] = useState(false);
   const formRef = useRef<{ getValues: () => TransactionFormValues }>(null);
 
   const handleOpenChange = (open: boolean) => {
@@ -43,6 +44,7 @@ export function TransactionDialog({
   const handleSuccess = () => {
     setDraft({});
     onSuccess();
+    onOpenChange(false);
   };
 
   return (
@@ -51,9 +53,13 @@ export function TransactionDialog({
       onOpenChange={handleOpenChange}
       title={title}
       description={description}
+      formId="transaction-form"
+      submitLabel={isPending ? "Menyimpan..." : "Catat Transaksi"}
+      isPending={isPending}
     >
       {item && (
         <TransactionForm
+          id="transaction-form"
           ref={formRef}
           projectId={projectId}
           itemId={item.id}
@@ -61,6 +67,7 @@ export function TransactionDialog({
           unit={item.unit}
           defaultType={type}
           draftValues={draft}
+          onPendingChange={setIsPending}
           onSuccess={handleSuccess}
         />
       )}

@@ -7,21 +7,8 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { useState } from "react";
+import { ResponsiveFormDialog } from "~/components/shared/responsive-form-dialog";
 import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-} from "~/components/ui/drawer";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,7 +17,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { useIsMobile } from "~/hooks/use-mobile";
 import { useProjectMembers } from "~/hooks/useProject";
 import { useSession } from "~/stores/use-session-store";
 import { LogisticItemForm } from "./item-form";
@@ -49,9 +35,9 @@ interface ItemActionsProps {
 export function ItemActions({ projectId, item, onDelete }: ItemActionsProps) {
   const { session } = useSession();
   const { data: members } = useProjectMembers(projectId);
-  const isMobile = useIsMobile();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+  const [isEditPending, setIsEditPending] = useState(false);
 
   // Find user's role in this project
   const projectMember = members?.find((m) => m.userId === session?.user?.id);
@@ -97,56 +83,38 @@ export function ItemActions({ projectId, item, onDelete }: ItemActionsProps) {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* ── Edit Dialog (same for all viewports) ──────────── */}
-      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Barang</DialogTitle>
-            <DialogDescription>
-              Perbarui nama atau satuan untuk barang ini.
-            </DialogDescription>
-          </DialogHeader>
-          <LogisticItemForm
-            projectId={projectId}
-            item={item}
-            onSuccess={() => setShowEditDialog(false)}
-          />
-        </DialogContent>
-      </Dialog>
+      {/* ── Edit Dialog ──────────── */}
+      <ResponsiveFormDialog
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        title="Edit Barang"
+        description="Perbarui nama atau satuan untuk barang ini."
+        formId="edit-item-form"
+        submitLabel={isEditPending ? "Menyimpan..." : "Simpan Perubahan"}
+        isPending={isEditPending}
+        dialogClassName="sm:max-w-md"
+      >
+        <LogisticItemForm
+          id="edit-item-form"
+          projectId={projectId}
+          item={item}
+          onPendingChange={setIsEditPending}
+          onSuccess={() => setShowEditDialog(false)}
+        />
+      </ResponsiveFormDialog>
 
-      {/* ── History: Drawer on mobile, Dialog on desktop ──── */}
-      {isMobile ? (
-        <Drawer open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
-          <DrawerContent className="flex flex-col h-[85dvh]">
-            <DrawerHeader className="text-left shrink-0">
-              <DrawerTitle>Riwayat Transaksi</DrawerTitle>
-              <DrawerDescription>
-                {item.name} · {item.unit}
-              </DrawerDescription>
-            </DrawerHeader>
-            <div
-              className="flex-1 min-h-0 overflow-y-auto px-4 pb-6 scroll-pb-24"
-              data-vaul-no-drag
-            >
-              <TransactionHistory projectId={projectId} itemId={item.id} />
-            </div>
-          </DrawerContent>
-        </Drawer>
-      ) : (
-        <Dialog open={showHistoryDialog} onOpenChange={setShowHistoryDialog}>
-          <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
-            <DialogHeader className="shrink-0">
-              <DialogTitle>Riwayat Transaksi</DialogTitle>
-              <DialogDescription>
-                {item.name} · {item.unit}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex-1 overflow-y-auto min-h-0 pr-1">
-              <TransactionHistory projectId={projectId} itemId={item.id} />
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      {/* ── History Dialog ──────────── */}
+      <ResponsiveFormDialog
+        open={showHistoryDialog}
+        onOpenChange={setShowHistoryDialog}
+        title="Riwayat Transaksi"
+        description={`${item.name} · ${item.unit}`}
+        cancelLabel="Tutup"
+        showCancelOnly
+        dialogClassName="sm:max-w-3xl"
+      >
+        <TransactionHistory projectId={projectId} itemId={item.id} />
+      </ResponsiveFormDialog>
     </>
   );
 }

@@ -53,10 +53,6 @@ export function DepositDialog({
     onOpenChange(false);
   };
 
-  const handleSubmit = () => {
-    formRef.current?.submit();
-  };
-
   const submitLabel = isPending
     ? "Memproses..."
     : isEdit
@@ -69,11 +65,12 @@ export function DepositDialog({
       onOpenChange={handleOpenChange}
       title={title}
       description={description}
+      formId="deposit-form"
       submitLabel={submitLabel}
-      onSubmit={handleSubmit}
       isPending={isPending}
     >
       <DepositForm
+        id="deposit-form"
         ref={formRef}
         projectId={projectId}
         projectSlug={projectSlug}

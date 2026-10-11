@@ -1,14 +1,13 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { useImperativeHandle } from "react";
+import { useEffect, useImperativeHandle } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import {
   normalizeUnit,
   UnitCombobox,
 } from "~/components/logistic/unit-combobox";
-import { Button } from "~/components/ui/button";
 import {
   Field,
   FieldDescription,
@@ -44,6 +43,8 @@ interface ItemFormProps {
   draftValues?: ItemFormDraft;
   ref?: React.Ref<{ getValues: () => ItemFormValues }>;
   onSuccess?: () => void;
+  id?: string;
+  onPendingChange?: (isPending: boolean) => void;
 }
 
 export function LogisticItemForm({
@@ -52,12 +53,19 @@ export function LogisticItemForm({
   draftValues,
   ref,
   onSuccess,
+  id = "item-form",
+  onPendingChange,
 }: ItemFormProps) {
   const createItem = useCreateLogisticItem();
   const updateItem = useUpdateLogisticItem();
   const isEditMode = !!item;
+  const isPending = createItem.isPending || updateItem.isPending;
 
   useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
+
+  useEffect(() => {
+    onPendingChange?.(isPending);
+  }, [isPending, onPendingChange]);
 
   const form = useForm({
     defaultValues: {
@@ -77,24 +85,27 @@ export function LogisticItemForm({
             name: value.name.trim(),
             unit: normalizedUnit,
           });
-          toast.success("Data barang berhasil diperbarui");
+          toast.success("Barang berhasil diperbarui");
         } else {
           await createItem.mutateAsync({
             projectId,
             name: value.name.trim(),
             unit: normalizedUnit,
           });
-          toast.success("Barang baru berhasil ditambahkan");
+          toast.success("Barang berhasil ditambahkan");
         }
         onSuccess?.();
-      } catch {
-        // Error is handled by global mutation cache
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Terjadi kesalahan",
+        );
       }
     },
   });
 
   return (
     <form
+      id={id}
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -110,9 +121,7 @@ export function LogisticItemForm({
               field.state.meta.isTouched && !field.state.meta.isValid;
             return (
               <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>
-                  Nama Barang Logistik
-                </FieldLabel>
+                <FieldLabel htmlFor={field.name}>Nama Barang</FieldLabel>
                 <Input
                   id={field.name}
                   name={field.name}
@@ -153,21 +162,6 @@ export function LogisticItemForm({
           }}
         />
       </FieldGroup>
-
-      <div className="flex justify-end gap-2 pt-4">
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-          children={([canSubmit, isSubmitting]) => (
-            <Button type="submit" disabled={!canSubmit || isSubmitting}>
-              {isSubmitting
-                ? "Menyimpan..."
-                : isEditMode
-                  ? "Simpan Perubahan"
-                  : "Tambah Barang"}
-            </Button>
-          )}
-        />
-      </div>
     </form>
   );
 }

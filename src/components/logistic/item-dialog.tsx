@@ -28,6 +28,7 @@ export function LogisticItemDialog({
   const description =
     "Buat barang logistik baru untuk dilacak pada proyek ini.";
   const [draft, setDraft] = useState<ItemFormDraft>({});
+  const [isPending, setIsPending] = useState(false);
   const formRef = useRef<{ getValues: () => ItemFormValues }>(null);
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -49,12 +50,17 @@ export function LogisticItemDialog({
       onOpenChange={handleOpenChange}
       title={title}
       description={description}
+      formId="item-form"
+      submitLabel={isPending ? "Menyimpan..." : "Tambah Barang"}
+      isPending={isPending}
       trigger={children}
     >
       <LogisticItemForm
+        id="item-form"
         ref={formRef}
         projectId={projectId}
         draftValues={draft}
+        onPendingChange={setIsPending}
         onSuccess={handleSuccess}
       />
     </ResponsiveFormDialog>
