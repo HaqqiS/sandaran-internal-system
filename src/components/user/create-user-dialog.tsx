@@ -163,18 +163,22 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+      <DialogContent className="sm:max-w-[480px] max-h-[85vh] p-0 gap-0 overflow-hidden flex flex-col">
+        <DialogHeader className="shrink-0 border-b px-5 py-3.5 text-left">
+          <DialogTitle className="flex items-center gap-2 text-base font-semibold">
             <IconUserPlus className="size-5 text-primary" />
             <span>Tambah Pengguna Baru</span>
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-xs text-muted-foreground mt-0.5">
             Buatkan akun baru secara langsung untuk staf atau pekerja lapangan.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 py-2">
+        <form
+          id="create-user-form"
+          onSubmit={handleSubmit}
+          className="min-h-0 flex-1 overflow-y-auto px-5 pt-4 pb-8 space-y-4"
+        >
           {/* Nama Lengkap */}
           <div className="space-y-1.5">
             <Label htmlFor="create-name" className="text-xs font-semibold">
@@ -427,36 +431,37 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
               </div>
             )}
           </div>
-
-          <DialogFooter className="pt-2 gap-2 sm:gap-0">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={createUser.isPending}
-              className="text-xs"
-            >
-              Batal
-            </Button>
-            <Button
-              type="submit"
-              disabled={createUser.isPending}
-              className="text-xs font-semibold"
-            >
-              {createUser.isPending ? (
-                <>
-                  <IconLoader2 className="mr-1.5 size-4 animate-spin" />
-                  <span>Membuat Akun...</span>
-                </>
-              ) : (
-                <>
-                  <IconUserPlus className="mr-1.5 size-4" />
-                  <span>Buat Akun Sekarang</span>
-                </>
-              )}
-            </Button>
-          </DialogFooter>
         </form>
+
+        <DialogFooter className="sticky bottom-0 z-10 shrink-0 border-t bg-muted/40 backdrop-blur-xs px-5 py-3 gap-2 sm:gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={createUser.isPending}
+            className="text-xs"
+          >
+            Batal
+          </Button>
+          <Button
+            type="submit"
+            form="create-user-form"
+            disabled={createUser.isPending}
+            className="text-xs font-semibold"
+          >
+            {createUser.isPending ? (
+              <>
+                <IconLoader2 className="mr-1.5 size-4 animate-spin" />
+                <span>Membuat Akun...</span>
+              </>
+            ) : (
+              <>
+                <IconUserPlus className="mr-1.5 size-4" />
+                <span>Buat Akun Sekarang</span>
+              </>
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

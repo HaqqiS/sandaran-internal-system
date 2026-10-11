@@ -453,21 +453,23 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
   if (!isMobile) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[480px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+        <DialogContent className="sm:max-w-[480px] max-h-[85vh] p-0 gap-0 overflow-hidden flex flex-col">
+          <DialogHeader className="shrink-0 border-b px-5 py-3.5 text-left">
             <DialogTitle className="flex items-center gap-2 text-base font-semibold">
               <IconUserCheck className="size-5 text-primary" />
               <span>Edit Data Pengguna</span>
             </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
+            <DialogDescription className="text-xs text-muted-foreground mt-0.5">
               Ubah informasi profil, nomor kontak, kata sandi, dan status hak
               akses {user.name}.
             </DialogDescription>
           </DialogHeader>
 
-          {formContent}
+          <div className="min-h-0 flex-1 overflow-y-auto px-5 pt-4 pb-8">
+            {formContent}
+          </div>
 
-          <DialogFooter className="pt-2 gap-2 sm:gap-0">
+          <DialogFooter className="sticky bottom-0 z-10 shrink-0 border-t bg-muted/40 backdrop-blur-xs px-5 py-3 gap-2 sm:gap-2">
             {footerButtons}
           </DialogFooter>
         </DialogContent>
@@ -477,26 +479,26 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="flex flex-col max-h-[90dvh] rounded-t-2xl">
-        <DrawerHeader className="text-left shrink-0 border-b pb-3 px-6 pt-4">
+      <DrawerContent className="flex flex-col max-h-[88dvh] rounded-t-2xl">
+        <DrawerHeader className="text-left shrink-0 border-b px-4 py-2.5">
           <DrawerTitle className="flex items-center gap-2 text-base font-semibold">
             <IconUserCheck className="size-5 text-primary" />
             <span>Edit Data Pengguna</span>
           </DrawerTitle>
-          <DrawerDescription className="text-xs text-muted-foreground mt-1">
+          <DrawerDescription className="text-xs text-muted-foreground mt-0.5">
             Ubah informasi profil, nomor kontak, kata sandi, dan status hak
             akses {user.name}.
           </DrawerDescription>
         </DrawerHeader>
 
         <div
-          className="flex-1 min-h-0 overflow-y-auto px-6 py-4 scroll-pb-24"
+          className="flex-1 min-h-0 overflow-y-auto px-4 py-3.5 scroll-pb-20"
           data-vaul-no-drag
         >
           {formContent}
         </div>
 
-        <DrawerFooter className="shrink-0 border-t mt-0 px-6 py-3 flex flex-row justify-end gap-2 bg-background pb-safe">
+        <DrawerFooter className="sticky bottom-0 z-10 shrink-0 border-t mt-0 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex flex-row justify-end gap-2 bg-background/95 backdrop-blur-xs">
           {footerButtons}
         </DrawerFooter>
       </DrawerContent>

@@ -66,26 +66,26 @@ export function ResponsiveFormDialog({
           )}
         >
           <div className="flex max-h-[90dvh] flex-col">
-            <div className="shrink-0 border-b px-6 pt-5 pb-4 pr-12">
-              <DialogTitle className="text-lg font-semibold">
+            <div className="shrink-0 border-b px-5 py-3 pr-12">
+              <DialogTitle className="text-base font-semibold">
                 {title}
               </DialogTitle>
               {description && (
-                <DialogDescription className="mt-1 text-sm">
+                <DialogDescription className="mt-0.5 text-xs text-muted-foreground">
                   {description}
                 </DialogDescription>
               )}
             </div>
             <div
               className={cn(
-                "min-h-0 flex-1 overflow-y-auto px-6 py-5",
+                "min-h-0 flex-1 overflow-y-auto px-5 py-4",
                 contentClassName,
               )}
             >
               {children}
             </div>
             {hasFooter && (
-              <div className="flex shrink-0 justify-end gap-2 rounded-b-xl border-t bg-muted/50 px-6 py-3.5">
+              <div className="sticky bottom-0 z-10 flex shrink-0 justify-end gap-2 border-t bg-muted/40 backdrop-blur-xs px-5 py-3">
                 <Button
                   type="button"
                   variant="outline"
@@ -108,14 +108,20 @@ export function ResponsiveFormDialog({
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
-      <DrawerContent className={cn("flex h-[85dvh] flex-col", drawerClassName)}>
-        <DrawerHeader className="shrink-0 border-b px-4 pb-3 pt-3 text-left">
-          <DrawerTitle>{title}</DrawerTitle>
-          {description && <DrawerDescription>{description}</DrawerDescription>}
+      <DrawerContent
+        className={cn("flex max-h-[88dvh] flex-col", drawerClassName)}
+      >
+        <DrawerHeader className="shrink-0 border-b px-4 py-2.5 text-left">
+          <DrawerTitle className="text-base font-semibold">{title}</DrawerTitle>
+          {description && (
+            <DrawerDescription className="mt-0.5 text-xs text-muted-foreground">
+              {description}
+            </DrawerDescription>
+          )}
         </DrawerHeader>
         <div
           className={cn(
-            "min-h-0 flex-1 overflow-y-auto px-4 py-4 scroll-pb-24",
+            "min-h-0 flex-1 overflow-y-auto px-4 py-3.5 scroll-pb-20",
             contentClassName,
           )}
           data-vaul-no-drag
@@ -123,7 +129,7 @@ export function ResponsiveFormDialog({
           {children}
         </div>
         {hasFooter && (
-          <DrawerFooter className="mt-0 flex shrink-0 flex-row gap-2 border-t px-4 py-3">
+          <DrawerFooter className="sticky bottom-0 z-10 mt-0 flex shrink-0 flex-row gap-2 border-t bg-background/95 backdrop-blur-xs px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             <Button
               type="button"
               variant="outline"
