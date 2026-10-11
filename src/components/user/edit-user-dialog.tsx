@@ -1,48 +1,63 @@
 "use client";
 
 import type { GlobalRole } from "@prisma/client";
-import {
-  IconEye,
-  IconEyeOff,
-  IconKey,
-  IconLoader2,
-  IconLock,
-  IconMail,
-  IconUser,
-  IconUserCheck,
-} from "@tabler/icons-react";
+import { IconEye, IconEyeOff, IconKey } from "@tabler/icons-react";
+import { useForm } from "@tanstack/react-form";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 import {
   COUNTRIES,
   type Country,
   DEFAULT_COUNTRY,
 } from "~/app/login/_data/countries";
 import { CountryPicker } from "~/components/login/country-picker";
+import { ResponsiveFormDialog } from "~/components/shared/responsive-form-dialog";
 import { Button } from "~/components/ui/button";
 import { Checkbox } from "~/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "~/components/ui/drawer";
+import { Field, FieldError, FieldLabel } from "~/components/ui/field";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { useUpdateUser } from "~/hooks";
-import { useIsMobile } from "~/hooks/use-mobile";
 import type { UserListItem } from "./user-columns";
+
+const editUserSchema = z
+  .object({
+    name: z.string().trim().min(1, "Silakan masukkan nama lengkap"),
+    phone: z.string(),
+    email: z
+      .string()
+      .refine(
+        (val) =>
+          !val.trim() || z.string().email().safeParse(val.trim()).success,
+        "Format alamat email tidak valid",
+      ),
+    role: z.enum(["USER", "ADMIN", "EXECUTIVE", "NONE"]),
+    isActive: z.boolean(),
+    changePassword: z.boolean(),
+    newPassword: z.string(),
+  })
+  .refine((data) => Boolean(data.email.trim() || data.phone.trim()), {
+    message: "Harap isi setidaknya salah satu dari Email atau Nomor HP",
+    path: ["phone"],
+  })
+  .refine(
+    (data) => {
+      if (data.changePassword) {
+        return Boolean(
+          data.newPassword.trim() && data.newPassword.trim().length >= 6,
+        );
+      }
+      return true;
+    },
+    {
+      message: "Kata sandi baru minimal 6 karakter",
+      path: ["newPassword"],
+    },
+  );
+
+type EditUserFormValues = z.infer<typeof editUserSchema>;
 
 interface EditUserDialogProps {
   user: UserListItem | null;
@@ -71,64 +86,96 @@ export function EditUserDialog({
   open,
   onOpenChange,
 }: EditUserDialogProps) {
-  const isMobile = useIsMobile();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [selectedCountry, setSelectedCountry] =
     useState<Country>(DEFAULT_COUNTRY);
-  const [role, setRole] = useState<GlobalRole>("USER");
-  const [isActive, setIsActive] = useState(true);
-
-  // Password reset state
-  const [changePassword, setChangePassword] = useState(false);
-  const [newPassword, setNewPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  const form = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      role: "USER" as GlobalRole,
+      isActive: true,
+      changePassword: false,
+      newPassword: "",
+    } as EditUserFormValues,
+    validators: {
+      onSubmit: editUserSchema,
+    },
+    onSubmit: async ({ value }) => {
+      if (!user) return;
+
+      let formattedPhone: string | undefined;
+      if (value.phone.trim()) {
+        const cleaned = value.phone.replace(/\D/g, "");
+        const normalized = cleaned.startsWith("0") ? cleaned.slice(1) : cleaned;
+        formattedPhone = `${selectedCountry.dialCode}${normalized}`;
+      }
+
+      updateUser.mutate({
+        userId: user.id,
+        name: value.name.trim(),
+        email: value.email.trim().toLowerCase() || undefined,
+        phoneNumber: formattedPhone,
+        password:
+          value.changePassword && value.newPassword.trim()
+            ? value.newPassword.trim()
+            : undefined,
+        roleGlobal: value.role,
+        isActive: value.isActive,
+      });
+    },
+  });
 
   useEffect(() => {
     if (open && user) {
-      setName(user.name);
-      // If email is fallback (@sandaran.internal), display as empty for cleaner editing
       const isInternalFallback = user.email.endsWith("@sandaran.internal");
-      setEmail(isInternalFallback ? "" : user.email);
-
       const parsed = parsePhoneNumber(user.phoneNumber);
       setSelectedCountry(parsed.country);
-      setPhone(parsed.digits);
-
-      setRole(user.roleGlobal);
-      setIsActive(user.isActive);
-
-      setChangePassword(false);
-      setNewPassword("");
       setShowPassword(false);
+
+      form.reset({
+        name: user.name,
+        email: isInternalFallback ? "" : user.email,
+        phone: parsed.digits,
+        role: user.roleGlobal,
+        isActive: user.isActive,
+        changePassword: false,
+        newPassword: "",
+      });
     }
-  }, [user, open]);
+  }, [user, open, form]);
 
   const updateUser = useUpdateUser({
     onSuccess: () => {
-      const formattedPhone = phone.trim()
-        ? `${selectedCountry.dialCode}${phone.replace(/\D/g, "").replace(/^0+/, "")}`
+      const currentValues = form.state.values;
+      const formattedPhone = currentValues.phone.trim()
+        ? `${selectedCountry.dialCode}${currentValues.phone.replace(/\D/g, "").replace(/^0+/, "")}`
         : "";
       const displayIdentifier =
-        formattedPhone || email.trim() || user?.email || "";
+        formattedPhone || currentValues.email.trim() || user?.email || "";
 
-      if (changePassword && newPassword.trim() && navigator.clipboard) {
+      if (
+        currentValues.changePassword &&
+        currentValues.newPassword.trim() &&
+        navigator.clipboard
+      ) {
         const summaryText = `Pembaruan Akun Sandaran Internal:
-Nama: ${name.trim()}
+Nama: ${currentValues.name.trim()}
 Login: ${displayIdentifier}
-Kata Sandi Baru: ${newPassword}
-Peran: ${role}
-Status: ${isActive ? "Aktif" : "Nonaktif"}
+Kata Sandi Baru: ${currentValues.newPassword}
+Peran: ${currentValues.role}
+Status: ${currentValues.isActive ? "Aktif" : "Nonaktif"}
 Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
 
         void navigator.clipboard.writeText(summaryText);
-        toast.success(`Data ${name} berhasil diperbarui!`, {
+        toast.success(`Data ${currentValues.name} berhasil diperbarui!`, {
           description:
             "Kredensial baru telah disalin ke clipboard untuk dikirimkan via chat.",
         });
       } else {
-        toast.success(`Data ${name} berhasil diperbarui!`);
+        toast.success(`Data ${currentValues.name} berhasil diperbarui!`);
       }
 
       onOpenChange(false);
@@ -138,370 +185,336 @@ Tautan: ${typeof window !== "undefined" ? window.location.origin : ""}/login`;
     },
   });
 
-  const handleGeneratePassword = () => {
-    const chars = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789!@#$%";
-    let gen = "";
-    for (let i = 0; i < 10; i++) {
-      gen += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    setNewPassword(gen);
-    toast.info(`Kata sandi acak dibuat: ${gen}`);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return;
-
-    if (!name.trim()) {
-      toast.error("Silakan masukkan nama lengkap");
-      return;
-    }
-
-    if (!email.trim() && !phone.trim() && !user.phoneNumber) {
-      toast.error("Harap isi setidaknya salah satu dari Email atau Nomor HP");
-      return;
-    }
-
-    if (changePassword && (!newPassword || newPassword.length < 6)) {
-      toast.error("Kata sandi baru minimal 6 karakter");
-      return;
-    }
-
-    let formattedPhone: string | undefined;
-    if (phone.trim()) {
-      const cleaned = phone.replace(/\D/g, "");
-      const normalized = cleaned.startsWith("0") ? cleaned.slice(1) : cleaned;
-      formattedPhone = `${selectedCountry.dialCode}${normalized}`;
-    }
-
-    updateUser.mutate({
-      userId: user.id,
-      name: name.trim(),
-      email: email.trim().toLowerCase() || undefined,
-      phoneNumber: formattedPhone,
-      password: changePassword && newPassword.trim() ? newPassword : undefined,
-      roleGlobal: role,
-      isActive,
-    });
-  };
-
   if (!user) return null;
 
-  const formContent = (
-    <form id="edit-user-form" onSubmit={handleSubmit} className="space-y-4">
-      {/* Nama Lengkap */}
-      <div className="space-y-1.5">
-        <Label htmlFor="edit-name" className="text-xs font-semibold">
-          Nama Lengkap <span className="text-destructive">*</span>
-        </Label>
-        <div className="relative">
-          <IconUser className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <Input
-            id="edit-name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Nama lengkap"
-            className="pl-9 h-10 text-sm"
-            required
-          />
-        </div>
-      </div>
-
-      {/* Nomor HP dengan CountryPicker */}
-      <div className="space-y-1.5">
-        <Label htmlFor="edit-phone" className="text-xs font-semibold">
-          Nomor WhatsApp / HP
-        </Label>
-        <div className="relative flex items-center">
-          <CountryPicker
-            selectedCountry={selectedCountry}
-            onSelectCountry={setSelectedCountry}
-            disabled={updateUser.isPending}
-          />
-          <Input
-            id="edit-phone"
-            type="tel"
-            inputMode="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="812-3456-7890"
-            style={{
-              paddingLeft: `${selectedCountry.dialCode.length * 8 + 72}px`,
-            }}
-            className="h-10 text-sm"
-          />
-        </div>
-        <p className="text-[10px] text-muted-foreground">
-          Format: 812... atau 0812... (Kode {selectedCountry.name}{" "}
-          {selectedCountry.dialCode})
-        </p>
-      </div>
-
-      {/* Email */}
-      <div className="space-y-1.5">
-        <Label htmlFor="edit-email" className="text-xs font-semibold">
-          Alamat Email
-        </Label>
-        <div className="relative">
-          <IconMail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <Input
-            id="edit-email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="staf@sandaran.com"
-            className="pl-9 h-10 text-sm"
-          />
-        </div>
-        <p className="text-[10px] text-muted-foreground">
-          Opsional jika pengguna masuk menggunakan Nomor HP
-        </p>
-      </div>
-
-      {/* Role Global */}
-      <div className="space-y-2 pt-1">
-        <Label className="text-xs font-semibold">
-          Peran Sistem (Global Role)
-        </Label>
-        <RadioGroup
-          value={role}
-          onValueChange={(val) => setRole(val as GlobalRole)}
-          className="grid grid-cols-4 gap-2"
-        >
-          <div>
-            <RadioGroupItem
-              value="USER"
-              id="edit-role-user"
-              className="peer sr-only"
-            />
-            <Label
-              htmlFor="edit-role-user"
-              className="flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer text-xs font-medium text-center transition-all"
-            >
-              <span className="font-semibold">USER</span>
-              <span className="text-[9px] text-muted-foreground">Staf</span>
-            </Label>
-          </div>
-
-          <div>
-            <RadioGroupItem
-              value="ADMIN"
-              id="edit-role-admin"
-              className="peer sr-only"
-            />
-            <Label
-              htmlFor="edit-role-admin"
-              className="flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer text-xs font-medium text-center transition-all"
-            >
-              <span className="font-semibold">ADMIN</span>
-              <span className="text-[9px] text-muted-foreground">Kelola</span>
-            </Label>
-          </div>
-
-          <div>
-            <RadioGroupItem
-              value="EXECUTIVE"
-              id="edit-role-executive"
-              className="peer sr-only"
-            />
-            <Label
-              htmlFor="edit-role-executive"
-              className="flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer text-xs font-medium text-center transition-all"
-            >
-              <span className="font-semibold">EXECUTIVE</span>
-              <span className="text-[9px] text-muted-foreground">View</span>
-            </Label>
-          </div>
-
-          <div>
-            <RadioGroupItem
-              value="NONE"
-              id="edit-role-none"
-              className="peer sr-only"
-            />
-            <Label
-              htmlFor="edit-role-none"
-              className="flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-destructive peer-data-[state=checked]:bg-destructive/5 cursor-pointer text-xs font-medium text-center transition-all"
-            >
-              <span className="font-semibold text-destructive">NONE</span>
-              <span className="text-[9px] text-muted-foreground">Blokir</span>
-            </Label>
-          </div>
-        </RadioGroup>
-      </div>
-
-      {/* Status Akun (Aktif / Nonaktif) */}
-      <Label
-        htmlFor="edit-is-active"
-        className="flex items-center justify-between rounded-lg border p-3 bg-muted/20 cursor-pointer transition-colors hover:bg-muted/40 active:bg-muted/60 select-none"
+  return (
+    <ResponsiveFormDialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          setShowPassword(false);
+        }
+        onOpenChange(nextOpen);
+      }}
+      title="Edit Data Pengguna"
+      description={`Ubah informasi profil, nomor kontak, kata sandi, dan status hak akses ${user.name}.`}
+      formId="edit-user-form"
+      submitLabel={updateUser.isPending ? "Menyimpan..." : "Simpan Perubahan"}
+      isPending={updateUser.isPending}
+      dialogClassName="sm:max-w-[480px]"
+    >
+      <form
+        id="edit-user-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          void form.handleSubmit();
+        }}
+        className="space-y-4"
       >
-        <div className="space-y-0.5">
-          <span className="text-xs font-semibold block">Status Akun Aktif</span>
-          <p className="text-[11px] text-muted-foreground font-normal">
-            {isActive
-              ? "Akun dapat masuk dan mengakses fitur internal."
-              : "Akun ditangguhkan (tidak dapat masuk sistem)."}
-          </p>
-        </div>
-        <Checkbox
-          id="edit-is-active"
-          checked={isActive}
-          onCheckedChange={(checked) => setIsActive(Boolean(checked))}
-          onClick={(e) => e.stopPropagation()}
-        />
-      </Label>
-
-      {/* Seksi Ubah Kata Sandi */}
-      <div className="space-y-3 pt-2 border-t">
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="edit-change-password"
-            checked={changePassword}
-            onCheckedChange={(checked) => setChangePassword(Boolean(checked))}
-          />
-          <Label
-            htmlFor="edit-change-password"
-            className="text-xs font-semibold cursor-pointer flex items-center gap-1.5"
-          >
-            <IconLock size={14} className="text-primary" />
-            <span>Reset / Ganti Kata Sandi Pengguna</span>
-          </Label>
-        </div>
-
-        {changePassword && (
-          <div className="space-y-2 pl-6 border-l-2 border-primary/20 pt-1">
-            <div className="flex items-center justify-between">
-              <Label
-                htmlFor="edit-new-password"
+        {/* Nama Lengkap */}
+        <form.Field name="name">
+          {(field) => (
+            <Field>
+              <FieldLabel
+                htmlFor={field.name}
                 className="text-xs font-semibold"
               >
-                Kata Sandi Baru <span className="text-destructive">*</span>
-              </Label>
-              <button
-                type="button"
-                onClick={handleGeneratePassword}
-                className="text-[11px] text-primary hover:underline flex items-center gap-1"
-              >
-                <IconKey size={12} />
-                <span>Acak Sandi</span>
-              </button>
-            </div>
-            <div className="relative">
+                Nama Lengkap <span className="text-destructive">*</span>
+              </FieldLabel>
               <Input
-                id="edit-new-password"
-                type={showPassword ? "text" : "password"}
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Minimal 6 karakter"
-                className="pr-10 h-10 text-sm font-mono"
-                required={changePassword}
+                id={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="Nama lengkap"
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              <FieldError errors={field.state.meta.errors} />
+            </Field>
+          )}
+        </form.Field>
+
+        {/* Nomor HP dengan CountryPicker */}
+        <form.Field name="phone">
+          {(field) => (
+            <Field>
+              <FieldLabel
+                htmlFor={field.name}
+                className="text-xs font-semibold"
               >
-                {showPassword ? (
-                  <IconEyeOff size={16} />
-                ) : (
-                  <IconEye size={16} />
+                Nomor WhatsApp / HP
+              </FieldLabel>
+              <div className="relative flex items-center">
+                <CountryPicker
+                  selectedCountry={selectedCountry}
+                  onSelectCountry={setSelectedCountry}
+                  disabled={updateUser.isPending}
+                />
+                <Input
+                  id={field.name}
+                  type="tel"
+                  inputMode="tel"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="812-3456-7890"
+                  style={{
+                    paddingLeft: `${selectedCountry.dialCode.length * 8 + 72}px`,
+                  }}
+                />
+              </div>
+              <p className="text-[10px] text-muted-foreground">
+                Format: 812... atau 0812... (Kode {selectedCountry.name}{" "}
+                {selectedCountry.dialCode})
+              </p>
+              <FieldError errors={field.state.meta.errors} />
+            </Field>
+          )}
+        </form.Field>
+
+        {/* Email */}
+        <form.Field name="email">
+          {(field) => (
+            <Field>
+              <FieldLabel
+                htmlFor={field.name}
+                className="text-xs font-semibold"
+              >
+                Alamat Email
+              </FieldLabel>
+              <Input
+                id={field.name}
+                type="email"
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                placeholder="staf@sandaran.com"
+              />
+              <p className="text-[10px] text-muted-foreground">
+                Opsional jika pengguna masuk menggunakan Nomor HP
+              </p>
+              <FieldError errors={field.state.meta.errors} />
+            </Field>
+          )}
+        </form.Field>
+
+        {/* Role Global */}
+        <form.Field name="role">
+          {(field) => (
+            <Field className="pt-1">
+              <FieldLabel className="text-xs font-semibold">
+                Peran Sistem (Global Role)
+              </FieldLabel>
+              <RadioGroup
+                value={field.state.value}
+                onValueChange={(val) => field.handleChange(val as GlobalRole)}
+                className="grid grid-cols-4 gap-2"
+              >
+                <div>
+                  <RadioGroupItem
+                    value="USER"
+                    id="edit-role-user"
+                    className="peer sr-only"
+                  />
+                  <Label
+                    htmlFor="edit-role-user"
+                    className="flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer text-xs font-medium text-center transition-all"
+                  >
+                    <span className="font-semibold">USER</span>
+                    <span className="text-[9px] text-muted-foreground">
+                      Staf
+                    </span>
+                  </Label>
+                </div>
+
+                <div>
+                  <RadioGroupItem
+                    value="ADMIN"
+                    id="edit-role-admin"
+                    className="peer sr-only"
+                  />
+                  <Label
+                    htmlFor="edit-role-admin"
+                    className="flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer text-xs font-medium text-center transition-all"
+                  >
+                    <span className="font-semibold">ADMIN</span>
+                    <span className="text-[9px] text-muted-foreground">
+                      Kelola
+                    </span>
+                  </Label>
+                </div>
+
+                <div>
+                  <RadioGroupItem
+                    value="EXECUTIVE"
+                    id="edit-role-executive"
+                    className="peer sr-only"
+                  />
+                  <Label
+                    htmlFor="edit-role-executive"
+                    className="flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer text-xs font-medium text-center transition-all"
+                  >
+                    <span className="font-semibold">EXECUTIVE</span>
+                    <span className="text-[9px] text-muted-foreground">
+                      View
+                    </span>
+                  </Label>
+                </div>
+
+                <div>
+                  <RadioGroupItem
+                    value="NONE"
+                    id="edit-role-none"
+                    className="peer sr-only"
+                  />
+                  <Label
+                    htmlFor="edit-role-none"
+                    className="flex flex-col items-center justify-center rounded-lg border-2 border-muted bg-popover p-2 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-destructive peer-data-[state=checked]:bg-destructive/5 cursor-pointer text-xs font-medium text-center transition-all"
+                  >
+                    <span className="font-semibold text-destructive">NONE</span>
+                    <span className="text-[9px] text-muted-foreground">
+                      Blokir
+                    </span>
+                  </Label>
+                </div>
+              </RadioGroup>
+              <FieldError errors={field.state.meta.errors} />
+            </Field>
+          )}
+        </form.Field>
+
+        {/* Status Akun (Aktif / Nonaktif) */}
+        <form.Field name="isActive">
+          {(field) => (
+            <Label
+              htmlFor={field.name}
+              className="flex items-center justify-between rounded-lg border p-3 bg-muted/20 cursor-pointer transition-colors hover:bg-muted/40 active:bg-muted/60 select-none"
+            >
+              <div className="space-y-0.5">
+                <span className="text-xs font-semibold block">
+                  Status Akun Aktif
+                </span>
+                <p className="text-[11px] text-muted-foreground font-normal">
+                  {field.state.value
+                    ? "Akun dapat masuk dan mengakses fitur internal."
+                    : "Akun ditangguhkan (tidak dapat masuk sistem)."}
+                </p>
+              </div>
+              <Checkbox
+                id={field.name}
+                checked={field.state.value}
+                onCheckedChange={(checked) =>
+                  field.handleChange(Boolean(checked))
+                }
+                onClick={(e) => e.stopPropagation()}
+              />
+            </Label>
+          )}
+        </form.Field>
+
+        {/* Reset Kata Sandi */}
+        <form.Subscribe selector={(state) => state.values.changePassword}>
+          {(isChangePassword) => (
+            <div className="rounded-xl border p-3.5 bg-muted/20 space-y-3">
+              <div className="flex items-center justify-between">
+                <form.Field name="changePassword">
+                  {(field) => (
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id={field.name}
+                        checked={field.state.value}
+                        onCheckedChange={(checked) =>
+                          field.handleChange(Boolean(checked))
+                        }
+                      />
+                      <Label
+                        htmlFor={field.name}
+                        className="text-xs font-medium cursor-pointer flex items-center gap-1.5"
+                      >
+                        <IconKey className="h-3.5 w-3.5 text-muted-foreground" />
+                        Reset Kata Sandi
+                      </Label>
+                    </div>
+                  )}
+                </form.Field>
+
+                {isChangePassword && (
+                  <form.Field name="newPassword">
+                    {(field) => (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const chars =
+                            "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789!@#$%";
+                          let gen = "";
+                          for (let i = 0; i < 10; i++) {
+                            gen += chars.charAt(
+                              Math.floor(Math.random() * chars.length),
+                            );
+                          }
+                          field.handleChange(gen);
+                          toast.info(`Kata sandi acak dibuat: ${gen}`);
+                        }}
+                        className="h-7 text-xs px-2"
+                      >
+                        Buat Acak
+                      </Button>
+                    )}
+                  </form.Field>
                 )}
-              </button>
+              </div>
+
+              {isChangePassword && (
+                <div className="space-y-1.5 pt-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                  <form.Field name="newPassword">
+                    {(field) => (
+                      <Field>
+                        <FieldLabel
+                          htmlFor={field.name}
+                          className="text-xs font-semibold"
+                        >
+                          Kata Sandi Baru
+                        </FieldLabel>
+                        <div className="relative flex items-center">
+                          <Input
+                            id={field.name}
+                            type={showPassword ? "text" : "password"}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                            placeholder="Masukkan kata sandi baru (min 6 karakter)"
+                            className="pr-8 font-mono"
+                            autoComplete="new-password"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            tabIndex={-1}
+                          >
+                            {showPassword ? (
+                              <IconEyeOff className="size-3.5" />
+                            ) : (
+                              <IconEye className="size-3.5" />
+                            )}
+                          </button>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground">
+                          Kata sandi baru akan otomatis dienkripsi dan siap
+                          digunakan untuk masuk.
+                        </p>
+                        <FieldError errors={field.state.meta.errors} />
+                      </Field>
+                    )}
+                  </form.Field>
+                </div>
+              )}
             </div>
-            <p className="text-[10px] text-muted-foreground">
-              Kata sandi baru akan otomatis dienkripsi dan siap digunakan untuk
-              masuk.
-            </p>
-          </div>
-        )}
-      </div>
-    </form>
-  );
-
-  const footerButtons = (
-    <>
-      <Button
-        type="button"
-        variant="outline"
-        onClick={() => onOpenChange(false)}
-        disabled={updateUser.isPending}
-        className="text-xs min-h-11 sm:min-h-10 px-4"
-      >
-        Batal
-      </Button>
-      <Button
-        type="submit"
-        form="edit-user-form"
-        disabled={updateUser.isPending}
-        className="text-xs font-semibold min-h-11 sm:min-h-10 px-4"
-      >
-        {updateUser.isPending ? (
-          <>
-            <IconLoader2 className="mr-1.5 size-4 animate-spin" />
-            <span>Menyimpan...</span>
-          </>
-        ) : (
-          <>
-            <IconUserCheck className="mr-1.5 size-4" />
-            <span>Simpan Perubahan</span>
-          </>
-        )}
-      </Button>
-    </>
-  );
-
-  if (!isMobile) {
-    return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[480px] max-h-[85vh] p-0 gap-0 overflow-hidden flex flex-col">
-          <DialogHeader className="shrink-0 border-b px-5 py-3.5 text-left">
-            <DialogTitle className="flex items-center gap-2 text-base font-semibold">
-              <IconUserCheck className="size-5 text-primary" />
-              <span>Edit Data Pengguna</span>
-            </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground mt-0.5">
-              Ubah informasi profil, nomor kontak, kata sandi, dan status hak
-              akses {user.name}.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="min-h-0 flex-1 overflow-y-auto px-5 pt-4 pb-8">
-            {formContent}
-          </div>
-
-          <DialogFooter className="sticky bottom-0 z-10 shrink-0 border-t bg-muted/40 backdrop-blur-xs px-5 py-3 gap-2 sm:gap-2">
-            {footerButtons}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
-  return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="flex flex-col max-h-[88dvh] rounded-t-2xl">
-        <DrawerHeader className="text-left shrink-0 border-b px-4 py-2.5">
-          <DrawerTitle className="flex items-center gap-2 text-base font-semibold">
-            <IconUserCheck className="size-5 text-primary" />
-            <span>Edit Data Pengguna</span>
-          </DrawerTitle>
-          <DrawerDescription className="text-xs text-muted-foreground mt-0.5">
-            Ubah informasi profil, nomor kontak, kata sandi, dan status hak
-            akses {user.name}.
-          </DrawerDescription>
-        </DrawerHeader>
-
-        <div
-          className="flex-1 min-h-0 overflow-y-auto px-4 py-3.5 scroll-pb-20"
-          data-vaul-no-drag
-        >
-          {formContent}
-        </div>
-
-        <DrawerFooter className="sticky bottom-0 z-10 shrink-0 border-t mt-0 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex flex-row justify-end gap-2 bg-background/95 backdrop-blur-xs">
-          {footerButtons}
-        </DrawerFooter>
-      </DrawerContent>
-    </Drawer>
+          )}
+        </form.Subscribe>
+      </form>
+    </ResponsiveFormDialog>
   );
 }

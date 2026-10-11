@@ -1,15 +1,8 @@
 "use client";
 
 import { toast } from "sonner";
+import { ResponsiveFormDialog } from "~/components/shared/responsive-form-dialog";
 import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
 import { useRejectUser } from "~/hooks/useUser";
 
 interface RejectUserDialogProps {
@@ -48,43 +41,46 @@ export function RejectUserDialog({
   if (!user) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Tolak Pengguna</DialogTitle>
-          <DialogDescription>
-            Apakah Anda yakin ingin menolak pendaftaran pengguna ini?
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="py-4">
-          <div className="rounded-md bg-muted p-3 text-sm">
-            <div className="font-medium">{user.name}</div>
-            <div className="text-muted-foreground">{user.email}</div>
-          </div>
-          <p className="mt-3 text-sm text-muted-foreground">
-            Pengguna ini akan ditandai sebagai ditolak dan tidak dapat mengakses
-            sistem.
-          </p>
-        </div>
-
-        <DialogFooter>
+    <ResponsiveFormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Tolak Pengguna"
+      description="Apakah Anda yakin ingin menolak pendaftaran pengguna ini?"
+      cancelLabel="Batal"
+      customFooter={
+        <>
           <Button
+            type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={reject.isPending}
+            className="flex-1 sm:flex-none"
           >
             Batal
           </Button>
           <Button
+            type="button"
             variant="destructive"
             onClick={handleReject}
             disabled={reject.isPending}
+            className="flex-1 sm:flex-none"
           >
             {reject.isPending ? "Menolak..." : "Tolak Pengguna"}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </>
+      }
+      dialogClassName="sm:max-w-[425px]"
+    >
+      <div className="space-y-3">
+        <div className="rounded-md bg-muted p-3 text-sm">
+          <div className="font-medium text-foreground">{user.name}</div>
+          <div className="text-muted-foreground">{user.email}</div>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Pengguna ini akan ditandai sebagai ditolak dan tidak dapat mengakses
+          sistem.
+        </p>
+      </div>
+    </ResponsiveFormDialog>
   );
 }

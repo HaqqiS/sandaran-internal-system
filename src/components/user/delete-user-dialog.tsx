@@ -1,15 +1,8 @@
 "use client";
 
 import { toast } from "sonner";
+import { ResponsiveFormDialog } from "~/components/shared/responsive-form-dialog";
 import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
 import { useDeleteUser } from "~/hooks/useUser";
 
 interface DeleteUserDialogProps {
@@ -49,54 +42,46 @@ export function DeleteUserDialog({
   if (!user) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Hapus Pengguna</DialogTitle>
-          <DialogDescription>
-            Apakah Anda yakin ingin menghapus pengguna ini secara permanen?
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="py-4">
-          <div className="rounded-md bg-muted p-3 text-sm">
-            <div className="font-medium">{user.name}</div>
-            <div className="text-muted-foreground">{user.email}</div>
-            <div className="mt-1 text-xs">
-              Status:{" "}
-              <span className="font-medium">
-                {user.isActive ? "Aktif" : "Tidak Aktif"}
-              </span>
-            </div>
-          </div>
-          <div className="mt-4 rounded-md border border-destructive/50 bg-destructive/10 p-3">
-            <p className="text-sm font-medium text-destructive">
-              ⚠️ Peringatan: Tindakan ini tidak dapat dibatalkan
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Pengguna dan semua data terkait akan dihapus secara permanen dari
-              sistem.
-            </p>
-          </div>
-        </div>
-
-        <DialogFooter>
+    <ResponsiveFormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Hapus Pengguna"
+      description="Apakah Anda yakin ingin menghapus pengguna ini secara permanen?"
+      cancelLabel="Batal"
+      customFooter={
+        <>
           <Button
+            type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={deleteUser.isPending}
+            className="flex-1 sm:flex-none"
           >
             Batal
           </Button>
           <Button
+            type="button"
             variant="destructive"
             onClick={handleDelete}
             disabled={deleteUser.isPending}
+            className="flex-1 sm:flex-none"
           >
             {deleteUser.isPending ? "Menghapus..." : "Hapus Pengguna"}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </>
+      }
+      dialogClassName="sm:max-w-[425px]"
+    >
+      <div className="space-y-3">
+        <div className="rounded-md bg-muted p-3 text-sm">
+          <div className="font-medium text-foreground">{user.name}</div>
+          <div className="text-muted-foreground">{user.email}</div>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Tindakan ini tidak dapat dibatalkan. Data pengguna akan dihapus secara
+          permanen dari sistem.
+        </p>
+      </div>
+    </ResponsiveFormDialog>
   );
 }
