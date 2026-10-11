@@ -2,76 +2,34 @@
 
 import { IconLoader2 } from "@tabler/icons-react";
 import {
-  AdminView,
-  ArchitectView,
-  ExecutiveView,
-  FinanceView,
-  LogisticView,
-  SupervisorView,
+  AdminDashboard,
+  ExecutiveDashboard,
+  UserDashboard,
 } from "~/components/dashboard";
 import { useUserRole } from "~/hooks/use-user-role";
-import { useSession } from "~/stores/use-session-store";
 
 export default function DashboardPage() {
-  const { user } = useSession();
-  const {
-    isAdmin,
-    isExecutive,
-    isSupervisor,
-    isArchitect,
-    isFinance,
-    isLogistic,
-    isLoading,
-  } = useUserRole();
+  const { role, isLoading } = useUserRole();
 
   if (isLoading) {
     return (
-      <div className="flex h-full items-center justify-center">
+      <div className="flex h-full min-h-[400px] items-center justify-center">
         <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
-  // If user has a role, show their dashboard
-  if (
-    isExecutive ||
-    isAdmin ||
-    isSupervisor ||
-    isArchitect ||
-    isFinance ||
-    isLogistic
-  ) {
-    return (
-      <>
-        {isExecutive && <ExecutiveView />}
-        {isAdmin && !isExecutive && <AdminView />}
-        {isSupervisor && <SupervisorView />}
-        {isArchitect && <ArchitectView />}
-        {isFinance && <FinanceView />}
-        {isLogistic && <LogisticView />}
-      </>
-    );
+  // Percabangan Bersih Berdasarkan roleGlobal (Fase 5 Switch Routing):
+  // 1. ADMIN -> AdminDashboard (kelancaran sistem, staf proyek, persetujuan, anomali)
+  if (role === "ADMIN") {
+    return <AdminDashboard />;
   }
 
-  // Fallback for users with no specific role
-  return (
-    <div className="flex flex-col gap-8 p-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground">
-          Selamat datang kembali, {user?.name ?? "Pengguna"}.
-        </p>
-      </div>
+  // 2. EXECUTIVE -> ExecutiveDashboard (tinjauan portofolio eksekutif read-only & tren)
+  if (role === "EXECUTIVE") {
+    return <ExecutiveDashboard />;
+  }
 
-      <div className="rounded-lg border border-dashed bg-muted/30 p-8 text-center">
-        <h3 className="text-lg font-medium">Halo, {user?.name}!</h3>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Anda sudah berhasil masuk, tetapi belum ada peran proyek yang
-          ditugaskan kepada Anda.
-          <br />
-          Silakan hubungi administrator untuk ditugaskan ke sebuah proyek.
-        </p>
-      </div>
-    </div>
-  );
+  // 3. USER -> UserDashboard (eksekusi harian pada proyek aktif via Role Lenses)
+  return <UserDashboard />;
 }

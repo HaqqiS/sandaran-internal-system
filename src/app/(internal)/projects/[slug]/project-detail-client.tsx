@@ -12,7 +12,7 @@ import {
 } from "@tabler/icons-react";
 import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { DepositDialog } from "~/components/emergency/deposit-dialog";
 import { WithdrawDialog } from "~/components/emergency/withdraw-dialog";
 import { PageLayout } from "~/components/layout";
@@ -33,6 +33,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { useProjectBySlug, useReportsByProject } from "~/hooks";
 import { useEmergencyFund } from "~/hooks/useEmergency";
 import { isAdmin } from "~/lib/auth-guards";
+import { formatWitaDate } from "~/lib/time-utils";
 import { useSessionStore } from "~/stores/use-session-store";
 
 interface ProjectDetailClientProps {
@@ -43,6 +44,16 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
   const { data: project, isLoading, error } = useProjectBySlug(slug);
   const { data: reportsData } = useReportsByProject(project?.id ?? "");
   const { data: emergencyFund } = useEmergencyFund(project?.id ?? "");
+
+  const latestReport = useMemo(() => {
+    if (!reportsData?.reports || reportsData.reports.length === 0) return null;
+    return [...reportsData.reports].sort((a, b) => {
+      const dateA = new Date(a.reportDate).getTime();
+      const dateB = new Date(b.reportDate).getTime();
+      if (dateB !== dateA) return dateB - dateA;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    })[0];
+  }, [reportsData?.reports]);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isCreateReportOpen, setIsCreateReportOpen] = useState(false);
   const [isFundOpen, setIsFundOpen] = useState(false);
@@ -131,24 +142,18 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                Progres Keseluruhan
+                Progres Terkini
               </CardTitle>
               <IconTrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {reportsData?.reports && reportsData.reports.length > 0
-                  ? Math.round(
-                      reportsData.reports.reduce(
-                        (acc, r) => acc + r.progressPercent,
-                        0,
-                      ) / reportsData.reports.length,
-                    )
-                  : 0}
-                %
+                {latestReport ? `${latestReport.progressPercent}%` : "0%"}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Berdasarkan {project._count.dailyReports} laporan
+                {latestReport
+                  ? `Laporan terakhir: ${formatWitaDate(latestReport.reportDate, { shortMonth: true })}`
+                  : `Belum ada laporan (${project._count.dailyReports} tercatat)`}
               </p>
             </CardContent>
           </Card>
