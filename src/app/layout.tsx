@@ -31,7 +31,7 @@ export const viewport: Viewport = {
 
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-inter",
   weight: ["400", "500", "600", "700", "800", "900"],
   display: "swap",
 });
@@ -58,7 +58,7 @@ const playfair = Playfair_Display({
 
 const spaceMono = Space_Mono({
   subsets: ["latin"],
-  variable: "--font-mono",
+  variable: "--font-space-mono",
   weight: ["400", "700"],
   display: "swap",
 });
