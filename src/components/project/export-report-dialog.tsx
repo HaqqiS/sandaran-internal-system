@@ -1,20 +1,20 @@
 "use client";
 
-import { IconFileSpreadsheet, IconLoader2 } from "@tabler/icons-react";
+import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
-import { Label } from "~/components/ui/label";
+import { z } from "zod";
+import { ResponsiveFormDialog } from "~/components/shared/responsive-form-dialog";
+import { Field, FieldError, FieldLabel } from "~/components/ui/field";
+import { Input } from "~/components/ui/input";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// ─── Types & Schema ──────────────────────────────────────────────────────────
+
+const exportSchema = z.object({
+  month: z.string().min(1, "Pilih bulan terlebih dahulu"),
+});
+
+type ExportFormValues = z.infer<typeof exportSchema>;
 
 interface ExportReportDialogProps {
   projectId: string;
@@ -45,25 +45,18 @@ export function ExportReportDialog({
   open,
   onOpenChange,
 }: ExportReportDialogProps) {
-  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const handleExport = async () => {
-    if (!selectedMonth) {
-      toast.error("Pilih bulan terlebih dahulu.");
-      return;
-    }
-
+  const handleExport = async (monthValue: string) => {
     setIsDownloading(true);
     const toastId = toast.loading("Sedang membuat laporan Excel…");
 
     try {
       const res = await fetch(
-        `/api/projects/${projectId}/export?month=${selectedMonth}`,
+        `/api/projects/${projectId}/export?month=${monthValue}`,
       );
 
       if (!res.ok) {
-        // Coba parse pesan error dari server
         let errorMsg = "Gagal mengekspor laporan.";
         try {
           const json = (await res.json()) as { error?: string };
@@ -74,19 +67,18 @@ export function ExportReportDialog({
         throw new Error(errorMsg);
       }
 
-      // Trigger download di browser
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = `laporan_${selectedMonth}.xlsx`;
+      anchor.download = `laporan_${monthValue}.xlsx`;
       document.body.appendChild(anchor);
       anchor.click();
       document.body.removeChild(anchor);
       URL.revokeObjectURL(url);
 
       toast.success(
-        `Laporan ${formatMonthLabel(selectedMonth)} berhasil diunduh!`,
+        `Laporan ${formatMonthLabel(monthValue)} berhasil diunduh!`,
         { id: toastId },
       );
       onOpenChange(false);
@@ -100,77 +92,76 @@ export function ExportReportDialog({
     }
   };
 
+  const form = useForm({
+    defaultValues: {
+      month: getCurrentMonth(),
+    } as ExportFormValues,
+    validators: {
+      onSubmit: exportSchema,
+    },
+    onSubmit: async ({ value }) => {
+      await handleExport(value.month);
+    },
+  });
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <IconFileSpreadsheet className="h-5 w-5 text-emerald-600" />
-            Ekspor Laporan ke Excel
-          </DialogTitle>
-          <DialogDescription>
-            Pilih periode bulan yang ingin diekspor. File Excel akan mencakup
-            seluruh daily report beserta task dan foto dokumentasi.
-          </DialogDescription>
-        </DialogHeader>
+    <ResponsiveFormDialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          form.reset();
+        }
+        onOpenChange(nextOpen);
+      }}
+      title="Ekspor Laporan ke Excel"
+      description="Pilih periode bulan yang ingin diekspor. File Excel akan mencakup seluruh daily report beserta task dan foto dokumentasi."
+      formId="export-report-form"
+      submitLabel={isDownloading ? "Membuat Laporan…" : "Unduh Laporan"}
+      isPending={isDownloading}
+      dialogClassName="sm:max-w-md"
+    >
+      <form
+        id="export-report-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          void form.handleSubmit();
+        }}
+        className="space-y-4"
+      >
+        <form.Field name="month">
+          {(field) => (
+            <Field>
+              <FieldLabel htmlFor={field.name}>Periode Bulan</FieldLabel>
+              <Input
+                id={field.name}
+                type="month"
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                max={getCurrentMonth()}
+                disabled={isDownloading}
+              />
+              {field.state.value && (
+                <p className="text-xs text-muted-foreground">
+                  Mengekspor laporan bulan{" "}
+                  <span className="font-medium text-foreground">
+                    {formatMonthLabel(field.state.value)}
+                  </span>
+                </p>
+              )}
+              <FieldError errors={field.state.meta.errors} />
+            </Field>
+          )}
+        </form.Field>
 
-        <div className="flex flex-col gap-4 py-2">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="export-month">Periode Bulan</Label>
-            <input
-              id="export-month"
-              type="month"
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              max={getCurrentMonth()}
-              disabled={isDownloading}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-            />
-            {selectedMonth && (
-              <p className="text-xs text-muted-foreground">
-                Mengekspor laporan bulan{" "}
-                <span className="font-medium text-foreground">
-                  {formatMonthLabel(selectedMonth)}
-                </span>
-              </p>
-            )}
-          </div>
-
-          <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2.5 dark:border-amber-800 dark:bg-amber-950/30">
-            <p className="text-xs text-amber-700 dark:text-amber-400">
-              ⚠️ Proses ekspor mungkin membutuhkan beberapa detik karena memuat
-              foto dokumentasi dari server.
-            </p>
-          </div>
+        <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2.5 dark:border-amber-800 dark:bg-amber-950/30">
+          <p className="text-xs text-amber-700 dark:text-amber-400">
+            ⚠️ Proses ekspor mungkin membutuhkan beberapa detik karena memuat
+            foto dokumentasi dari server.
+          </p>
         </div>
-
-        <DialogFooter className="gap-2 sm:gap-0">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isDownloading}
-          >
-            Batal
-          </Button>
-          <Button
-            onClick={handleExport}
-            disabled={isDownloading || !selectedMonth}
-            className="gap-2"
-          >
-            {isDownloading ? (
-              <>
-                <IconLoader2 className="h-4 w-4 animate-spin" />
-                Membuat Laporan…
-              </>
-            ) : (
-              <>
-                <IconFileSpreadsheet className="h-4 w-4" />
-                Unduh Laporan
-              </>
-            )}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      </form>
+    </ResponsiveFormDialog>
   );
 }

@@ -4,7 +4,7 @@
 import { IconCalendar } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
 import { format } from "date-fns";
-import { useImperativeHandle } from "react";
+import { useEffect, useImperativeHandle } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "~/components/ui/button";
@@ -67,6 +67,8 @@ interface ProjectFormProps {
   draftValues?: ProjectFormDraft;
   ref?: React.Ref<{ getValues: () => ProjectFormValues }>;
   onSuccess?: () => void;
+  id?: string;
+  onPendingChange?: (isPending: boolean) => void;
 }
 
 export function ProjectForm({
@@ -74,12 +76,19 @@ export function ProjectForm({
   draftValues,
   ref,
   onSuccess,
+  id = "project-form",
+  onPendingChange,
 }: ProjectFormProps) {
   const createProject = useCreateProject();
   const updateProject = useUpdateProject();
   const isEditMode = !!project;
+  const isPending = createProject.isPending || updateProject.isPending;
 
   useImperativeHandle(ref, () => ({ getValues: () => form.state.values }));
+
+  useEffect(() => {
+    onPendingChange?.(isPending);
+  }, [isPending, onPendingChange]);
 
   const form = useForm({
     defaultValues: {
@@ -129,6 +138,7 @@ export function ProjectForm({
 
   return (
     <form
+      id={id}
       onSubmit={(e) => {
         e.preventDefault();
         form.handleSubmit();
@@ -375,21 +385,6 @@ export function ProjectForm({
           }}
         />
       </FieldGroup>
-
-      <div className="flex justify-end gap-2 pt-4">
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-          children={([canSubmit, isSubmitting]) => (
-            <Button type="submit" disabled={!canSubmit || isSubmitting}>
-              {isSubmitting
-                ? "Menyimpan..."
-                : isEditMode
-                  ? "Simpan Perubahan"
-                  : "Buat Proyek"}
-            </Button>
-          )}
-        />
-      </div>
     </form>
   );
 }

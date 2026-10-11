@@ -4,7 +4,7 @@ import { IconCalendar } from "@tabler/icons-react";
 import { useForm } from "@tanstack/react-form";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
-import { useImperativeHandle } from "react";
+import { useEffect, useImperativeHandle } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ImageUpload } from "~/components/shared/image-upload";
@@ -76,8 +76,10 @@ interface ReportFormProps {
     location?: string | null;
   };
   draftValues?: ReportFormDraft;
-  ref?: React.Ref<{ getValues: () => ReportFormValues; submit: () => void }>;
+  ref?: React.Ref<{ getValues: () => ReportFormValues; submit?: () => void }>;
   onSuccess?: () => void;
+  id?: string;
+  onPendingChange?: (isPending: boolean) => void;
 }
 
 export function ReportForm({
@@ -87,6 +89,8 @@ export function ReportForm({
   draftValues,
   ref,
   onSuccess,
+  id = "report-form",
+  onPendingChange,
 }: ReportFormProps) {
   const createReport = useCreateReport();
   const updateReport = useUpdateReport();
@@ -94,6 +98,12 @@ export function ReportForm({
   const router = useRouter();
 
   const isEditMode = !!report;
+  const isPending =
+    createReport.isPending || updateReport.isPending || uploadMedia.isPending;
+
+  useEffect(() => {
+    onPendingChange?.(isPending);
+  }, [isPending, onPendingChange]);
 
   // Check if existing weather is a custom value
   const isCustomWeather =
@@ -229,6 +239,7 @@ export function ReportForm({
 
   return (
     <form
+      id={id}
       onSubmit={(e) => {
         e.preventDefault();
         e.stopPropagation();

@@ -31,8 +31,9 @@ export function ProjectDialog({
   onOpenChange,
   children,
 }: ProjectDialogProps) {
-  const isEditMode = !!project;
+  const isEditMode = Boolean(project);
   const [draft, setDraft] = useState<ProjectFormDraft>({});
+  const [isPending, setIsPending] = useState(false);
   const formRef = useRef<{ getValues: () => ProjectFormValues }>(null);
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -58,13 +59,18 @@ export function ProjectDialog({
       onOpenChange={handleOpenChange}
       title={title}
       description={description}
+      formId="project-form"
+      submitLabel={isEditMode ? "Simpan Perubahan" : "Buat Proyek"}
+      isPending={isPending}
       trigger={children}
       dialogClassName="sm:max-w-[525px]"
     >
       <ProjectForm
+        id="project-form"
         ref={formRef}
         project={project}
         draftValues={draft}
+        onPendingChange={setIsPending}
         onSuccess={handleSuccess}
       />
     </ResponsiveFormDialog>

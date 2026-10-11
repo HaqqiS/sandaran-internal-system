@@ -32,11 +32,11 @@ export function ReportDialog({
   open,
   onOpenChange,
 }: ReportDialogProps) {
-  const isEditMode = !!report;
+  const isEditMode = Boolean(report);
   const [draft, setDraft] = useState<ReportFormDraft>({});
+  const [isPending, setIsPending] = useState(false);
   const formRef = useRef<{
     getValues: () => ReportFormValues;
-    submit: () => void;
   }>(null);
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -49,10 +49,6 @@ export function ReportDialog({
   const handleSuccess = () => {
     setDraft({});
     onOpenChange(false);
-  };
-
-  const handleSubmit = () => {
-    formRef.current?.submit();
   };
 
   const title = isEditMode ? "Edit Laporan" : "Buat Laporan Baru";
@@ -68,15 +64,18 @@ export function ReportDialog({
       onOpenChange={handleOpenChange}
       title={title}
       description={description}
+      formId="report-form"
       submitLabel={submitLabel}
-      onSubmit={handleSubmit}
+      isPending={isPending}
     >
       <ReportForm
+        id="report-form"
         ref={formRef}
         projectId={projectId}
         projectSlug={projectSlug || "project"}
         report={report}
         draftValues={draft}
+        onPendingChange={setIsPending}
         onSuccess={handleSuccess}
       />
     </ResponsiveFormDialog>
