@@ -77,6 +77,7 @@ export function useCreateLogisticItem() {
       void utils.logistic.getStockSummary.invalidate({
         projectId: variables.projectId,
       });
+      void utils.dashboard.invalidate();
     },
   });
 }
@@ -123,6 +124,7 @@ export function useUpdateLogisticItem() {
       void utils.logistic.getStockSummary.invalidate({
         projectId: variables.projectId,
       });
+      void utils.dashboard.invalidate();
     },
   });
 }
@@ -181,6 +183,7 @@ export function useDeleteLogisticItem() {
       void utils.logistic.getStockSummary.invalidate({
         projectId: variables.projectId,
       });
+      void utils.dashboard.invalidate();
     },
   });
 }
@@ -238,6 +241,7 @@ export function useRecordLogisticTransaction() {
       void utils.logistic.getStockSummary.invalidate({
         projectId: variables.projectId,
       });
+      void utils.dashboard.invalidate();
     },
   });
 }

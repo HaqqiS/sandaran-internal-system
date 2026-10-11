@@ -42,6 +42,7 @@ export function useCreateReport() {
       void utils.report.getByProject.invalidate({
         projectId: variables.projectId,
       });
+      void utils.dashboard.invalidate();
     },
   });
 }
@@ -61,6 +62,7 @@ export function useUpdateReport() {
       void utils.report.getByProject.invalidate({
         projectId: variables.projectId,
       });
+      void utils.dashboard.invalidate();
     },
   });
 }
@@ -72,6 +74,7 @@ export function useDeleteReport() {
       void utils.report.getByProject.invalidate({
         projectId: variables.projectId,
       });
+      void utils.dashboard.invalidate();
     },
   });
 }

@@ -25,6 +25,7 @@ export function useCreateComment() {
       void utils.report.getByProject.invalidate({
         projectId: variables.projectId,
       });
+      void utils.dashboard.invalidate();
     },
   });
 }
@@ -35,6 +36,7 @@ export function useUpdateComment() {
     onSuccess: () => {
       // Invalidate all since we don't have reportId in variables
       void utils.comment.getByReport.invalidate();
+      void utils.dashboard.invalidate();
     },
   });
 }
@@ -45,6 +47,7 @@ export function useDeleteComment() {
     onSuccess: () => {
       // Invalidate all since we don't have reportId in variables
       void utils.comment.getByReport.invalidate();
+      void utils.dashboard.invalidate();
     },
   });
 }

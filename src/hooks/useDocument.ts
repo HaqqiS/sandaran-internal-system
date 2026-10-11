@@ -31,6 +31,7 @@ export function useUploadDocument() {
       void utils.document.getByProject.invalidate({
         projectId: variables.projectId,
       });
+      void utils.dashboard.invalidate();
     },
   });
 }
@@ -50,6 +51,7 @@ export function useUpdateDocument() {
       void utils.document.getByProject.invalidate({
         projectId: data.projectId,
       });
+      void utils.dashboard.invalidate();
     },
   });
 }
@@ -61,6 +63,7 @@ export function useDeleteDocument() {
       void utils.document.getByProject.invalidate({
         projectId: variables.projectId,
       });
+      void utils.dashboard.invalidate();
     },
   });
 }

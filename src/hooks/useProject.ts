@@ -30,6 +30,7 @@ export function useCreateProject() {
   return api.project.create.useMutation({
     onSuccess: () => {
       void utils.project.getAll.invalidate();
+      void utils.dashboard.invalidate();
     },
   });
 }
@@ -41,6 +42,7 @@ export function useUpdateProject() {
       void utils.project.getById.invalidate({ projectId: data.id });
       void utils.project.getBySlug.invalidate({ slug: data.slug });
       void utils.project.getAll.invalidate();
+      void utils.dashboard.invalidate();
     },
   });
 }
@@ -50,6 +52,7 @@ export function useDeleteProject() {
   return api.project.delete.useMutation({
     onSuccess: () => {
       void utils.project.getAll.invalidate();
+      void utils.dashboard.invalidate();
     },
   });
 }
@@ -60,6 +63,7 @@ export function useAddProjectMember() {
     onSuccess: (data) => {
       void utils.project.getMembers.invalidate({ projectId: data.projectId });
       void utils.project.getById.invalidate({ projectId: data.projectId });
+      void utils.dashboard.invalidate();
     },
   });
 }
@@ -69,6 +73,7 @@ export function useUpdateMemberRole() {
   return api.project.updateMemberRole.useMutation({
     onSuccess: (data) => {
       void utils.project.getMembers.invalidate({ projectId: data.projectId });
+      void utils.dashboard.invalidate();
     },
   });
 }
@@ -79,6 +84,7 @@ export function useRemoveMember() {
     onSuccess: () => {
       // Invalidate all since we don't have projectId in response
       void utils.project.getMembers.invalidate();
+      void utils.dashboard.invalidate();
     },
   });
 }

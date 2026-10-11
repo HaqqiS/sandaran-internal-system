@@ -10,6 +10,14 @@ import { api } from "~/trpc/react";
 // Executive Dashboard Hooks (formerly CEO)
 // ============================================
 
+export function useExecutiveOverview() {
+  return api.dashboard.getExecutiveOverview.useQuery();
+}
+
+export function useExecutiveTrends() {
+  return api.dashboard.getExecutiveTrends.useQuery();
+}
+
 export function useExecutiveStats() {
   return api.dashboard.getExecutiveStats.useQuery();
 }
@@ -18,13 +26,13 @@ export function useExecutiveRecentReports(limit?: number) {
   return api.dashboard.getExecutiveRecentReports.useQuery({ limit });
 }
 
-// Backward compatibility aliases
-export const useCEOStats = useExecutiveStats;
-export const useCEORecentReports = useExecutiveRecentReports;
-
 // ============================================
 // Admin Dashboard Hooks
 // ============================================
+
+export function useAdminOverview() {
+  return api.dashboard.getAdminOverview.useQuery();
+}
 
 export function useAdminStats() {
   return api.dashboard.getAdminStats.useQuery();
@@ -87,4 +95,12 @@ export function useLogisticStats() {
 
 export function useLogisticRecentTransactions(limit?: number) {
   return api.dashboard.getLogisticRecentTransactions.useQuery({ limit });
+}
+
+// ============================================
+// User Multi-Role Overview Hook (Remodel Fase 4)
+// ============================================
+
+export function useUserOverview() {
+  return api.dashboard.getUserOverview.useQuery();
 }

@@ -14,13 +14,14 @@ export {
 } from "./useComment";
 // Dashboard hooks
 export {
+  useAdminOverview,
   useAdminStats,
   useArchitectDashboard,
   useArchitectStats,
-  useCEORecentReports,
-  useCEOStats,
+  useExecutiveOverview,
   useExecutiveRecentReports,
   useExecutiveStats,
+  useExecutiveTrends,
   useFinanceFundBreakdown,
   useFinanceRecentTransactions,
   useFinanceStats,
@@ -30,6 +31,7 @@ export {
   useMandorStats,
   useSupervisorRecentReports,
   useSupervisorStats,
+  useUserOverview,
 } from "./useDashboard";
 // Document hooks
 export {

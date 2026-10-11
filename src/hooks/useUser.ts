@@ -46,6 +46,7 @@ export function useApproveUser() {
   return api.user.approveUser.useMutation({
     onSuccess: () => {
       void utils.user.invalidate();
+      void utils.dashboard.invalidate();
     },
   });
 }
@@ -55,6 +56,7 @@ export function useRejectUser() {
   return api.user.rejectUser.useMutation({
     onSuccess: () => {
       void utils.user.invalidate();
+      void utils.dashboard.invalidate();
     },
   });
 }
@@ -64,6 +66,7 @@ export function useDeleteUser() {
   return api.user.deleteUser.useMutation({
     onSuccess: () => {
       void utils.user.invalidate();
+      void utils.dashboard.invalidate();
     },
   });
 }
@@ -76,6 +79,7 @@ export function useBulkApprove(options?: {
   return api.user.bulkApprove.useMutation({
     onSuccess: (data) => {
       void utils.user.invalidate();
+      void utils.dashboard.invalidate();
       if (options?.onSuccess) {
         options.onSuccess(data);
       }
