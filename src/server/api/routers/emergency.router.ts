@@ -233,9 +233,9 @@ export const emergencyRouter = createTRPCRouter({
           publicId: input.proofPublicId,
           url: input.proofUrl,
           type: "DEPOSIT",
-          status: "REVIEWED", // Auto-approved for balance additions
-          verifiedById: ctx.session.user.id,
-          verifiedAt: new Date(),
+          status: "UNREVIEWED",
+          verifiedById: null,
+          verifiedAt: null,
         },
       });
 
@@ -373,14 +373,6 @@ export const emergencyRouter = createTRPCRouter({
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: "Transaksi belum ditinjau",
-          });
-        }
-
-        if (transaction.type === "DEPOSIT") {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message:
-              "Transaksi dana masuk (deposit) tidak dapat dibatalkan review-nya",
           });
         }
       }

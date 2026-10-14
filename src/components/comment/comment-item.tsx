@@ -9,10 +9,10 @@ import { ConfirmDeleteDialog } from "~/components/shared/confirm-delete-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { useDeleteComment } from "~/hooks/useComment";
 import { cn } from "~/lib/utils";
 import { useSessionStore } from "~/stores/use-session-store";
 import type { RouterOutputs } from "~/trpc/react";
-import { api } from "~/trpc/react";
 
 type Comment = RouterOutputs["comment"]["getByReport"][number];
 
@@ -23,15 +23,10 @@ interface CommentItemProps {
 
 export function CommentItem({ comment, projectId }: CommentItemProps) {
   const session = useSessionStore((state) => state.session);
-  const utils = api.useUtils();
 
-  const deleteComment = api.comment.delete.useMutation({
+  const deleteComment = useDeleteComment({
     onSuccess: () => {
       toast.success("Komentar dihapus");
-      utils.comment.getByReport.invalidate({
-        projectId,
-        reportId: comment.reportId,
-      });
     },
     onError: (error) => {
       toast.error(error.message);

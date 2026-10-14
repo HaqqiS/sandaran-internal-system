@@ -100,6 +100,7 @@ export function useCreateUserWithCredentials(options?: {
   return api.user.createUserWithCredentials.useMutation({
     onSuccess: () => {
       void utils.user.invalidate();
+      void utils.dashboard.invalidate();
       options?.onSuccess?.();
     },
     onError: (error) => {
@@ -116,6 +117,7 @@ export function useUpdateUser(options?: {
   return api.user.updateUser.useMutation({
     onSuccess: () => {
       void utils.user.invalidate();
+      void utils.dashboard.invalidate();
       options?.onSuccess?.();
     },
     onError: (error) => {
@@ -132,6 +134,8 @@ export function useUpdateProfile(options?: {
   return api.user.updateProfile.useMutation({
     onSuccess: () => {
       void utils.user.invalidate();
+      void utils.project.invalidate();
+      void utils.dashboard.invalidate();
       options?.onSuccess?.();
     },
     onError: (error) => {

@@ -42,6 +42,9 @@ export function useCreateReport() {
       void utils.report.getByProject.invalidate({
         projectId: variables.projectId,
       });
+      void utils.report.getRecentByProject.invalidate();
+      void utils.project.getBySlug.invalidate();
+      void utils.project.getAll.invalidate();
       void utils.dashboard.invalidate();
     },
   });
@@ -62,6 +65,9 @@ export function useUpdateReport() {
       void utils.report.getByProject.invalidate({
         projectId: variables.projectId,
       });
+      void utils.report.getRecentByProject.invalidate();
+      void utils.project.getBySlug.invalidate();
+      void utils.project.getAll.invalidate();
       void utils.dashboard.invalidate();
     },
   });
@@ -74,6 +80,10 @@ export function useDeleteReport() {
       void utils.report.getByProject.invalidate({
         projectId: variables.projectId,
       });
+      void utils.report.getBySlug.invalidate();
+      void utils.report.getRecentByProject.invalidate();
+      void utils.project.getBySlug.invalidate();
+      void utils.project.getAll.invalidate();
       void utils.dashboard.invalidate();
     },
   });
@@ -87,6 +97,7 @@ export function useAddReportTask() {
         projectId: variables.projectId,
         reportId: variables.reportId,
       });
+      void utils.report.getBySlug.invalidate();
     },
   });
 }
@@ -97,6 +108,7 @@ export function useUpdateReportTask() {
     onSuccess: () => {
       // Invalidate all since we don't have reportId in variables
       void utils.report.getById.invalidate();
+      void utils.report.getBySlug.invalidate();
     },
   });
 }
@@ -107,6 +119,7 @@ export function useDeleteReportTask() {
     onSuccess: () => {
       // Invalidate all since we don't have reportId in variables
       void utils.report.getById.invalidate();
+      void utils.report.getBySlug.invalidate();
     },
   });
 }
@@ -119,6 +132,10 @@ export function useUploadReportMedia() {
         projectId: variables.projectId,
         reportId: variables.reportId,
       });
+      void utils.report.getBySlug.invalidate();
+      void utils.report.getByProject.invalidate({
+        projectId: variables.projectId,
+      });
     },
   });
 }
@@ -126,9 +143,14 @@ export function useUploadReportMedia() {
 export function useDeleteReportMedia() {
   const utils = api.useUtils();
   return api.report.deleteMedia.useMutation({
-    onSuccess: () => {
-      // Invalidate all since we don't have reportId in variables
+    onSuccess: (_data, variables) => {
       void utils.report.getById.invalidate();
+      void utils.report.getBySlug.invalidate();
+      if (variables?.projectId) {
+        void utils.report.getByProject.invalidate({
+          projectId: variables.projectId,
+        });
+      }
     },
   });
 }

@@ -39,6 +39,10 @@ export function useAddEmergencyBalance() {
       void utils.emergency.getTransactions.invalidate({
         projectId: variables.projectId,
       });
+      void utils.emergency.getAnalytics.invalidate();
+      void utils.emergency.getRecentTransactions.invalidate();
+      void utils.project.getBySlug.invalidate();
+      void utils.project.getAll.invalidate();
       void utils.dashboard.invalidate();
     },
   });
@@ -54,6 +58,10 @@ export function useRequestEmergencyFund() {
       void utils.emergency.getTransactions.invalidate({
         projectId: variables.projectId,
       });
+      void utils.emergency.getAnalytics.invalidate();
+      void utils.emergency.getRecentTransactions.invalidate();
+      void utils.project.getBySlug.invalidate();
+      void utils.project.getAll.invalidate();
       void utils.dashboard.invalidate();
     },
   });
@@ -69,6 +77,10 @@ export function useVerifyEmergencyRequest() {
       void utils.emergency.getTransactions.invalidate({
         projectId: variables.projectId,
       });
+      void utils.emergency.getAnalytics.invalidate();
+      void utils.emergency.getRecentTransactions.invalidate();
+      void utils.project.getBySlug.invalidate();
+      void utils.project.getAll.invalidate();
       void utils.dashboard.invalidate();
     },
   });
@@ -84,6 +96,10 @@ export function useEditEmergencyTransaction() {
       void utils.emergency.getTransactions.invalidate({
         projectId: variables.projectId,
       });
+      void utils.emergency.getAnalytics.invalidate();
+      void utils.emergency.getRecentTransactions.invalidate();
+      void utils.project.getBySlug.invalidate();
+      void utils.project.getAll.invalidate();
       void utils.dashboard.invalidate();
     },
   });
@@ -99,6 +115,10 @@ export function useDeleteEmergencyTransaction() {
       void utils.emergency.getTransactions.invalidate({
         projectId: variables.projectId,
       });
+      void utils.emergency.getAnalytics.invalidate();
+      void utils.emergency.getRecentTransactions.invalidate();
+      void utils.project.getBySlug.invalidate();
+      void utils.project.getAll.invalidate();
       void utils.dashboard.invalidate();
     },
   });

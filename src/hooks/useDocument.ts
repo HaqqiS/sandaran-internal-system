@@ -31,6 +31,9 @@ export function useUploadDocument() {
       void utils.document.getByProject.invalidate({
         projectId: variables.projectId,
       });
+      void utils.document.getAnalytics.invalidate();
+      void utils.project.getBySlug.invalidate();
+      void utils.project.getAll.invalidate();
       void utils.dashboard.invalidate();
     },
   });
@@ -51,6 +54,7 @@ export function useUpdateDocument() {
       void utils.document.getByProject.invalidate({
         projectId: data.projectId,
       });
+      void utils.document.getAnalytics.invalidate();
       void utils.dashboard.invalidate();
     },
   });
@@ -63,6 +67,9 @@ export function useDeleteDocument() {
       void utils.document.getByProject.invalidate({
         projectId: variables.projectId,
       });
+      void utils.document.getAnalytics.invalidate();
+      void utils.project.getBySlug.invalidate();
+      void utils.project.getAll.invalidate();
       void utils.dashboard.invalidate();
     },
   });

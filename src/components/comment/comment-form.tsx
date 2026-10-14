@@ -9,7 +9,7 @@ import { Button } from "~/components/ui/button";
 import { FieldError } from "~/components/ui/field";
 import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
-import { api } from "~/trpc/react";
+import { useCreateComment } from "~/hooks/useComment";
 
 const commentSchema = z.object({
   content: z.string().trim().min(1, "Komentar tidak boleh kosong"),
@@ -26,11 +26,9 @@ export function CommentForm({
   reportId,
   onSuccess,
 }: CommentFormProps) {
-  const utils = api.useUtils();
-  const createComment = api.comment.create.useMutation({
+  const createComment = useCreateComment({
     onSuccess: () => {
       toast.success("Komentar berhasil dikirim");
-      utils.comment.getByReport.invalidate({ projectId, reportId });
       form.reset();
       onSuccess?.();
     },

@@ -246,11 +246,8 @@ export function TransactionList({
       id: "actions",
       cell: ({ row }) => {
         const status = row.getValue("status") as string;
-        const type = row.getValue("type") as string;
-        const showReview =
-          canReview && status === "UNREVIEWED" && type === "WITHDRAWAL";
-        const showUndoReview =
-          canReview && status === "REVIEWED" && type === "WITHDRAWAL";
+        const showReview = canReview && status === "UNREVIEWED";
+        const showUndoReview = canReview && status === "REVIEWED";
         const showEditDelete = canEditDelete(row.original);
 
         if (!showReview && !showUndoReview && !showEditDelete) return null;

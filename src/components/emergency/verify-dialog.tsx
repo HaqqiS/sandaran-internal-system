@@ -65,7 +65,7 @@ export function VerifyDialog({
           <DialogDescription>
             {isUndo
               ? "Apakah Anda yakin ingin membatalkan status review transaksi ini? Transaksi akan dikembalikan ke status belum ditinjau."
-              : "Apakah Anda yakin ingin menandai transaksi ini sebagai sudah direview? Ini mengonfirmasi bahwa pengeluaran tersebut valid."}
+              : "Apakah Anda yakin ingin menandai transaksi ini sebagai sudah direview? Ini mengonfirmasi bahwa transaksi tersebut valid."}
           </DialogDescription>
         </DialogHeader>
 
