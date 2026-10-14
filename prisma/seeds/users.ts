@@ -6,17 +6,21 @@ export interface DummyUser {
   email: string;
   roleGlobal: GlobalRole;
   isActive: boolean;
+  password?: string;
 }
+
+export const DEFAULT_SEED_PASSWORD = "password";
 
 export const DUMMY_USERS: DummyUser[] = [
   // 1. GLOBAL ROLE: ADMIN
-  // Email akun utama (dapat langsung digunakan saat login Google OAuth)
+  // Email akun utama (dapat langsung digunakan saat login Google OAuth maupun Email + Password)
   {
     id: "user_admin_haqqi",
     name: "Haqqi Sukmara (Admin)",
     email: "haqqi30sukmara@gmail.com",
     roleGlobal: "ADMIN",
     isActive: true,
+    password: "password",
   },
   // Dummy Admin tambahan untuk testing
   {
@@ -25,6 +29,7 @@ export const DUMMY_USERS: DummyUser[] = [
     email: "admin@sandaran.id",
     roleGlobal: "ADMIN",
     isActive: true,
+    password: "password",
   },
 
   // 2. GLOBAL ROLE: EXECUTIVE
@@ -35,6 +40,7 @@ export const DUMMY_USERS: DummyUser[] = [
     email: "executive@sandaran.id",
     roleGlobal: "EXECUTIVE",
     isActive: true,
+    password: "password",
   },
 
   // 3. GLOBAL ROLE: USER (Project-Based Members)
@@ -45,6 +51,7 @@ export const DUMMY_USERS: DummyUser[] = [
     email: "supervisor@sandaran.id",
     roleGlobal: "USER",
     isActive: true,
+    password: "password",
   },
   {
     id: "user_architect_1",
@@ -52,6 +59,7 @@ export const DUMMY_USERS: DummyUser[] = [
     email: "architect@sandaran.id",
     roleGlobal: "USER",
     isActive: true,
+    password: "password",
   },
   {
     id: "user_finance_1",
@@ -59,6 +67,7 @@ export const DUMMY_USERS: DummyUser[] = [
     email: "finance@sandaran.id",
     roleGlobal: "USER",
     isActive: true,
+    password: "password",
   },
   {
     id: "user_logistic_1",
@@ -66,6 +75,7 @@ export const DUMMY_USERS: DummyUser[] = [
     email: "logistic@sandaran.id",
     roleGlobal: "USER",
     isActive: true,
+    password: "password",
   },
 
   // 4. GLOBAL ROLE: NONE (Pending Approval)
@@ -76,5 +86,6 @@ export const DUMMY_USERS: DummyUser[] = [
     email: "pending@sandaran.id",
     roleGlobal: "NONE",
     isActive: false,
+    password: "password",
   },
 ];

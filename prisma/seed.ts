@@ -1,8 +1,9 @@
 import { PrismaClient } from "@prisma/client";
+import { hashPassword } from "better-auth/crypto";
 import { DUMMY_PROJECT_MEMBERS } from "./seeds/members";
 import { DUMMY_PROJECTS } from "./seeds/projects";
 import { DUMMY_REPORTS } from "./seeds/reports";
-import { DUMMY_USERS } from "./seeds/users";
+import { DEFAULT_SEED_PASSWORD, DUMMY_USERS } from "./seeds/users";
 
 const prisma = new PrismaClient();
 
@@ -17,7 +18,10 @@ async function main() {
       where: { email: user.email },
     });
 
+    let targetUserId = user.id;
+
     if (existing) {
+      targetUserId = existing.id;
       await prisma.user.update({
         where: { id: existing.id },
         data: {
@@ -43,6 +47,27 @@ async function main() {
         `   - User created: ${user.name} (${user.email}) -> Role: ${user.roleGlobal}`,
       );
     }
+
+    // Hash dan pasangkan password ke tabel Account (Better Auth credential provider)
+    const rawPassword = user.password ?? DEFAULT_SEED_PASSWORD;
+    const hashedPassword = await hashPassword(rawPassword);
+    const credentialAccountId = `account_${targetUserId}_credential`;
+
+    await prisma.account.upsert({
+      where: { id: credentialAccountId },
+      update: {
+        password: hashedPassword,
+        accountId: targetUserId,
+      },
+      create: {
+        id: credentialAccountId,
+        userId: targetUserId,
+        accountId: targetUserId,
+        providerId: "credential",
+        password: hashedPassword,
+      },
+    });
+    console.log(`     └─ Password set for ${user.email} ("${rawPassword}")`);
   }
 
   // 2. Seed Projects
