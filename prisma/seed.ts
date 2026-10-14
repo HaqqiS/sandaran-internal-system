@@ -1,6 +1,7 @@
-import { PrismaClient } from "../generated/prisma";
-import { DUMMY_PROJECTS } from "../src/lib/dummy-projects";
-import { DUMMY_REPORTS } from "../src/lib/dummy-reports";
+import { PrismaClient } from "@prisma/client";
+import { DUMMY_PROJECTS } from "./seeds/projects";
+import { DUMMY_REPORTS } from "./seeds/reports";
+import { DUMMY_USERS } from "./seeds/users";
 
 const prisma = new PrismaClient();
 
@@ -8,25 +9,8 @@ async function main() {
   console.log("⏳ Start seeding database...");
 
   // 1. Seed Users (Mandor / Project Authors)
-  const dummyUsers = [
-    {
-      id: "user_mandor_1",
-      name: "Budi Santoso",
-      email: "budi.santoso@astalokadesign.com",
-      roleGlobal: "USER" as const,
-      isActive: true,
-    },
-    {
-      id: "user_mandor_2",
-      name: "Joko Susilo",
-      email: "joko.susilo@astalokadesign.com",
-      roleGlobal: "USER" as const,
-      isActive: true,
-    },
-  ];
-
   console.log("👤 Seeding users...");
-  for (const user of dummyUsers) {
+  for (const user of DUMMY_USERS) {
     const upserted = await prisma.user.upsert({
       where: { id: user.id },
       update: {
@@ -50,9 +34,12 @@ async function main() {
   console.log("📂 Seeding projects...");
   for (const project of DUMMY_PROJECTS) {
     const upserted = await prisma.project.upsert({
-      where: { slug: project.slug },
+      where: { id: project.id },
       update: {
         name: project.name,
+        slug: project.slug,
+        shortId: project.shortId,
+        storageKey: project.storageKey,
         description: project.description,
         location: project.location,
         startDate: project.startDate,
@@ -63,6 +50,8 @@ async function main() {
         id: project.id,
         name: project.name,
         slug: project.slug,
+        shortId: project.shortId,
+        storageKey: project.storageKey,
         description: project.description,
         location: project.location,
         startDate: project.startDate,

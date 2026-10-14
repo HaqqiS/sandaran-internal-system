@@ -99,7 +99,7 @@ export const DUMMY_REPORTS: DummyDailyReport[] = [
         taskName: "Pembersihan sisa material & debu konstruksi",
         workerCount: 2,
         progress: 100,
-        notes: "Siap untuk serah terima.",
+        notes: "Rumah siap diserahterimakan.",
       },
     ],
   },

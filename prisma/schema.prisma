@@ -148,7 +148,9 @@ model Verification {
 model Project {
   id          String        @id @default(cuid())
   name        String
-  slug        String        @unique // Untuk URL: /project/villa-jimbaran
+  slug        String        @unique // Dynamic cosmetic slug: /project/villa-jimbaran-d0df55qy7c
+  shortId     String?       @unique // Potongan ID database: d0df55qy7c
+  storageKey  String?       @unique // Permanent Cloudinary folder key: villa-jimbaran-d0df55qy7c
   description String?       @db.Text
   location    String?
   startDate   DateTime?

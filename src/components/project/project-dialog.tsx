@@ -14,6 +14,7 @@ interface ProjectDialogProps {
     id: string;
     name: string;
     slug: string;
+    shortId?: string | null;
     description?: string | null;
     location?: string | null;
     startDate?: Date | null;

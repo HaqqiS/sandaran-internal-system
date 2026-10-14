@@ -3,11 +3,13 @@ import {
   deleteCloudinaryAsset,
   generateUploadSignature,
 } from "~/lib/cloudinary";
+import { extractShortIdFromSlug } from "~/lib/slug-utils";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const uploadRouter = createTRPCRouter({
   /**
    * Get signed upload params for client-side upload
+   * Resolves the project permanent storageKey to prevent broken URLs upon project renames
    * Returns signature, timestamp, folder, cloudName, apiKey
    */
   getSignedUploadParams: protectedProcedure
@@ -17,9 +19,20 @@ export const uploadRouter = createTRPCRouter({
         type: z.enum(["reports", "documents", "emergency"]),
       }),
     )
-    .mutation(({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      const shortId = extractShortIdFromSlug(input.projectSlug);
+      const project = await ctx.db.project.findFirst({
+        where: {
+          OR: [...(shortId ? [{ shortId }] : []), { slug: input.projectSlug }],
+        },
+        select: { storageKey: true, slug: true },
+      });
+
+      const storageKey =
+        project?.storageKey ?? project?.slug ?? input.projectSlug;
+
       const params = generateUploadSignature({
-        projectSlug: input.projectSlug,
+        projectSlug: storageKey,
         type: input.type,
       });
       return params;

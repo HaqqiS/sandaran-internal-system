@@ -1,6 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { renameCloudinaryFolder } from "~/lib/cloudinary";
+import {
+  buildCosmeticSlug,
+  deriveShortId,
+  extractShortIdFromSlug,
+} from "~/lib/slug-utils";
 import {
   adminProcedure,
   createTRPCRouter,
@@ -37,7 +41,7 @@ export const projectRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string().min(1),
-        slug: z.string().min(1),
+        slug: z.string().optional(),
         description: z.string().optional(),
         location: z.string().optional(),
         startDate: z.date().optional(),
@@ -46,42 +50,46 @@ export const projectRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      // Check if slug already exists
-      const existing = await ctx.db.project.findUnique({
-        where: { slug: input.slug },
-      });
-
-      if (existing) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Project with this slug already exists",
+      const project = await ctx.db.$transaction(async (tx) => {
+        const tempSlug = `tmp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        const created = await tx.project.create({
+          data: {
+            name: input.name,
+            slug: tempSlug,
+            description: input.description,
+            location: input.location,
+            startDate: input.startDate,
+            endDate: input.endDate,
+            status: input.status,
+          },
         });
-      }
 
-      const project = await ctx.db.project.create({
-        data: {
-          name: input.name,
-          slug: input.slug,
-          description: input.description,
-          location: input.location,
-          startDate: input.startDate,
-          endDate: input.endDate,
-          status: input.status,
-        },
-        include: {
-          members: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                  image: true,
+        const shortId = deriveShortId(created.id, 10);
+        const cosmeticSlug = buildCosmeticSlug(input.name, shortId);
+        const storageKey = cosmeticSlug;
+
+        return await tx.project.update({
+          where: { id: created.id },
+          data: {
+            slug: cosmeticSlug,
+            shortId,
+            storageKey,
+          },
+          include: {
+            members: {
+              include: {
+                user: {
+                  select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    image: true,
+                  },
                 },
               },
             },
           },
-        },
+        });
       });
 
       return project;
@@ -303,32 +311,46 @@ export const projectRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const { id: userId, roleGlobal } = ctx.session.user;
 
-      const project = await ctx.db.project.findUnique({
-        where: { slug: input.slug },
-        include: {
-          members: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true,
-                  image: true,
-                  roleGlobal: true,
-                },
+      const shortId = extractShortIdFromSlug(input.slug);
+
+      const includeConfig = {
+        members: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+                roleGlobal: true,
               },
             },
           },
-          emergencyFund: true,
-          _count: {
-            select: {
-              dailyReports: true,
-              documents: true,
-              logistics: true,
-            },
+        },
+        emergencyFund: true,
+        _count: {
+          select: {
+            dailyReports: true,
+            documents: true,
+            logistics: true,
           },
         },
-      });
+      };
+
+      let project = null;
+      if (shortId) {
+        project = await ctx.db.project.findUnique({
+          where: { shortId },
+          include: includeConfig,
+        });
+      }
+
+      if (!project) {
+        project = await ctx.db.project.findUnique({
+          where: { slug: input.slug },
+          include: includeConfig,
+        });
+      }
 
       if (!project) {
         throw new TRPCError({
@@ -373,10 +395,16 @@ export const projectRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      // Get current project to check old slug
+      // Get current project to check shortId and storageKey
       const currentProject = await ctx.db.project.findUnique({
         where: { id: input.projectId },
-        select: { slug: true, id: true },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          shortId: true,
+          storageKey: true,
+        },
       });
 
       if (!currentProject) {
@@ -386,10 +414,24 @@ export const projectRouter = createTRPCRouter({
         });
       }
 
-      // Check slug uniqueness if updated
-      if (input.slug && input.slug !== currentProject.slug) {
+      const shortId =
+        currentProject.shortId || deriveShortId(currentProject.id, 10);
+      const storageKey = currentProject.storageKey || currentProject.slug;
+
+      // Recalculate cosmetic slug if name or slug changed
+      let newSlug = currentProject.slug;
+      if (input.name && input.name !== currentProject.name) {
+        newSlug = buildCosmeticSlug(input.name, shortId);
+      } else if (input.slug && input.slug !== currentProject.slug) {
+        newSlug = input.slug.endsWith(shortId)
+          ? input.slug
+          : `${input.slug}-${shortId}`;
+      }
+
+      // Check slug uniqueness if changed
+      if (newSlug !== currentProject.slug) {
         const existing = await ctx.db.project.findUnique({
-          where: { slug: input.slug },
+          where: { slug: newSlug },
         });
         if (existing && existing.id !== input.projectId) {
           throw new TRPCError({
@@ -403,7 +445,9 @@ export const projectRouter = createTRPCRouter({
         where: { id: input.projectId },
         data: {
           name: input.name,
-          slug: input.slug,
+          slug: newSlug,
+          shortId,
+          storageKey,
           description: input.description,
           location: input.location,
           startDate: input.startDate,
@@ -426,11 +470,6 @@ export const projectRouter = createTRPCRouter({
           },
         },
       });
-
-      // Sync Cloudinary folder if slug changed
-      if (input.slug && input.slug !== currentProject.slug) {
-        await renameCloudinaryFolder(currentProject.slug, input.slug);
-      }
 
       return project;
     }),

@@ -66,7 +66,7 @@ Seluruh file foto laporan harian, bukti transaksi kas darurat, dan dokumen tekni
 ```
 
 - **Pencegahan Orphaned Storage**: Saat dokumen proyek atau bukti transaksi dihapus/diganti, backend secara otomatis memanggil `deleteCloudinaryAsset(publicId)` di Cloudinary sebelum atau bersamaan dengan penghapusan baris data di database.
-- **Folder Berbasis Slug**: Folder Cloudinary disusun per proyek (`sandaran/[project-slug]/...`). Pembaruan slug proyek memicu `renameCloudinaryFolder` untuk menjaga kerapian struktur direktori aset.
+- **Permanent Storage Key & Cosmetic Dynamic Slug**: Folder Cloudinary disusun per proyek menggunakan kunci permanen (`astaloka/[storageKey]/[type]`), di mana `storageKey = [initial-slug]-[shortId]`. Kunci ini ditetapkan saat proyek pertama kali dibuat dan **tidak pernah di-rename**, menjamin tidak ada aset historis yang menjadi 404 saat nama atau slug proyek diedit. Slug URL web mengikuti pola Notion/Stack Overflow (`[nama-proyek]-[shortId]`) di mana backend mengekstrak `shortId` (10-karakter ID database) untuk identifikasi instan dengan toleransi penuh terhadap URL lama.
 
 ---
 

@@ -12,7 +12,7 @@ import {
 } from "@tabler/icons-react";
 import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { DepositDialog } from "~/components/emergency/deposit-dialog";
 import { WithdrawDialog } from "~/components/emergency/withdraw-dialog";
 import { PageLayout } from "~/components/layout";
@@ -44,6 +44,13 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
   const { data: project, isLoading, error } = useProjectBySlug(slug);
   const { data: reportsData } = useReportsByProject(project?.id ?? "");
   const { data: emergencyFund } = useEmergencyFund(project?.id ?? "");
+
+  // Sync browser URL to canonical slug if accessed via old slug or shortId
+  useEffect(() => {
+    if (project?.slug && project.slug !== slug) {
+      window.history.replaceState(null, "", `/projects/${project.slug}`);
+    }
+  }, [project?.slug, slug]);
 
   const latestReport = useMemo(() => {
     if (!reportsData?.reports || reportsData.reports.length === 0) return null;

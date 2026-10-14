@@ -31,6 +31,12 @@ import {
 } from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
 import { useCreateProject, useUpdateProject } from "~/hooks";
+import {
+  buildCosmeticSlug,
+  deriveShortId,
+  extractShortIdFromSlug,
+  slugify,
+} from "~/lib/slug-utils";
 import { cn } from "~/lib/utils";
 
 const projectSchema = z.object({
@@ -58,6 +64,7 @@ interface ProjectFormProps {
     id: string;
     name: string;
     slug: string;
+    shortId?: string | null;
     description?: string | null;
     location?: string | null;
     startDate?: Date | null;
@@ -163,12 +170,20 @@ export function ProjectForm({
                     const newName = e.target.value;
                     field.handleChange(newName);
 
-                    // Auto-generate slug from name
-                    const newSlug = newName
-                      .toLowerCase()
-                      .replace(/[^a-z0-9]+/g, "-")
-                      .replace(/^-|-$/g, "");
-                    form.setFieldValue("slug", newSlug);
+                    if (isEditMode && project) {
+                      const effectiveShortId =
+                        project.shortId ||
+                        extractShortIdFromSlug(project.slug) ||
+                        deriveShortId(project.id, 10);
+                      const cosmeticSlug = buildCosmeticSlug(
+                        newName,
+                        effectiveShortId,
+                      );
+                      form.setFieldValue("slug", cosmeticSlug);
+                    } else {
+                      const newSlug = slugify(newName);
+                      form.setFieldValue("slug", newSlug);
+                    }
                   }}
                   aria-invalid={isInvalid}
                   placeholder="Proyek Konstruksi Saya"
@@ -202,7 +217,9 @@ export function ProjectForm({
                   className="bg-muted cursor-not-allowed"
                 />
                 <FieldDescription>
-                  Dibuat otomatis berdasarkan nama proyek.
+                  {isEditMode
+                    ? "Slug kosmetik diperbarui otomatis dengan ID unik permanen."
+                    : "Slug URL awal. ID unik 10 karakter akan ditambahkan otomatis saat proyek disimpan."}
                 </FieldDescription>
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}
               </Field>

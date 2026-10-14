@@ -5,6 +5,8 @@ export const DUMMY_PROJECTS: Omit<Project, "createdAt" | "updatedAt">[] = [
     id: "proj_sadara_boutique",
     name: "Sadara Boutique Resort",
     slug: "sadara-boutique-resort",
+    shortId: "a_boutique",
+    storageKey: "sadara-boutique-resort",
     description:
       "Revitalisasi interior lobi utama dan villa suite dengan konsep modern tropis Bali. Desain menekankan penggunaan material lokal seperti kayu jati bekas, batu alam, dan kerajinan anyaman rotan untuk menciptakan suasana hangat dan mewah.",
     location: "Nusa Dua, Bali",
@@ -16,6 +18,8 @@ export const DUMMY_PROJECTS: Omit<Project, "createdAt" | "updatedAt">[] = [
     id: "proj_ba_house",
     name: "B A House",
     slug: "b-a-house",
+    shortId: "j_ba_house",
+    storageKey: "b-a-house",
     description:
       "Pembangunan rumah tinggal minimalis kontemporer 2 lantai. Fokus pada tata ruang fungsional, pencahayaan alami maksimal melalui bukaan jendela besar, serta integrasi ruang hijau indoor.",
     location: "Canggu, Bali",
@@ -27,6 +31,8 @@ export const DUMMY_PROJECTS: Omit<Project, "createdAt" | "updatedAt">[] = [
     id: "proj_sekar_tunjung",
     name: "Sekar Tunjung House",
     slug: "sekar-tunjung-house",
+    shortId: "ar_tunjung",
+    storageKey: "sekar-tunjung-house",
     description:
       "Proyek renovasi interior ruang keluarga, dapur bersih (dry kitchen), dan kamar tidur utama dengan style modern classic. Sentuhan warna netral hangat dikombinasikan dengan profil dinding (wainscoting) yang elegan.",
     location: "Denpasar, Bali",
@@ -38,6 +44,8 @@ export const DUMMY_PROJECTS: Omit<Project, "createdAt" | "updatedAt">[] = [
     id: "proj_villa_jimbaran",
     name: "Villa Jimbaran",
     slug: "villa-jimbaran",
+    shortId: "a_jimbaran",
+    storageKey: "villa-jimbaran",
     description:
       "Pekerjaan desain interior villa privat mewah di atas bukit Jimbaran. Konsep open-plan living dengan pemandangan langsung ke arah laut, dilengkapi furnitur custom bernilai estetika tinggi.",
     location: "Jimbaran, Bali",
