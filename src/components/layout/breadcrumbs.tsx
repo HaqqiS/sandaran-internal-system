@@ -11,14 +11,91 @@ import {
   BreadcrumbSeparator,
 } from "~/components/ui/breadcrumb";
 import { useIsMobile } from "~/hooks/use-mobile";
+import { extractShortIdFromSlug } from "~/lib/slug-utils";
 import { cn } from "~/lib/utils";
+
+const ROUTE_LABELS: Record<string, string> = {
+  projects: "Proyek",
+  reports: "Laporan",
+  logistics: "Logistik",
+  documents: "Dokumen",
+  emergency: "Kas Darurat",
+  users: "Pengguna",
+  dashboard: "Dashboard",
+  settings: "Pengaturan",
+};
+
+const MONTH_NAMES = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "Mei",
+  "Jun",
+  "Jul",
+  "Agu",
+  "Sep",
+  "Okt",
+  "Nov",
+  "Des",
+];
+
+function toTitleCase(str: string): string {
+  return str
+    .split("-")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+function formatBreadcrumbLabel(segment: string, prevSegment?: string): string {
+  const lower = segment.toLowerCase();
+
+  // 1. Label statis bawaan rute
+  if (ROUTE_LABELS[lower]) {
+    return ROUTE_LABELS[lower];
+  }
+
+  // 2. Segmen Detail Laporan (berada setelah "/reports/")
+  if (prevSegment === "reports") {
+    // Hilangkan timestamp milidetik di akhir: e.g. -1791953865327
+    const cleanedReport = segment.replace(/-\d{10,14}$/, "");
+
+    // Jika mengandung tanggal YYYY-MM-DD
+    const dateMatch = cleanedReport.match(/(\d{4})-(\d{2})-(\d{2})/);
+    if (dateMatch) {
+      const [, year, month, day] = dateMatch;
+      const monthIdx = Number.parseInt(month ?? "1", 10) - 1;
+      const monthLabel = MONTH_NAMES[monthIdx] ?? month;
+      return `Laporan ${Number.parseInt(day ?? "1", 10)} ${monthLabel} ${year}`;
+    }
+
+    return toTitleCase(cleanedReport);
+  }
+
+  // 3. Segmen Proyek (berada setelah "/projects/")
+  if (prevSegment === "projects") {
+    const shortId = extractShortIdFromSlug(segment);
+    if (
+      shortId &&
+      segment.toLowerCase().endsWith(`-${shortId.toLowerCase()}`)
+    ) {
+      const base = segment.slice(0, -(shortId.length + 1));
+      if (base) return toTitleCase(base);
+    }
+    return toTitleCase(segment);
+  }
+
+  // 4. Default format
+  return toTitleCase(segment);
+}
 
 function generateBreadcrumbs(pathname: string) {
   const paths = pathname.split("/").filter(Boolean);
   return paths.map((path, index) => {
     const href = `/${paths.slice(0, index + 1).join("/")}`;
-    const label =
-      path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, " ");
+    const prevPath = index > 0 ? paths[index - 1] : undefined;
+    const label = formatBreadcrumbLabel(path, prevPath);
     return { href, label };
   });
 }
