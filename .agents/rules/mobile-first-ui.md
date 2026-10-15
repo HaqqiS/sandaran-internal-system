@@ -2,215 +2,191 @@
 trigger: always_on
 ---
 
----
+# Agent Rules — Sandaran Internal System
 
-title: Cursor Rules — Mobile-First Stack
-description: AI agent rules for Next.js 15 + shadcn/ui + tRPC + TanStack + Zustand + Prisma
-stack:
+**Stack:** Next.js 15 App Router, React 19, TypeScript, Tailwind CSS v4, shadcn/ui, Radix UI, tRPC v11, TanStack Query v5, Zustand v5, Prisma v6, Better Auth, Vaul, Sonner, Cloudinary, Biome, and Vitest.
 
-- Next.js 15
-- shadcn/ui + Radix UI
-- Tailwind CSS v4
-- tRPC v11 + TanStack Query v5
-- Zustand v5
-- Prisma v6
-- Better Auth v1.3
-- Vaul + Sonner
-- Biome + Vitest
-  updated: 2026-04-22
-  rules: 36
+## 1. Core Principles
 
----
+- Inspect relevant code, callers, documentation, and package versions before making changes.
+- Follow existing project patterns and documented conventions over generic preferences.
+- Keep changes minimal and scoped to the requested task. Avoid unrelated refactors, mass replacements, file renames, dependency changes, or architecture redesigns.
+- Preserve existing functionality, responsive behavior, accessibility, and desktop UX unless explicitly asked to change them.
+- Apply rules to new or directly affected code. Do not modify unrelated code merely for consistency.
+- Consult `DESIGN-SYSTEM.md`, `docs/ARCHITECTURE.md`, `docs/PERMISSIONS.md`, and relevant feature implementations when applicable. Verify file paths before relying on documentation.
+- When instructions conflict, prioritize explicit user requirements, verified project-specific conventions, and existing implementation over generic rules.
+- If a change could affect shared behavior or introduce significant risk, explain the concern and choose the narrowest safe solution.
 
-# Cursor Rules — Mobile-First Stack
+## 2. Mobile-First UI/UX
 
-> Agent rules for **Next.js 15 · shadcn/ui · Radix UI · tRPC v11 · TanStack Query v5** > **Zustand v5 · Prisma v6 · Better Auth · Vaul · Sonner · Biome · Vitest**
+### Responsive Layouts
 
-## Contents
-
-- [Mobile-First UI/UX](#mobile-first-uiux)
-- [Stack Conventions](#stack-conventions)
-- [Accessibility](#accessibility)
-- [Performance](#performance)
-- [Code Quality & Architecture](#code-quality--architecture)
-- [UX Patterns](#ux-patterns)
-
----
-
-## 📱 Mobile-First UI/UX
-
-> You are an expert in Mobile-First UI/UX using Next.js 15, shadcn/ui, Radix UI, Tailwind CSS v4, Vaul, and Sonner.
+- Build mobile-first using Tailwind breakpoints, then enhance for larger screens.
+- Fix mobile issues without unnecessarily changing established desktop layouts.
+- Prevent horizontal overflow, clipped content, overlapping elements, and unreadable text.
+- Use responsive sizing, wrapping, and deliberate overflow handling instead of arbitrary width reductions.
+- Reuse existing shared components and responsive patterns when appropriate.
+- Do not introduce a shared component solely to remove duplication when the implementations have meaningfully different behavior.
 
 ### Touch Targets
 
-All interactive elements must meet minimum touch target sizes: 44×44pt (iOS) / 48×48dp (Android). Use `min-h-11 min-w-11` or `p-3` as a baseline. Never rely on `cursor: pointer` alone — the tap area matters.
+- Apply touch-target improvements at the usage site rather than globally changing shared UI primitives.
+- Use responsive sizing when suitable, e.g. `min-h-11 md:min-h-8`.
+- Preserve compact controls and information density in dashboards, tables, toolbars, and data-heavy interfaces.
+- Do not indiscriminately enlarge every button, input, checkbox, badge, or table action.
 
-### Thumb Zone Awareness
+### Typography
 
-Place primary actions in the bottom 40% of the screen (thumb zone). Destructive or secondary actions go in the harder-to-reach top zone. Use `pb-safe` and `env(safe-area-inset-bottom)` for devices with home indicators.
+- Use readable typography appropriate to content, context, and screen size.
+- Prefer existing Tailwind utilities and design-system tokens.
+- Small sizes such as `text-xs`, `text-[11px]`, and `text-[10px]` are allowed for badges, metadata, compact labels, and secondary information when legible.
+- Do not globally increase font sizes or replace arbitrary sizes without checking their purpose and visual impact.
+- Prevent clipping and layout issues at narrow widths and increased browser zoom.
 
-### Navigation Patterns
+### Navigation & Interaction
 
-Use bottom tab bars for top-level navigation. Avoid deep nav hierarchies (max 3 levels). Prefer sheet-based flows (`vaul` Drawer) over full page pushes for contextual actions. Always support swipe-to-back gestures and browser back button.
+- Follow the existing information architecture. Do not force every navigation flow into drawers, sheets, or bottom navigation.
+- Keep primary actions discoverable and reachable on mobile.
+- Preserve browser history and established navigation behavior.
+- Add interaction feedback where useful without unnecessary animations or dependencies.
 
-### Typography & Readability
+### Dialogs, Forms & States
 
-Minimum body text: 14px (mobile), 16px (desktop). Use `text-sm` as the floor, `text-base` for body. Set `leading-relaxed` on paragraphs. Support Dynamic Type via `rem` units — never use `px` for font sizes. Test at 200% zoom.
+- Reuse established responsive Dialog/Drawer patterns. Do not replace them with standalone components without a concrete reason.
+- Follow existing form libraries, validation schemas, and submission patterns. Do not introduce another form library or adapter without justification.
+- Use appropriate input types, `inputMode`, `autoComplete`, accessible labels, and validation feedback.
+- Preserve keyboard behavior, focus management, and submission states.
+- Provide suitable loading, empty, success, and error states for data-dependent views.
+- Use skeletons when they match the expected content layout. Spinners remain appropriate for buttons, short operations, and compact actions.
+- Do not mass-replace existing loading patterns without a specific UX requirement.
 
-### Interaction Feedback
+## 3. shadcn/ui & Accessibility
 
-Every tap must produce immediate feedback: `active:scale-95`, `active:opacity-70`, or haptic via the Vibration API. Use `sonner` for toast notifications. Use skeleton loaders (`animate-pulse`) over spinners. Never leave the user wondering if their tap registered.
+### Shared Component Integrity
 
-### Dark Mode & Color
+- Treat `src/components/ui/*` as shared foundational primitives.
+- **Do not modify shadcn/ui defaults or primitive implementations to solve a page-specific problem.**
+- Prefer usage-site `className`, existing props, supported variants, or feature-level wrappers.
+- Preserve default dimensions, variants, styling, and accessibility behavior unless a change is explicitly requested or a verified shared defect requires it.
+- Check whether a primitive already exists before adding another.
+- Avoid unnecessary global changes to button sizes, input heights, checkbox dimensions, spacing, or typography.
+- If a shared primitive genuinely needs modification, establish the impact and use the smallest appropriate fix.
 
-All components must support dark mode via `next-themes`. Use Tailwind's `dark:` variant consistently. Maintain WCAG AA contrast ratios (4.5:1 body, 3:1 large text) in both themes. Never hardcode colors — use CSS variables from your `globals.css` theme tokens.
+### Accessibility
 
-### Sheets & Drawers (Vaul)
+- Use semantic HTML and keyboard-accessible interactive elements with visible focus indicators.
+- Give icon-only controls accessible names and informative images meaningful alternative text. Use empty alt text for decorative images.
+- Preserve Radix keyboard navigation, focus management, and dialog semantics.
+- Maintain sufficient contrast in light and dark themes.
+- Respect reduced-motion preferences when introducing animations.
+- Check narrow screens, keyboard navigation, and increased zoom when relevant.
 
-Prefer `vaul` Drawer over Dialog for mobile-initiated flows. Drawers slide from bottom, feel native. Use `snapPoints` for multi-state drawers. Radix Dialog is acceptable for desktop-first confirmations. Never use both for the same intent.
+### Theme & Styling
 
-### Forms & Input (TanStack Form + Zod)
+- Follow existing CSS variables, theme tokens, and `DESIGN-SYSTEM.md` conventions.
+- Maintain compatibility with the project's existing theme implementation.
+- Avoid unnecessary hardcoded colors, new design tokens, or styling systems.
 
-Use `@tanstack/react-form` with `@tanstack/zod-form-adapter` for all forms. Set correct `inputMode` and `type` attributes (`email`, `tel`, `url`, `numeric`). Enable `autoComplete` and `autoCapitalize` appropriately. Show inline field errors immediately on blur, not only on submit.
+## 4. Project Stack Conventions
 
-### Whitespace & Visual Hierarchy
+### Next.js & React
 
-Use whitespace to group related content and separate sections — not decorative padding. Follow an 8pt grid (`gap-2`, `gap-4`, `gap-6`, `gap-8`). Clear hierarchy: one H1 per view, descriptive subheadings, supporting body text. Content first, chrome second.
+- Prefer Server Components by default. Use `"use client"` only when client-side state, effects, browser APIs, interactivity, or client context require it.
+- Respect App Router conventions and server/client boundaries.
+- Reuse established server-side data-fetching patterns and tRPC callers.
+- Do not move working server logic into client components without a concrete need.
+- Use `next/image` where appropriate and follow existing image-handling conventions.
 
-### Loading / Empty / Error States
+### tRPC & TanStack Query
 
-Every data-dependent view needs three states: loading (skeleton, not spinner), empty (illustrated CTA — never blank), error (helpful message + retry action). Use TanStack Query's `isPending`, `isError`, `data === undefined` guards. Never render null silently.
+- Use the project's tRPC patterns for internal API communication.
+- Preserve existing query, mutation, cache invalidation, optimistic update, and error-handling conventions.
+- Avoid raw `fetch` for internal APIs when an established tRPC implementation exists.
+- Do not duplicate query keys or introduce redundant caching layers.
 
----
+### Zustand
 
-## 🏗️ Stack Conventions
+- Inspect each store's purpose, consumers, and hydration behavior before changing it.
+- Follow existing store boundaries and initialization patterns.
+- Do not assume every store contains only local UI state.
+- Avoid duplicating server state or removing stores without understanding their role.
 
-> Conventions for the specific libraries in this project.
+### Prisma & Database
 
-### tRPC (v11)
+- Access Prisma through established server-side boundaries.
+- Use `select` and `include` deliberately to retrieve required data.
+- Paginate potentially large collections where appropriate; do not force pagination onto small, bounded datasets or operations that need complete results.
+- Preserve transactions, relations, constraints, and data semantics.
+- Do not change schemas, migrations, or database behavior incidentally during UI work.
 
-All server communication goes through tRPC. Never use raw `fetch` for internal API calls. Colocate router procedures with their feature folder. Use `superjson` as transformer. Prefer `useQuery` / `useMutation` from `@trpc/react-query` — do not call procedures imperatively unless in a server action.
+### Authentication & Permissions
 
-### TanStack Query (v5)
+- Follow Better Auth and the repository's actual authentication helpers. Verify implementation before using any API or helper.
+- Use existing procedures such as `publicProcedure`, `protectedProcedure`, `adminProcedure`, and `projectProcedure` where appropriate.
+- Follow `docs/PERMISSIONS.md` for role and authorization requirements.
+- Enforce permissions server-side. Hiding a UI action is not authorization.
+- Preserve session initialization, hydration, and role-specific navigation.
 
-Cache keys are managed by tRPC — never manually define `queryKey` for tRPC routes. For non-tRPC queries, use descriptive array keys: `['user', userId, 'posts']`. Prefer `staleTime` over disabling caching. Use `suspense: true` + React Suspense for server-synced views.
+### Cloudinary & Uploads
 
-### Zustand (v5)
+- Follow the existing signed client-to-Cloudinary upload workflow and established tRPC signing endpoint.
+- Preserve validation, progress feedback, and error handling.
+- Maintain storage conventions, including `url` and `publicId` where required.
+- Preserve asset deletion and database consistency workflows.
+- Do not replace direct uploads with server-side file forwarding or change storage conventions without explicit justification.
 
-Zustand is for local UI state only (modals, sidebar open, theme override, multi-step wizard). Server state lives in TanStack Query via tRPC. Create one store per feature domain. Use `immer` middleware for nested state updates. Never store derived data — compute it with selectors.
+### Icons, Notifications & Utilities
 
-### Prisma (v6)
+- Prefer `@tabler/icons-react` and existing icon sizing conventions.
+- Use Sonner and established notification patterns.
+- Avoid adding dependencies when existing project utilities already solve the problem.
 
-Database access only inside tRPC routers or Server Actions marked `'use server'`. Never query Prisma from client components. Use `select` to return only needed fields — never `findMany` without a `select` in list views. Always paginate — default limit: 20, max: 100.
+## 5. Code Quality & Architecture
 
-### Better Auth (v1.3)
+### TypeScript & Validation
 
-Session is accessed via `auth()` in server components / tRPC context. Never pass the full session to client components — pass only the fields needed. Protect tRPC procedures with an `authedProcedure` middleware. Redirect unauthenticated users in middleware, not in components.
+- Preserve strict typing and infer types from existing schemas where appropriate.
+- Avoid `any`, unsafe assertions, and ignored errors unless justified.
+- Follow existing Zod validation patterns and the installed version.
+- Validate untrusted input at the appropriate boundaries.
 
-### shadcn/ui + Radix UI
+### Files & Naming
 
-shadcn/ui is the default component library — never build modal, dropdown, tooltip, or select from scratch. Install components via `npx shadcn@latest add <component>`. Extend, don't fork. Compose Radix primitives only when shadcn doesn't have what you need. Keep custom variants in `cva()` inside the component file.
+- Follow existing naming, folder structure, and import aliases.
+- Do not rename or reorganize files to enforce generic conventions.
+- A file exceeding 300 lines is not, by itself, a reason to refactor. Split files when it improves cohesion and maintainability, preferably within the task's scope.
+- Keep abstractions proportional to actual reuse and complexity.
 
-### Icons (@tabler/icons-react)
+### Dependencies & Tooling
 
-Use `@tabler/icons-react` exclusively. Import named icons: `import { IconUser } from '@tabler/icons-react'`. Default size: `size={20}` for UI icons, `size={16}` inside buttons/badges. Never use emoji as icons in production UI. Never mix icon libraries.
+- Follow installed package versions, `biome.json`, and existing project scripts.
+- Use the established package manager and tooling.
+- Do not introduce competing libraries, formatters, or linters without justification.
+- Avoid unrelated dependency upgrades and configuration changes.
 
-### Drag & Drop (@dnd-kit)
+## 6. Performance & UX
 
-All drag-and-drop uses `@dnd-kit/core` + `@dnd-kit/sortable`. Wrap drag contexts in `DndContext` at the feature level, not globally. Use `restrictToVerticalAxis` or `restrictToParentElement` modifiers to constrain movement. Always implement keyboard DnD for accessibility.
+- Avoid unnecessary client components, rerenders, network requests, and heavy dependencies.
+- Use appropriate image sizing and loading priorities.
+- Communicate pending operations and handle failures clearly.
+- Use optimistic updates only with appropriate rollback and error handling.
+- Avoid unnecessary animations or gestures that complicate usability.
+- Do not sacrifice accessibility, maintainability, or existing behavior for minor optimizations.
 
-### Image Uploads (Cloudinary + react-dropzone)
+## 7. Change Workflow
 
-Use `react-dropzone` for the drop zone UI. Compress before upload with `browser-image-compression` (max 1MB, max 1920px). Upload in a tRPC mutation that calls `cloudinary` server-side. Show upload progress. Store only the Cloudinary `public_id` in the DB, not the full URL.
+### Before Changes
 
-### Linting & Formatting (Biome)
+1. Inspect the target code, its callers, shared components, and established patterns.
+2. Identify the actual issue and its scope.
+3. Check relevant documentation, permissions, and installed APIs.
+4. Choose the smallest safe change that satisfies the request.
 
-Biome is the single formatter + linter — never mix with ESLint or Prettier. Run `biome check --write` on save. No unused imports, no `console.log` in committed code. Follow the project's `biome.json` config. CI must pass Biome checks before merge.
+### After Changes
 
----
+1. Review the diff for unintended modifications.
+2. Check relevant mobile and desktop layouts, interactions, and UI states.
+3. Run applicable type checks, linting, and tests using available project scripts.
+4. Report what changed, what was verified, and any remaining limitations. Never claim checks passed if they were not run.
 
-## ♿ Accessibility
-
-> Accessibility is not a phase — it's built in from the first component.
-
-### Keyboard Navigation
-
-All interactive elements reachable via Tab. Visible focus rings always on (never `outline: none` without a custom replacement). Modal dialogs trap focus and restore it on close — Radix handles this automatically, don't override it.
-
-### Screen Readers (VoiceOver / TalkBack)
-
-Every image needs `alt` text (decorative images: `alt=''`). Icon-only buttons need `aria-label`. Dynamic content changes announced via `aria-live='polite'`. Use semantic HTML — `<button>`, `<nav>`, `<main>`, `<section>`, `<article>` — not `<div onClick>`.
-
-### Color Contrast
-
-Body text: minimum 4.5:1 contrast ratio. Large text (18pt+ or 14pt bold): 3:1. UI components and focus indicators: 3:1. Test both light and dark themes. Use Tailwind's default palette — it's contrast-safe at the `500`+ scale on white and `400`- on dark backgrounds.
-
-### Font Scaling (Dynamic Type)
-
-All font sizes in `rem` — never `px`. Test at 200% browser zoom and with OS font size set to largest. Components must not overflow or clip at large sizes. Use `clamp()` for display sizes that would otherwise break layout.
-
----
-
-## ⚡ Performance
-
-> Performance is a feature — especially on mid-range mobile devices.
-
-### React Server Components (Next.js 15)
-
-Default to Server Components. Add `'use client'` only when you need: `useState`, `useEffect`, event handlers, browser APIs, or context. Move as much data fetching as possible to RSC + tRPC server-side caller. Never fetch in a client component what can be fetched on the server.
-
-### Bundle Size
-
-Import only named exports: `import { Button } from '@/components/ui/button'` not `import * from 'shadcn'`. Use `next/dynamic` with `ssr: false` for heavy client-only components (charts, rich editors). Audit with `@next/bundle-analyzer` before shipping new heavy deps.
-
-### Images
-
-Always use `next/image`. Always set `width` and `height` (or `fill` with a sized container) to prevent CLS. Use `priority` only for above-the-fold LCP images. Use Cloudinary transformations (`f_auto,q_auto,w_800`) via URL params, not locally.
-
-### Core Web Vitals Targets
-
-LCP < 2.5s, CLS < 0.1, INP < 200ms on a Moto G4 equivalent. Use Lighthouse CI in your pipeline. Avoid layout shifts from async fonts — use `font-display: swap` and `next/font`. Measure on real devices, not just DevTools throttle.
-
----
-
-## 🧹 Code Quality & Architecture
-
-> Clean, predictable code that scales with the team.
-
-### TypeScript Strict
-
-TypeScript strict mode. No `any`, no `as unknown as X`, no `@ts-ignore` without a dated comment explaining why. Prefer `type` over `interface` for data shapes. Infer Zod types with `z.infer<typeof schema>` — don't duplicate type definitions.
-
-### File Size & Colocation
-
-Max 300 lines per file. Feature folders contain: `page.tsx`, `_components/`, `_hooks/`, `_store.ts`, `schema.ts`. Shared UI in `components/ui/`. Shared logic in `lib/`. Don't reach into another feature's internals — expose a public API via the folder's `index.ts`.
-
-### Naming Conventions
-
-Components: PascalCase. Hooks: `use` prefix, camelCase. Stores: `use[Feature]Store`. tRPC routers: `[feature]Router`. Zod schemas: `[feature]Schema`. Files: `kebab-case.ts` for utilities/lib, `PascalCase.tsx` for components. Never abbreviate unless the abbreviation is universally known (`id`, `url`, `db`).
-
-### Zod v4 Validation
-
-Zod schemas are the single source of truth for data shapes. Define schemas in a co-located `schema.ts`. Use `z.infer` to derive TypeScript types — never duplicate. Validate at every boundary: tRPC input, form input, env vars (via `@t3-oss/env-nextjs`), and external API responses.
-
----
-
-## ✨ UX Patterns
-
-> Patterns that make mobile apps feel native and delightful.
-
-### Optimistic Updates
-
-Use TanStack Query's `onMutate` / `onError` / `onSettled` lifecycle for optimistic UI. Update the cache immediately on user action, rollback on error, and revalidate on settle. Show a `sonner` toast on error with a retry action. Never wait for a server round-trip before updating the UI for common actions.
-
-### Onboarding
-
-Keep onboarding to 3 steps or fewer. Always provide a 'Skip' option. Request permissions in context — explain why before the system prompt appears. Use progressive disclosure: show advanced features only after the user completes core actions.
-
-### Gestures
-
-Swipe-to-delete on list items (via `@dnd-kit` or CSS translate + threshold logic). Pull-to-refresh via TanStack Query `refetch`. Drawer dismiss via downward swipe (Vaul handles this). Long-press for contextual menus (DropdownMenu on `onPointerDown` with a timer). Never require two-handed gestures for primary actions.
-
-### Toasts & Notifications (Sonner)
-
-Use `sonner` for all transient feedback: success, error, loading, info. Position: `top-center` on mobile, `top-center` on desktop. Duration: 3s for info/success, persistent for errors until dismissed. Never stack more than 3 toasts. Use `toast.promise()` for async actions.
+**Core rule:** Preserve working code and shared component defaults. Follow the actual project, solve problems at the narrowest appropriate level, and improve mobile UX without degrading desktop behavior.

@@ -7,10 +7,12 @@
 ## 1. Isu Aktif & Gotchas
 
 ### 1.1 Mobile UI & Responsive Overflows
+
 - **Tabel Data di Layar Kecil**: Tampilan data-table pada halaman detail proyek (`/projects/[slug]`) dan Emergency Fund masih mengalami horizontal overflow pada perangkat dengan lebar layar < 360px.
-- **Warna Indikator Chart**: Perlu penyesuaian kontras warna dan kurva indikator chart kas darurat pada mode tema gelap (*dark theme*).
+- **Warna Indikator Chart**: Perlu penyesuaian kontras warna dan kurva indikator chart kas darurat pada mode tema gelap (_dark theme_).
 
 ### 1.2 iOS Safari Virtual Keyboard Zoom & Overlay Scroll
+
 - **Auto-Zoom pada Input Form**: Pada peramban iOS Safari, elemen form (`CommandInput`, `Input`, `Textarea`) yang memiliki ukuran font di bawah `16px` (`text-sm`) akan memicu zoom otomatis saat disentuh.
 - **Scroll Gestures dalam Drawer**: Interaksi scroll daftar item panjang di dalam modal Vaul Drawer memerlukan penanganan gesture khusus (`data-vaul-no-drag`) agar interaksi swipe keyboard atau daftar tidak menutup drawer secara tidak sengaja.
 
@@ -34,6 +36,6 @@
 ## 3. Rencana Fitur & Backlog Mendatang
 
 - **Galeri Foto Proyek (Project Galleries)**:
-  Pengembangan antarmuka galeri foto terpadu per proyek serta feed foto dokumentasi terkini (*recent progress gallery*) dari seluruh proyek aktif.
+  Pengembangan antarmuka galeri foto terpadu per proyek serta feed foto dokumentasi terkini (_recent progress gallery_) dari seluruh proyek aktif.
 - **Role Lenses Dashboard Remodel**:
   Implementasi spesifikasi perombakan dashboard per role lens berdasarkan `docs/dashboard-remodel-spec.md`.
