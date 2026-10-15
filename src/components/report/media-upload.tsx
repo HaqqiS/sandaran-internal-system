@@ -1,6 +1,12 @@
 "use client";
 
-import { IconLoader2, IconPlus, IconX, IconZoomIn } from "@tabler/icons-react";
+import {
+  IconLoader2,
+  IconPhoto,
+  IconUpload,
+  IconX,
+  IconZoomIn,
+} from "@tabler/icons-react";
 import Image from "next/image";
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -11,6 +17,14 @@ import { Progress } from "~/components/ui/progress";
 import { useDeleteReportMedia, useUploadReportMedia } from "~/hooks";
 import { useCloudinaryUpload } from "~/hooks/useCloudinaryUpload";
 import { cn } from "~/lib/utils";
+
+function formatFileSize(bytes?: number | null): string {
+  if (!bytes || bytes === 0) return "";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${Number.parseFloat((bytes / k ** i).toFixed(1))} ${sizes[i]}`;
+}
 
 interface MediaUploadProps {
   projectId: string;
@@ -43,7 +57,7 @@ export function MediaUpload({
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
-      if (!canEdit) return;
+      if (!canEdit || acceptedFiles.length === 0) return;
 
       setUploading(true);
       try {
@@ -66,10 +80,12 @@ export function MediaUpload({
             resourceType: result.resourceType || "image",
           });
         }
-        toast.success(`${acceptedFiles.length} gambar berhasil diunggah`);
+        toast.success(
+          `${acceptedFiles.length} foto dokumentasi berhasil diunggah`,
+        );
       } catch (error) {
         console.error("Upload failed:", error);
-        toast.error("Gagal mengunggah gambar");
+        toast.error("Gagal mengunggah foto dokumentasi");
       } finally {
         setUploading(false);
       }
@@ -83,9 +99,9 @@ export function MediaUpload({
         projectId,
         mediaId,
       });
-      toast.success("Gambar berhasil dihapus");
+      toast.success("Foto dokumentasi berhasil dihapus");
     } catch {
-      toast.error("Gagal menghapus gambar");
+      toast.error("Gagal menghapus foto");
     }
   };
 
@@ -96,82 +112,122 @@ export function MediaUpload({
   });
 
   return (
-    <div className="space-y-4">
-      {/* Existing Media Grid */}
+    <div className="space-y-3">
+      {/* Existing Media Cards Grid (@reui/attachment pattern) */}
       {existingMedia.length > 0 && (
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {existingMedia.map((media) => (
             <div
               key={media.id}
-              className="group relative aspect-square overflow-hidden rounded-lg border bg-muted"
+              className="group relative flex items-center gap-3 rounded-xl border border-border/70 bg-card p-2.5 shadow-xs transition-all hover:border-border"
             >
-              <button
-                type="button"
-                className="h-full w-full cursor-pointer border-0 bg-transparent p-0"
-                onClick={() => setLightboxImage(media.url)}
-              >
+              {/* Thumbnail Preview */}
+              <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border bg-muted/40">
                 <Image
                   src={media.url}
-                  alt="Report media"
+                  alt={media.fileName ?? "Dokumentasi"}
                   fill
-                  className="object-cover transition-transform group-hover:scale-105"
-                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                  className="object-cover"
+                  sizes="48px"
                 />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/20">
-                  <IconZoomIn className="h-6 w-6 text-white opacity-0 transition-opacity group-hover:opacity-100" />
+              </div>
+
+              {/* Information */}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xs font-medium text-foreground">
+                  {media.fileName || "Foto Dokumentasi"}
+                </p>
+                <div className="flex items-center gap-2 text-[11px] text-muted-foreground mt-0.5">
+                  {media.fileSize ? (
+                    <span>{formatFileSize(media.fileSize)}</span>
+                  ) : (
+                    <span>Tersimpan</span>
+                  )}
                 </div>
-              </button>
-              {canEdit && (
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-1 shrink-0">
                 <Button
                   type="button"
-                  variant="destructive"
+                  variant="ghost"
                   size="icon"
-                  className="absolute right-1 top-1 h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
-                  onClick={() => handleDelete(media.id)}
+                  className="min-h-11 min-w-11 sm:h-8 sm:w-8 text-muted-foreground hover:text-foreground"
+                  onClick={() => setLightboxImage(media.url)}
+                  aria-label="Perbesar foto"
                 >
-                  <IconX className="h-3 w-3" />
+                  <IconZoomIn className="h-4 w-4" />
                 </Button>
-              )}
+                {canEdit && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="min-h-11 min-w-11 sm:h-8 sm:w-8 text-destructive hover:bg-destructive/10"
+                    onClick={() => handleDelete(media.id)}
+                    aria-label="Hapus foto"
+                  >
+                    <IconX className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Upload Area */}
+      {/* Unified Dropzone Upload Area (@reui/file-upload pattern) */}
       {canEdit && (
         <div
           {...getRootProps()}
           className={cn(
-            "cursor-pointer rounded-lg border-2 border-dashed p-6 text-center transition-colors",
-            "hover:border-primary hover:bg-muted/50",
-            isDragActive && "border-primary bg-muted/50",
+            "group relative cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition-all sm:p-7",
+            "border-border/80 hover:border-primary hover:bg-muted/40",
+            isDragActive && "border-primary bg-primary/5",
             uploading && "cursor-not-allowed opacity-50",
           )}
         >
           <input {...getInputProps()} />
-          <div className="flex flex-col items-center gap-2">
-            {uploading ? (
-              <IconLoader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            ) : (
-              <IconPlus className="h-8 w-8 text-muted-foreground" />
-            )}
-            <p className="text-sm text-muted-foreground">
-              {isDragActive
-                ? "Letakkan gambar di sini"
-                : uploading
-                  ? "Mengunggah..."
-                  : "Letakkan gambar atau klik untuk unggah"}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              JPG, PNG, WebP maks. 5MB per file
-            </p>
+          <div className="flex flex-col items-center gap-2.5">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-muted transition-transform group-hover:scale-105 group-hover:bg-primary/10">
+              {uploading ? (
+                <IconLoader2 className="h-5 w-5 animate-spin text-primary" />
+              ) : isDragActive ? (
+                <IconUpload className="h-5 w-5 text-primary animate-bounce" />
+              ) : (
+                <IconPhoto className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
+              )}
+            </div>
+
+            <div className="space-y-0.5">
+              <p className="text-sm font-medium text-foreground">
+                {uploading
+                  ? "Sedang mengunggah..."
+                  : isDragActive
+                    ? "Lepaskan foto di sini"
+                    : "Seret & lepas atau ketuk untuk menambah foto"}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Kamera langsung atau galeri (JPG, PNG, WebP) maks. 5MB per
+                berkas
+              </p>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Progress */}
-      {uploading && <Progress value={progress} className="h-2" />}
+      {/* Upload Progress Bar */}
+      {uploading && (
+        <div className="space-y-1">
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>Mengunggah ke Cloudinary...</span>
+            <span>{progress}%</span>
+          </div>
+          <Progress value={progress} className="h-1.5" />
+        </div>
+      )}
 
+      {/* Lightbox Preview */}
       <MediaPreview
         url={lightboxImage}
         open={!!lightboxImage}
