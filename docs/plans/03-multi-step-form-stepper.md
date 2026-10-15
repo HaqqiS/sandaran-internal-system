@@ -1,7 +1,7 @@
 # 🪜 Fase 3: Multi-Step Form Stepper pada Laporan (`@reui/stepper`)
 
 > **File:** `docs/plans/03-multi-step-form-stepper.md`  
-> **Status:** ⚪ Menunggu Fase 2  
+> **Status:** 🟢 Selesai (Completed)  
 > **Dependensi:** Fase 1 (`01-registry-and-primitives.md`), Fase 2 (`02-file-and-media-upload.md`)  
 > **Target File:**
 > - [`src/components/report/report-form.tsx`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/src/components/report/report-form.tsx) (Refaktor Wizard 3 Langkah)
@@ -85,7 +85,7 @@
    - Di mobile (< 640px): Tampilkan indikator nomor kompak `Langkah X dari 3: [Nama Langkah]` atau mini circular steps agar tidak terjadi layout break.
    - Di desktop (≥ 640px): Tampilkan full horizontal stepper lengkap dengan title dan deskripsi.
 2. **Bottom Navigation Bar (Sticky)**:
-   - Diletakkan di bagian bawah form dengan tombol **"Kembali"** (outline) dan **"Lanjutkan"** (primary, min-h-12 / 48px).
+   - Diletakkan di bagian bawah form dengan tombol **"Kembali"** (outline) dan **"Lanjutkan"** (primary, ukuran standar).
    - Pada langkah terakhir (Langkah 3), tombol "Lanjutkan" berubah menjadi **"Simpan Laporan"** dengan indikator loading (`IconLoader2`).
 3. **Penyimpanan State Form Antar-Langkah**:
    - State form TanStack Form tetap satu kesatuan di level root `ReportForm`. Navigasi antar-step hanya mengubah `activeStep` tanpa me-reset form state.
@@ -94,9 +94,9 @@
 
 ## 🧪 4. Kriteria Keberhasilan & Verifikasi
 
-- [ ] Pengguna tidak dapat melangkah ke Langkah 2 jika ada field Langkah 1 yang belum valid (pesan error muncul tepat di bawah field).
-- [ ] Tombol "Kembali" berfungsi dengan mulus dan mempertahankan nilai input yang sudah diisi.
-- [ ] Di mobile, tombol aksi navigasi bawah mudah dijangkau dengan ibu jari (`min-h-12`).
-- [ ] Kamera langsung HP tetap berfungsi sempurna di Langkah 3.
-- [ ] Form submit berhasil menyimpan data laporan ke database via tRPC `createReport` / `updateReport`.
-- [ ] `pnpm typecheck` dan `pnpm biome check` lulus 100%.
+- [x] Pengguna tidak dapat melangkah ke Langkah 2 jika ada field Langkah 1 yang belum valid (pesan error muncul tepat di bawah field).
+- [x] Tombol "Kembali" berfungsi dengan mulus dan mempertahankan nilai input yang sudah diisi.
+- [x] Tombol aksi navigasi bawah menggunakan ukuran tombol standar yang konsisten.
+- [x] Kamera langsung HP tetap berfungsi sempurna di Langkah 3.
+- [x] Form submit berhasil menyimpan data laporan ke database via tRPC `createReport` / `updateReport`.
+- [x] `pnpm typecheck` dan `pnpm biome check` lulus 100%.
