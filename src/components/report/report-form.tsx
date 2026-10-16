@@ -338,6 +338,7 @@ export function ReportForm({
           await updateReport.mutateAsync({
             projectId,
             reportId: currentReportId,
+            reportDate: value.reportDate,
             taskDescription: value.taskDescription,
             progressPercent: value.progressPercent,
             issues: value.issues || undefined,
@@ -345,7 +346,7 @@ export function ReportForm({
             totalWorkers: value.totalWorkers,
             location: value.location || undefined,
           });
-          toast.success("Teks laporan berhasil diperbarui");
+          toast.success("Laporan berhasil diperbarui");
         } else {
           const newReport = await createReport.mutateAsync({
             projectId,
@@ -930,7 +931,7 @@ export function ReportForm({
       </Stepper>
 
       {/* Stepper indicator placed at the very bottom of the form content */}
-      <div className="border-t pt-2 pb-0">
+      <div className="border-t pt-2">
         <SimpleStepper
           currentStep={currentStep}
           onStepClick={handleStepClick}

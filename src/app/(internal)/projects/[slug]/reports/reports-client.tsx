@@ -8,15 +8,19 @@ import {
   IconLoader2,
   IconPlus,
 } from "@tabler/icons-react";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 import { PageLayout } from "~/components/layout";
 import { ReportDialog } from "~/components/report/report-dialog";
 import { ReportList } from "~/components/report/report-list";
-import type { ReportViewMode } from "~/components/report/types";
+import type { ReportItemData, ReportViewMode } from "~/components/report/types";
+import { ConfirmDeleteDialog } from "~/components/shared/confirm-delete-dialog";
 import { Button } from "~/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "~/components/ui/toggle-group";
-import { useProjectBySlug } from "~/hooks";
+import { useDeleteReport, useProjectBySlug } from "~/hooks";
 import { useSessionStore } from "~/stores/use-session-store";
 
 const VIEW_MODE_STORAGE_KEY = "sandaran_reports_view_mode";
@@ -27,7 +31,14 @@ interface ReportsClientProps {
 
 export function ReportsClient({ projectSlug }: ReportsClientProps) {
   const { data: project, isLoading, error } = useProjectBySlug(projectSlug);
+  const deleteReport = useDeleteReport();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [editingReport, setEditingReport] = useState<ReportItemData | null>(
+    null,
+  );
+  const [deletingReport, setDeletingReport] = useState<ReportItemData | null>(
+    null,
+  );
   const [viewMode, setViewMode] = useState<ReportViewMode>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
@@ -42,15 +53,40 @@ export function ReportsClient({ projectSlug }: ReportsClientProps) {
     localStorage.setItem(VIEW_MODE_STORAGE_KEY, mode);
   };
 
-  // Check if user can create reports (SUPERVISOR or ARCHITECT, or ADMIN)
+  // Check permissions
+  // Note: EXECUTIVE has read-only access to project mutations per server permission rules
   const userRole = session?.user?.roleGlobal as GlobalRole | undefined;
-  const isAdmin = userRole === "ADMIN" || userRole === "EXECUTIVE";
+  const isGlobalAdmin = userRole === "ADMIN";
   const projectMember = project?.members.find(
     (m) => m.userId === session?.user?.id,
   );
   const memberRole = projectMember?.role as ProjectRole | undefined;
-  const canCreate =
-    isAdmin || memberRole === "SUPERVISOR" || memberRole === "ARCHITECT";
+  const isCreatorMember =
+    memberRole === "SUPERVISOR" || memberRole === "ARCHITECT";
+  const canCreate = isGlobalAdmin || isCreatorMember;
+
+  const canManageReport = (report: ReportItemData) => {
+    if (isGlobalAdmin) return true;
+    const currentUserId = session?.user?.id;
+    if (!currentUserId || !isCreatorMember) return false;
+    return report.userId === currentUserId || report.user.id === currentUserId;
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingReport || !project) return;
+    try {
+      await deleteReport.mutateAsync({
+        projectId: project.id,
+        reportId: deletingReport.id,
+      });
+      toast.success("Laporan beserta foto terkait berhasil dihapus");
+      setDeletingReport(null);
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Gagal menghapus laporan",
+      );
+    }
+  };
 
   if (isLoading) {
     return (
@@ -127,14 +163,61 @@ export function ReportsClient({ projectSlug }: ReportsClientProps) {
           viewMode={viewMode}
           canCreate={canCreate}
           onCreateClick={() => setIsCreateOpen(true)}
+          canManageReport={canManageReport}
+          onEditReport={(report) => setEditingReport(report)}
+          onDeleteReport={(report) => setDeletingReport(report)}
         />
       </div>
 
+      {/* Create Report Dialog */}
       <ReportDialog
         projectId={project.id}
         projectSlug={projectSlug}
         open={isCreateOpen}
         onOpenChange={setIsCreateOpen}
+      />
+
+      {/* Edit Report Dialog */}
+      <ReportDialog
+        projectId={project.id}
+        projectSlug={projectSlug}
+        report={editingReport ?? undefined}
+        open={Boolean(editingReport)}
+        onOpenChange={(open) => {
+          if (!open) setEditingReport(null);
+        }}
+      />
+
+      {/* Delete Report Confirmation Dialog */}
+      <ConfirmDeleteDialog
+        open={Boolean(deletingReport)}
+        onOpenChange={(open) => {
+          if (!open) setDeletingReport(null);
+        }}
+        title="Hapus Laporan Harian"
+        description={
+          deletingReport ? (
+            <>
+              Apakah Anda yakin ingin menghapus laporan tanggal{" "}
+              <span className="font-semibold text-foreground">
+                {format(new Date(deletingReport.reportDate), "dd MMMM yyyy", {
+                  locale: id,
+                })}
+              </span>{" "}
+              oleh{" "}
+              <span className="font-semibold text-foreground">
+                {deletingReport.user.name}
+              </span>
+              {deletingReport.media.length > 0
+                ? ` beserta ${deletingReport.media.length} foto dokumentasi terkait`
+                : ""}
+              ? Tindakan ini tidak dapat dibatalkan.
+            </>
+          ) : undefined
+        }
+        onConfirm={handleConfirmDelete}
+        isPending={deleteReport.isPending}
+        showIcon
       />
     </PageLayout>
   );

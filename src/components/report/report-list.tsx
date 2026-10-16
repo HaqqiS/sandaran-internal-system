@@ -6,7 +6,7 @@ import { ItemGroup } from "~/components/ui/item";
 import { useReportsByProject } from "~/hooks";
 import { ReportCard } from "./report-card";
 import { ReportListItem } from "./report-list-item";
-import type { ReportViewMode } from "./types";
+import type { ReportItemData, ReportViewMode } from "./types";
 
 interface ReportListProps {
   projectId: string;
@@ -14,6 +14,9 @@ interface ReportListProps {
   viewMode?: ReportViewMode;
   onCreateClick?: () => void;
   canCreate?: boolean;
+  canManageReport?: (report: ReportItemData) => boolean;
+  onEditReport?: (report: ReportItemData) => void;
+  onDeleteReport?: (report: ReportItemData) => void;
 }
 
 export function ReportList({
@@ -22,6 +25,9 @@ export function ReportList({
   viewMode = "grid",
   onCreateClick,
   canCreate = false,
+  canManageReport,
+  onEditReport,
+  onDeleteReport,
 }: ReportListProps) {
   const { data, isLoading, error } = useReportsByProject(projectId);
 
@@ -61,23 +67,33 @@ export function ReportList({
     <div className="space-y-4">
       {viewMode === "list" ? (
         <ItemGroup className="gap-2.5">
-          {reports.map((report) => (
-            <ReportListItem
-              key={report.id}
-              report={report}
-              projectSlug={projectSlug}
-            />
-          ))}
+          {reports.map((report) => {
+            const canManage = canManageReport ? canManageReport(report) : false;
+            return (
+              <ReportListItem
+                key={report.id}
+                report={report}
+                projectSlug={projectSlug}
+                onEdit={canManage ? onEditReport : undefined}
+                onDelete={canManage ? onDeleteReport : undefined}
+              />
+            );
+          })}
         </ItemGroup>
       ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {reports.map((report) => (
-            <ReportCard
-              key={report.id}
-              report={report}
-              projectSlug={projectSlug}
-            />
-          ))}
+          {reports.map((report) => {
+            const canManage = canManageReport ? canManageReport(report) : false;
+            return (
+              <ReportCard
+                key={report.id}
+                report={report}
+                projectSlug={projectSlug}
+                onEdit={canManage ? onEditReport : undefined}
+                onDelete={canManage ? onDeleteReport : undefined}
+              />
+            );
+          })}
         </div>
       )}
 

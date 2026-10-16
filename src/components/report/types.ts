@@ -11,6 +11,7 @@ export interface ReportTaskItemData {
 export interface ReportItemData {
   id: string;
   slug: string;
+  userId?: string;
   reportDate: Date | string;
   taskDescription: string;
   progressPercent: number;
@@ -18,7 +19,7 @@ export interface ReportItemData {
   location?: string | null;
   issues?: string | null;
   totalWorkers: number;
-  user: { name: string; image?: string | null };
+  user: { id?: string; name: string; image?: string | null };
   media: Array<{
     id: string;
     url: string;
@@ -33,9 +34,13 @@ export interface ReportItemData {
 export interface ReportCardProps {
   report: ReportItemData;
   projectSlug: string;
+  onEdit?: (report: ReportItemData) => void;
+  onDelete?: (report: ReportItemData) => void;
 }
 
 export interface ReportListItemProps {
   report: ReportItemData;
   projectSlug: string;
+  onEdit?: (report: ReportItemData) => void;
+  onDelete?: (report: ReportItemData) => void;
 }

@@ -314,6 +314,7 @@ export const reportRouter = createTRPCRouter({
       z.object({
         projectId: z.string(),
         reportId: z.string(),
+        reportDate: z.date().optional(),
         taskDescription: z.string().min(1).optional(),
         progressPercent: z.number().min(0).max(100).optional(),
         weather: z.string().optional(),
@@ -341,6 +342,7 @@ export const reportRouter = createTRPCRouter({
       const updated = await ctx.db.dailyReport.update({
         where: { id: input.reportId },
         data: {
+          reportDate: input.reportDate,
           taskDescription: input.taskDescription,
           progressPercent: input.progressPercent,
           weather: input.weather,
@@ -376,13 +378,23 @@ export const reportRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      // Get report to check ownership
+      // Get report with media to check ownership and clean up Cloudinary assets
       const report = await ctx.db.dailyReport.findFirst({
         where: {
           id: input.reportId,
           projectId: ctx.projectId,
         },
+        include: {
+          media: true,
+        },
       });
+
+      if (!report) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Report not found",
+        });
+      }
 
       // Check ownership (ADMIN bypasses this)
       requireOwnership(
@@ -390,6 +402,24 @@ export const reportRouter = createTRPCRouter({
         ctx.session.user.id,
         ctx.session.user.roleGlobal,
       );
+
+      // Delete all associated media assets from Cloudinary first
+      if (report.media.length > 0) {
+        await Promise.allSettled(
+          report.media
+            .filter((media) => Boolean(media.publicId))
+            .map((media) =>
+              deleteCloudinaryAsset(media.publicId, {
+                resourceType: media.resourceType ?? "image",
+              }).catch((err) => {
+                console.error(
+                  `Failed to delete Cloudinary asset (${media.publicId}):`,
+                  err,
+                );
+              }),
+            ),
+        );
+      }
 
       await ctx.db.dailyReport.delete({
         where: { id: input.reportId },

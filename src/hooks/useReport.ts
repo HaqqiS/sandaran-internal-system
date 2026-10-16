@@ -77,6 +77,10 @@ export function useDeleteReport() {
   const utils = api.useUtils();
   return api.report.delete.useMutation({
     onSuccess: (_data, variables) => {
+      void utils.report.getById.invalidate({
+        projectId: variables.projectId,
+        reportId: variables.reportId,
+      });
       void utils.report.getByProject.invalidate({
         projectId: variables.projectId,
       });

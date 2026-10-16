@@ -45,7 +45,7 @@ export function ReportDialog({
   const formRef = useRef<ReportFormHandle>(null);
 
   const handleOpenChange = (isOpen: boolean) => {
-    if (!isOpen && formRef.current) {
+    if (!isOpen && !isEditMode && formRef.current) {
       setDraft(formRef.current.getValues());
     }
     if (!isOpen) {
@@ -55,7 +55,9 @@ export function ReportDialog({
   };
 
   const handleSuccess = () => {
-    setDraft({});
+    if (!isEditMode) {
+      setDraft({});
+    }
     setActiveStep(1);
     onOpenChange(false);
   };
@@ -142,12 +144,13 @@ export function ReportDialog({
       isPending={isPending}
     >
       <ReportForm
+        key={report?.id ?? "create"}
         id="report-form"
         ref={formRef}
         projectId={projectId}
         projectSlug={projectSlug || "project"}
         report={report}
-        draftValues={draft}
+        draftValues={isEditMode ? undefined : draft}
         activeStep={activeStep}
         onStepChange={setActiveStep}
         onPendingChange={setIsPending}

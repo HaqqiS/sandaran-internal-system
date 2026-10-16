@@ -7,7 +7,9 @@ import {
   IconListCheck,
   IconMapPin,
   IconMessageCircle,
+  IconPencil,
   IconPhoto,
+  IconTrash,
   IconUsers,
 } from "@tabler/icons-react";
 import { format } from "date-fns";
@@ -16,6 +18,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import {
   Item,
   ItemActions,
@@ -26,7 +29,12 @@ import { Progress } from "~/components/ui/progress";
 import { getWeatherIcon } from "./report-card";
 import type { ReportListItemProps } from "./types";
 
-export function ReportListItem({ report, projectSlug }: ReportListItemProps) {
+export function ReportListItem({
+  report,
+  projectSlug,
+  onEdit,
+  onDelete,
+}: ReportListItemProps) {
   const reportDate = new Date(report.reportDate);
   const initials = report.user.name
     .split(" ")
@@ -180,9 +188,9 @@ export function ReportListItem({ report, projectSlug }: ReportListItemProps) {
           </div>
         </ItemContent>
 
-        {/* Zone 3: Operational Metrics Grid + Progress Bar + Action */}
-        <ItemActions className="shrink-0 self-center gap-3 sm:gap-4">
-          {/* Operational Stats Grid (Visible on md+) */}
+        {/* Zone 3: Operational Metrics Grid + Progress Bar + Actions */}
+        <ItemActions className="shrink-0 self-center gap-2 sm:gap-3.5">
+          {/* Operational Stats Grid (Visible on lg+) */}
           <div className="hidden grid-cols-2 gap-x-4 gap-y-1.5 border-l border-border/60 pl-4 text-xs text-muted-foreground lg:grid">
             <div className="flex items-center gap-1.5">
               <IconUsers className="size-3.5 shrink-0 text-muted-foreground/80" />
@@ -232,6 +240,46 @@ export function ReportListItem({ report, projectSlug }: ReportListItemProps) {
               className="hidden h-1.5 w-full sm:block"
             />
           </div>
+
+          {/* Direct Edit & Delete Action Buttons */}
+          {(onEdit || onDelete) && (
+            <div className="flex items-center gap-1 sm:border-l sm:border-border/60 sm:pl-2">
+              {onEdit && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 rounded-lg text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onEdit(report);
+                  }}
+                  aria-label="Edit laporan"
+                  title="Edit laporan"
+                >
+                  <IconPencil className="size-4" />
+                </Button>
+              )}
+              {onDelete && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onDelete(report);
+                  }}
+                  aria-label="Hapus laporan"
+                  title="Hapus laporan"
+                >
+                  <IconTrash className="size-4" />
+                </Button>
+              )}
+            </div>
+          )}
 
           {/* Trailing Arrow */}
           <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted/50 text-muted-foreground transition-colors group-hover/item:bg-primary/10 group-hover/item:text-primary">

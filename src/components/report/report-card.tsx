@@ -5,8 +5,10 @@ import {
   IconCloud,
   IconCloudRain,
   IconMessageCircle,
+  IconPencil,
   IconPhoto,
   IconSun,
+  IconTrash,
   IconUsers,
 } from "@tabler/icons-react";
 import { format } from "date-fns";
@@ -14,6 +16,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
+import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Progress } from "~/components/ui/progress";
 import type { ReportCardProps } from "./types";
@@ -34,7 +37,12 @@ export function getWeatherIcon(weather?: string | null) {
   );
 }
 
-export function ReportCard({ report, projectSlug }: ReportCardProps) {
+export function ReportCard({
+  report,
+  projectSlug,
+  onEdit,
+  onDelete,
+}: ReportCardProps) {
   const reportDate = new Date(report.reportDate);
   const initials = report.user.name
     .split(" ")
@@ -94,8 +102,8 @@ export function ReportCard({ report, projectSlug }: ReportCardProps) {
       <Card className="relative z-10 -mt-6 flex w-full flex-col shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:border-primary/20 group-hover:shadow-lg sm:-mt-8">
         <CardHeader className="pb-2">
           <div className="flex items-start justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <Avatar className="h-8 w-8 border">
+            <div className="flex min-w-0 flex-1 items-center gap-2">
+              <Avatar className="h-8 w-8 shrink-0 border">
                 <AvatarImage src={report.user.image ?? undefined} />
                 <AvatarFallback className="text-xs">{initials}</AvatarFallback>
               </Avatar>
@@ -111,6 +119,45 @@ export function ReportCard({ report, projectSlug }: ReportCardProps) {
                 </div>
               </div>
             </div>
+
+            {(onEdit || onDelete) && (
+              <div className="flex shrink-0 items-center gap-1">
+                {onEdit && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="size-7 rounded-md text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onEdit(report);
+                    }}
+                    aria-label="Edit laporan"
+                    title="Edit laporan"
+                  >
+                    <IconPencil className="size-3.5" />
+                  </Button>
+                )}
+                {onDelete && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="size-7 rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      onDelete(report);
+                    }}
+                    aria-label="Hapus laporan"
+                    title="Hapus laporan"
+                  >
+                    <IconTrash className="size-3.5" />
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         </CardHeader>
         <CardContent className="space-y-3 pb-3">
