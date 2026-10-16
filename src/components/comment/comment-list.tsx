@@ -2,6 +2,12 @@
 
 import { IconMessageCircle } from "@tabler/icons-react";
 import { useEffect, useMemo, useRef } from "react";
+import {
+  Message,
+  MessageAvatar,
+  MessageContent,
+  MessageGroup,
+} from "~/components/ui/message";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Skeleton } from "~/components/ui/skeleton";
 import { api } from "~/trpc/react";
@@ -51,37 +57,46 @@ export function CommentList({ projectId, reportId }: CommentListProps) {
 
       {/* Comment Body / ScrollArea */}
       {isLoading ? (
-        <div className="h-[280px] sm:h-[320px] space-y-4 py-2 pr-3">
+        <MessageGroup className="h-[280px] sm:h-[320px] gap-4 py-2 pr-3">
           {/* Bubble Skeleton 1: Left */}
-          <div className="flex items-end gap-2.5">
-            <Skeleton className="h-8 w-8 rounded-full shrink-0" />
-            <div className="space-y-1.5 w-2/3">
+          <Message align="start" className="items-end gap-2.5">
+            <MessageAvatar className="size-8 bg-transparent">
+              <Skeleton className="size-8 rounded-full shrink-0" />
+            </MessageAvatar>
+            <MessageContent className="w-2/3 max-w-[75%] gap-1.5 items-start">
               <Skeleton className="h-3 w-28" />
               <Skeleton className="h-14 w-full rounded-2xl rounded-bl-xs" />
-            </div>
-          </div>
+              <Skeleton className="h-2.5 w-24" />
+            </MessageContent>
+          </Message>
 
           {/* Bubble Skeleton 2: Right */}
-          <div className="flex items-end justify-end gap-2.5">
-            <div className="space-y-1.5 w-1/2 flex flex-col items-end">
-              <Skeleton className="h-3 w-20" />
+          <Message align="end" className="items-end gap-2.5">
+            <MessageAvatar className="size-8 bg-transparent">
+              <Skeleton className="size-8 rounded-full shrink-0" />
+            </MessageAvatar>
+            <MessageContent className="w-1/2 max-w-[75%] gap-1.5 items-end">
+              <Skeleton className="h-3 w-16" />
               <Skeleton className="h-10 w-full rounded-2xl rounded-br-xs" />
-            </div>
-            <Skeleton className="h-8 w-8 rounded-full shrink-0" />
-          </div>
+              <Skeleton className="h-2.5 w-20" />
+            </MessageContent>
+          </Message>
 
           {/* Bubble Skeleton 3: Left */}
-          <div className="flex items-end gap-2.5">
-            <Skeleton className="h-8 w-8 rounded-full shrink-0" />
-            <div className="space-y-1.5 w-3/5">
+          <Message align="start" className="items-end gap-2.5">
+            <MessageAvatar className="size-8 bg-transparent">
+              <Skeleton className="size-8 rounded-full shrink-0" />
+            </MessageAvatar>
+            <MessageContent className="w-3/5 max-w-[75%] gap-1.5 items-start">
               <Skeleton className="h-3 w-32" />
               <Skeleton className="h-12 w-full rounded-2xl rounded-bl-xs" />
-            </div>
-          </div>
-        </div>
+              <Skeleton className="h-2.5 w-24" />
+            </MessageContent>
+          </Message>
+        </MessageGroup>
       ) : (
         <ScrollArea className="h-[280px] sm:h-[320px] pr-3">
-          <div className="space-y-4 py-2">
+          <MessageGroup className="gap-4 py-2">
             {orderedComments.map((comment) => (
               <CommentItem
                 key={comment.id}
@@ -106,7 +121,7 @@ export function CommentList({ projectId, reportId }: CommentListProps) {
             )}
 
             <div ref={bottomRef} />
-          </div>
+          </MessageGroup>
         </ScrollArea>
       )}
 

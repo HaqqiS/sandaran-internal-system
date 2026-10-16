@@ -81,7 +81,11 @@ export function CommentForm({
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
+                  const isSubmitShortcut =
+                    e.key === "Enter" &&
+                    (!e.shiftKey || e.ctrlKey || e.metaKey);
+
+                  if (isSubmitShortcut) {
                     e.preventDefault();
                     if (
                       field.state.value.trim().length > 0 &&
@@ -107,7 +111,7 @@ export function CommentForm({
                     <Button
                       type="submit"
                       size="icon"
-                      className="h-10 w-10 shrink-0 rounded-xl transition-all active:scale-95"
+                      className="size-11 sm:size-10 shrink-0 rounded-xl transition-all active:scale-95"
                       disabled={isDisabled}
                       aria-label="Kirim komentar"
                     >

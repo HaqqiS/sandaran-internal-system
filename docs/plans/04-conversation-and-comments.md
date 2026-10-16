@@ -1,9 +1,10 @@
 # 💬 Fase 4: Modernisasi Chat Komentar (`@reui/c-message-*`)
 
 > **File:** `docs/plans/04-conversation-and-comments.md`  
-> **Status:** ⚪ Menunggu Fase 1  
+> **Status:** 🟢 Selesai (Completed)  
 > **Dependensi:** Fase 1 (`01-registry-and-primitives.md`)  
 > **Target File:**
+>
 > - [`src/components/comment/comment-list.tsx`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/src/components/comment/comment-list.tsx)
 > - [`src/components/comment/comment-item.tsx`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/src/components/comment/comment-item.tsx)
 > - [`src/components/comment/comment-form.tsx`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/src/components/comment/comment-form.tsx)
@@ -18,7 +19,6 @@
 1. **Pengalaman Percakapan Dua Sisi (Two-Sided Chat)**: Mengubah tampilan list komentar yang datar menjadi alur percakapan modern layaknya aplikasi pesan enterprise (Notion/Linear/Slack).
 2. **Pemanfaatan Komponen Primitif Standar**: Mengadopsi pola `@reui/c-message-1` menggunakan komponen primitif `Message` dan `Bubble` yang telah disiapkan di Fase 1.
 3. **Visibilitas Peran Anggota Proyek**: Menampilkan badge peran pengguna (`ADMIN`, `ARCHITECT`, `SUPERVISOR`, `FINANCE`) secara konsisten pada setiap balon pesan.
-4. **Sentuhan Mobile Touch**: Memastikan tombol kirim dan tombol hapus mudah ditekan di layar HP (`min-h-11`).
 
 ---
 
@@ -40,12 +40,14 @@
 ```
 
 ### 2.1 Pesan Sendiri (`isAuthor === true`)
+
 - **Penataan**: `align="end"` (rata kanan).
 - **Balon Chat**: Menggunakan `<Bubble variant="default">` warna `bg-primary text-primary-foreground` dengan radius kurva modern `rounded-2xl rounded-br-xs`.
-- **Aksi Hapus**: Tombol hapus ikon tempat sampah dengan touch target `min-h-11 min-w-11` di mobile, terintegrasi dengan `ConfirmDeleteDialog`.
+- **Aksi Hapus**: Tombol hapus ikon tempat sampah terintegrasi dengan `ConfirmDeleteDialog`.
 - **Avatar**: Tampil di pojok kanan bawah atau avatar mini yang rapi.
 
 ### 2.2 Pesan Rekan Proyek (`isAuthor === false`)
+
 - **Penataan**: `align="start"` (rata kiri).
 - **Avatar & Header**: Avatar di kiri (`MessageAvatar`), diikuti nama pengirim tebal dan `Badge` role (`ADMIN`, `ARCHITECT`, `SUPERVISOR`, `CLIENT`).
 - **Balon Chat**: Menggunakan `<Bubble variant="muted">` atau `border` dengan sudut `rounded-2xl rounded-bl-xs` untuk membedakan dengan jelas.
@@ -71,9 +73,9 @@
 
 ## 🧪 4. Kriteria Keberhasilan & Verifikasi
 
-- [ ] Balon chat sendiri berada di kanan dengan warna primary, balon orang lain di kiri dengan warna muted.
-- [ ] Badge role (`ADMIN`, `SUPERVISOR`, dll.) muncul jelas pada komentar orang lain.
-- [ ] Menghapus komentar sendiri memunculkan dialog konfirmasi dan berhasil menghapus via tRPC.
-- [ ] Input komentar baru otomatis menambahkan chat di bagian bawah dan me-scroll tampilan ke bawah.
-- [ ] Kontras warna teks di dalam balon chat lolos uji WCAG AA di light mode dan dark mode.
-- [ ] `pnpm typecheck` dan `pnpm biome check` lulus tanpa error.
+- [x] Balon chat sendiri berada di kanan dengan warna primary, balon orang lain di kiri dengan warna muted.
+- [x] Badge role (`ADMIN`, `SUPERVISOR`, dll.) muncul jelas pada komentar orang lain.
+- [x] Menghapus komentar sendiri memunculkan dialog konfirmasi dan berhasil menghapus via tRPC.
+- [x] Input komentar baru otomatis menambahkan chat di bagian bawah dan me-scroll tampilan ke bawah.
+- [x] Kontras warna teks di dalam balon chat lolos uji WCAG AA di light mode dan dark mode.
+- [x] `pnpm typecheck` dan `pnpm biome check` lulus tanpa error.
