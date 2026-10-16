@@ -1,7 +1,7 @@
 # 🔀 Fase 5: Pemolesan ReportCard & Dual-View Grid/List (`@reui/item`)
 
 > **File:** `docs/plans/05-report-card-and-dual-view.md`  
-> **Status:** ⚪ Menunggu Fase 1  
+> **Status:** 🟢 Selesai (Completed)  
 > **Dependensi:** Fase 1 (`01-registry-and-primitives.md`)  
 > **Target File:**
 > - [`src/components/report/types.ts`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/src/components/report/types.ts) (File Baru: Definisi Type Bersama)
@@ -48,7 +48,7 @@ Dibangun menggunakan primitif [`src/components/ui/item.tsx`](file:///d:/Haqqi%20
 >
   <Link href={`/projects/${projectSlug}/reports/${report.slug}`}>
     {/* Leading: Thumbnail mini + Avatar */}
-    <ItemLeading className="gap-3">
+    <ItemMedia className="gap-3">
       <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border bg-muted/30">
         {report.media[0] ? (
           <Image src={report.media[0].url} alt="" fill className="object-cover" />
@@ -65,7 +65,7 @@ Dibangun menggunakan primitif [`src/components/ui/item.tsx`](file:///d:/Haqqi%20
         <AvatarImage src={report.user.image ?? undefined} />
         <AvatarFallback className="text-[10px]">{initials}</AvatarFallback>
       </Avatar>
-    </ItemLeading>
+    </ItemMedia>
 
     {/* Content: Info & Deskripsi Laporan */}
     <ItemContent className="min-w-0 flex-1">
@@ -90,12 +90,12 @@ Dibangun menggunakan primitif [`src/components/ui/item.tsx`](file:///d:/Haqqi%20
     </ItemContent>
 
     {/* Trailing: Progress Pill & Chevron */}
-    <ItemTrailing className="gap-3 shrink-0">
+    <ItemActions className="gap-3 shrink-0">
       <Badge className={cn("text-xs font-semibold px-2 py-0.5", getProgressColor(report.progressPercent))}>
         {report.progressPercent}%
       </Badge>
       <IconChevronRight className="h-5 w-5 text-muted-foreground" />
-    </ItemTrailing>
+    </ItemActions>
   </Link>
 </Item>
 ```
@@ -142,9 +142,9 @@ Toolbar menampilkan switcher:
 
 ## 🧪 5. Kriteria Keberhasilan & Verifikasi
 
-- [ ] Seluruh blok dead code yang di-comment out (baris 70–128) di `report-card.tsx` telah dihapus.
-- [ ] Badge `📸 N Foto` muncul di pojok kiri atas foto cover jika laporan memiliki foto dokumentasi.
-- [ ] Toggle mode Grid/List berfungsi seketika tanpa reload halaman.
-- [ ] Preferensi view mode tersimpan di `localStorage` dan tetap aktif setelah browser di-refresh.
-- [ ] Mode list (`report-list-item.tsx`) memiliki touch target minimal 44px dan mudah di-tap di mobile.
-- [ ] `pnpm typecheck` dan `pnpm biome check` lulus 100%.
+- [x] Seluruh blok dead code yang di-comment out (baris 70–128) di `report-card.tsx` telah dihapus.
+- [x] Badge `📸 N Foto` muncul di pojok kiri atas foto cover jika laporan memiliki foto dokumentasi.
+- [x] Toggle mode Grid/List berfungsi seketika tanpa reload halaman.
+- [x] Preferensi view mode tersimpan di `localStorage` dan tetap aktif setelah browser di-refresh.
+- [x] Mode list (`report-list-item.tsx`) memiliki touch target minimal 44px dan mudah di-tap di mobile.
+- [x] `pnpm typecheck` dan `pnpm biome check` lulus 100%.

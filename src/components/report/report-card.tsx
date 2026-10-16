@@ -16,31 +16,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import { Progress } from "~/components/ui/progress";
+import type { ReportCardProps } from "./types";
 
-interface ReportCardProps {
-  report: {
-    id: string;
-    slug: string;
-    reportDate: Date | string;
-    taskDescription: string;
-    progressPercent: number;
-    weather?: string | null;
-    totalWorkers: number;
-    user: { name: string; image?: string | null };
-    media: {
-      url: string;
-      id: string;
-      createdAt: Date;
-      publicId: string;
-      reportId: string;
-    }[];
-    tasks: unknown[];
-    _count?: { comments: number };
-  };
-  projectSlug: string;
-}
-
-function getWeatherIcon(weather?: string | null) {
+export function getWeatherIcon(weather?: string | null) {
   if (!weather) return null;
   const lower = weather.toLowerCase();
   if (lower.includes("hujan"))
@@ -67,66 +45,6 @@ export function ReportCard({ report, projectSlug }: ReportCardProps) {
 
   const url = `/projects/${projectSlug}/reports/${report.slug}`;
 
-  // return (
-  //   <Link href={`/projects/${projectSlug}/reports/${report.slug}`}>
-  //     <Card className="transition-colors hover:bg-muted/50">
-  //       <CardHeader className="pb-2">
-  //         <div className="flex items-start justify-between gap-2">
-  //           <div className="flex items-center gap-2">
-  //             <Avatar className="h-8 w-8">
-  //               <AvatarImage src={report.user.image ?? undefined} />
-  //               <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-  //             </Avatar>
-  //             <div>
-  //               <p className="text-sm font-medium">{report.user.name}</p>
-  //               <div className="flex items-center gap-1 text-xs text-muted-foreground">
-  //                 <IconCalendar className="h-3 w-3" />
-  //                 {format(reportDate, "dd MMM yyyy")}
-  //               </div>
-  //             </div>
-  //           </div>
-  //           {report.weather && (
-  //             <Badge variant="outline" className="flex items-center gap-1">
-  //               {getWeatherIcon(report.weather)}
-  //               {report.weather}
-  //             </Badge>
-  //           )}
-  //         </div>
-  //       </CardHeader>
-  //       <CardContent className="space-y-3">
-  //         <p className="line-clamp-2 text-sm text-muted-foreground">
-  //           {report.taskDescription}
-  //         </p>
-
-  //         {/* Progress */}
-  //         <div className="space-y-1">
-  //           <div className="flex items-center justify-between text-xs">
-  //             <span className="text-muted-foreground">Progress</span>
-  //             <span className="font-medium">{report.progressPercent}%</span>
-  //           </div>
-  //           <Progress value={report.progressPercent} className="h-2" />
-  //         </div>
-
-  //         {/* Stats */}
-  //         <div className="flex items-center gap-4 text-xs text-muted-foreground">
-  //           <div className="flex items-center gap-1">
-  //             <IconUsers className="h-3.5 w-3.5" />
-  //             <span>{report.totalWorkers} workers</span>
-  //           </div>
-  //           <div className="flex items-center gap-1">
-  //             <IconPhoto className="h-3.5 w-3.5" />
-  //             <span>{report.media.length}</span>
-  //           </div>
-  //           <div className="flex items-center gap-1">
-  //             <IconMessageCircle className="h-3.5 w-3.5" />
-  //             <span>{report._count?.comments ?? 0}</span>
-  //           </div>
-  //         </div>
-  //       </CardContent>
-  //     </Card>
-  //   </Link>
-  // );
-
   return (
     <Link
       href={url}
@@ -148,9 +66,19 @@ export function ReportCard({ report, projectSlug }: ReportCardProps) {
           </div>
         )}
 
+        {/* Photo Count Badge Overlay */}
+        {report.media.length > 0 && (
+          <div className="absolute top-3 left-3 z-10">
+            <div className="flex items-center gap-1.5 rounded-full border border-white/20 bg-black/60 px-2.5 py-1 text-xs font-medium text-white shadow-sm backdrop-blur-md transition-transform group-hover:scale-105">
+              <IconPhoto className="h-3.5 w-3.5 shrink-0" />
+              <span>{report.media.length} Foto</span>
+            </div>
+          </div>
+        )}
+
         {/* Weather Badge */}
         {report.weather && (
-          <div className="absolute right-3 top-3">
+          <div className="absolute top-3 right-3 z-10">
             <Badge
               variant="outline"
               className="flex items-center gap-1.5 bg-background/80 text-foreground border-border/50 shadow-xs backdrop-blur-md px-2.5 py-1 text-xs font-medium"

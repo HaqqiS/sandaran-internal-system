@@ -2,12 +2,16 @@
 
 import { IconLoader2, IconPlus } from "@tabler/icons-react";
 import { Button } from "~/components/ui/button";
+import { ItemGroup } from "~/components/ui/item";
 import { useReportsByProject } from "~/hooks";
 import { ReportCard } from "./report-card";
+import { ReportListItem } from "./report-list-item";
+import type { ReportViewMode } from "./types";
 
 interface ReportListProps {
   projectId: string;
   projectSlug: string;
+  viewMode?: ReportViewMode;
   onCreateClick?: () => void;
   canCreate?: boolean;
 }
@@ -15,6 +19,7 @@ interface ReportListProps {
 export function ReportList({
   projectId,
   projectSlug,
+  viewMode = "grid",
   onCreateClick,
   canCreate = false,
 }: ReportListProps) {
@@ -54,16 +59,27 @@ export function ReportList({
 
   return (
     <div className="space-y-4">
-      {/* Reports Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {reports.map((report) => (
-          <ReportCard
-            key={report.id}
-            report={report}
-            projectSlug={projectSlug}
-          />
-        ))}
-      </div>
+      {viewMode === "list" ? (
+        <ItemGroup className="gap-2.5">
+          {reports.map((report) => (
+            <ReportListItem
+              key={report.id}
+              report={report}
+              projectSlug={projectSlug}
+            />
+          ))}
+        </ItemGroup>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {reports.map((report) => (
+            <ReportCard
+              key={report.id}
+              report={report}
+              projectSlug={projectSlug}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Load More */}
       {data?.nextCursor && (
