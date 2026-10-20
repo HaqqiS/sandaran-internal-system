@@ -15,7 +15,12 @@ export function UsersTable({ data }: UsersTableProps) {
       columns={columns}
       data={data}
       filterColumn="name"
-      filterPlaceholder="Search users by name or email..."
+      filterPlaceholder="Cari pengguna berdasarkan nama..."
+      initialColumnPinning={{
+        left: ["select", "name"],
+        right: ["actions"],
+      }}
+      exportFilename="daftar-pengguna"
     />
   );
 }

@@ -373,6 +373,32 @@ export function UsersClient() {
                 data={users}
                 filterColumn="name"
                 filterPlaceholder="Cari pengguna berdasarkan nama..."
+                initialColumnPinning={{
+                  left: ["select", "name"],
+                  right: ["actions"],
+                }}
+                exportFilename="daftar-pengguna"
+                csvColumns={[
+                  { header: "Nama", accessor: (u) => u.name },
+                  {
+                    header: "Email",
+                    accessor: (u) =>
+                      u.email.endsWith("@sandaran.internal") ? "-" : u.email,
+                  },
+                  {
+                    header: "No. HP",
+                    accessor: (u) => u.phoneNumber ?? "-",
+                  },
+                  { header: "Role Global", accessor: (u) => u.roleGlobal },
+                  {
+                    header: "Status",
+                    accessor: (u) => getUserStatus(u.isActive, u.reviewedAt),
+                  },
+                  {
+                    header: "Jumlah Proyek",
+                    accessor: (u) => u._count.projectMembers,
+                  },
+                ]}
                 state={{ rowSelection }}
                 onRowSelectionChange={setRowSelection}
               />

@@ -177,7 +177,7 @@ export function getUserColumnsWithActions({
       // Show approve/reject buttons for pending users
       if (status === "pending") {
         return (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center gap-2">
             <Button
               size="sm"
               variant="default"
@@ -198,34 +198,41 @@ export function getUserColumnsWithActions({
 
       // Show dropdown menu for approved/rejected users
       return (
-        <DropdownMenu modal={false}>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm">
-              <IconDots className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() => onEditUser?.(user)}
-              className="cursor-pointer"
-            >
-              Edit Pengguna
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => onDelete?.(user)}
-              className="text-destructive cursor-pointer"
-              disabled={user.isActive}
-            >
-              Hapus Pengguna
-              {user.isActive && (
-                <span className="ml-2 text-xs text-muted-foreground">
-                  (Hanya nonaktif)
-                </span>
-              )}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center justify-center">
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="size-8"
+                aria-label={`Menu aksi ${user.name}`}
+              >
+                <IconDots className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52 min-w-48">
+              <DropdownMenuItem
+                onClick={() => onEditUser?.(user)}
+                className="cursor-pointer"
+              >
+                Edit Pengguna
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => onDelete?.(user)}
+                className="text-destructive cursor-pointer flex items-center justify-between gap-2"
+                disabled={user.isActive}
+              >
+                <span className="truncate">Hapus Pengguna</span>
+                {user.isActive && (
+                  <span className="text-[11px] text-muted-foreground whitespace-nowrap">
+                    (Nonaktif)
+                  </span>
+                )}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       );
     },
   };

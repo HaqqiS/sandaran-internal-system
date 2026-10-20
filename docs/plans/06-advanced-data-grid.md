@@ -1,14 +1,14 @@
 # 📊 Fase 6: Advanced Data Grid & Column Pinning (`@reui/data-grid`)
 
 > **File:** `docs/plans/06-advanced-data-grid.md`  
-> **Status:** ⚪ Menunggu Fase 1  
+> **Status:** 🟢 Selesai (Completed)  
 > **Dependensi:** Fase 1 (`01-registry-and-primitives.md`)  
 > **Target File:**
-> - [`src/components/ui/data-grid.tsx`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/src/components/ui/data-grid.tsx) (Komponen Baru / Ekstensi `data-table.tsx`)
+> - [`src/components/ui/data-grid.tsx`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/src/components/ui/data-grid.tsx) (Komponen Baru / Ekstensi [`src/components/ui/data-table.tsx`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/src/components/ui/data-table.tsx))
 > - Tabel Konsumen:
 >   - [`src/components/emergency/transaction-list.tsx`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/src/components/emergency/transaction-list.tsx)
->   - [`src/components/logistic/items-table.tsx`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/src/components/logistic/items-table.tsx)
->   - [`src/components/user/user-table.tsx`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/src/components/user/user-table.tsx)
+>   - [`src/components/logistic/item-list.tsx`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/src/components/logistic/item-list.tsx)
+>   - [`src/components/user/users-table.tsx`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/src/components/user/users-table.tsx) & [`src/app/(internal)/users/users-client.tsx`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/src/app/%28internal%29/users/users-client.tsx)
 >   - [`src/components/document/document-list.tsx`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/src/components/document/document-list.tsx)
 
 ---
@@ -73,11 +73,11 @@ Pilihan kerapatan baris tabel melalui tombol di toolbar:
 - **Normal**: `py-3 px-4 text-sm` (tampilan standar yang nyaman dibaca).
 
 ### 3.2 Quick Search & Column Visibility
-- Input pencarian real-time dengan debouncing otomatis.
-- Dropdown menu untuk menyembunyikan/menampilkan kolom tertentu sesuai preferensi pengguna.
+- Input pencarian real-time dengan tombol reset cepat.
+- Dropdown menu untuk menyembunyikan/menampilkan kolom tertentu dan melakukan pin/unpin kolom sesuai preferensi pengguna.
 
 ### 3.3 Export Action
-- Tombol "Ekspor Data" (`IconDownload`) yang mengonversi data baris aktif menjadi file `.csv`.
+- Tombol "Ekspor CSV" (`IconDownload`) yang mengonversi data baris aktif menjadi file `.csv` lengkap dengan UTF-8 BOM.
 
 ---
 
@@ -85,20 +85,19 @@ Pilihan kerapatan baris tabel melalui tombol di toolbar:
 
 1. **Prioritas 1: `transaction-list.tsx` (Kas Darurat)**:
    - Kolom "Deskripsi Transaksi" di-pin di kiri.
-   - Kolom "Status & Aksi" di-pin di kanan.
-   - Sentuhan tombol verifikasi/detail min 44px di mobile.
-2. **Prioritas 2: `items-table.tsx` (Logistik)**:
-   - Kolom "Nama Material" di-pin di kiri.
-   - Kolom "Stok & Aksi" di-pin di kanan.
-3. **Prioritas 3: `user-table.tsx` & `document-list.tsx`**:
+   - Kolom "Aksi" di-pin di kanan.
+2. **Prioritas 2: `item-list.tsx` (Logistik)**:
+   - Kolom "Nama Barang" di-pin di kiri.
+   - Kolom "Aksi" di-pin di kanan.
+3. **Prioritas 3: `users-table.tsx` (`users-client.tsx`) & `document-list.tsx`**:
    - Terapkan konfigurasi serupa untuk standarisasi antar modul.
 
 ---
 
 ## 🧪 5. Kriteria Keberhasilan & Verifikasi
 
-- [ ] Saat tabel digeser horizontal di layar HP, kolom paling kiri dan kolom aksi paling kanan tetap terlihat di tempatnya.
-- [ ] Tombol density switcher mengubah tinggi baris tabel dengan mulus.
-- [ ] Ekspor CSV menghasilkan data yang sesuai dengan filter pencarian yang sedang aktif.
-- [ ] Tidak ada horizontal scrollbar liar di level halaman (`body`).
-- [ ] `pnpm typecheck` dan `pnpm biome check` lulus 100%.
+- [x] Saat tabel digeser horizontal di layar HP, kolom paling kiri dan kolom aksi paling kanan tetap terlihat di tempatnya.
+- [x] Tombol density switcher mengubah tinggi baris tabel dengan mulus.
+- [x] Ekspor CSV menghasilkan data yang sesuai dengan filter pencarian yang sedang aktif.
+- [x] Tidak ada horizontal scrollbar liar di level halaman (`body`).
+- [x] `pnpm typecheck` dan `pnpm biome check` lulus 100%.

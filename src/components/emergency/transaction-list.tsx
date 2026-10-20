@@ -1,56 +1,22 @@
 "use client";
 
-import type { EmergencyTransaction } from "@prisma/client";
-import {
-  IconArrowBackUp,
-  IconDotsVertical,
-  IconEdit,
-  IconTrash,
-  IconZoomIn,
-} from "@tabler/icons-react";
-import {
-  type ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  type SortingState,
-  useReactTable,
-} from "@tanstack/react-table";
 import { format } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ConfirmDeleteDialog } from "~/components/shared/confirm-delete-dialog";
 import { MediaPreview } from "~/components/shared/media-preview";
-import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "~/components/ui/table";
+import { DataGrid } from "~/components/ui/data-grid";
 import {
   useDeleteEmergencyTransaction,
   useEmergencyTransactions,
 } from "~/hooks/useEmergency";
 import { DepositDialog } from "./deposit-dialog";
+import {
+  type EmergencyTransactionWithRelations,
+  getEmergencyTransactionColumns,
+} from "./transaction-columns";
 import { VerifyDialog } from "./verify-dialog";
 import { WithdrawDialog } from "./withdraw-dialog";
-
-// Extended transaction type that includes requester relation
-type TransactionWithRelations = EmergencyTransaction & {
-  requester?: { id: string; name: string; image: string | null } | null;
-  verifier?: { id: string; name: string; image: string | null } | null;
-};
 
 interface TransactionListProps {
   projectId: string;
@@ -69,7 +35,6 @@ export function TransactionList({
 }: TransactionListProps) {
   const { data: transactions, isLoading } = useEmergencyTransactions(projectId);
   const deleteTransaction = useDeleteEmergencyTransaction();
-  const [sorting, setSorting] = useState<SortingState>([]);
   const [verifyTarget, setVerifyTarget] = useState<{
     id: string;
     mode: "review" | "undo";
@@ -105,7 +70,7 @@ export function TransactionList({
   /**
    * Determine if the current user can edit/delete a given transaction
    */
-  function canEditDelete(row: TransactionWithRelations): boolean {
+  function canEditDelete(row: EmergencyTransactionWithRelations): boolean {
     // ADMIN can always edit/delete
     if (isAdmin) return true;
 
@@ -119,7 +84,7 @@ export function TransactionList({
     return true;
   }
 
-  function handleEditClick(row: TransactionWithRelations) {
+  function handleEditClick(row: EmergencyTransactionWithRelations) {
     const isReviewed = row.status === "REVIEWED";
     const initialValues = {
       amount: String(Number(row.amount)),
@@ -160,175 +125,13 @@ export function TransactionList({
     }
   }
 
-  const columns: ColumnDef<TransactionWithRelations>[] = [
-    {
-      accessorKey: "createdAt",
-      header: "Tanggal",
-      cell: ({ row }) => format(new Date(row.getValue("createdAt")), "PP p"),
-    },
-    {
-      accessorKey: "description",
-      header: "Keterangan",
-      cell: ({ row }) => (
-        <div
-          className="max-w-[300px] truncate"
-          title={row.getValue("description")}
-        >
-          {row.getValue("description")}
-        </div>
-      ),
-    },
-    {
-      accessorKey: "type",
-      header: "Tipe",
-      cell: ({ row }) => {
-        const type = row.getValue("type") as string;
-        return (
-          <Badge variant={type === "DEPOSIT" ? "default" : "secondary"}>
-            {type}
-          </Badge>
-        );
-      },
-    },
-    {
-      accessorKey: "amount",
-      header: "Jumlah",
-      cell: ({ row }) => {
-        const amount = Number(row.getValue("amount"));
-        const type = row.getValue("type") as string;
-        const color = type === "DEPOSIT" ? "text-green-600" : "text-red-600";
-        return (
-          <div className={`font-medium ${color}`}>
-            {type === "DEPOSIT" ? "+" : "-"}
-            Rp {amount.toLocaleString("id-ID")}
-          </div>
-        );
-      },
-    },
-    {
-      accessorKey: "status",
-      header: "Status",
-      cell: ({ row }) => {
-        const status = row.getValue("status") as string;
-        return (
-          <Badge variant={status === "REVIEWED" ? "outline" : "destructive"}>
-            {status}
-          </Badge>
-        );
-      },
-    },
-    {
-      accessorKey: "publicId",
-      header: "Bukti",
-      cell: ({ row }) => {
-        const proofUrl = row.original.url;
-        if (!proofUrl) return <span className="text-muted-foreground">-</span>;
-        return (
-          <button
-            type="button"
-            className="group relative h-10 w-10 overflow-hidden rounded border bg-muted flex items-center justify-center cursor-pointer"
-            onClick={() => setLightboxImage(proofUrl)}
-          >
-            {/* biome-ignore lint: using img for Cloudinary external URLs */}
-            <img
-              src={proofUrl}
-              alt="Proof"
-              className="h-full w-full object-cover transition-transform group-hover:scale-110"
-            />
-            <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/20">
-              <IconZoomIn className="h-4 w-4 text-white opacity-0 transition-opacity group-hover:opacity-100" />
-            </div>
-          </button>
-        );
-      },
-    },
-    {
-      id: "actions",
-      cell: ({ row }) => {
-        const status = row.getValue("status") as string;
-        const showReview = canReview && status === "UNREVIEWED";
-        const showUndoReview = canReview && status === "REVIEWED";
-        const showEditDelete = canEditDelete(row.original);
-
-        if (!showReview && !showUndoReview && !showEditDelete) return null;
-
-        return (
-          <div className="flex items-center gap-1">
-            {showReview && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  setVerifyTarget({ id: row.original.id, mode: "review" })
-                }
-              >
-                Tinjau
-              </Button>
-            )}
-            {(showEditDelete || showUndoReview) && (
-              <DropdownMenu modal={false}>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0"
-                    aria-label="Aksi lainnya"
-                  >
-                    <IconDotsVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  {showUndoReview && (
-                    <DropdownMenuItem
-                      onClick={() =>
-                        setVerifyTarget({ id: row.original.id, mode: "undo" })
-                      }
-                    >
-                      <IconArrowBackUp className="mr-2 h-4 w-4" />
-                      Batalkan Tinjauan
-                    </DropdownMenuItem>
-                  )}
-                  {showEditDelete && (
-                    <>
-                      <DropdownMenuItem
-                        onClick={() => handleEditClick(row.original)}
-                      >
-                        <IconEdit className="mr-2 h-4 w-4" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-destructive focus:text-destructive"
-                        onClick={() =>
-                          setDeleteTarget({
-                            id: row.original.id,
-                            description: row.original.description,
-                          })
-                        }
-                      >
-                        <IconTrash className="mr-2 h-4 w-4" />
-                        Hapus
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
-        );
-      },
-    },
-  ];
-
-  const table = useReactTable({
-    data: (transactions as TransactionWithRelations[]) || [],
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting,
-    state: {
-      sorting,
-    },
+  const columns = getEmergencyTransactionColumns({
+    canReview,
+    canEditDelete,
+    onVerify: setVerifyTarget,
+    onEdit: handleEditClick,
+    onDelete: setDeleteTarget,
+    onPreviewImage: setLightboxImage,
   });
 
   if (isLoading) {
@@ -337,54 +140,33 @@ export function TransactionList({
 
   return (
     <div className="space-y-4 min-w-0 w-full">
-      <div className="rounded-md border overflow-x-auto min-w-0">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  Tidak ada transaksi ditemukan.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      <DataGrid
+        columns={columns}
+        data={(transactions as EmergencyTransactionWithRelations[]) || []}
+        filterColumn="description"
+        filterPlaceholder="Cari keterangan transaksi..."
+        initialColumnPinning={{
+          left: ["description"],
+          right: ["actions"],
+        }}
+        exportFilename="transaksi-dana-darurat"
+        csvColumns={[
+          {
+            header: "Tanggal",
+            accessor: (row) =>
+              format(new Date(row.createdAt), "yyyy-MM-dd HH:mm"),
+          },
+          { header: "Keterangan", accessor: (row) => row.description },
+          { header: "Tipe", accessor: (row) => row.type },
+          { header: "Jumlah (IDR)", accessor: (row) => Number(row.amount) },
+          { header: "Status", accessor: (row) => row.status },
+          {
+            header: "Pengaju",
+            accessor: (row) => row.requester?.name ?? "-",
+          },
+        ]}
+        emptyMessage="Tidak ada transaksi ditemukan."
+      />
 
       {/* Review / Undo Review Dialog */}
       <VerifyDialog

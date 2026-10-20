@@ -100,6 +100,11 @@
   --status-attention-bg: oklch(0.96 0.04 27);
   --status-attention-border: oklch(0.85 0.1 27);
 
+  /* ─── DataGrid Solid Surface Tokens (100% Opaque, No Opacity / Translucency) ─── */
+  --grid-header: color-mix(in oklch, var(--secondary) 15%, var(--card));
+  --grid-row-hover: color-mix(in oklch, var(--secondary) 10%, var(--card));
+  --grid-row-selected: color-mix(in oklch, var(--secondary) 15%, var(--card));
+
   /* ─── Homepage / Landing Page Tokens ─────────────────────────────────── */
   /* Background dark ala yurdaermimarlik — deep navy-black */
   --hp-bg: #000a12;
@@ -200,6 +205,11 @@
   --status-attention-bg: oklch(0.24 0.08 27 / 0.45);
   --status-attention-border: oklch(0.4 0.1 27);
 
+  /* ─── DataGrid Solid Surface Tokens (100% Opaque, No Opacity / Translucency) ─── */
+  --grid-header: color-mix(in oklch, var(--muted) 60%, var(--card));
+  --grid-row-hover: color-mix(in oklch, var(--muted) 40%, var(--card));
+  --grid-row-selected: color-mix(in oklch, var(--muted) 50%, var(--card));
+
   /* ─── Homepage dark overrides (berlaku di dalam .dark) ───────────────── */
   /* Tokens ini sudah sama dengan :root karena homepage selalu dark,        */
   /* tapi didefinisikan ulang agar konsisten jika tema berubah.             */
@@ -259,6 +269,10 @@
   --color-status-attention: var(--status-attention);
   --color-status-attention-bg: var(--status-attention-bg);
   --color-status-attention-border: var(--status-attention-border);
+
+  --color-grid-header: var(--grid-header);
+  --color-grid-row-hover: var(--grid-row-hover);
+  --color-grid-row-selected: var(--grid-row-selected);
 
   --color-primary-text: var(--primary-text);
 
