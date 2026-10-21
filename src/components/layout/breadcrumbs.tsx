@@ -17,6 +17,7 @@ import { cn } from "~/lib/utils";
 const ROUTE_LABELS: Record<string, string> = {
   projects: "Proyek",
   reports: "Laporan",
+  gallery: "Galeri Foto",
   logistics: "Logistik",
   documents: "Dokumen",
   emergency: "Kas Darurat",

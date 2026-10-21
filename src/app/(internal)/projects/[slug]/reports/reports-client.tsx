@@ -6,6 +6,7 @@ import {
   IconLayoutGrid,
   IconList,
   IconLoader2,
+  IconPhoto,
   IconPlus,
 } from "@tabler/icons-react";
 import { format } from "date-fns";
@@ -146,6 +147,18 @@ export function ReportsClient({ projectSlug }: ReportsClientProps) {
               <span>List</span>
             </ToggleGroupItem>
           </ToggleGroup>
+
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="h-8 gap-1.5 px-2.5 text-xs font-medium cursor-pointer"
+          >
+            <Link href={`/projects/${projectSlug}/gallery`}>
+              <IconPhoto className="size-3.5" />
+              <span>Galeri</span>
+            </Link>
+          </Button>
 
           {canCreate && (
             <Button size="sm" onClick={() => setIsCreateOpen(true)}>

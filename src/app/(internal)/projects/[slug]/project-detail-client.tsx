@@ -20,6 +20,7 @@ import { ExportReportDialog } from "~/components/project/export-report-dialog";
 import {
   DocumentsSection,
   EmergencyFundSection,
+  GallerySection,
   LogisticsSection,
   ProjectInfoSection,
   RecentReportsSection,
@@ -273,6 +274,8 @@ export function ProjectDetailClient({ slug }: ProjectDetailClientProps) {
         <LogisticsSection projectId={project.id} projectSlug={project.slug} />
 
         <DocumentsSection projectId={project.id} projectSlug={project.slug} />
+
+        <GallerySection projectId={project.id} projectSlug={project.slug} />
       </div>
 
       {canManage && (

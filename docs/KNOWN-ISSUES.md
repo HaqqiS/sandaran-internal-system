@@ -28,6 +28,8 @@
   - **Migrasi Data**: Seluruh proyek eksisting telah dimigrasikan dengan `shortId` dan `storageKey` permanen tanpa merusak link aset yang telah diunggah sebelumnya.
 - **[RESOLVED 2026-09-25] Sheet Form Virtual Keyboard Glitch**:
   Glitch tampilan mobile saat keyboard virtual muncul telah diatasi dengan merombak navigasi menjadi Mobile Bottom Navigation (`MobileBottomNav`) dan dialog pemilih proyek menggunakan Vaul Drawer mandiri (`ProjectSwitcherDrawer`).
+- **[RESOLVED 2026-10-21] Galeri Foto Dokumentasi Proyek (Project Galleries)**:
+  Telah diimplementasikan secara terpadu di `/projects/[slug]/gallery` dengan tampilan Timeline harian, integrasi Dynamic FilterBar (cuaca, tanggal, pelapor), Lightbox interaktif (prev/next, metadata, link laporan, unduh), serta widget preview di Overview Proyek (`GallerySection`) dan tombol pintas di header Laporan.
 - **[RESOLVED 2026-09-30] Lenis Global Scroll Conflict**:
   Konflik smooth scroll Lenis yang mengganggu interaksi form di dalam modal dialog telah diselesaikan dengan membatasi scope `SmoothScrollProvider` hanya pada halaman homepage.
 
@@ -35,7 +37,5 @@
 
 ## 3. Rencana Fitur & Backlog Mendatang
 
-- **Galeri Foto Proyek (Project Galleries)**:
-  Pengembangan antarmuka galeri foto terpadu per proyek serta feed foto dokumentasi terkini (_recent progress gallery_) dari seluruh proyek aktif.
 - **Role Lenses Dashboard Remodel**:
   Implementasi spesifikasi perombakan dashboard per role lens berdasarkan `docs/dashboard-remodel-spec.md`.

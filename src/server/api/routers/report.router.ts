@@ -187,6 +187,59 @@ export const reportRouter = createTRPCRouter({
     }),
 
   /**
+   * Get all documentation media photos for a project gallery
+   */
+  getGalleryMedia: projectMemberProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+        limit: z.number().min(1).max(100).default(60),
+        cursor: z.string().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const media = await ctx.db.reportMedia.findMany({
+        where: {
+          report: {
+            projectId: ctx.projectId,
+          },
+        },
+        take: input.limit + 1,
+        cursor: input.cursor ? { id: input.cursor } : undefined,
+        orderBy: [{ report: { reportDate: "desc" } }, { createdAt: "desc" }],
+        include: {
+          report: {
+            select: {
+              id: true,
+              slug: true,
+              reportDate: true,
+              weather: true,
+              taskDescription: true,
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  image: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      let nextCursor: string | undefined;
+      if (media.length > input.limit) {
+        const nextItem = media.pop();
+        nextCursor = nextItem?.id;
+      }
+
+      return {
+        media,
+        nextCursor,
+      };
+    }),
+
+  /**
    * Get 5 most recent reports for each project
    * Admin/CEO: All projects
    * User: Only member projects

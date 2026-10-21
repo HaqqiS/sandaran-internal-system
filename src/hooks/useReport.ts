@@ -24,6 +24,17 @@ export function useReportsByProject(
   );
 }
 
+export function useProjectGalleryMedia(
+  projectId: string,
+  limit = 60,
+  cursor?: string,
+) {
+  return api.report.getGalleryMedia.useQuery(
+    { projectId, limit, cursor },
+    { enabled: !!projectId },
+  );
+}
+
 export function useReportBySlug(projectId: string, reportSlug: string) {
   return api.report.getBySlug.useQuery(
     { projectId, reportSlug },
