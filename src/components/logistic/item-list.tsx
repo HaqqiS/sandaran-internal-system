@@ -13,6 +13,11 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ConfirmDeleteDialog } from "~/components/shared/confirm-delete-dialog";
 import { DataGrid } from "~/components/ui/data-grid";
+import {
+  FilterBar,
+  type FilterField,
+  useDynamicFilters,
+} from "~/components/ui/filters";
 import { Input } from "~/components/ui/input";
 import { Skeleton } from "~/components/ui/skeleton";
 import {
@@ -24,6 +29,27 @@ import { useSession } from "~/stores/use-session-store";
 import { ItemActions } from "./item-actions";
 import { getLogisticColumns, type LogisticStockItem } from "./item-columns";
 import { TransactionDialog } from "./transaction-dialog";
+
+const LOGISTIC_FILTER_FIELDS: FilterField[] = [
+  {
+    id: "stockStatus",
+    label: "Status Stok",
+    options: [
+      { label: "Stok Aman (> 5)", value: "safe" },
+      { label: "Stok Menipis (1 - 5)", value: "low" },
+      { label: "Stok Habis (0)", value: "out" },
+    ],
+  },
+  {
+    id: "activity",
+    label: "Mutasi Stok",
+    options: [
+      { label: "Ada Barang Masuk", value: "in" },
+      { label: "Ada Barang Keluar", value: "out" },
+      { label: "Belum Ada Mutasi", value: "none" },
+    ],
+  },
+];
 
 interface ItemListProps {
   projectId: string;
@@ -142,12 +168,50 @@ export function ItemList({ projectId }: ItemListProps) {
     );
   }, [items]);
 
-  // Apply mobile search filter
-  const filteredItems = useMemo(() => {
+  const { activeFilters, addFilter, removeFilter, resetFilters } =
+    useDynamicFilters();
+
+  // Apply search query filter
+  const searchedItems = useMemo(() => {
     if (!searchQuery.trim()) return sortedItems;
     const q = searchQuery.toLowerCase().trim();
     return sortedItems.filter((item) => item.name.toLowerCase().includes(q));
   }, [sortedItems, searchQuery]);
+
+  // Apply dynamic attribute filters
+  const finalItems = useMemo(() => {
+    if (activeFilters.length === 0) return searchedItems;
+
+    return searchedItems.filter((item) => {
+      // 1. Status Stok
+      const stockFilter = activeFilters.find((f) => f.field === "stockStatus");
+      if (stockFilter) {
+        if (stockFilter.value === "out" && item.currentStock !== 0)
+          return false;
+        if (
+          stockFilter.value === "low" &&
+          (item.currentStock <= 0 || item.currentStock > 5)
+        )
+          return false;
+        if (stockFilter.value === "safe" && item.currentStock <= 5)
+          return false;
+      }
+
+      // 2. Mutasi Stok
+      const activityFilter = activeFilters.find((f) => f.field === "activity");
+      if (activityFilter) {
+        if (activityFilter.value === "in" && item.totalIn === 0) return false;
+        if (activityFilter.value === "out" && item.totalOut === 0) return false;
+        if (
+          activityFilter.value === "none" &&
+          (item.totalIn > 0 || item.totalOut > 0)
+        )
+          return false;
+      }
+
+      return true;
+    });
+  }, [searchedItems, activeFilters]);
 
   const columns = useMemo(
     () =>
@@ -183,38 +247,48 @@ export function ItemList({ projectId }: ItemListProps) {
 
   return (
     <div className="space-y-4">
-      {/* ── Mobile Search ──────────────── */}
-      <div className="relative flex-1 md:hidden">
-        <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-        <Input
-          placeholder="Cari barang..."
-          className="pl-9 pr-9"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+      {/* ── Mobile Toolbar: Search & Filter ──────────────── */}
+      <div className="flex flex-col gap-2.5 md:hidden">
+        <div className="relative flex-1">
+          <IconSearch className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Input
+            placeholder="Cari barang..."
+            className="pl-9 pr-9"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <IconX className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+
+        <FilterBar
+          fields={LOGISTIC_FILTER_FIELDS}
+          activeFilters={activeFilters}
+          onAddFilter={addFilter}
+          onRemoveFilter={removeFilter}
+          onResetFilters={resetFilters}
         />
-        {searchQuery && (
-          <button
-            type="button"
-            onClick={() => setSearchQuery("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <IconX className="h-3.5 w-3.5" />
-          </button>
-        )}
       </div>
 
       {/* ── Mobile: Card View ─────────────────────── */}
       <div className="md:hidden space-y-2">
-        {filteredItems.length === 0 ? (
+        {finalItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed p-10 text-center">
             <IconSearch className="h-8 w-8 text-muted-foreground/50 mb-3" />
             <p className="text-sm font-medium">Tidak ada hasil ditemukan</p>
             <p className="text-xs text-muted-foreground mt-1">
-              Coba ubah kata kunci pencarian
+              Coba ubah filter atau kata kunci pencarian
             </p>
           </div>
         ) : (
-          filteredItems.map((item) => (
+          finalItems.map((item) => (
             <div
               key={item.id}
               className="rounded-xl border bg-card p-3.5 transition-colors hover:bg-muted/30"
@@ -301,9 +375,18 @@ export function ItemList({ projectId }: ItemListProps) {
       <div className="hidden md:block">
         <DataGrid
           columns={columns}
-          data={sortedItems as LogisticStockItem[]}
+          data={finalItems as LogisticStockItem[]}
           filterColumn="name"
           filterPlaceholder="Cari nama barang..."
+          toolbarActions={
+            <FilterBar
+              fields={LOGISTIC_FILTER_FIELDS}
+              activeFilters={activeFilters}
+              onAddFilter={addFilter}
+              onRemoveFilter={removeFilter}
+              onResetFilters={resetFilters}
+            />
+          }
           initialColumnPinning={{
             left: ["name"],
             right: ["actions"],

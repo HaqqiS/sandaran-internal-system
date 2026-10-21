@@ -52,7 +52,7 @@ flowchart TD
 | **04** | [`04-conversation-and-comments.md`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/plans/04-conversation-and-comments.md) | `@reui/c-message-*`, `bubble`, `message` | `comment-list.tsx`, `comment-item.tsx`, `comment-form.tsx` | 🟢 Selesai (Completed) |
 | **05** | [`05-report-card-and-dual-view.md`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/plans/05-report-card-and-dual-view.md) | `@reui/item`, `toggle-group` | `report-card.tsx`, `report-list-item.tsx`, `report-list.tsx`, `reports-client.tsx` | 🟢 Selesai (Completed) |
 | **06** | [`06-advanced-data-grid.md`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/plans/06-advanced-data-grid.md) | `@reui/data-grid`, TanStack Table Pinning | `data-grid.tsx`, `transaction-list.tsx`, `item-list.tsx`, `users-table.tsx`, `document-list.tsx` | 🟢 Selesai (Completed) |
-| **07** | [`07-dynamic-filter-query-builder.md`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/plans/07-dynamic-filter-query-builder.md) | `@reui/filters` | `reports-client.tsx`, `logistic-client.tsx`, `emergency-client.tsx` | 🟡 Siap Eksekusi |
+| **07** | [`07-dynamic-filter-query-builder.md`](file:///d:/Haqqi%20Sukmara/NextJS/sandaran-internal-system/docs/plans/07-dynamic-filter-query-builder.md) | `@reui/filters` | `reports-client.tsx`, `logistic-client.tsx`, `emergency-client.tsx` | 🟢 Selesai (Completed) |
 
 ---
 

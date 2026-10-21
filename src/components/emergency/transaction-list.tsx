@@ -1,11 +1,16 @@
 "use client";
 
 import { format } from "date-fns";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { ConfirmDeleteDialog } from "~/components/shared/confirm-delete-dialog";
 import { MediaPreview } from "~/components/shared/media-preview";
 import { DataGrid } from "~/components/ui/data-grid";
+import {
+  FilterBar,
+  type FilterField,
+  useDynamicFilters,
+} from "~/components/ui/filters";
 import {
   useDeleteEmergencyTransaction,
   useEmergencyTransactions,
@@ -17,6 +22,43 @@ import {
 } from "./transaction-columns";
 import { VerifyDialog } from "./verify-dialog";
 import { WithdrawDialog } from "./withdraw-dialog";
+
+const EMERGENCY_FILTER_FIELDS: FilterField[] = [
+  {
+    id: "type",
+    label: "Tipe Transaksi",
+    options: [
+      { label: "Dana Masuk (Deposit)", value: "DEPOSIT" },
+      { label: "Dana Keluar (Tarik Dana)", value: "WITHDRAWAL" },
+    ],
+  },
+  {
+    id: "status",
+    label: "Status Tinjauan",
+    options: [
+      { label: "Belum Ditinjau", value: "UNREVIEWED" },
+      { label: "Disetujui", value: "REVIEWED" },
+      { label: "Ditolak", value: "REJECTED" },
+    ],
+  },
+  {
+    id: "amountRange",
+    label: "Nominal",
+    options: [
+      { label: "< Rp 1.000.000", value: "under1m" },
+      { label: "≥ Rp 1.000.000", value: "over1m" },
+      { label: "≥ Rp 5.000.000", value: "over5m" },
+    ],
+  },
+  {
+    id: "hasProof",
+    label: "Bukti Kwitansi",
+    options: [
+      { label: "Ada Bukti Foto", value: "yes" },
+      { label: "Tanpa Bukti Foto", value: "no" },
+    ],
+  },
+];
 
 interface TransactionListProps {
   projectId: string;
@@ -125,6 +167,43 @@ export function TransactionList({
     }
   }
 
+  const { activeFilters, addFilter, removeFilter, resetFilters } =
+    useDynamicFilters();
+
+  const filteredTransactions = useMemo(() => {
+    const raw = (transactions as EmergencyTransactionWithRelations[]) || [];
+    if (activeFilters.length === 0) return raw;
+
+    return raw.filter((tx) => {
+      // 1. Tipe Transaksi
+      const typeFilter = activeFilters.find((f) => f.field === "type");
+      if (typeFilter && tx.type !== typeFilter.value) return false;
+
+      // 2. Status Tinjauan
+      const statusFilter = activeFilters.find((f) => f.field === "status");
+      if (statusFilter && tx.status !== statusFilter.value) return false;
+
+      // 3. Nominal
+      const amountFilter = activeFilters.find((f) => f.field === "amountRange");
+      if (amountFilter) {
+        const amt = Number(tx.amount);
+        if (amountFilter.value === "under1m" && amt >= 1_000_000) return false;
+        if (amountFilter.value === "over1m" && amt < 1_000_000) return false;
+        if (amountFilter.value === "over5m" && amt < 5_000_000) return false;
+      }
+
+      // 4. Bukti Foto
+      const proofFilter = activeFilters.find((f) => f.field === "hasProof");
+      if (proofFilter) {
+        const hasProof = Boolean(tx.url || tx.publicId);
+        if (proofFilter.value === "yes" && !hasProof) return false;
+        if (proofFilter.value === "no" && hasProof) return false;
+      }
+
+      return true;
+    });
+  }, [transactions, activeFilters]);
+
   const columns = getEmergencyTransactionColumns({
     canReview,
     canEditDelete,
@@ -142,9 +221,18 @@ export function TransactionList({
     <div className="space-y-4 min-w-0 w-full">
       <DataGrid
         columns={columns}
-        data={(transactions as EmergencyTransactionWithRelations[]) || []}
+        data={filteredTransactions}
         filterColumn="description"
         filterPlaceholder="Cari keterangan transaksi..."
+        toolbarActions={
+          <FilterBar
+            fields={EMERGENCY_FILTER_FIELDS}
+            activeFilters={activeFilters}
+            onAddFilter={addFilter}
+            onRemoveFilter={removeFilter}
+            onResetFilters={resetFilters}
+          />
+        }
         initialColumnPinning={{
           left: ["description"],
           right: ["actions"],
