@@ -2,6 +2,8 @@ import { IconArrowLeft } from "@tabler/icons-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getSession } from "~/server/better-auth/server";
 import { LoginForm } from "../../components/login/login-form";
 
 export const metadata: Metadata = {
@@ -10,7 +12,12 @@ export const metadata: Metadata = {
     "Masuk ke portal internal Sandaran / Astaloka Architecture & Interior",
 };
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const session = await getSession();
+  if (session?.user) {
+    redirect("/dashboard");
+  }
+
   return (
     <main className="relative flex h-svh max-h-svh w-full flex-col justify-between overflow-hidden bg-background p-4 sm:p-6 select-none">
       {/* Subtle Background Accent */}

@@ -7,12 +7,7 @@ const PUBLIC_ROUTES = ["/", "/login", "/unauthorized", "/waiting-approval"];
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow public routes
-  if (PUBLIC_ROUTES.includes(pathname)) {
-    return NextResponse.next();
-  }
-
-  // Allow static files and API routes (handled by tRPC)
+  // Allow static files and API routes (handled by tRPC / Next)
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
@@ -26,6 +21,20 @@ export async function middleware(request: NextRequest) {
   const sessionToken =
     request.cookies.get("better-auth.session_token")?.value ||
     request.cookies.get("__Secure-better-auth.session_token")?.value;
+
+  const normalizedPath = pathname.replace(/\/$/, "") || "/";
+
+  // If user is already logged in and enters /login, redirect to /dashboard
+  if (normalizedPath === "/login" && sessionToken) {
+    const redirectUrl = new URL("/dashboard", request.url);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  // Allow public routes
+  if (PUBLIC_ROUTES.includes(normalizedPath)) {
+    return NextResponse.next();
+  }
+
   // If no session token, redirect to login
   if (!sessionToken) {
     const redirectUrl = new URL("/", request.url);
