@@ -2,10 +2,13 @@
 
 import {
   IconAdjustmentsHorizontal,
+  IconArrowsSort,
+  IconChevronDown,
   IconChevronLeft,
   IconChevronRight,
   IconChevronsLeft,
   IconChevronsRight,
+  IconChevronUp,
   IconDownload,
   IconLayoutList,
   IconListDetails,
@@ -88,6 +91,8 @@ export interface DataGridProps<TData, TValue> {
   emptyMessage?: string;
   /** Default page size (default: 10) */
   defaultPageSize?: number;
+  /** Optional click handler for table rows (excluding interactive controls) */
+  onRowClick?: (row: TData) => void;
   state?: Partial<TableState>;
   onRowSelectionChange?: OnChangeFn<RowSelectionState>;
   getRowId?: (originalRow: TData, index: number) => string;
@@ -117,6 +122,7 @@ export function DataGrid<TData, TValue>({
   toolbarActions,
   emptyMessage = "Tidak ada data ditemukan.",
   defaultPageSize = 10,
+  onRowClick,
   state: controlledState,
   onRowSelectionChange,
   getRowId,
@@ -447,6 +453,12 @@ export function DataGrid<TData, TValue>({
                     leftPinnedCols[leftPinnedCols.length - 1] ===
                       header.column.id;
 
+                  const canSort =
+                    header.column.getCanSort() &&
+                    header.column.id !== "select" &&
+                    header.column.id !== "actions";
+                  const isSorted = header.column.getIsSorted();
+
                   return (
                     <TableHead
                       key={header.id}
@@ -475,12 +487,36 @@ export function DataGrid<TData, TValue>({
                             header.column.id === "actions" && "justify-center",
                           )}
                         >
-                          <span className="truncate">
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                          </span>
+                          {canSort ? (
+                            <button
+                              type="button"
+                              onClick={header.column.getToggleSortingHandler()}
+                              className="group/header inline-flex items-center gap-1.5 truncate text-left font-semibold text-foreground hover:text-foreground transition-colors cursor-pointer select-none focus-visible:outline-none focus-visible:underline"
+                            >
+                              <span className="truncate">
+                                {flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                )}
+                              </span>
+                              <span className="shrink-0 text-muted-foreground transition-colors group-hover/header:text-foreground">
+                                {isSorted === "asc" ? (
+                                  <IconChevronUp className="size-3.5 text-primary" />
+                                ) : isSorted === "desc" ? (
+                                  <IconChevronDown className="size-3.5 text-primary" />
+                                ) : (
+                                  <IconArrowsSort className="size-3.5 opacity-0 group-hover/header:opacity-100 transition-opacity" />
+                                )}
+                              </span>
+                            </button>
+                          ) : (
+                            <span className="truncate">
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                            </span>
+                          )}
                           {isPinned &&
                             header.column.getCanPin() &&
                             header.column.id !== "select" &&
@@ -513,7 +549,45 @@ export function DataGrid<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className="group/row bg-card hover:bg-grid-row-hover data-[state=selected]:bg-grid-row-selected border-b border-border/70 transition-colors"
+                  onClick={
+                    onRowClick
+                      ? (e) => {
+                          const target = e.target as HTMLElement;
+                          if (
+                            target.closest(
+                              'button, a, input, select, textarea, [role="button"], [role="menuitem"], [data-radix-collection-item]',
+                            )
+                          ) {
+                            return;
+                          }
+                          onRowClick(row.original);
+                        }
+                      : undefined
+                  }
+                  tabIndex={onRowClick ? 0 : undefined}
+                  onKeyDown={
+                    onRowClick
+                      ? (e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            const target = e.target as HTMLElement;
+                            if (
+                              target.closest(
+                                'button, a, input, select, textarea, [role="button"], [role="menuitem"], [data-radix-collection-item]',
+                              )
+                            ) {
+                              return;
+                            }
+                            e.preventDefault();
+                            onRowClick(row.original);
+                          }
+                        }
+                      : undefined
+                  }
+                  className={cn(
+                    "group/row bg-card hover:bg-grid-row-hover data-[state=selected]:bg-grid-row-selected border-b border-border/70 transition-colors",
+                    onRowClick &&
+                      "cursor-pointer focus-visible:outline-none focus-visible:bg-grid-row-hover",
+                  )}
                 >
                   {row.getVisibleCells().map((cell) => {
                     const isPinned = cell.column.getIsPinned();

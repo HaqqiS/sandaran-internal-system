@@ -1,19 +1,14 @@
 "use client";
 
 import { IconArrowRight, IconCalendar } from "@tabler/icons-react";
+import type { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardHeader, CardTitle } from "~/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "~/components/ui/table";
+import { DataGrid, type DataGridCsvColumn } from "~/components/ui/data-grid";
 import { formatWitaDate } from "~/lib/time-utils";
 import { cn, formatIDR } from "~/lib/utils";
 import { TimelineProgress } from "./timeline-progress";
@@ -45,25 +40,200 @@ interface PortfolioTableProps {
   className?: string;
 }
 
+function formatDateRange(
+  start: Date | string | null,
+  end: Date | string | null,
+) {
+  if (!start && !end) return "Jadwal belum diatur";
+  if (start && !end) {
+    return `Mulai ${formatWitaDate(start, { shortMonth: true })}`;
+  }
+  if (!start && end) {
+    return `Target ${formatWitaDate(end, { shortMonth: true })}`;
+  }
+  if (start && end) {
+    return `${formatWitaDate(start, { shortMonth: true })} – ${formatWitaDate(end, { shortMonth: true })}`;
+  }
+  return "Jadwal belum diatur";
+}
+
 export function PortfolioTable({ projects, className }: PortfolioTableProps) {
   const router = useRouter();
 
-  const formatDateRange = (
-    start: Date | string | null,
-    end: Date | string | null,
-  ) => {
-    if (!start && !end) return "Jadwal belum diatur";
-    if (start && !end) {
-      return `Mulai ${formatWitaDate(start, { shortMonth: true })}`;
-    }
-    if (!start && end) {
-      return `Target ${formatWitaDate(end, { shortMonth: true })}`;
-    }
-    if (start && end) {
-      return `${formatWitaDate(start, { shortMonth: true })} – ${formatWitaDate(end, { shortMonth: true })}`;
-    }
-    return "Jadwal belum diatur";
-  };
+  const columns = useMemo<ColumnDef<PortfolioItem>[]>(
+    () => [
+      {
+        accessorKey: "name",
+        header: "Proyek & Periode",
+        cell: ({ row }) => {
+          const project = row.original;
+          return (
+            <div className="space-y-1 py-0.5 min-w-[200px]">
+              <Link
+                href={`/projects/${project.slug}`}
+                className="text-sm font-semibold text-foreground line-clamp-1 hover:underline"
+              >
+                {project.name}
+              </Link>
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <IconCalendar className="h-3.5 w-3.5 shrink-0" />
+                <span>
+                  {formatDateRange(project.startDate, project.endDate)}
+                </span>
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        id: "progress",
+        header: "Waktu vs Progres Kumulatif",
+        accessorFn: (row) => row.latestReport?.progressPercent ?? -1,
+        cell: ({ row }) => {
+          const project = row.original;
+          const hasReport = project.latestReport !== null;
+          const dateLabel = project.hasReportedToday
+            ? "Hari Ini"
+            : project.staleDays !== null
+              ? `${project.staleDays} hr lalu`
+              : undefined;
+
+          if (!hasReport) {
+            return (
+              <div className="space-y-1 min-w-[220px]">
+                <span className="text-xs text-status-attention font-medium">
+                  Belum ada laporan
+                </span>
+                {project.elapsedPercent !== null && (
+                  <p className="text-[11px] text-muted-foreground">
+                    Waktu kalender: {project.elapsedPercent}%
+                  </p>
+                )}
+              </div>
+            );
+          }
+
+          return (
+            <div className="min-w-[220px]">
+              <TimelineProgress
+                elapsedPercent={project.elapsedPercent}
+                progressPercent={project.latestReport?.progressPercent ?? null}
+                hasAnomaly={project.hasProgressAnomaly}
+                reportDateLabel={dateLabel}
+              />
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "todayWorkers",
+        header: "Pekerja Hari Ini",
+        cell: ({ row }) => {
+          const count = row.original.todayWorkers;
+          if (count > 0) {
+            return (
+              <div className="space-y-0.5 text-center min-w-[100px]">
+                <span className="text-sm font-bold text-foreground">
+                  {count}
+                </span>
+                <span className="text-[11px] text-muted-foreground block">
+                  Orang
+                </span>
+              </div>
+            );
+          }
+          return (
+            <div className="text-center min-w-[100px]">
+              <span className="text-xs text-muted-foreground">-</span>
+            </div>
+          );
+        },
+      },
+      {
+        accessorKey: "emergencyBalance",
+        header: "Saldo Kas Darurat",
+        cell: ({ row }) => {
+          const project = row.original;
+          return (
+            <div className="space-y-0.5 text-right min-w-[140px]">
+              <span className="text-sm font-semibold text-foreground">
+                {formatIDR(project.emergencyBalance)}
+              </span>
+              {project.unreviewedWithdrawalsCount > 0 && (
+                <div className="flex justify-end">
+                  <Badge
+                    variant="outline"
+                    className="border-status-warning bg-status-warning-bg text-status-warning text-[10px] px-1 py-0 font-medium"
+                  >
+                    {project.unreviewedWithdrawalsCount} pending
+                  </Badge>
+                </div>
+              )}
+            </div>
+          );
+        },
+      },
+      {
+        id: "actions",
+        header: "Aksi",
+        enableSorting: false,
+        cell: ({ row }) => {
+          const project = row.original;
+          return (
+            <div className="flex items-center justify-center">
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                title={`Detail portofolio ${project.name}`}
+              >
+                <Link href={`/projects/${project.slug}`}>
+                  <IconArrowRight className="h-4 w-4 text-muted-foreground group-hover/row:text-foreground transition-colors" />
+                  <span className="sr-only">Buka portofolio</span>
+                </Link>
+              </Button>
+            </div>
+          );
+        },
+      },
+    ],
+    [],
+  );
+
+  const csvColumns = useMemo<DataGridCsvColumn<PortfolioItem>[]>(
+    () => [
+      { header: "Nama Proyek", accessor: (p) => p.name },
+      {
+        header: "Periode Mulai",
+        accessor: (p) =>
+          p.startDate ? formatWitaDate(p.startDate, { shortMonth: true }) : "-",
+      },
+      {
+        header: "Target Selesai",
+        accessor: (p) =>
+          p.endDate ? formatWitaDate(p.endDate, { shortMonth: true }) : "-",
+      },
+      {
+        header: "Waktu Kalender (%)",
+        accessor: (p) => p.elapsedPercent ?? "-",
+      },
+      {
+        header: "Progres Kumulatif (%)",
+        accessor: (p) => p.latestReport?.progressPercent ?? "-",
+      },
+      { header: "Pekerja Hari Ini", accessor: (p) => p.todayWorkers },
+      {
+        header: "Saldo Kas Darurat (IDR)",
+        accessor: (p) => p.emergencyBalance,
+      },
+      {
+        header: "Penarikan Pending",
+        accessor: (p) => p.unreviewedWithdrawalsCount,
+      },
+    ],
+    [],
+  );
 
   if (projects.length === 0) {
     return (
@@ -92,129 +262,23 @@ export function PortfolioTable({ projects, className }: PortfolioTableProps) {
         </Badge>
       </CardHeader>
 
-      {/* Desktop / Tablet Table View (>= 768px) */}
-      <div className="hidden md:block overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
-              <TableHead className="font-semibold text-xs min-w-[200px]">
-                Proyek & Periode
-              </TableHead>
-              <TableHead className="font-semibold text-xs min-w-[220px]">
-                Waktu vs Progres Kumulatif
-              </TableHead>
-              <TableHead className="font-semibold text-xs text-center min-w-[120px]">
-                Pekerja Hari Ini
-              </TableHead>
-              <TableHead className="font-semibold text-xs text-right min-w-[150px]">
-                Saldo Kas Darurat
-              </TableHead>
-              <TableHead className="w-10" />
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {projects.map((project) => {
-              const hasReport = project.latestReport !== null;
-              const dateLabel = project.hasReportedToday
-                ? "Hari Ini"
-                : project.staleDays !== null
-                  ? `${project.staleDays} hr lalu`
-                  : undefined;
-
-              return (
-                <TableRow
-                  key={project.id}
-                  onClick={() => router.push(`/projects/${project.slug}`)}
-                  className="cursor-pointer transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:bg-muted/50"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      router.push(`/projects/${project.slug}`);
-                    }
-                  }}
-                  role="link"
-                  aria-label={`Buka detail portofolio ${project.name}`}
-                >
-                  <TableCell className="font-medium">
-                    <div className="space-y-1">
-                      <p className="text-sm font-semibold text-foreground line-clamp-1">
-                        {project.name}
-                      </p>
-                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <IconCalendar className="h-3.5 w-3.5 shrink-0" />
-                        <span>
-                          {formatDateRange(project.startDate, project.endDate)}
-                        </span>
-                      </div>
-                    </div>
-                  </TableCell>
-
-                  <TableCell>
-                    {hasReport ? (
-                      <TimelineProgress
-                        elapsedPercent={project.elapsedPercent}
-                        progressPercent={
-                          project.latestReport?.progressPercent ?? null
-                        }
-                        hasAnomaly={project.hasProgressAnomaly}
-                        reportDateLabel={dateLabel}
-                      />
-                    ) : (
-                      <div className="space-y-1">
-                        <span className="text-xs text-status-attention font-medium">
-                          Belum ada laporan
-                        </span>
-                        {project.elapsedPercent !== null && (
-                          <p className="text-[11px] text-muted-foreground">
-                            Waktu kalender: {project.elapsedPercent}%
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </TableCell>
-
-                  <TableCell className="text-center font-medium">
-                    {project.todayWorkers > 0 ? (
-                      <div className="space-y-0.5">
-                        <span className="text-sm font-bold text-foreground">
-                          {project.todayWorkers}
-                        </span>
-                        <span className="text-[11px] text-muted-foreground block">
-                          Orang
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">-</span>
-                    )}
-                  </TableCell>
-
-                  <TableCell className="text-right">
-                    <div className="space-y-0.5">
-                      <span className="text-sm font-semibold text-foreground">
-                        {formatIDR(project.emergencyBalance)}
-                      </span>
-                      {project.unreviewedWithdrawalsCount > 0 && (
-                        <div className="flex justify-end">
-                          <Badge
-                            variant="outline"
-                            className="border-status-warning bg-status-warning-bg text-status-warning text-[10px] px-1 py-0 font-medium"
-                          >
-                            {project.unreviewedWithdrawalsCount} pending
-                          </Badge>
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-
-                  <TableCell>
-                    <IconArrowRight className="h-4 w-4 text-muted-foreground/50" />
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+      {/* Desktop / Tablet DataGrid View (>= 768px) */}
+      <div className="hidden md:block px-4 md:px-5">
+        <DataGrid
+          columns={columns}
+          data={projects}
+          filterColumn="name"
+          filterPlaceholder="Cari nama proyek..."
+          initialColumnPinning={{
+            left: ["name"],
+            right: ["actions"],
+          }}
+          onRowClick={(project) => router.push(`/projects/${project.slug}`)}
+          exportFilename="portofolio-proyek"
+          csvColumns={csvColumns}
+          defaultDensity="normal"
+          emptyMessage="Tidak ada proyek yang sesuai dengan pencarian."
+        />
       </div>
 
       {/* Mobile Card List View (< 768px) */}
