@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { deleteCloudinaryAsset } from "~/lib/cloudinary";
+import { deleteCloudinaryAsset, isValidCloudinaryUrl } from "~/lib/cloudinary";
 import {
   createTRPCRouter,
   projectProcedure,
@@ -203,53 +203,65 @@ export const emergencyRouter = createTRPCRouter({
       z.object({
         projectId: z.string(),
         amount: z.number().positive(),
-        description: z.string(),
-        proofPublicId: z.string().optional(),
-        proofUrl: z.string().optional(),
+        description: z.string().trim().min(1).max(2000),
+        proofPublicId: z
+          .string()
+          .refine((p) => p.startsWith("astaloka/") && !p.includes(".."), {
+            message: "Format publicId tidak valid",
+          })
+          .optional(),
+        proofUrl: z
+          .string()
+          .refine((val) => !val || isValidCloudinaryUrl(val), {
+            message: "URL bukti harus berupa URL Cloudinary yang valid",
+          })
+          .optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      // Get or create fund
-      let fund = await ctx.db.emergencyFund.findUnique({
-        where: { projectId: ctx.projectId },
-      });
+      return ctx.db.$transaction(async (tx) => {
+        // Get or create fund atomically
+        let fund = await tx.emergencyFund.findUnique({
+          where: { projectId: ctx.projectId },
+        });
 
-      if (!fund) {
-        fund = await ctx.db.emergencyFund.create({
+        if (!fund) {
+          fund = await tx.emergencyFund.create({
+            data: {
+              projectId: ctx.projectId,
+              currentBalance: 0,
+            },
+          });
+        }
+
+        // Create transaction and update balance atomically
+        const transaction = await tx.emergencyTransaction.create({
           data: {
-            projectId: ctx.projectId,
-            currentBalance: 0,
+            fundId: fund.id,
+            requestedById: ctx.session.user.id,
+            amount: input.amount,
+            description: input.description,
+            publicId: input.proofPublicId,
+            url: input.proofUrl,
+            type: "DEPOSIT",
+            status: "UNREVIEWED",
+            verifiedById: null,
+            verifiedAt: null,
           },
         });
-      }
 
-      // Create transaction and update balance
-      const transaction = await ctx.db.emergencyTransaction.create({
-        data: {
-          fundId: fund.id,
-          requestedById: ctx.session.user.id,
-          amount: input.amount,
-          description: input.description,
-          publicId: input.proofPublicId,
-          url: input.proofUrl,
-          type: "DEPOSIT",
-          status: "UNREVIEWED",
-          verifiedById: null,
-          verifiedAt: null,
-        },
-      });
-
-      // Update fund balance
-      await ctx.db.emergencyFund.update({
-        where: { id: fund.id },
-        data: {
-          currentBalance: {
-            increment: input.amount,
+        // Update fund balance
+        await tx.emergencyFund.update({
+          where: { id: fund.id },
+          data: {
+            currentBalance: {
+              increment: input.amount,
+            },
           },
-        },
-      });
+        });
 
-      return transaction;
+        return transaction;
+      });
     }),
 
   /**
@@ -261,66 +273,82 @@ export const emergencyRouter = createTRPCRouter({
       z.object({
         projectId: z.string(),
         amount: z.number().positive(),
-        description: z.string().min(1),
-        proofPublicId: z.string().optional(),
-        proofUrl: z.string().optional(),
+        description: z.string().trim().min(1).max(2000),
+        proofPublicId: z
+          .string()
+          .refine((p) => p.startsWith("astaloka/") && !p.includes(".."), {
+            message: "Format publicId tidak valid",
+          })
+          .optional(),
+        proofUrl: z
+          .string()
+          .refine((val) => !val || isValidCloudinaryUrl(val), {
+            message: "URL bukti harus berupa URL Cloudinary yang valid",
+          })
+          .optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      // Get fund
-      const fund = await ctx.db.emergencyFund.findUnique({
-        where: { projectId: ctx.projectId },
-      });
-
-      if (!fund) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Emergency fund not found for this project",
+      return ctx.db.$transaction(async (tx) => {
+        // 1. Get fund
+        const fund = await tx.emergencyFund.findUnique({
+          where: { projectId: ctx.projectId },
         });
-      }
 
-      // Check if sufficient balance
-      // NOTE: Balance decreases immediately upon request creation
-      if (Number(fund.currentBalance) < input.amount) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Insufficient emergency fund balance",
-        });
-      }
+        if (!fund) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Emergency fund not found for this project",
+          });
+        }
 
-      const transaction = await ctx.db.emergencyTransaction.create({
-        data: {
-          fundId: fund.id,
-          requestedById: ctx.session.user.id,
-          amount: input.amount,
-          description: input.description,
-          publicId: input.proofPublicId,
-          url: input.proofUrl,
-          type: "WITHDRAWAL",
-          status: "UNREVIEWED",
-        },
-        include: {
-          requester: {
-            select: {
-              id: true,
-              name: true,
-              image: true,
+        // 2. Atomic conditional decrement to eliminate TOCTOU race conditions
+        const updateResult = await tx.emergencyFund.updateMany({
+          where: {
+            id: fund.id,
+            currentBalance: {
+              gte: input.amount,
             },
           },
-        },
-      });
-
-      // Deduct balance immediately
-      await ctx.db.emergencyFund.update({
-        where: { id: fund.id },
-        data: {
-          currentBalance: {
-            decrement: input.amount,
+          data: {
+            currentBalance: {
+              decrement: input.amount,
+            },
           },
-        },
-      });
+        });
 
-      return transaction;
+        if (updateResult.count === 0) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Saldo kas darurat tidak mencukupi untuk penarikan ini",
+          });
+        }
+
+        // 3. Create transaction record only if balance was successfully reserved
+        const transaction = await tx.emergencyTransaction.create({
+          data: {
+            fundId: fund.id,
+            requestedById: ctx.session.user.id,
+            amount: input.amount,
+            description: input.description,
+            publicId: input.proofPublicId,
+            url: input.proofUrl,
+            type: "WITHDRAWAL",
+            status: "UNREVIEWED",
+          },
+          include: {
+            requester: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+          },
+        });
+
+        return transaction;
+      });
     }),
 
   /**
@@ -421,9 +449,23 @@ export const emergencyRouter = createTRPCRouter({
         projectId: z.string(),
         transactionId: z.string(),
         amount: z.number().positive(),
-        description: z.string().min(1),
-        proofPublicId: z.string().nullable().optional(),
-        proofUrl: z.string().nullable().optional(),
+        description: z.string().trim().min(1).max(2000),
+        proofPublicId: z
+          .string()
+          .refine(
+            (val) =>
+              !val || (val.startsWith("astaloka/") && !val.includes("..")),
+            { message: "Format publicId tidak valid" },
+          )
+          .nullable()
+          .optional(),
+        proofUrl: z
+          .string()
+          .refine((val) => !val || isValidCloudinaryUrl(val), {
+            message: "URL bukti harus berupa URL Cloudinary yang valid",
+          })
+          .nullable()
+          .optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -495,32 +537,68 @@ export const emergencyRouter = createTRPCRouter({
         });
       }
 
-      // Calculate balance adjustment
+      // Calculate and apply atomic balance adjustment inside transaction
       const oldAmount = Number(transaction.amount);
       const newAmount = input.amount;
-      const currentBalance = Number(transaction.fund.currentBalance);
 
-      let newBalance: number;
-      if (transaction.type === "DEPOSIT") {
-        // For deposits: remove old amount, add new amount
-        newBalance = currentBalance - oldAmount + newAmount;
-      } else {
-        // For withdrawals: restore old reservation, apply new reservation
-        newBalance = currentBalance + oldAmount - newAmount;
-      }
+      return ctx.db.$transaction(async (tx) => {
+        if (transaction.type === "DEPOSIT") {
+          const diff = newAmount - oldAmount;
+          if (diff > 0) {
+            await tx.emergencyFund.update({
+              where: { id: transaction.fundId },
+              data: { currentBalance: { increment: diff } },
+            });
+          } else if (diff < 0) {
+            const decrease = Math.abs(diff);
+            const updateResult = await tx.emergencyFund.updateMany({
+              where: {
+                id: transaction.fundId,
+                currentBalance: { gte: decrease },
+              },
+              data: { currentBalance: { decrement: decrease } },
+            });
 
-      // Safety: balance must not go negative
-      if (newBalance < 0) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message:
-            "Perubahan ini akan menyebabkan saldo menjadi negatif. Operasi dibatalkan.",
-        });
-      }
+            if (updateResult.count === 0) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message:
+                  "Perubahan ini akan menyebabkan saldo menjadi negatif karena dana telah terpakai. Operasi dibatalkan.",
+              });
+            }
+          }
+        } else {
+          // WITHDRAWAL
+          const diff = newAmount - oldAmount;
+          if (diff > 0) {
+            // Withdrawing more money requires sufficient current balance
+            const extra = diff;
+            const updateResult = await tx.emergencyFund.updateMany({
+              where: {
+                id: transaction.fundId,
+                currentBalance: { gte: extra },
+              },
+              data: { currentBalance: { decrement: extra } },
+            });
 
-      // Atomic update: transaction + balance
-      const [updated] = await ctx.db.$transaction([
-        ctx.db.emergencyTransaction.update({
+            if (updateResult.count === 0) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message:
+                  "Saldo kas darurat tidak mencukupi untuk menambah jumlah penarikan ini.",
+              });
+            }
+          } else if (diff < 0) {
+            // Withdrawing less money returns the difference to the balance
+            const refund = Math.abs(diff);
+            await tx.emergencyFund.update({
+              where: { id: transaction.fundId },
+              data: { currentBalance: { increment: refund } },
+            });
+          }
+        }
+
+        const updated = await tx.emergencyTransaction.update({
           where: { id: input.transactionId },
           data: {
             amount: newAmount,
@@ -540,14 +618,10 @@ export const emergencyRouter = createTRPCRouter({
               select: { id: true, name: true, image: true },
             },
           },
-        }),
-        ctx.db.emergencyFund.update({
-          where: { id: transaction.fundId },
-          data: { currentBalance: newBalance },
-        }),
-      ]);
+        });
 
-      return updated;
+        return updated;
+      });
     }),
 
   /**
@@ -608,29 +682,40 @@ export const emergencyRouter = createTRPCRouter({
         });
       }
 
-      // Calculate new balance after deletion
-      const currentBalance = Number(transaction.fund.currentBalance);
       const amount = Number(transaction.amount);
 
-      let newBalance: number;
-      if (transaction.type === "DEPOSIT") {
-        // Removing a deposit decreases balance
-        newBalance = currentBalance - amount;
-      } else {
-        // Removing a withdrawal restores the reserved amount
-        newBalance = currentBalance + amount;
-      }
+      // Atomic delete + balance update
+      await ctx.db.$transaction(async (tx) => {
+        if (transaction.type === "DEPOSIT") {
+          const updateResult = await tx.emergencyFund.updateMany({
+            where: {
+              id: transaction.fundId,
+              currentBalance: { gte: amount },
+            },
+            data: { currentBalance: { decrement: amount } },
+          });
 
-      // Safety: balance must not go negative
-      if (newBalance < 0) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message:
-            "Menghapus transaksi ini akan menyebabkan saldo menjadi negatif. Operasi dibatalkan.",
+          if (updateResult.count === 0) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message:
+                "Menghapus transaksi deposit ini akan menyebabkan saldo kas menjadi negatif karena dana telah terpakai. Operasi dibatalkan.",
+            });
+          }
+        } else {
+          // WITHDRAWAL: restoring reserved funds back to the fund
+          await tx.emergencyFund.update({
+            where: { id: transaction.fundId },
+            data: { currentBalance: { increment: amount } },
+          });
+        }
+
+        await tx.emergencyTransaction.delete({
+          where: { id: input.transactionId },
         });
-      }
+      });
 
-      // Issue 2: Delete asset from Cloudinary when deleting transaction
+      // Delete asset from Cloudinary only after database transaction successfully commits
       if (transaction.publicId) {
         await deleteCloudinaryAsset(transaction.publicId).catch((err) => {
           console.error(
@@ -639,17 +724,6 @@ export const emergencyRouter = createTRPCRouter({
           );
         });
       }
-
-      // Atomic delete + balance update
-      await ctx.db.$transaction([
-        ctx.db.emergencyTransaction.delete({
-          where: { id: input.transactionId },
-        }),
-        ctx.db.emergencyFund.update({
-          where: { id: transaction.fundId },
-          data: { currentBalance: newBalance },
-        }),
-      ]);
 
       return { success: true };
     }),

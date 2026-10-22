@@ -4,6 +4,7 @@ import { z } from "zod";
 import {
   deleteCloudinaryAsset,
   generateSignedDownloadUrl,
+  isValidCloudinaryUrl,
 } from "~/lib/cloudinary";
 import { requireOwnership } from "~/server/api/helpers/permission";
 import {
@@ -127,7 +128,7 @@ export const documentRouter = createTRPCRouter({
     .input(
       z.object({
         projectId: z.string(),
-        fileName: z.string(),
+        fileName: z.string().trim().min(1).max(255),
         fileType: z.enum([
           "DESIGN",
           "DRAWING",
@@ -135,14 +136,24 @@ export const documentRouter = createTRPCRouter({
           "SPECIFICATION",
           "OTHER",
         ]),
-        publicId: z.string(),
-        url: z.string().url(),
+        publicId: z
+          .string()
+          .min(1)
+          .refine((p) => p.startsWith("astaloka/") && !p.includes(".."), {
+            message: "Format publicId tidak valid",
+          }),
+        url: z
+          .string()
+          .url()
+          .refine(isValidCloudinaryUrl, {
+            message: "URL dokumen harus berupa URL Cloudinary yang valid",
+          }),
         fileSize: z.number().int().optional(),
-        mimeType: z.string().optional(),
-        resourceType: z.string().optional(),
-        title: z.string().optional(),
-        description: z.string().optional(),
-        version: z.string().optional(),
+        mimeType: z.string().max(100).optional(),
+        resourceType: z.string().max(50).optional(),
+        title: z.string().trim().max(255).optional(),
+        description: z.string().trim().max(3000).optional(),
+        version: z.string().trim().max(50).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -311,18 +322,29 @@ export const documentRouter = createTRPCRouter({
       z.object({
         projectId: z.string(),
         documentId: z.string(),
-        title: z.string().nullable().optional(),
-        description: z.string().nullable().optional(),
-        version: z.string().nullable().optional(),
+        title: z.string().trim().max(255).nullable().optional(),
+        description: z.string().trim().max(3000).nullable().optional(),
+        version: z.string().trim().max(50).nullable().optional(),
         fileType: z
           .enum(["DESIGN", "DRAWING", "REFERENCE", "SPECIFICATION", "OTHER"])
           .optional(),
-        fileName: z.string().optional(),
-        publicId: z.string().optional(),
-        url: z.string().url().optional(),
+        fileName: z.string().trim().max(255).optional(),
+        publicId: z
+          .string()
+          .refine((p) => p.startsWith("astaloka/") && !p.includes(".."), {
+            message: "Format publicId tidak valid",
+          })
+          .optional(),
+        url: z
+          .string()
+          .url()
+          .refine(isValidCloudinaryUrl, {
+            message: "URL dokumen harus berupa URL Cloudinary yang valid",
+          })
+          .optional(),
         fileSize: z.number().int().optional(),
-        mimeType: z.string().optional(),
-        resourceType: z.string().optional(),
+        mimeType: z.string().max(100).optional(),
+        resourceType: z.string().max(50).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -438,7 +460,10 @@ export const documentRouter = createTRPCRouter({
       );
 
       // Delete asset from Cloudinary to prevent orphaned storage
-      if (document.publicId) {
+      if (
+        document.publicId?.startsWith("astaloka/") &&
+        !document.publicId.includes("..")
+      ) {
         await deleteCloudinaryAsset(document.publicId, {
           resourceType: document.resourceType ?? undefined,
         }).catch((err) => {

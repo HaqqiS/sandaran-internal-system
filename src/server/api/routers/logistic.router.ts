@@ -103,7 +103,7 @@ export const logisticRouter = createTRPCRouter({
     .input(
       z.object({
         projectId: z.string(),
-        name: z.string().min(1),
+        name: z.string().trim().min(1).max(100),
         unit: z.string().trim().min(1).max(20), // e.g., "Sack", "Pcs", "Kg"
       }),
     )
@@ -165,7 +165,7 @@ export const logisticRouter = createTRPCRouter({
       z.object({
         projectId: z.string(),
         itemId: z.string(),
-        name: z.string().min(1).optional(),
+        name: z.string().trim().min(1).max(100).optional(),
         unit: z.string().trim().min(1).max(20).optional(),
       }),
     )
@@ -246,66 +246,74 @@ export const logisticRouter = createTRPCRouter({
         itemId: z.string(),
         type: z.enum(["IN", "OUT"]),
         quantity: z.number().positive(),
-        notes: z.string().optional(),
+        notes: z.string().trim().max(1000).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      // Verify item belongs to this project
-      const item = await ctx.db.logisticItem.findFirst({
-        where: {
-          id: input.itemId,
-          projectId: ctx.projectId,
-        },
-        include: {
-          transactions: true,
-        },
-      });
-
-      if (!item) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Logistic item not found in this project",
+      return ctx.db.$transaction(async (tx) => {
+        // Verify item belongs to this project
+        const item = await tx.logisticItem.findFirst({
+          where: {
+            id: input.itemId,
+            projectId: ctx.projectId,
+          },
         });
-      }
 
-      if (input.type === "OUT") {
-        const totalIn = item.transactions
-          .filter((t) => t.type === "IN")
-          .reduce((sum, t) => sum + Number(t.quantity), 0);
-        const totalOut = item.transactions
-          .filter((t) => t.type === "OUT")
-          .reduce((sum, t) => sum + Number(t.quantity), 0);
-        const currentStock = totalIn - totalOut;
-
-        if (input.quantity > currentStock) {
+        if (!item) {
           throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: `Stok tidak mencukupi. Stok saat ini: ${currentStock} ${item.unit}`,
+            code: "NOT_FOUND",
+            message: "Logistic item not found in this project",
           });
         }
-      }
 
-      const transaction = await ctx.db.logisticTransaction.create({
-        data: {
-          itemId: input.itemId,
-          userId: ctx.session.user.id,
-          type: input.type,
-          quantity: input.quantity,
-          notes: input.notes,
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              image: true,
-            },
+        if (input.type === "OUT") {
+          const aggregates = await tx.logisticTransaction.groupBy({
+            by: ["type"],
+            where: { itemId: input.itemId },
+            _sum: { quantity: true },
+          });
+
+          let totalIn = 0;
+          let totalOut = 0;
+          for (const agg of aggregates) {
+            if (agg.type === "IN") {
+              totalIn = Number(agg._sum.quantity ?? 0);
+            } else if (agg.type === "OUT") {
+              totalOut = Number(agg._sum.quantity ?? 0);
+            }
+          }
+          const currentStock = totalIn - totalOut;
+
+          if (input.quantity > currentStock) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: `Stok tidak mencukupi. Stok saat ini: ${currentStock} ${item.unit}`,
+            });
+          }
+        }
+
+        const transaction = await tx.logisticTransaction.create({
+          data: {
+            itemId: input.itemId,
+            userId: ctx.session.user.id,
+            type: input.type,
+            quantity: input.quantity,
+            notes: input.notes,
           },
-          item: true,
-        },
-      });
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+              },
+            },
+            item: true,
+          },
+        });
 
-      return transaction;
+        return transaction;
+      });
     }),
 
   /**

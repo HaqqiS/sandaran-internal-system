@@ -3,6 +3,8 @@ import ExcelJS from "exceljs";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { isAdmin, validateSessionAccess } from "~/lib/auth-guards";
+import { isValidCloudinaryUrl } from "~/lib/cloudinary";
+import { sanitizeSpreadsheetText } from "~/lib/spreadsheet";
 import { getSession } from "~/server/better-auth/server";
 import { db } from "~/server/db";
 
@@ -65,12 +67,20 @@ function formatMonthYearID(year: number, month: number): string {
   return d.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
 }
 
-function buildCloudinaryThumbUrl(url: string): string {
+function buildCloudinaryThumbUrl(url: string): string | null {
+  if (!isValidCloudinaryUrl(url) || !url.includes("/upload/")) {
+    return null;
+  }
   // Insert transformation after /upload/ in Cloudinary URL
   return url.replace("/upload/", "/upload/w_100,h_80,c_fill,q_auto,f_auto/");
 }
 
-async function fetchImageBuffer(url: string): Promise<ArrayBuffer | null> {
+async function fetchImageBuffer(
+  url: string | null,
+): Promise<ArrayBuffer | null> {
+  if (!url || !isValidCloudinaryUrl(url)) {
+    return null;
+  }
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
     if (!res.ok) return null;
@@ -284,11 +294,11 @@ export async function GET(
         value: formatDateID(new Date(report.reportDate)),
         center: true,
       },
-      { col: 3, value: report.weather ?? "-", center: true },
+      { col: 3, value: sanitizeSpreadsheetText(report.weather), center: true },
       { col: 4, value: report.totalWorkers, center: true },
-      { col: 5, value: report.location ?? "-", center: false },
+      { col: 5, value: sanitizeSpreadsheetText(report.location), center: false },
       { col: 6, value: `${report.progressPercent}%`, center: true },
-      { col: 8, value: report.issues ?? "-", center: false },
+      { col: 8, value: sanitizeSpreadsheetText(report.issues), center: false },
     ];
 
     for (const { col, value, center } of mergedCols) {
@@ -315,7 +325,8 @@ export async function GET(
         if (task.notes) taskParts.push(`   📝 ${task.notes}`);
         taskCell.value = taskParts.join("\n");
       } else {
-        if (t === 0) taskCell.value = report.taskDescription ?? "-";
+        if (t === 0)
+          taskCell.value = sanitizeSpreadsheetText(report.taskDescription);
       }
       applyDataCellStyle(taskCell, false);
 

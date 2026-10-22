@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { deleteCloudinaryAsset } from "~/lib/cloudinary";
+import { deleteCloudinaryAsset, isValidCloudinaryUrl } from "~/lib/cloudinary";
 import { requireOwnership } from "~/server/api/helpers/permission";
 import {
   createTRPCRouter,
@@ -38,12 +38,12 @@ export const reportRouter = createTRPCRouter({
       z.object({
         projectId: z.string(),
         reportDate: z.date().optional(),
-        taskDescription: z.string().min(1),
+        taskDescription: z.string().trim().min(1).max(5000),
         progressPercent: z.number().min(0).max(100).default(0),
-        weather: z.string().optional(),
+        weather: z.string().trim().max(100).optional(),
         totalWorkers: z.number().int().min(0).default(0),
-        location: z.string().optional(),
-        issues: z.string().optional(),
+        location: z.string().trim().max(255).optional(),
+        issues: z.string().trim().max(3000).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -368,12 +368,12 @@ export const reportRouter = createTRPCRouter({
         projectId: z.string(),
         reportId: z.string(),
         reportDate: z.date().optional(),
-        taskDescription: z.string().min(1).optional(),
+        taskDescription: z.string().trim().min(1).max(5000).optional(),
         progressPercent: z.number().min(0).max(100).optional(),
-        weather: z.string().optional(),
+        weather: z.string().trim().max(100).optional(),
         totalWorkers: z.number().int().min(0).optional(),
-        location: z.string().optional(),
-        issues: z.string().optional(),
+        location: z.string().trim().max(255).optional(),
+        issues: z.string().trim().max(3000).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -490,10 +490,10 @@ export const reportRouter = createTRPCRouter({
       z.object({
         projectId: z.string(),
         reportId: z.string(),
-        taskName: z.string().min(1),
+        taskName: z.string().trim().min(1).max(255),
         workerCount: z.number().int().min(0).default(0),
         progress: z.number().min(0).max(100).default(0),
-        notes: z.string().optional(),
+        notes: z.string().trim().max(2000).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -534,10 +534,10 @@ export const reportRouter = createTRPCRouter({
       z.object({
         projectId: z.string(),
         taskId: z.string(),
-        taskName: z.string().min(1).optional(),
+        taskName: z.string().trim().min(1).max(255).optional(),
         workerCount: z.number().int().min(0).optional(),
         progress: z.number().min(0).max(100).optional(),
-        notes: z.string().optional(),
+        notes: z.string().trim().max(2000).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -553,6 +553,14 @@ export const reportRouter = createTRPCRouter({
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Task not found",
+        });
+      }
+
+      // Verify task belongs to this project
+      if (task.report.projectId !== ctx.projectId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Tugas tidak termasuk dalam proyek ini",
         });
       }
 
@@ -603,6 +611,14 @@ export const reportRouter = createTRPCRouter({
         });
       }
 
+      // Verify task belongs to this project
+      if (task.report.projectId !== ctx.projectId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Tugas tidak termasuk dalam proyek ini",
+        });
+      }
+
       // Check ownership of the report
       requireOwnership(
         task.report,
@@ -629,12 +645,20 @@ export const reportRouter = createTRPCRouter({
       z.object({
         projectId: z.string(),
         reportId: z.string(),
-        publicId: z.string(),
-        url: z.url(),
-        resourceType: z.string().optional(),
-        fileName: z.string().optional(),
+        publicId: z
+          .string()
+          .trim()
+          .min(1)
+          .refine((id) => id.startsWith("astaloka/"), {
+            message: "Public ID Cloudinary tidak valid",
+          }),
+        url: z.string().url().refine(isValidCloudinaryUrl, {
+          message: "URL media harus berupa URL Cloudinary yang valid",
+        }),
+        resourceType: z.string().trim().max(50).optional(),
+        fileName: z.string().trim().max(255).optional(),
         fileSize: z.number().int().optional(),
-        mimeType: z.string().optional(),
+        mimeType: z.string().trim().max(100).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -692,6 +716,14 @@ export const reportRouter = createTRPCRouter({
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Media not found",
+        });
+      }
+
+      // Verify media belongs to this project
+      if (media.report.projectId !== ctx.projectId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Media tidak termasuk dalam proyek ini",
         });
       }
 
