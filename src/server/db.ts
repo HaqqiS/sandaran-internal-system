@@ -43,9 +43,16 @@ export const getDb = (): PrismaClient => {
     return existing;
   }
 
+  // Supabase poolers and managed hosts use certificates that fail standard Node CA checks without custom CA.
+  // Default to rejectUnauthorized: false for compatibility unless explicitly enabled.
+  const sslRejectUnauthorized =
+    process.env.DATABASE_SSL_REJECT_UNAUTHORIZED === "true";
+
   const pool = new Pool({
     connectionString: info.string,
-    ssl: info.isHyperdrive ? undefined : { rejectUnauthorized: false },
+    ssl: info.isHyperdrive
+      ? undefined
+      : { rejectUnauthorized: sslRejectUnauthorized },
     max: info.isHyperdrive ? 5 : 1,
     connectionTimeoutMillis: 10000,
   });
