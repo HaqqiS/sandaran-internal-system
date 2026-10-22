@@ -16,6 +16,11 @@
 - **Auto-Zoom pada Input Form**: Pada peramban iOS Safari, elemen form (`CommandInput`, `Input`, `Textarea`) yang memiliki ukuran font di bawah `16px` (`text-sm`) akan memicu zoom otomatis saat disentuh.
 - **Scroll Gestures dalam Drawer**: Interaksi scroll daftar item panjang di dalam modal Vaul Drawer memerlukan penanganan gesture khusus (`data-vaul-no-drag`) agar interaksi swipe keyboard atau daftar tidak menutup drawer secara tidak sengaja.
 
+### 1.3 Perizinan & Header Keamanan (Security & RBAC Minor Limitations)
+
+- **Visibilitas Tombol Hapus Proyek untuk Role EXECUTIVE**: Prosedur backend `project.delete` sudah diproteksi ketat menggunakan `strictAdminProcedure` (hanya role `ADMIN`). Namun di UI (`projects-client.tsx`), opsi "Hapus" pada dropdown menu masih tampak bagi pengguna dengan peran `EXECUTIVE` karena dibungkus helper `canManage`. Saat dikonfirmasi, server dengan benar menolak aksi dengan notifikasi error *"Operasi ini hanya dapat dilakukan oleh Administrator"*. Ke depan, visibilitas tombol ini di UI sebaiknya langsung disembunyikan jika `roleGlobal !== "ADMIN"`.
+- **Header Keamanan HTTP Legacy (`X-XSS-Protection`)**: Header `X-XSS-Protection: 1; mode=block` pada `next.config.js` dipertahankan untuk backward-compatibility browser lawas. Pada standar web modern (OWASP), header ini sudah didepresiasi dan proteksi XSS diemban sepenuhnya oleh `Content-Security-Policy`.
+
 ---
 
 ## 2. Riwayat Isu yang Telah Terselesaikan (Resolved)
