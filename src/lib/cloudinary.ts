@@ -143,4 +143,32 @@ export function getOptimizedImageUrl(
   });
 }
 
+/**
+ * Validate that a URL is a legitimate Cloudinary HTTPS URL belonging to this application's cloud name.
+ * Prevents SSRF attacks when fetching or processing media URLs server-side.
+ */
+export function isValidCloudinaryUrl(url: string): boolean {
+  if (!url || typeof url !== "string") return false;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:") return false;
+    if (parsed.hostname !== "res.cloudinary.com") return false;
+
+    // Path structure: /<cloud_name>/<resource_type>/upload/...
+    const pathSegments = parsed.pathname.split("/").filter(Boolean);
+    if (pathSegments.length < 3) return false;
+    if (pathSegments[0] !== env.CLOUDINARY_CLOUD_NAME) return false;
+
+    // Ensure it is an authenticated or upload path and doesn't contain path traversal sequences
+    const isUploadOrAuth =
+      pathSegments.includes("upload") || pathSegments.includes("authenticated");
+    if (!isUploadOrAuth) return false;
+    if (parsed.pathname.includes("..")) return false;
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export { cloudinary };
