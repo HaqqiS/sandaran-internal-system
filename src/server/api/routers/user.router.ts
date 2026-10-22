@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { hashPassword } from "better-auth/crypto";
+import { hashPassword, verifyPassword } from "better-auth/crypto";
 import { z } from "zod";
 import {
   adminOrCeoProcedure,
@@ -142,10 +142,10 @@ export const userRouter = createTRPCRouter({
 
   /**
    * Search users (for adding members)
-   * Returns users not strictly restricted
+   * Restricted to Admin and Executive who manage project memberships
    */
-  search: protectedProcedure
-    .input(z.object({ query: z.string().optional() }))
+  search: adminProcedure
+    .input(z.object({ query: z.string().trim().max(100).optional() }))
     .query(async ({ ctx, input }) => {
       const query = input.query || "";
 
@@ -189,6 +189,14 @@ export const userRouter = createTRPCRouter({
       const { userId, roleGlobal, projectAssignment } = input;
       const approverId = ctx.session.user.id;
 
+      // Validation: only ADMIN can assign ADMIN role
+      if (roleGlobal === "ADMIN" && ctx.session.user.roleGlobal !== "ADMIN") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Hanya Administrator yang dapat memberikan peran ADMIN",
+        });
+      }
+
       // Validation: cannot approve self to ADMIN unless already ADMIN
       if (roleGlobal === "ADMIN" && userId === approverId) {
         if (ctx.session.user.roleGlobal !== "ADMIN") {
@@ -197,6 +205,31 @@ export const userRouter = createTRPCRouter({
             message: "Cannot self-promote to ADMIN",
           });
         }
+      }
+
+      // Hierarchy protection: fetch target user
+      const targetUser = await ctx.db.user.findUnique({
+        where: { id: userId },
+        select: { roleGlobal: true },
+      });
+
+      if (!targetUser) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      // Only ADMIN can modify or demote an existing ADMIN user
+      if (
+        targetUser.roleGlobal === "ADMIN" &&
+        ctx.session.user.roleGlobal !== "ADMIN"
+      ) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message:
+            "Hanya Administrator yang dapat menyetujui atau mengubah data akun Administrator lain",
+        });
       }
 
       // Update user global role & status
@@ -263,6 +296,23 @@ export const userRouter = createTRPCRouter({
         });
       }
 
+      // Validation: only ADMIN can reject an ADMIN user
+      const targetUser = await ctx.db.user.findUnique({
+        where: { id: userId },
+        select: { roleGlobal: true },
+      });
+
+      if (
+        targetUser?.roleGlobal === "ADMIN" &&
+        ctx.session.user.roleGlobal !== "ADMIN"
+      ) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message:
+            "Hanya Administrator yang dapat menolak akun Administrator lain",
+        });
+      }
+
       return ctx.db.user.update({
         where: { id: userId },
         data: {
@@ -288,6 +338,14 @@ export const userRouter = createTRPCRouter({
       const { userIds, roleGlobal } = input;
       const approverId = ctx.session.user.id;
 
+      // Validation: only ADMIN can assign ADMIN role
+      if (roleGlobal === "ADMIN" && ctx.session.user.roleGlobal !== "ADMIN") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Hanya Administrator yang dapat memberikan peran ADMIN",
+        });
+      }
+
       // Filter out self if trying to approve self to ADMIN
       const validUserIds =
         roleGlobal === "ADMIN"
@@ -299,6 +357,25 @@ export const userRouter = createTRPCRouter({
           code: "BAD_REQUEST",
           message: "No valid users to approve",
         });
+      }
+
+      // Hierarchy protection: ensure non-ADMIN cannot modify any existing ADMIN accounts
+      if (ctx.session.user.roleGlobal !== "ADMIN") {
+        const adminTargets = await ctx.db.user.findMany({
+          where: {
+            id: { in: validUserIds },
+            roleGlobal: "ADMIN",
+          },
+          select: { id: true },
+        });
+
+        if (adminTargets.length > 0) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message:
+              "Hanya Administrator yang dapat memodifikasi akun Administrator lain",
+          });
+        }
       }
 
       await ctx.db.user.updateMany({
@@ -343,6 +420,18 @@ export const userRouter = createTRPCRouter({
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "User not found",
+        });
+      }
+
+      // Validation: only ADMIN can delete an ADMIN user
+      if (
+        user.roleGlobal === "ADMIN" &&
+        ctx.session.user.roleGlobal !== "ADMIN"
+      ) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message:
+            "Hanya Administrator yang dapat menghapus akun Administrator lain",
         });
       }
 
@@ -392,6 +481,15 @@ export const userRouter = createTRPCRouter({
       const { name, roleGlobal, projectAssignment, password } = input;
       const email = input.email?.trim().toLowerCase();
       const phoneNumber = input.phoneNumber?.trim();
+
+      // Hierarchy validation: only ADMIN can create an ADMIN account
+      if (roleGlobal === "ADMIN" && ctx.session.user.roleGlobal !== "ADMIN") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message:
+            "Hanya Administrator yang dapat membuat akun dengan peran Administrator",
+        });
+      }
 
       if (!email && !phoneNumber) {
         throw new TRPCError({
@@ -546,6 +644,30 @@ export const userRouter = createTRPCRouter({
         });
       }
 
+      // 1b. Hierarchy protection: only ADMIN can modify an ADMIN user or promote to ADMIN
+      if (
+        targetUser.roleGlobal === "ADMIN" &&
+        ctx.session.user.roleGlobal !== "ADMIN"
+      ) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message:
+            "Hanya Administrator yang dapat mengubah data akun Administrator lain",
+        });
+      }
+
+      if (
+        roleGlobal === "ADMIN" &&
+        targetUser.roleGlobal !== "ADMIN" &&
+        ctx.session.user.roleGlobal !== "ADMIN"
+      ) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message:
+            "Hanya Administrator yang dapat menetapkan peran Administrator",
+        });
+      }
+
       // 2. Prevent self-demotion from ADMIN
       if (userId === currentUserId && targetUser.roleGlobal === "ADMIN") {
         if (roleGlobal !== "ADMIN") {
@@ -687,6 +809,7 @@ export const userRouter = createTRPCRouter({
           .min(8, "Nomor telepon minimal 8 karakter")
           .optional()
           .or(z.literal("")),
+        currentPassword: z.string().optional(),
         password: z
           .string()
           .min(6, "Kata sandi minimal 6 karakter")
@@ -762,13 +885,37 @@ export const userRouter = createTRPCRouter({
       return ctx.db.$transaction(async (tx) => {
         // Handle password update if provided
         if (password) {
-          const hashedPassword = await hashPassword(password);
           const existingAccount = await tx.account.findFirst({
             where: {
               userId,
               providerId: "credential",
             },
           });
+
+          // If user already has an existing password, current password is required and verified
+          if (existingAccount?.password) {
+            if (!input.currentPassword) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message:
+                  "Kata sandi saat ini wajib diisi untuk mengubah kata sandi",
+              });
+            }
+
+            const isMatch = await verifyPassword({
+              hash: existingAccount.password,
+              password: input.currentPassword,
+            });
+
+            if (!isMatch) {
+              throw new TRPCError({
+                code: "FORBIDDEN",
+                message: "Kata sandi saat ini tidak valid",
+              });
+            }
+          }
+
+          const hashedPassword = await hashPassword(password);
 
           if (existingAccount) {
             await tx.account.update({

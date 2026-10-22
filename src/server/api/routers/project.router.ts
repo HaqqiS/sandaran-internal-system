@@ -10,6 +10,7 @@ import {
   createTRPCRouter,
   projectProcedure,
   protectedProcedure,
+  strictAdminProcedure,
 } from "~/server/api/trpc";
 
 /**
@@ -40,10 +41,10 @@ export const projectRouter = createTRPCRouter({
   create: adminProcedure
     .input(
       z.object({
-        name: z.string().min(1),
-        slug: z.string().optional(),
-        description: z.string().optional(),
-        location: z.string().optional(),
+        name: z.string().trim().min(1).max(100),
+        slug: z.string().trim().max(100).optional(),
+        description: z.string().trim().max(3000).optional(),
+        location: z.string().trim().max(255).optional(),
         startDate: z.date().optional(),
         endDate: z.date().optional(),
         status: z.enum(["ACTIVE", "DONE", "PAUSED"]).default("ACTIVE"),
@@ -385,10 +386,10 @@ export const projectRouter = createTRPCRouter({
     .input(
       z.object({
         projectId: z.string(),
-        name: z.string().min(1).optional(),
-        slug: z.string().min(1).optional(),
-        description: z.string().optional(),
-        location: z.string().optional(),
+        name: z.string().trim().min(1).max(100).optional(),
+        slug: z.string().trim().max(100).optional(),
+        description: z.string().trim().max(3000).optional(),
+        location: z.string().trim().max(255).optional(),
         startDate: z.date().optional(),
         endDate: z.date().optional(),
         status: z.enum(["ACTIVE", "DONE", "PAUSED"]).optional(),
@@ -478,7 +479,7 @@ export const projectRouter = createTRPCRouter({
    * Delete project
    * Only ADMIN can delete projects
    */
-  delete: adminProcedure
+  delete: strictAdminProcedure
     .input(
       z.object({
         projectId: z.string(),
@@ -505,15 +506,24 @@ export const projectRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      // Check if user exists
+      // Check if user exists and is active
       const user = await ctx.db.user.findUnique({
         where: { id: input.userId },
+        select: { id: true, isActive: true },
       });
 
       if (!user) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "User not found",
+        });
+      }
+
+      if (!user.isActive) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "Hanya pengguna aktif dan disetujui yang dapat ditambahkan ke proyek",
         });
       }
 

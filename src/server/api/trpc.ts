@@ -48,8 +48,15 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
+    const isInternalError = error.code === "INTERNAL_SERVER_ERROR";
+    const isProd = process.env.NODE_ENV === "production";
+
     return {
       ...shape,
+      message:
+        isInternalError && isProd
+          ? "Terjadi kesalahan internal pada server. Silakan hubungi administrator."
+          : shape.message,
       data: {
         ...shape.data,
         zodError:
@@ -205,6 +212,45 @@ export const adminProcedure = t.procedure
     return next({
       ctx: {
         // infers the `session` as non-nullable with admin role
+        session: { ...ctx.session, user: ctx.session.user },
+      },
+    });
+  });
+
+/**
+ * Strict Admin-only procedure
+ *
+ * Only accessible to users with strictly ADMIN role (excludes EXECUTIVE).
+ * Use this for critical administrative mutations like creating admins, resetting credentials, deleting projects, etc.
+ */
+export const strictAdminProcedure = t.procedure
+  .use(timingMiddleware)
+  .use(({ ctx, next }) => {
+    if (!ctx.session?.user) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "Not authenticated",
+      });
+    }
+
+    const { roleGlobal, isActive } = ctx.session.user;
+
+    if (!isActive) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Account is not active.",
+      });
+    }
+
+    if (roleGlobal !== "ADMIN") {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Operasi ini hanya dapat dilakukan oleh Administrator.",
+      });
+    }
+
+    return next({
+      ctx: {
         session: { ...ctx.session, user: ctx.session.user },
       },
     });

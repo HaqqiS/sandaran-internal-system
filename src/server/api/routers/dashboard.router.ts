@@ -606,15 +606,7 @@ export const dashboardRouter = createTRPCRouter({
   /**
    * Get stats for Executive dashboard
    */
-  getExecutiveStats: protectedProcedure.query(async ({ ctx }) => {
-    // Check if Executive or Admin
-    if (
-      ctx.session.user.roleGlobal !== "EXECUTIVE" &&
-      ctx.session.user.roleGlobal !== "ADMIN"
-    ) {
-      throw new Error("Unauthorized");
-    }
-
+  getExecutiveStats: adminOrExecutiveProcedure.query(async ({ ctx }) => {
     const projects = await ctx.db.project.findMany({
       select: {
         id: true,
@@ -637,14 +629,7 @@ export const dashboardRouter = createTRPCRouter({
   }),
 
   // Backward compatibility alias
-  getCEOStats: protectedProcedure.query(async ({ ctx }) => {
-    if (
-      ctx.session.user.roleGlobal !== "EXECUTIVE" &&
-      ctx.session.user.roleGlobal !== "ADMIN"
-    ) {
-      throw new Error("Unauthorized");
-    }
-
+  getCEOStats: adminOrExecutiveProcedure.query(async ({ ctx }) => {
     const projects = await ctx.db.project.findMany({
       select: {
         id: true,
@@ -669,17 +654,9 @@ export const dashboardRouter = createTRPCRouter({
   /**
    * Get recent reports across all projects (Executive)
    */
-  getExecutiveRecentReports: protectedProcedure
+  getExecutiveRecentReports: adminOrExecutiveProcedure
     .input(z.object({ limit: z.number().default(5).optional() }))
     .query(async ({ ctx, input }) => {
-      // Check if Executive or Admin
-      if (
-        ctx.session.user.roleGlobal !== "EXECUTIVE" &&
-        ctx.session.user.roleGlobal !== "ADMIN"
-      ) {
-        throw new Error("Unauthorized");
-      }
-
       const reports = await ctx.db.dailyReport.findMany({
         take: input.limit ?? 5,
         orderBy: { reportDate: "desc" },
@@ -710,16 +687,9 @@ export const dashboardRouter = createTRPCRouter({
     }),
 
   // Backward compatibility alias
-  getCEORecentReports: protectedProcedure
+  getCEORecentReports: adminOrExecutiveProcedure
     .input(z.object({ limit: z.number().default(5).optional() }))
     .query(async ({ ctx, input }) => {
-      if (
-        ctx.session.user.roleGlobal !== "EXECUTIVE" &&
-        ctx.session.user.roleGlobal !== "ADMIN"
-      ) {
-        throw new Error("Unauthorized");
-      }
-
       return ctx.db.dailyReport.findMany({
         take: input.limit ?? 5,
         orderBy: { reportDate: "desc" },
