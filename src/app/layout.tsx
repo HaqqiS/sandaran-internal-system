@@ -80,7 +80,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <TRPCReactProvider>
-            <Toaster richColors position="top-center" duration={5000} />
+            <Toaster richColors position="top-right" duration={5000} />
             {children}
           </TRPCReactProvider>
         </ThemeProvider>

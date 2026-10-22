@@ -39,6 +39,7 @@ const accountSchema = z
       ),
     phone: z.string(),
     changePassword: z.boolean(),
+    currentPassword: z.string().optional(),
     newPassword: z.string(),
   })
   .refine((data) => Boolean(data.email.trim() || data.phone.trim()), {
@@ -95,6 +96,7 @@ export function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
       email: "",
       phone: "",
       changePassword: false,
+      currentPassword: "",
       newPassword: "",
     } as AccountFormValues,
     validators: {
@@ -109,6 +111,10 @@ export function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
         name: value.name.trim(),
         email: value.email.trim() || undefined,
         phoneNumber: formattedPhone || undefined,
+        currentPassword:
+          value.changePassword && value.currentPassword?.trim()
+            ? value.currentPassword.trim()
+            : undefined,
         password: value.changePassword ? value.newPassword.trim() : undefined,
       });
     },
@@ -127,6 +133,7 @@ export function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
         email: isInternalFallback ? "" : currentUser.email,
         phone: parsed.digits,
         changePassword: false,
+        currentPassword: "",
         newPassword: "",
       });
     }
@@ -334,7 +341,36 @@ export function AccountDialog({ open, onOpenChange }: AccountDialogProps) {
             </div>
 
             {isChangePassword && (
-              <div className="space-y-1.5 pt-1 animate-in fade-in slide-in-from-top-1 duration-200">
+              <div className="space-y-3 pt-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                <form.Field name="currentPassword">
+                  {(field) => (
+                    <Field>
+                      <FieldLabel
+                        htmlFor={field.name}
+                        className="text-xs font-semibold"
+                      >
+                        Kata Sandi Saat Ini
+                      </FieldLabel>
+                      <div className="relative flex items-center">
+                        <Input
+                          id={field.name}
+                          type="password"
+                          value={field.state.value ?? ""}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          placeholder="Masukkan kata sandi saat ini"
+                          className="font-mono text-xs"
+                          autoComplete="current-password"
+                        />
+                      </div>
+                      <p className="text-[11px] text-muted-foreground">
+                        Diperlukan untuk memverifikasi akun sebelum mengubah kata sandi.
+                      </p>
+                      <FieldError errors={field.state.meta.errors} />
+                    </Field>
+                  )}
+                </form.Field>
+
                 <form.Field name="newPassword">
                   {(field) => (
                     <Field>

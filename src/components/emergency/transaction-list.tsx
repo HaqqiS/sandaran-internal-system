@@ -158,9 +158,7 @@ export function TransactionList({
       });
       toast.success("Transaksi berhasil dihapus");
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Gagal menghapus transaksi";
-      toast.error(message);
+      // Error toast is handled by global mutation cache
       console.error(error);
     } finally {
       setDeleteTarget(null);

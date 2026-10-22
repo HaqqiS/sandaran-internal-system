@@ -25,12 +25,16 @@ export const createQueryClient = () =>
       },
     },
     mutationCache: new MutationCache({
-      onError: (error) => {
-        if (error instanceof Error) {
-          toast.error(error.message);
-        } else {
-          toast.error("An unknown error occurred");
+      onError: (error, _variables, _context, mutation) => {
+        // Skip global toast if the mutation already handles onError locally
+        if (mutation.options.onError) {
+          return;
         }
+
+        const message =
+          error instanceof Error ? error.message : "An unknown error occurred";
+        // Use message as toast id to deduplicate identical toasts
+        toast.error(message, { id: message });
       },
     }),
   });
